@@ -6,6 +6,28 @@
                 {
                     "source": "R:\\_PROJEKTI\\A B SWITCH\\AB SWITCH delovna verzija\\app\\src\\main\\res\\values-en\\strings.xml",
                     "from": {
+                        "startLines": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,37,-1,-1",
+                        "startColumns": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,4,-1,-1",
+                        "startOffsets": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1083,-1,-1",
+                        "endColumns": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,52,-1,-1",
+                        "endOffsets": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1131,-1,-1"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,110,168,226,286,340,396,440,478,530,593,649,705,761,816,871,924,1001",
+                        "endColumns": "54,57,57,59,53,55,43,37,51,62,55,55,55,54,54,52,76,79",
+                        "endOffsets": "105,163,221,281,335,391,435,473,525,588,644,700,756,811,866,919,996,1076"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "C:\\Users\\andra\\.gradle\\daemon\\8.7\\com.dante.abworkdaywidget.app-mergeDebugResources-29:\\values-en\\values-en.xml",
+            "map": [
+                {
+                    "source": "R:\\_PROJEKTI\\A B SWITCH\\AB SWITCH delovna verzija\\app\\src\\main\\res\\values-en\\strings.xml",
+                    "from": {
                         "startLines": "3,7,23,5,15,21,31,29,19,27,25,13,17,33,35,9,11",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
                         "startOffsets": "59,180,693,117,463,634,920,879,579,813,754,404,520,967,1025,241,321",

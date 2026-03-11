@@ -18,6 +18,7 @@ id shiftPlus
 id shiftText
 id switchHolidays
 id switchWeekends
+id todayStatusText
 id widgetHint
 layout activity_main
 layout widget_layout
@@ -39,6 +40,7 @@ string start_date
 string start_date_label
 string start_day_a
 string start_day_b
+string today_status
 string widget_added
 string widget_not_added
 style Theme.ABWidget

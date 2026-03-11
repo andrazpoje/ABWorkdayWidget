@@ -3444,6 +3444,7 @@ id time
 id title
 id titleDividerNoCustom
 id title_template
+id todayStatusText
 id toggle
 id top
 id topPanel
@@ -3857,6 +3858,7 @@ string start_date_label
 string start_day_a
 string start_day_b
 string status_bar_notification_info_overflow
+string today_status
 string widget_added
 string widget_not_added
 style AlertDialog_AppCompat

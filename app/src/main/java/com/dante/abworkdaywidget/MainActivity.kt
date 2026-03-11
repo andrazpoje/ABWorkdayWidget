@@ -28,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var saveButton: Button
     private lateinit var refreshButton: Button
 
+    private lateinit var todayStatusText: TextView
+
     private lateinit var widgetHint: TextView
     private lateinit var openWidgetsButton: Button
     private lateinit var prefixEdit: EditText
@@ -59,8 +61,12 @@ class MainActivity : AppCompatActivity() {
         shiftMinus = findViewById(R.id.shiftMinus)
         openWidgetsButton = findViewById(R.id.openWidgetsButton)
 
+        todayStatusText = findViewById(R.id.todayStatusText)
+
         updateWidgetHint()
         loadSettings()
+
+        updateTodayStatus()
 
         openWidgetsButton.setOnClickListener {
             try {
@@ -89,6 +95,7 @@ class MainActivity : AppCompatActivity() {
                 .edit()
                 .putInt("cycleShift", shift)
                 .apply()
+            updateTodayStatus()
         }
 
         shiftMinus.setOnClickListener {
@@ -98,9 +105,13 @@ class MainActivity : AppCompatActivity() {
                 .edit()
                 .putInt("cycleShift", shift)
                 .apply()
+            updateTodayStatus()
         }
     }
-
+    private fun updateTodayStatus() {
+        val letter = ABLogic.getTodayLetter(this)
+        todayStatusText.text = getString(R.string.today_status, letter)
+    }
     private fun updateWidgetHint() {
         val manager = AppWidgetManager.getInstance(this)
         val ids = manager.getAppWidgetIds(

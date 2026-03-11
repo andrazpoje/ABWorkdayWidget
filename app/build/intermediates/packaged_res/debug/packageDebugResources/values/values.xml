@@ -16,6 +16,7 @@
     <string name="start_date_label">Začetni datum</string>
     <string name="start_day_a">Začetni dan je A</string>
     <string name="start_day_b">Začetni dan je B</string>
+    <string name="today_status">Danes: %1$s</string>
     <string name="widget_added">Widget je dodan na začetni zaslon.</string>
     <string name="widget_not_added">Dodajte widget na začetni zaslon.</string>
     <style name="Theme.ABWidget" parent="Theme.Material3.DayNight.NoActionBar"/>

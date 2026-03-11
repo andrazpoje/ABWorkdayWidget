@@ -35,4 +35,6 @@
 
     <string name="start_day_b">Start day is B</string>
 
+    <string name="today_status">Today: %1$s</string>
+
 </resources>
