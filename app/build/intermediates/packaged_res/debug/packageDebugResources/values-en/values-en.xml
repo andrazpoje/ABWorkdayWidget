@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AB Workday Widget</string>
+    <string name="cycle_shift">Cycle shift: %1$d</string>
+    <string name="cycle_shift_label">Cycle shift</string>
+    <string name="hello_text">AB Workday Widget OK</string>
+    <string name="open_widgets">Open widgets</string>
+    <string name="prefix_text">Text before A/B</string>
+    <string name="refresh">Refresh</string>
+    <string name="save">Save</string>
+    <string name="select_date">Select date</string>
+    <string name="skip_holidays">Skip public holidays</string>
+    <string name="skip_weekends">Skip weekends</string>
+    <string name="start_date">Start date: %1$s</string>
+    <string name="start_date_label">Start date</string>
+    <string name="start_day_a">Start day is A</string>
+    <string name="start_day_b">Start day is B</string>
+    <string name="widget_added">Widget is added to the home screen.</string>
+    <string name="widget_not_added">Add the widget to the home screen.</string>
+</resources>

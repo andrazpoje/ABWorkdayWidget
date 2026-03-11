@@ -16,6 +16,10 @@
         "source": "com.dante.abworkdaywidget.app-main-33:/mipmap-mdpi/ic_launcher_round.webp"
     },
     {
+        "merged": "com.dante.abworkdaywidget.app-debug-31:/xml_locale_config.xml.flat",
+        "source": "com.dante.abworkdaywidget.app-main-33:/xml/locale_config.xml"
+    },
+    {
         "merged": "com.dante.abworkdaywidget.app-debug-31:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
         "source": "com.dante.abworkdaywidget.app-main-33:/mipmap-xhdpi/ic_launcher_foreground.webp"
     },

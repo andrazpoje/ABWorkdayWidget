@@ -9,11 +9,13 @@ import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
-import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,8 +23,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pickDateButton: Button
     private lateinit var radioA: RadioButton
     private lateinit var radioB: RadioButton
-    private lateinit var switchWeekends: Switch
-    private lateinit var switchHolidays: Switch
+    private lateinit var switchWeekends: SwitchMaterial
+    private lateinit var switchHolidays: SwitchMaterial
     private lateinit var saveButton: Button
     private lateinit var refreshButton: Button
 
@@ -82,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
         shiftPlus.setOnClickListener {
             shift++
-            shiftText.text = "Zamik cikla: $shift"
+            shiftText.text = getString(R.string.cycle_shift, shift)
             getSharedPreferences("abprefs", MODE_PRIVATE)
                 .edit()
                 .putInt("cycleShift", shift)
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
         shiftMinus.setOnClickListener {
             shift--
-            shiftText.text = "Zamik cikla: $shift"
+            shiftText.text = getString(R.string.cycle_shift, shift)
             getSharedPreferences("abprefs", MODE_PRIVATE)
                 .edit()
                 .putInt("cycleShift", shift)
@@ -107,9 +109,9 @@ class MainActivity : AppCompatActivity() {
 
         widgetHint.text =
             if (ids.isNotEmpty()) {
-                "Widget je dodan na začetni zaslon."
+                getString(R.string.widget_added)
             } else {
-                "Dodajte widget na začetni zaslon (Home screen → Widgets → AB Workday Widget)."
+                getString(R.string.widget_not_added)
             }
     }
 
@@ -144,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         switchHolidays.isChecked = skipHolidays
         prefixEdit.setText(prefs.getString("prefixText", "") ?: "")
 
-        shiftText.text = "Zamik cikla: $shift"
+        shiftText.text = getString(R.string.cycle_shift, shift)
         updateDateText()
     }
 
@@ -179,7 +181,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateDateText() {
-        val formatter = DateTimeFormatter.ofPattern("d.M.yyyy")
-        dateText.text = "Začetni datum: ${selectedDate.format(formatter)}"
+        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+            .withLocale(Locale.getDefault())
+        dateText.text = getString(
+            R.string.start_date,
+            selectedDate.format(formatter)
+        )
     }
 }
