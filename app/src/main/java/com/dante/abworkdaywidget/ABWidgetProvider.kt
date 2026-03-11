@@ -76,15 +76,15 @@ class ABWidgetProvider : AppWidgetProvider() {
 
         if (
             intent.action == Intent.ACTION_DATE_CHANGED ||
-            intent.action == Intent.ACTION_BOOT_COMPLETED
+            intent.action == Intent.ACTION_BOOT_COMPLETED ||
+            intent.action == Intent.ACTION_TIME_CHANGED ||
+            intent.action == Intent.ACTION_TIMEZONE_CHANGED ||
+            intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE
         ) {
-
             val manager = AppWidgetManager.getInstance(context)
-
             val ids = manager.getAppWidgetIds(
                 ComponentName(context, ABWidgetProvider::class.java)
             )
-
             onUpdate(context, manager, ids)
         }
     }

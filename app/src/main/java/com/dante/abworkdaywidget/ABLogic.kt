@@ -7,6 +7,10 @@ import java.time.LocalDate
 object ABLogic {
 
     fun getTodayLetter(context: Context): String {
+        return getLetterForDate(context, LocalDate.now())
+    }
+
+    fun getLetterForDate(context: Context, date: LocalDate): String {
 
         val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
 
@@ -20,13 +24,12 @@ object ABLogic {
         val skipHolidays = prefs.getBoolean("skipHolidays", true)
 
         val startDate = LocalDate.of(startYear, startMonth, startDay)
-        val today = LocalDate.now()
 
-        if (skipWeekends && isWeekend(today)) {
+        if (skipWeekends && isWeekend(date)) {
             return "X"
         }
 
-        if (skipHolidays && WorkdayUtil.isWorkFreeDay(today)) {
+        if (skipHolidays && WorkdayUtil.isWorkFreeDay(date)) {
             return "X"
         }
 
@@ -34,7 +37,7 @@ object ABLogic {
 
         val workDays = countWorkDays(
             startDate,
-            today,
+            date,
             skipWeekends,
             skipHolidays
         ) + shift
