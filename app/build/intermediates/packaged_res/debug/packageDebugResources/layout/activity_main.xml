@@ -38,7 +38,19 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/open_widgets"
-			android:layout_marginTop="10dp"/>			
+			android:layout_marginTop="10dp"/>
+
+		<Button
+			android:id="@+id/checkDateButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/check_date"/>
+		
+		<TextView
+			android:id="@+id/dateResultText"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="20sp" />
 
         <TextView
             android:id="@+id/dateText"

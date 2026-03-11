@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AB Workday Widget</string>
+    <string name="check_date">Check date</string>
     <string name="cycle_shift">Cycle shift: %1$d</string>
     <string name="cycle_shift_label">Cycle shift</string>
+    <string name="date_result">For this date: %1$s</string>
     <string name="hello_text">AB Workday Widget OK</string>
     <string name="open_widgets">Open widgets</string>
     <string name="prefix_text">Text before A/B</string>

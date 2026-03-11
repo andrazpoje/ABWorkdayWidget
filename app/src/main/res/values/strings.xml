@@ -37,4 +37,8 @@
 
     <string name="today_status">Danes: %1$s</string>
 
+    <string name="date_result">Za ta datum: %1$s</string>
+
+    <string name="check_date">Preveri datum</string>
+
 </resources>

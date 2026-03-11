@@ -2,8 +2,10 @@
 <resources>
     <color name="ic_launcher_background">#000000</color>
     <string name="app_name">AB Workday Widget</string>
+    <string name="check_date">Preveri datum</string>
     <string name="cycle_shift">Zamik cikla: %1$d</string>
     <string name="cycle_shift_label">Zamik cikla</string>
+    <string name="date_result">Za ta datum: %1$s</string>
     <string name="hello_text">AB Workday Widget OK</string>
     <string name="open_widgets">Odpri widgete</string>
     <string name="prefix_text">Besedilo pred A/B</string>

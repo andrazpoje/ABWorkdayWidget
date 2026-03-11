@@ -3104,6 +3104,7 @@ id center_horizontal
 id center_vertical
 id chain
 id chains
+id checkDateButton
 id checkbox
 id checked
 id chronometer
@@ -3126,6 +3127,7 @@ id cradle
 id custom
 id customPanel
 id cut
+id dateResultText
 id dateText
 id date_picker_actions
 id decelerate
@@ -3723,9 +3725,11 @@ string call_notification_screening_text
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
+string check_date
 string clear_text_end_icon_content_description
 string cycle_shift
 string cycle_shift_label
+string date_result
 string error_a11y_label
 string error_icon_content_description
 string exposed_dropdown_menu_content_description

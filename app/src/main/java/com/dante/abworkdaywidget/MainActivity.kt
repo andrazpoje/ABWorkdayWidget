@@ -28,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var saveButton: Button
     private lateinit var refreshButton: Button
 
+    private lateinit var checkDateButton: Button
+    private lateinit var dateResultText: TextView
     private lateinit var todayStatusText: TextView
 
     private lateinit var widgetHint: TextView
@@ -54,7 +56,8 @@ class MainActivity : AppCompatActivity() {
         switchHolidays = findViewById(R.id.switchHolidays)
         saveButton = findViewById(R.id.saveButton)
         refreshButton = findViewById(R.id.refreshButton)
-
+        checkDateButton = findViewById(R.id.checkDateButton)
+        dateResultText = findViewById(R.id.dateResultText)
         prefixEdit = findViewById(R.id.prefixEdit)
         shiftText = findViewById(R.id.shiftText)
         shiftPlus = findViewById(R.id.shiftPlus)
@@ -67,6 +70,10 @@ class MainActivity : AppCompatActivity() {
         loadSettings()
 
         updateTodayStatus()
+
+        checkDateButton.setOnClickListener {
+            showCheckDatePicker()
+        }
 
         openWidgetsButton.setOnClickListener {
             try {
@@ -107,6 +114,29 @@ class MainActivity : AppCompatActivity() {
                 .apply()
             updateTodayStatus()
         }
+    }
+
+    private fun showCheckDatePicker() {
+
+        val today = LocalDate.now()
+
+        val dialog = DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+
+                val date = LocalDate.of(year, month + 1, dayOfMonth)
+
+                val letter = ABLogic.getLetterForDate(this, date)
+
+                dateResultText.text =
+                    getString(R.string.date_result, letter)
+            },
+            today.year,
+            today.monthValue - 1,
+            today.dayOfMonth
+        )
+
+        dialog.show()
     }
     private fun updateTodayStatus() {
         val letter = ABLogic.getTodayLetter(this)
