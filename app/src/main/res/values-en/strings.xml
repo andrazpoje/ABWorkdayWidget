@@ -45,4 +45,30 @@
 
     <string name="skip_sundays">Skip Sundays</string>
 
+    <string name="tomorrow_status">Tomorrow: %1$s</string>
+
+    <string name="status_section">Status</string>
+
+    <string name="confirm_changes_title">Confirm changes</string>
+    <string name="confirm_changes_message">These changes will affect the A/B cycle calculation. Do you want to continue?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="labels_section">Display labels</string>
+    <string name="label_a">Label for A</string>
+    <string name="label_b">Label for B</string>
+    <string name="label_x">Label for X</string>
+    <string name="labels_hint">Affects display only, not cycle logic.</string>
+
+    <string name="start_day_prefix">Start day is %1$s</string>
+
+    <string name="cycle_section">Cycle</string>
+    <string name="rules_section">Rules</string>
+    <string name="display_section">Display</string>
+    <string name="widget_section">Widget</string>
+
+    <string name="date_check_section">Date check</string>
+
+    <string name="github_project">Project on GitHub</string>
+    <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
 </resources>

@@ -1,0 +1,4 @@
+com.dante.abworkdaywidget.test.app-androidTest-0 R:\_PROJEKTI\A B SWITCH\AB SWITCH delovna verzija\app\build\generated\res\resValues\androidTest\debug
+com.dante.abworkdaywidget.test.app-mergeDebugAndroidTestResources-1 R:\_PROJEKTI\A B SWITCH\AB SWITCH delovna verzija\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.dante.abworkdaywidget.test.app-mergeDebugAndroidTestResources-2 R:\_PROJEKTI\A B SWITCH\AB SWITCH delovna verzija\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.dante.abworkdaywidget.test.app-debugAndroidTest-3 R:\_PROJEKTI\A B SWITCH\AB SWITCH delovna verzija\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources

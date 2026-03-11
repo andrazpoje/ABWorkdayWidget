@@ -9,187 +9,398 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:padding="20dp"
-		android:gravity="center_horizontal">
+		android:padding="20dp">
 
-		<TextView
-			android:id="@+id/todayStatusText"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/today_status"
-			android:textSize="28sp"
-			android:textStyle="bold"
-			android:layout_marginBottom="20dp" />
+		<!-- STATUS -->
 
 		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="Osnovne nastavitve"
+			android:text="@string/status_section"
 			android:textStyle="bold"
 			android:textSize="18sp"
 			android:layout_marginBottom="8dp" />
 
-		<TextView
-			android:id="@+id/dateText"
-			android:layout_width="wrap_content"
+		<com.google.android.material.card.MaterialCardView
+			android:id="@+id/statusCard"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/start_date"
-			android:layout_marginBottom="8dp" />
+			android:layout_marginBottom="16dp"
+			app:cardCornerRadius="20dp"
+			app:cardElevation="6dp">
 
-		<Button
-			android:id="@+id/pickDateButton"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/select_date"
-			android:layout_marginBottom="12dp" />
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:padding="20dp"
+				android:gravity="center_horizontal">
 
-		<RadioButton
-			android:id="@+id/radioA"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/start_day_a" />
+				<TextView
+					android:id="@+id/todayStatusText"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="30sp"
+					android:textStyle="bold"
+					android:textColor="@color/statusTextOnCard"
+					android:gravity="center"
+					android:layout_marginBottom="6dp" />
 
-		<RadioButton
-			android:id="@+id/radioB"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/start_day_b"
-			android:layout_marginBottom="12dp" />
+				<TextView
+					android:id="@+id/tomorrowStatusText"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textSize="20sp"
+					android:textStyle="bold"
+					android:textColor="@color/statusTextOnCard"
+					android:gravity="center" />
 
-		<TextView
-			android:id="@+id/shiftText"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/cycle_shift"
-			android:layout_marginBottom="8dp" />
+			</LinearLayout>
+
+		</com.google.android.material.card.MaterialCardView>
+
+		<!-- WIDGET PROMPT -->
 
 		<LinearLayout
-			android:layout_width="wrap_content"
+			android:id="@+id/widgetPromptContainer"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:layout_marginBottom="20dp">
+			android:orientation="vertical"
+			android:layout_marginBottom="16dp"
+			android:visibility="gone">
+
+			<TextView
+				android:id="@+id/widgetHint"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="8dp" />
 
 			<Button
-				android:id="@+id/shiftMinus"
-				android:layout_width="48dp"
+				android:id="@+id/openWidgetsButton"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="-" />
+				android:text="@string/open_widgets" />
 
-			<Button
-				android:id="@+id/shiftPlus"
-				android:layout_width="48dp"
-				android:layout_height="wrap_content"
-				android:text="+"
-				android:layout_marginStart="12dp" />
 		</LinearLayout>
 
-		<TextView
+		<!-- CIKEL HEADER -->
+
+		<com.google.android.material.card.MaterialCardView
+			android:id="@+id/cycleHeader"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="Pravila"
-			android:textStyle="bold"
-			android:textSize="18sp"
-			android:layout_marginBottom="8dp" />
+			android:layout_marginBottom="8dp"
+			app:cardCornerRadius="14dp"
+			app:cardElevation="3dp">
 
-		<com.google.android.material.switchmaterial.SwitchMaterial
-			android:id="@+id/switchSaturdays"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/skip_saturdays"
-			app:useMaterialThemeColors="true" />
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:padding="16dp">
 
-		<com.google.android.material.switchmaterial.SwitchMaterial
-			android:id="@+id/switchSundays"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/skip_sundays"
-			app:useMaterialThemeColors="true" />
+				<TextView
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="@string/cycle_section"
+					android:textStyle="bold"
+					android:textSize="18sp" />
 
-		<com.google.android.material.switchmaterial.SwitchMaterial
-			android:id="@+id/switchHolidays"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/skip_holidays"
-			app:useMaterialThemeColors="true"
-			android:layout_marginBottom="20dp" />
+				<TextView
+					android:id="@+id/cycleArrow"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="▼"
+					android:textSize="18sp" />
 
-		<TextView
+			</LinearLayout>
+
+		</com.google.android.material.card.MaterialCardView>
+
+		<!-- CIKEL SECTION -->
+
+		<LinearLayout
+			android:id="@+id/cycleSection"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="Prikaz"
-			android:textStyle="bold"
-			android:textSize="18sp"
-			android:layout_marginBottom="8dp" />
+			android:orientation="vertical"
+			android:layout_marginBottom="16dp"
+			android:gravity="center_horizontal">
 
-		<EditText
-			android:id="@+id/prefixEdit"
+			<TextView
+				android:id="@+id/dateText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/start_date"
+				android:layout_marginBottom="8dp" />
+
+			<Button
+				android:id="@+id/pickDateButton"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/select_date"
+				android:layout_marginBottom="12dp" />
+
+			<RadioGroup
+				android:id="@+id/startDayGroup"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:layout_marginBottom="12dp">
+
+				<RadioButton
+					android:id="@+id/radioA"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/start_day_a" />
+
+				<RadioButton
+					android:id="@+id/radioB"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/start_day_b" />
+
+			</RadioGroup>
+
+			<TextView
+				android:id="@+id/shiftText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/cycle_shift"
+				android:layout_marginBottom="8dp" />
+
+			<LinearLayout
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<Button
+					android:id="@+id/shiftMinus"
+					android:layout_width="56dp"
+					android:layout_height="wrap_content"
+					android:text="-" />
+
+				<Button
+					android:id="@+id/shiftPlus"
+					android:layout_width="56dp"
+					android:layout_height="wrap_content"
+					android:text="+"
+					android:layout_marginStart="12dp" />
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+		<!-- PRAVILA HEADER -->
+
+		<com.google.android.material.card.MaterialCardView
+			android:id="@+id/rulesHeader"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:hint="@string/prefix_text"
-			android:inputType="text"
-			android:layout_marginBottom="20dp" />
+			android:layout_marginBottom="8dp"
+			app:cardCornerRadius="14dp"
+			app:cardElevation="3dp">
 
-		<TextView
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:padding="16dp">
+
+				<TextView
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="@string/rules_section"
+					android:textStyle="bold"
+					android:textSize="18sp" />
+
+				<TextView
+					android:id="@+id/rulesArrow"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="▼"
+					android:textSize="18sp" />
+
+			</LinearLayout>
+
+		</com.google.android.material.card.MaterialCardView>
+
+		<!-- PRAVILA SECTION -->
+
+		<LinearLayout
+			android:id="@+id/rulesSection"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="Preverjanje datuma"
-			android:textStyle="bold"
-			android:textSize="18sp"
-			android:layout_marginBottom="8dp" />
+			android:orientation="vertical"
+			android:layout_marginBottom="16dp"
+			android:gravity="center_horizontal">
+
+			<com.google.android.material.switchmaterial.SwitchMaterial
+				android:id="@+id/switchSaturdays"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/skip_saturdays"
+				app:useMaterialThemeColors="true" />
+
+			<com.google.android.material.switchmaterial.SwitchMaterial
+				android:id="@+id/switchSundays"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/skip_sundays"
+				app:useMaterialThemeColors="true" />
+
+			<com.google.android.material.switchmaterial.SwitchMaterial
+				android:id="@+id/switchHolidays"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/skip_holidays"
+				app:useMaterialThemeColors="true" />
+
+		</LinearLayout>
+
+		<!-- PRIKAZ HEADER -->
+
+		<com.google.android.material.card.MaterialCardView
+			android:id="@+id/displayHeader"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="8dp"
+			app:cardCornerRadius="14dp"
+			app:cardElevation="3dp">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:padding="16dp">
+
+				<TextView
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="@string/display_section"
+					android:textStyle="bold"
+					android:textSize="18sp" />
+
+				<TextView
+					android:id="@+id/displayArrow"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="▼"
+					android:textSize="18sp" />
+
+			</LinearLayout>
+
+		</com.google.android.material.card.MaterialCardView>
+
+		<!-- PRIKAZ SECTION -->
+
+		<LinearLayout
+			android:id="@+id/displaySection"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:layout_marginBottom="16dp">
+
+			<EditText
+				android:id="@+id/prefixEdit"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="@string/prefix_text"
+				android:inputType="text"
+				android:layout_marginBottom="16dp" />
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/labels_section"
+				android:textStyle="bold"
+				android:textSize="18sp"
+				android:layout_marginBottom="6dp" />
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/labels_hint"
+				android:textSize="12sp"
+				android:layout_marginBottom="10dp" />
+
+			<EditText
+				android:id="@+id/labelAEdit"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="@string/label_a"
+				android:maxLength="6"
+				android:layout_marginBottom="6dp" />
+
+			<EditText
+				android:id="@+id/labelBEdit"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="@string/label_b"
+				android:maxLength="6"
+				android:layout_marginBottom="6dp" />
+
+			<EditText
+				android:id="@+id/labelXEdit"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="@string/label_x"
+				android:maxLength="6"
+				android:layout_marginBottom="8dp" />
+
+		</LinearLayout>
+
+		<!-- DATE CHECK -->
 
 		<Button
 			android:id="@+id/checkDateButton"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/check_date" />
+			android:text="@string/check_date"
+			android:layout_marginBottom="8dp" />
 
 		<TextView
 			android:id="@+id/dateResultText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="8dp"
 			android:layout_marginBottom="20dp"
 			android:textSize="20sp" />
 
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Widget"
-			android:textStyle="bold"
-			android:textSize="18sp"
-			android:layout_marginBottom="8dp" />
-
-		<TextView
-			android:id="@+id/widgetHint"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginBottom="8dp" />
+		<!-- SAVE -->
 
 		<Button
-			android:id="@+id/openWidgetsButton"
+			android:id="@+id/saveButton"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/save"
+			android:layout_marginBottom="10dp" />
+
+		<!-- GITHUB -->
+
+		<TextView
+			android:id="@+id/githubLinkText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="@string/open_widgets"
-			android:layout_marginBottom="20dp" />
+			android:text="@string/github_project"
+			android:textColor="@android:color/holo_blue_dark"
+			android:clickable="true"
+			android:focusable="true"
+			android:layout_gravity="center_horizontal"
+			android:layout_marginBottom="6dp" />
 
-		<LinearLayout
+		<!-- VERSION -->
+
+		<TextView
+			android:id="@+id/versionText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal">
-
-			<Button
-				android:id="@+id/saveButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/save" />
-
-			<Button
-				android:id="@+id/refreshButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/refresh"
-				android:layout_marginStart="12dp" />
-		</LinearLayout>
+			android:text="v1.1"
+			android:textSize="12sp"
+			android:alpha="0.7"
+			android:layout_gravity="end" />
 
 	</LinearLayout>
 </ScrollView>

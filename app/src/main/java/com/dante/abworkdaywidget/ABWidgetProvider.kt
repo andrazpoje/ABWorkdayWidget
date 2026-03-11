@@ -8,6 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
+import android.app.AlarmManager
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 class ABWidgetProvider : AppWidgetProvider() {
 
@@ -26,14 +30,34 @@ class ABWidgetProvider : AppWidgetProvider() {
                     R.layout.widget_layout
                 )
 
-                // A / B / X
-                views.setTextViewText(
-                    R.id.abText,
-                    ABLogic.getTodayLetter(context)
-                )
+                val letter = ABLogic.getTodayLetter(context)
 
                 val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+
                 val prefix = prefs.getString("prefixText","") ?: ""
+
+                val labelA = prefs.getString("labelA", "A") ?: "A"
+                val labelB = prefs.getString("labelB", "B") ?: "B"
+                val labelX = prefs.getString("labelX", "X") ?: "X"
+
+                val display = when (letter) {
+                    "A" -> labelA
+                    "B" -> labelB
+                    else -> labelX
+                }
+
+                views.setTextViewText(R.id.abText, display)
+
+                val color = when (letter) {
+                    "A" -> ContextCompat.getColor(context, R.color.shiftA)
+                    "B" -> ContextCompat.getColor(context, R.color.shiftB)
+                    else -> ContextCompat.getColor(context, R.color.shiftOff)
+                }
+
+                views.setTextColor(R.id.abText, color)
+
+
+
 
                 val options = appWidgetManager.getAppWidgetOptions(widgetId)
                 val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,0)
@@ -48,7 +72,6 @@ class ABWidgetProvider : AppWidgetProvider() {
                     views.setViewVisibility(R.id.prefixText, View.GONE)
                 }
 
-                // klik na widget → odpre aplikacijo
                 val intent = Intent(context, MainActivity::class.java)
 
                 val pendingIntent = PendingIntent.getActivity(
@@ -66,9 +89,43 @@ class ABWidgetProvider : AppWidgetProvider() {
                 appWidgetManager.updateAppWidget(widgetId, views)
             }
 
+            scheduleNextUpdate(context)
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun scheduleNextUpdate(context: Context) {
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val intent = Intent(context, ABWidgetProvider::class.java).apply {
+            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val nextMidnight = LocalDateTime.now()
+            .plusDays(1)
+            .toLocalDate()
+            .atStartOfDay()
+
+        val triggerTime = nextMidnight
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+
+        alarmManager.set(
+            AlarmManager.RTC_WAKEUP,
+            triggerTime,
+            pendingIntent
+        )
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -76,7 +133,6 @@ class ABWidgetProvider : AppWidgetProvider() {
 
         if (
             intent.action == Intent.ACTION_DATE_CHANGED ||
-            intent.action == Intent.ACTION_BOOT_COMPLETED ||
             intent.action == Intent.ACTION_TIME_CHANGED ||
             intent.action == Intent.ACTION_TIMEZONE_CHANGED ||
             intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -86,6 +142,9 @@ class ABWidgetProvider : AppWidgetProvider() {
                 ComponentName(context, ABWidgetProvider::class.java)
             )
             onUpdate(context, manager, ids)
+        }
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            scheduleNextUpdate(context)
         }
     }
 }

@@ -7,12 +7,16 @@ android {
     namespace 'com.dante.abworkdaywidget'
     compileSdk 36
 
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         applicationId "com.dante.abworkdaywidget"
         minSdk 26
         targetSdk 36
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
     }
 
     buildTypes {

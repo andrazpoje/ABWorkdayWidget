@@ -2,13 +2,26 @@
 <resources>
     <string name="app_name">AB Workday Widget</string>
     <string name="check_date">Check date</string>
+    <string name="confirm_changes_message">These changes will affect the A/B cycle calculation. Do you want to continue?</string>
+    <string name="confirm_changes_title">Confirm changes</string>
+    <string name="cycle_section">Cycle</string>
     <string name="cycle_shift">Cycle shift: %1$d</string>
     <string name="cycle_shift_label">Cycle shift</string>
+    <string name="date_check_section">Date check</string>
     <string name="date_result">For this date: %1$s</string>
+    <string name="display_section">Display</string>
+    <string name="github_project">Project on GitHub</string>
     <string name="hello_text">AB Workday Widget OK</string>
+    <string name="label_a">Label for A</string>
+    <string name="label_b">Label for B</string>
+    <string name="label_x">Label for X</string>
+    <string name="labels_hint">Affects display only, not cycle logic.</string>
+    <string name="labels_section">Display labels</string>
+    <string name="no">No</string>
     <string name="open_widgets">Open widgets</string>
     <string name="prefix_text">Text before A/B</string>
     <string name="refresh">Refresh</string>
+    <string name="rules_section">Rules</string>
     <string name="save">Save</string>
     <string name="select_date">Select date</string>
     <string name="skip_holidays">Skip public holidays</string>
@@ -19,7 +32,13 @@
     <string name="start_date_label">Start date</string>
     <string name="start_day_a">Start day is A</string>
     <string name="start_day_b">Start day is B</string>
+    <string name="start_day_prefix">Start day is %1$s</string>
+    <string name="status_section">Status</string>
     <string name="today_status">Today: %1$s</string>
+    <string name="tomorrow_status">Tomorrow: %1$s</string>
     <string name="widget_added">Widget is added to the home screen.</string>
     <string name="widget_not_added">Add the widget to the home screen.</string>
+    <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
+    <string name="widget_section">Widget</string>
+    <string name="yes">Yes</string>
 </resources>
