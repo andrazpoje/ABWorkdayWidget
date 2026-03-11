@@ -23,7 +23,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pickDateButton: Button
     private lateinit var radioA: RadioButton
     private lateinit var radioB: RadioButton
-    private lateinit var switchWeekends: SwitchMaterial
+
+    private lateinit var switchSaturdays: SwitchMaterial
+    private lateinit var switchSundays: SwitchMaterial
     private lateinit var switchHolidays: SwitchMaterial
     private lateinit var saveButton: Button
     private lateinit var refreshButton: Button
@@ -52,7 +54,8 @@ class MainActivity : AppCompatActivity() {
         pickDateButton = findViewById(R.id.pickDateButton)
         radioA = findViewById(R.id.radioA)
         radioB = findViewById(R.id.radioB)
-        switchWeekends = findViewById(R.id.switchWeekends)
+        switchSaturdays = findViewById(R.id.switchSaturdays)
+        switchSundays = findViewById(R.id.switchSundays)
         switchHolidays = findViewById(R.id.switchHolidays)
         saveButton = findViewById(R.id.saveButton)
         refreshButton = findViewById(R.id.refreshButton)
@@ -176,14 +179,16 @@ class MainActivity : AppCompatActivity() {
         selectedDate = LocalDate.of(year, month, day)
 
         val startIsA = prefs.getBoolean("startIsA", true)
-        val skipWeekends = prefs.getBoolean("skipWeekends", true)
+        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
+        val skipSundays = prefs.getBoolean("skipSundays", true)
         val skipHolidays = prefs.getBoolean("skipHolidays", true)
 
         shift = prefs.getInt("cycleShift", 0)
 
         radioA.isChecked = startIsA
         radioB.isChecked = !startIsA
-        switchWeekends.isChecked = skipWeekends
+        switchSaturdays.isChecked = skipSaturdays
+        switchSundays.isChecked = skipSundays
         switchHolidays.isChecked = skipHolidays
         prefixEdit.setText(prefs.getString("prefixText", "") ?: "")
 
@@ -199,7 +204,8 @@ class MainActivity : AppCompatActivity() {
             .putInt("startMonth", selectedDate.monthValue)
             .putInt("startDay", selectedDate.dayOfMonth)
             .putBoolean("startIsA", radioA.isChecked)
-            .putBoolean("skipWeekends", switchWeekends.isChecked)
+            .putBoolean("skipSaturdays", switchSaturdays.isChecked)
+            .putBoolean("skipSundays", switchSundays.isChecked)
             .putBoolean("skipHolidays", switchHolidays.isChecked)
             .putString("prefixText", prefixEdit.text.toString())
             .putInt("cycleShift", shift)

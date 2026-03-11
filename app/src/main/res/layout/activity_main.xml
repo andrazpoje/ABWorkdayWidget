@@ -1,157 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fillViewport="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-			android:text="@string/app_name"
-            android:textSize="26sp"
-            android:textStyle="bold" />
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:padding="20dp"
+		android:gravity="center_horizontal">
 
 		<TextView
 			android:id="@+id/todayStatusText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:text="@string/today_status"
 			android:textSize="28sp"
 			android:textStyle="bold"
-			android:layout_marginTop="16dp"
-			android:layout_gravity="center_horizontal"/>
-			
+			android:layout_marginBottom="20dp" />
+
 		<TextView
-			android:id="@+id/widgetHint"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Osnovne nastavitve"
+			android:textStyle="bold"
+			android:textSize="18sp"
+			android:layout_marginBottom="8dp" />
+
+		<TextView
+			android:id="@+id/dateText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="10dp"
-			android:text="@string/widget_not_added"
-			android:textSize="16sp"/>	
-			
+			android:text="@string/start_date"
+			android:layout_marginBottom="8dp" />
+
 		<Button
-			android:id="@+id/openWidgetsButton"
+			android:id="@+id/pickDateButton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="@string/open_widgets"
-			android:layout_marginTop="10dp"/>
+			android:text="@string/select_date"
+			android:layout_marginBottom="12dp" />
+
+		<RadioButton
+			android:id="@+id/radioA"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/start_day_a" />
+
+		<RadioButton
+			android:id="@+id/radioB"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/start_day_b"
+			android:layout_marginBottom="12dp" />
+
+		<TextView
+			android:id="@+id/shiftText"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/cycle_shift"
+			android:layout_marginBottom="8dp" />
+
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_marginBottom="20dp">
+
+			<Button
+				android:id="@+id/shiftMinus"
+				android:layout_width="48dp"
+				android:layout_height="wrap_content"
+				android:text="-" />
+
+			<Button
+				android:id="@+id/shiftPlus"
+				android:layout_width="48dp"
+				android:layout_height="wrap_content"
+				android:text="+"
+				android:layout_marginStart="12dp" />
+		</LinearLayout>
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Pravila"
+			android:textStyle="bold"
+			android:textSize="18sp"
+			android:layout_marginBottom="8dp" />
+
+		<com.google.android.material.switchmaterial.SwitchMaterial
+			android:id="@+id/switchSaturdays"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/skip_saturdays"
+			app:useMaterialThemeColors="true" />
+
+		<com.google.android.material.switchmaterial.SwitchMaterial
+			android:id="@+id/switchSundays"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/skip_sundays"
+			app:useMaterialThemeColors="true" />
+
+		<com.google.android.material.switchmaterial.SwitchMaterial
+			android:id="@+id/switchHolidays"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/skip_holidays"
+			app:useMaterialThemeColors="true"
+			android:layout_marginBottom="20dp" />
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Prikaz"
+			android:textStyle="bold"
+			android:textSize="18sp"
+			android:layout_marginBottom="8dp" />
+
+		<EditText
+			android:id="@+id/prefixEdit"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:hint="@string/prefix_text"
+			android:inputType="text"
+			android:layout_marginBottom="20dp" />
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Preverjanje datuma"
+			android:textStyle="bold"
+			android:textSize="18sp"
+			android:layout_marginBottom="8dp" />
 
 		<Button
 			android:id="@+id/checkDateButton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="@string/check_date"/>
+			android:text="@string/check_date" />
 
 		<TextView
 			android:id="@+id/dateResultText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_marginTop="8dp"
+			android:layout_marginBottom="20dp"
 			android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/dateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-			android:text="@string/start_date_label"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/pickDateButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-			android:text="@string/select_date" />
-
-        <RadioGroup
-            android:id="@+id/radioGroupAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radioA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-				android:text="@string/start_day_a" />
-
-            <RadioButton
-                android:id="@+id/radioB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-				android:text="@string/start_day_b" />
-        </RadioGroup>
-		<EditText
-			android:id="@+id/prefixEdit"
+		<TextView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="20dp"
-			android:text="@string/prefix_text"/>
-<TextView
-    android:id="@+id/shiftText"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-	android:text="@string/cycle_shift_label"
-    android:textSize="18sp"
-    android:layout_marginTop="20dp"/>
+			android:text="Widget"
+			android:textStyle="bold"
+			android:textSize="18sp"
+			android:layout_marginBottom="8dp" />
 
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+		<TextView
+			android:id="@+id/widgetHint"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/shiftMinus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="-1"/>
+		<Button
+			android:id="@+id/openWidgetsButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/open_widgets"
+			android:layout_marginBottom="20dp" />
 
-    <Button
-        android:id="@+id/shiftPlus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+1"/>
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
 
-</LinearLayout>
-
-		<com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchWeekends"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-			android:text="@string/skip_weekends" />
-
-		<com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchHolidays"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-			android:text="@string/skip_holidays" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/saveButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+			<Button
+				android:id="@+id/saveButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
 				android:text="@string/save" />
 
-            <Button
-                android:id="@+id/refreshButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-				android:text="@string/refresh" />
-        </LinearLayout>
+			<Button
+				android:id="@+id/refreshButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/refresh"
+				android:layout_marginStart="12dp" />
+		</LinearLayout>
 
-    </LinearLayout>
+	</LinearLayout>
 </ScrollView>

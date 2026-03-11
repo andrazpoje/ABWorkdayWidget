@@ -13,6 +13,8 @@
     <string name="save">Shrani</string>
     <string name="select_date">Izberi datum</string>
     <string name="skip_holidays">Preskoči dela proste dni</string>
+    <string name="skip_saturdays">Preskoči sobote</string>
+    <string name="skip_sundays">Preskoči nedelje</string>
     <string name="skip_weekends">Preskoči vikende</string>
     <string name="start_date">Začetni datum: %1$s</string>
     <string name="start_date_label">Začetni datum</string>

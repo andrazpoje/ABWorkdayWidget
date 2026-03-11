@@ -41,4 +41,8 @@
 
     <string name="check_date">Preveri datum</string>
 
+    <string name="skip_saturdays">Preskoči sobote</string>
+
+    <string name="skip_sundays">Preskoči nedelje</string>
+
 </resources>

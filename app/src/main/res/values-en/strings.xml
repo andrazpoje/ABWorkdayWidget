@@ -41,4 +41,8 @@
 
     <string name="check_date">Check date</string>
 
+    <string name="skip_saturdays">Skip Saturdays</string>
+
+    <string name="skip_sundays">Skip Sundays</string>
+
 </resources>

@@ -3338,7 +3338,6 @@ id progress_horizontal
 id radio
 id radioA
 id radioB
-id radioGroupAB
 id ratio
 id rectangles
 id refreshButton
@@ -3411,7 +3410,8 @@ id stretch
 id submenuarrow
 id submit_area
 id switchHolidays
-id switchWeekends
+id switchSaturdays
+id switchSundays
 id tabMode
 id tag_accessibility_actions
 id tag_accessibility_clickable_spans
@@ -3856,6 +3856,8 @@ string select_date
 string side_sheet_accessibility_pane_title
 string side_sheet_behavior
 string skip_holidays
+string skip_saturdays
+string skip_sundays
 string skip_weekends
 string start_date
 string start_date_label

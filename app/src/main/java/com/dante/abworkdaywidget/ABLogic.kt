@@ -20,16 +20,13 @@ object ABLogic {
 
         val startIsA = prefs.getBoolean("startIsA", true)
 
-        val skipWeekends = prefs.getBoolean("skipWeekends", true)
+        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
+        val skipSundays = prefs.getBoolean("skipSundays", true)
         val skipHolidays = prefs.getBoolean("skipHolidays", true)
 
         val startDate = LocalDate.of(startYear, startMonth, startDay)
 
-        if (skipWeekends && isWeekend(date)) {
-            return "X"
-        }
-
-        if (skipHolidays && WorkdayUtil.isWorkFreeDay(date)) {
+        if (shouldSkipDay(date, skipSaturdays, skipSundays, skipHolidays)) {
             return "X"
         }
 
@@ -38,7 +35,8 @@ object ABLogic {
         val workDays = countWorkDays(
             startDate,
             date,
-            skipWeekends,
+            skipSaturdays,
+            skipSundays,
             skipHolidays
         ) + shift
 
@@ -51,6 +49,18 @@ object ABLogic {
         return if (isA) "A" else "B"
     }
 
+    private fun shouldSkipDay(
+        date: LocalDate,
+        skipSaturdays: Boolean,
+        skipSundays: Boolean,
+        skipHolidays: Boolean
+    ): Boolean {
+        if (skipSaturdays && date.dayOfWeek == DayOfWeek.SATURDAY) return true
+        if (skipSundays && date.dayOfWeek == DayOfWeek.SUNDAY) return true
+        if (skipHolidays && WorkdayUtil.isWorkFreeDay(date)) return true
+        return false
+    }
+
     private fun isWeekend(date: LocalDate): Boolean {
         return date.dayOfWeek == DayOfWeek.SATURDAY ||
             date.dayOfWeek == DayOfWeek.SUNDAY
@@ -59,7 +69,8 @@ object ABLogic {
     private fun countWorkDays(
         start: LocalDate,
         end: LocalDate,
-        skipWeekends: Boolean,
+        skipSaturdays: Boolean,
+        skipSundays: Boolean,
         skipHolidays: Boolean
     ): Int {
 
@@ -69,8 +80,7 @@ object ABLogic {
         while (d.isBefore(end)) {
             d = d.plusDays(1)
 
-            if (skipWeekends && isWeekend(d)) continue
-            if (skipHolidays && WorkdayUtil.isWorkFreeDay(d)) continue
+            if (shouldSkipDay(d, skipSaturdays, skipSundays, skipHolidays)) continue
 
             count++
         }
