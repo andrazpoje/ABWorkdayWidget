@@ -1,28 +1,38 @@
 package com.dante.abworkdaywidget
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.app.DatePickerDialog
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.RadioButton
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-import android.transition.AutoTransition
-import android.transition.TransitionManager
-import android.view.ViewGroup
+import android.util.Log
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,8 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rulesHeader: View
     private lateinit var displayHeader: View
 
-    private lateinit var widgetHeader: View
-
     private lateinit var cycleArrow: TextView
     private lateinit var rulesArrow: TextView
     private lateinit var displayArrow: TextView
@@ -40,20 +48,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var widgetPromptContainer: View
     private lateinit var githubLinkText: TextView
     private lateinit var versionText: TextView
+    private lateinit var mainScrollView: ScrollView
 
     private lateinit var cycleSection: View
     private lateinit var rulesSection: View
     private lateinit var displaySection: View
-    private lateinit var widgetSection: View
 
     private lateinit var dateText: TextView
     private lateinit var pickDateButton: Button
-    private lateinit var radioA: RadioButton
-    private lateinit var radioB: RadioButton
+
+    private lateinit var cycleDaysEdit: EditText
+    private lateinit var firstCycleDayEdit: EditText
 
     private lateinit var statusCard: MaterialCardView
     private lateinit var todayStatusText: TextView
     private lateinit var tomorrowStatusText: TextView
+
+    private lateinit var previewRecyclerView: RecyclerView
+    private lateinit var previewAdapter: CyclePreviewAdapter
 
     private lateinit var switchSaturdays: SwitchMaterial
     private lateinit var switchSundays: SwitchMaterial
@@ -66,28 +78,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dateResultText: TextView
     private lateinit var widgetHint: TextView
     private lateinit var prefixEdit: EditText
-    private lateinit var shiftText: TextView
-    private lateinit var shiftPlus: Button
-    private lateinit var shiftMinus: Button
+    private lateinit var settingsButton: ImageButton
 
-    private lateinit var labelAEdit: EditText
-    private lateinit var labelBEdit: EditText
-    private lateinit var labelXEdit: EditText
+    private lateinit var themeClassic: RadioButton
+    private lateinit var themePastel: RadioButton
+    private lateinit var themeDark: RadioButton
 
     private lateinit var selectedDate: LocalDate
-
-    private var shift: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         bindViews()
+        setupPreviewRecyclerView()
+        migrateLegacySettingsIfNeeded()
 
         updateWidgetHint()
         loadSettings()
-        updateStartDayLabels()
         updateTodayStatus()
+        updateCyclePreview()
 
         checkDateButton.setOnClickListener {
             showCheckDatePicker()
@@ -108,23 +118,43 @@ class MainActivity : AppCompatActivity() {
             showSaveConfirmation()
         }
 
-        shiftPlus.setOnClickListener {
-            shift++
-            saveShiftAndRefresh()
-        }
+        settingsButton.setOnClickListener {
+            if (displaySection.visibility != View.VISIBLE) {
+                hideAllSections()
+                resetArrows()
+                displaySection.visibility = View.VISIBLE
+                displayArrow.text = "▲"
+            }
 
-        shiftMinus.setOnClickListener {
-            shift--
-            saveShiftAndRefresh()
+            displayHeader.post {
+                mainScrollView.smoothScrollTo(0, displayHeader.top)
+            }
         }
 
         githubLinkText.setOnClickListener {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                android.net.Uri.parse("https://github.com/andrazpoje/ABWorkdayWidget")
+                Uri.parse("https://github.com/andrazpoje/ABWorkdayWidget")
             )
             startActivity(intent)
         }
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                v.paddingTop,
+                v.paddingRight,
+                bars.bottom
+            )
+            insets
+        }
+
+        Log.d("LANG_TEST", "locale=" + Locale.getDefault().toString())
+        Log.d("LANG_TEST", "resources_locale=" + resources.configuration.locales[0].toLanguageTag())
+        Log.d("LANG_TEST", "save_string=" + getString(R.string.save))
+        Log.d("LANG_TEST", "check_date_string=" + getString(R.string.check_date))
+
 
         versionText.text = "v${BuildConfig.VERSION_NAME}"
 
@@ -138,6 +168,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
+        mainScrollView = findViewById(R.id.main)
+
         cycleHeader = findViewById(R.id.cycleHeader)
         rulesHeader = findViewById(R.id.rulesHeader)
         displayHeader = findViewById(R.id.displayHeader)
@@ -157,8 +189,9 @@ class MainActivity : AppCompatActivity() {
         widgetHint = findViewById(R.id.widgetHint)
         dateText = findViewById(R.id.dateText)
         pickDateButton = findViewById(R.id.pickDateButton)
-        radioA = findViewById(R.id.radioA)
-        radioB = findViewById(R.id.radioB)
+
+        cycleDaysEdit = findViewById(R.id.cycleDaysEdit)
+        firstCycleDayEdit = findViewById(R.id.firstCycleDayEdit)
 
         switchSaturdays = findViewById(R.id.switchSaturdays)
         switchSundays = findViewById(R.id.switchSundays)
@@ -170,17 +203,53 @@ class MainActivity : AppCompatActivity() {
 
         dateResultText = findViewById(R.id.dateResultText)
         prefixEdit = findViewById(R.id.prefixEdit)
-        shiftText = findViewById(R.id.shiftText)
-        shiftPlus = findViewById(R.id.shiftPlus)
-        shiftMinus = findViewById(R.id.shiftMinus)
 
         statusCard = findViewById(R.id.statusCard)
         todayStatusText = findViewById(R.id.todayStatusText)
         tomorrowStatusText = findViewById(R.id.tomorrowStatusText)
 
-        labelAEdit = findViewById(R.id.labelAEdit)
-        labelBEdit = findViewById(R.id.labelBEdit)
-        labelXEdit = findViewById(R.id.labelXEdit)
+        previewRecyclerView = findViewById(R.id.previewRecyclerView)
+
+        settingsButton = findViewById(R.id.settingsButton)
+
+        themeClassic = findViewById(R.id.themeClassic)
+        themePastel = findViewById(R.id.themePastel)
+        themeDark = findViewById(R.id.themeDark)
+    }
+
+    private fun setupPreviewRecyclerView() {
+        previewAdapter = CyclePreviewAdapter()
+        previewRecyclerView.layoutManager = LinearLayoutManager(this)
+        previewRecyclerView.adapter = previewAdapter
+        previewRecyclerView.isNestedScrollingEnabled = false
+    }
+
+    private fun migrateLegacySettingsIfNeeded() {
+        val cyclePrefs = getSharedPreferences("ab_cycle_prefs", MODE_PRIVATE)
+        val hasCycle = cyclePrefs.contains("cycle_days")
+        val hasStartDate = cyclePrefs.contains("cycle_start_date")
+
+        if (hasCycle && hasStartDate) return
+
+        val prefs = getSharedPreferences("abprefs", MODE_PRIVATE)
+
+        val year = prefs.getInt("startYear", 2026)
+        val month = prefs.getInt("startMonth", 3)
+        val day = prefs.getInt("startDay", 2)
+        val startIsA = prefs.getBoolean("startIsA", true)
+
+        val labelA = sanitizeLabel(prefs.getString("labelA", "A") ?: "A", "A")
+        val labelB = sanitizeLabel(prefs.getString("labelB", "B") ?: "B", "B")
+
+        val selectedLegacyDate = LocalDate.of(year, month, day)
+        val cycleStartDate = if (startIsA) {
+            selectedLegacyDate
+        } else {
+            selectedLegacyDate.minusDays(1)
+        }
+
+        CycleManager.saveCycle(this, listOf(labelA, labelB))
+        CycleManager.saveStartDate(this, cycleStartDate)
     }
 
     private fun hideAllSections() {
@@ -191,7 +260,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSection(header: View, section: View, arrow: TextView) {
         header.setOnClickListener {
-
             val parent = section.parent as ViewGroup
             TransitionManager.beginDelayedTransition(parent, AutoTransition())
 
@@ -207,20 +275,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun resetArrows() {
         cycleArrow.text = "▼"
         rulesArrow.text = "▼"
         displayArrow.text = "▼"
     }
+
     private fun showSaveConfirmation() {
         AlertDialog.Builder(this)
             .setTitle(R.string.confirm_changes_title)
             .setMessage(R.string.confirm_changes_message)
             .setPositiveButton(R.string.yes) { _, _ ->
                 saveSettings()
-                updateStartDayLabels()
                 refreshWidget()
                 updateTodayStatus()
+                updateCyclePreview()
             }
             .setNegativeButton(R.string.no, null)
             .show()
@@ -233,9 +303,7 @@ class MainActivity : AppCompatActivity() {
             this,
             { _, year, month, dayOfMonth ->
                 val date = LocalDate.of(year, month + 1, dayOfMonth)
-                val raw = ABLogic.getLetterForDate(this, date)
-                val label = getDisplayLabel(raw)
-
+                val label = CycleManager.getCycleDayForDate(this, date)
                 dateResultText.text = getString(R.string.date_result, label)
             },
             today.year,
@@ -246,34 +314,53 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun updateStartDayLabels() {
-        val labelA = getDisplayLabel("A")
-        val labelB = getDisplayLabel("B")
-
-        radioA.text = getString(R.string.start_day_prefix, labelA)
-        radioB.text = getString(R.string.start_day_prefix, labelB)
-    }
-
     private fun updateTodayStatus() {
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
 
-        val todayRaw = ABLogic.getLetterForDate(this, today)
-        val tomorrowRaw = ABLogic.getLetterForDate(this, tomorrow)
+        val todayLabel = CycleManager.getCycleDayForDate(this, today)
+        val tomorrowLabel = CycleManager.getCycleDayForDate(this, tomorrow)
 
-        val todayLabel = getDisplayLabel(todayRaw)
-        val tomorrowLabel = getDisplayLabel(tomorrowRaw)
-
-        todayStatusText.text = getString(R.string.today_status, todayLabel)
+        todayStatusText.text = todayLabel
         tomorrowStatusText.text = getString(R.string.tomorrow_status, tomorrowLabel)
 
-        val cardColor = when (todayRaw) {
-            "A" -> ContextCompat.getColor(this, R.color.shiftA)
-            "B" -> ContextCompat.getColor(this, R.color.shiftB)
-            else -> ContextCompat.getColor(this, R.color.shiftOff)
+        val cycle = CycleManager.loadCycle(this)
+        val cardColor = CycleColorHelper.getBackgroundColor(
+            context = this,
+            label = todayLabel,
+            cycle = cycle
+        )
+
+        animateStatusCardColor(cardColor)
+        todayStatusText.setTextColor(ContextCompat.getColor(this, android.R.color.white))
+        tomorrowStatusText.setTextColor(ContextCompat.getColor(this, android.R.color.white))
+    }
+
+    private fun updateCyclePreview() {
+        val today = LocalDate.now()
+        val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
+        val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+            .withLocale(Locale.getDefault())
+
+        val items = (0 until 7).map { offset ->
+            val date = today.plusDays(offset.toLong())
+            val title = when (offset) {
+                0 -> "Danes"
+                1 -> "Jutri"
+                else -> date.format(dayFormatter).replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
+            }
+
+            CyclePreviewAdapter.PreviewItem(
+                title = title,
+                dateText = date.format(dateFormatter),
+                cycleLabel = CycleManager.getCycleDayForDate(this, date)
+            )
         }
 
-        statusCard.setCardBackgroundColor(cardColor)
+        val cycle = CycleManager.loadCycle(this)
+        previewAdapter.submitList(items, cycle)
     }
 
     private fun updateWidgetHint() {
@@ -303,65 +390,91 @@ class MainActivity : AppCompatActivity() {
     private fun loadSettings() {
         val prefs = getSharedPreferences("abprefs", MODE_PRIVATE)
 
-        val year = prefs.getInt("startYear", 2026)
-        val month = prefs.getInt("startMonth", 3)
-        val day = prefs.getInt("startDay", 2)
+        val cycle = CycleManager.loadCycle(this)
+        val cycleStartDate = CycleManager.loadStartDate(this)
 
-        selectedDate = LocalDate.of(year, month, day)
+        selectedDate = cycleStartDate
 
-        val startIsA = prefs.getBoolean("startIsA", true)
-        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
-        val skipSundays = prefs.getBoolean("skipSundays", true)
-        val skipHolidays = prefs.getBoolean("skipHolidays", true)
+        cycleDaysEdit.setText(cycle.joinToString(","))
+        firstCycleDayEdit.setText(cycle.firstOrNull() ?: "A")
 
-        shift = prefs.getInt("cycleShift", 0)
-
-        radioA.isChecked = startIsA
-        radioB.isChecked = !startIsA
-        switchSaturdays.isChecked = skipSaturdays
-        switchSundays.isChecked = skipSundays
-        switchHolidays.isChecked = skipHolidays
+        switchSaturdays.isChecked = prefs.getBoolean("skipSaturdays", true)
+        switchSundays.isChecked = prefs.getBoolean("skipSundays", true)
+        switchHolidays.isChecked = prefs.getBoolean("skipHolidays", true)
 
         prefixEdit.setText(prefs.getString("prefixText", "") ?: "")
-        labelAEdit.setText(prefs.getString("labelA", "A"))
-        labelBEdit.setText(prefs.getString("labelB", "B"))
-        labelXEdit.setText(prefs.getString("labelX", "X"))
 
-        shiftText.text = getString(R.string.cycle_shift, shift)
+        when (CycleThemeManager.loadTheme(this)) {
+            CycleThemeManager.THEME_PASTEL -> themePastel.isChecked = true
+            CycleThemeManager.THEME_DARK -> themeDark.isChecked = true
+            else -> themeClassic.isChecked = true
+        }
+
         updateDateText()
     }
 
     private fun saveSettings() {
         val prefs = getSharedPreferences("abprefs", MODE_PRIVATE)
 
+        val cycle = parseCycleInput(cycleDaysEdit.text.toString())
+        val selectedFirstDay = sanitizeLabel(
+            firstCycleDayEdit.text.toString(),
+            cycle.firstOrNull() ?: "A"
+        )
+
+        val normalizedCycle = ensureFirstDayAtStart(cycle, selectedFirstDay)
+
+        CycleManager.saveCycle(this, normalizedCycle)
+        CycleManager.saveStartDate(this, selectedDate)
+
+        when {
+            themePastel.isChecked ->
+                CycleThemeManager.saveTheme(this, CycleThemeManager.THEME_PASTEL)
+
+            themeDark.isChecked ->
+                CycleThemeManager.saveTheme(this, CycleThemeManager.THEME_DARK)
+
+            else ->
+                CycleThemeManager.saveTheme(this, CycleThemeManager.THEME_CLASSIC)
+        }
+
+        firstCycleDayEdit.setText(normalizedCycle.firstOrNull() ?: "A")
+        cycleDaysEdit.setText(normalizedCycle.joinToString(","))
+
         prefs.edit()
             .putInt("startYear", selectedDate.year)
             .putInt("startMonth", selectedDate.monthValue)
             .putInt("startDay", selectedDate.dayOfMonth)
-            .putBoolean("startIsA", radioA.isChecked)
+            .putString("prefixText", prefixEdit.text.toString())
             .putBoolean("skipSaturdays", switchSaturdays.isChecked)
             .putBoolean("skipSundays", switchSundays.isChecked)
             .putBoolean("skipHolidays", switchHolidays.isChecked)
-            .putString("prefixText", prefixEdit.text.toString())
-            .putInt("cycleShift", shift)
-            .putString("labelA", labelAEdit.text.toString())
-            .putString("labelB", labelBEdit.text.toString())
-            .putString("labelX", labelXEdit.text.toString())
             .apply()
     }
 
-    private fun getDisplayLabel(raw: String): String {
-        val prefs = getSharedPreferences("abprefs", MODE_PRIVATE)
+    private fun parseCycleInput(input: String): List<String> {
+        val parsed = input
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
 
-        val labelA = prefs.getString("labelA", "A") ?: "A"
-        val labelB = prefs.getString("labelB", "B") ?: "B"
-        val labelX = prefs.getString("labelX", "X") ?: "X"
+        return if (parsed.isEmpty()) listOf("A", "B") else parsed
+    }
 
-        return when (raw) {
-            "A" -> labelA
-            "B" -> labelB
-            else -> labelX
-        }
+    private fun ensureFirstDayAtStart(cycle: List<String>, firstDay: String): List<String> {
+        val index = cycle.indexOf(firstDay)
+        if (index <= 0) return cycle
+        if (index == -1) return cycle
+
+        val firstPart = cycle.subList(index, cycle.size)
+        val secondPart = cycle.subList(0, index)
+
+        return firstPart + secondPart
+    }
+
+    private fun sanitizeLabel(text: String, fallback: String): String {
+        val cleaned = text.trim()
+        return if (cleaned.isEmpty()) fallback else cleaned
     }
 
     private fun showDatePicker() {
@@ -389,14 +502,16 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun saveShiftAndRefresh() {
-        shiftText.text = getString(R.string.cycle_shift, shift)
+    private fun animateStatusCardColor(toColor: Int) {
+        val fromColor = statusCard.cardBackgroundColor.defaultColor
 
-        getSharedPreferences("abprefs", MODE_PRIVATE)
-            .edit()
-            .putInt("cycleShift", shift)
-            .apply()
-
-        updateTodayStatus()
+        ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor).apply {
+            duration = 220
+            addUpdateListener { animator ->
+                val animatedColor = animator.animatedValue as Int
+                statusCard.setCardBackgroundColor(animatedColor)
+            }
+            start()
+        }
     }
 }

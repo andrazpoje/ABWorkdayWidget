@@ -3,28 +3,55 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace 'com.dante.abworkdaywidget'
     compileSdk 36
-
-    buildFeatures {
-        buildConfig true
-    }
 
     defaultConfig {
         applicationId "com.dante.abworkdaywidget"
         minSdk 26
         targetSdk 36
-        versionCode 1
-        versionName "1.1"
+        versionCode 3
+        versionName "1.2"
+    }
+
+    buildFeatures {
+        buildConfig true
+        viewBinding true
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
     }
 
     buildTypes {
         debug {
-            minifyEnabled false
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            debuggable true
+            resValue "string", "app_name", "AB Switch DEV"
         }
+
         release {
             minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+            resValue "string", "app_name", "AB Switch"
+
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
         }
     }
 

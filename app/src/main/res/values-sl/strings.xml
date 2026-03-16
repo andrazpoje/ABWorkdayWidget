@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AB delovni cikel</string>
+
+    <!-- STATUS -->
+    <string name="status_section">Status</string>
+    <string name="tomorrow_status">Jutri: %1$s</string>
+
+    <!-- PREVIEW -->
+    <string name="preview_title">Naslednjih 7 dni</string>
+
+    <!-- CYCLE -->
+    <string name="cycle_section">Cikel</string>
+    <string name="start_date">Začetni datum: %1$s</string>
+    <string name="select_date">Izberi datum</string>
+
+    <string name="cycle_days_hint">
+        Vnesi oznake cikla, ločene z vejico. Primer: A,B ali Jutro,Popoldne,Nočna,Prosto
+    </string>
+
+    <string name="first_cycle_day_label">Začetni dan cikla</string>
+    <string name="first_cycle_day_hint">
+        Ta oznaka velja za izbrani začetni datum.
+    </string>
+
+    <!-- RULES -->
+    <string name="rules_section">Pravila</string>
+    <string name="skip_saturdays">Preskoči sobote</string>
+    <string name="skip_sundays">Preskoči nedelje</string>
+    <string name="skip_holidays">Preskoči praznike</string>
+
+    <string name="rules_info_text">
+        Pravila za preskakovanje prostih dni in praznikov.
+    </string>
+
+    <!-- DISPLAY -->
+    <string name="display_section">Prikaz</string>
+    <string name="prefix_text">Besedilo pred oznako cikla</string>
+
+    <string name="display_info_text">
+        Widget prikaže točno oznake, ki jih vneseš v cikel.
+    </string>
+
+    <!-- COLOR THEMES -->
+    <string name="color_theme">Barvna tema</string>
+    <string name="theme_classic">Klasična</string>
+    <string name="theme_pastel">Pastelna</string>
+    <string name="theme_dark">Temna</string>
+
+    <!-- WIDGET -->
+    <string name="widget_not_added_short">
+        Widget še ni dodan na domači zaslon.
+    </string>
+    <string name="open_widgets">Odpri widgete</string>
+
+    <!-- DATE CHECK -->
+    <string name="check_date">Preveri datum</string>
+    <string name="date_result">Za ta datum: %1$s</string>
+
+    <!-- SAVE -->
+    <string name="save">Shrani</string>
+
+    <!-- DIALOG -->
+    <string name="confirm_changes_title">Potrditev sprememb</string>
+    <string name="confirm_changes_message">
+        Te spremembe vplivajo na izračun cikla. Ali želiš nadaljevati?
+    </string>
+    <string name="yes">Da</string>
+    <string name="no">Ne</string>
+
+    <!-- OTHER -->
+    <string name="github_project">Projekt na GitHubu</string>
+    <string name="settings">Nastavitve</string>
+
+    <string name="today_label">Danes</string>
+    <string name="tomorrow_label">Jutri</string>
+
+</resources>

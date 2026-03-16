@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/main"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:fillViewport="true">
@@ -9,64 +10,112 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:padding="20dp">
+		android:paddingStart="20dp"
+		android:paddingTop="20dp"
+		android:paddingEnd="20dp"
+		android:paddingBottom="72dp">
 
-		<!-- STATUS -->
-
-		<TextView
+		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/status_section"
-			android:textStyle="bold"
-			android:textSize="18sp"
-			android:layout_marginBottom="8dp" />
+			android:layout_marginBottom="12dp">
+
+			<TextView
+				android:id="@+id/appTitle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:letterSpacing="0.03"
+				android:text="@string/app_name"
+				android:textSize="22sp"
+				android:textStyle="bold" />
+
+			<ImageButton
+				android:id="@+id/settingsButton"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_alignParentEnd="true"
+				android:layout_centerVertical="true"
+				android:background="?attr/selectableItemBackgroundBorderless"
+				android:contentDescription="@string/settings"
+				android:padding="8dp"
+				android:src="@android:drawable/ic_menu_preferences"
+				android:tint="?attr/colorOnSurface" />
+		</RelativeLayout>
 
 		<com.google.android.material.card.MaterialCardView
 			android:id="@+id/statusCard"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
+			android:layout_height="180dp"
 			android:layout_marginBottom="16dp"
+			android:clickable="true"
+			android:focusable="true"
+			android:foreground="?attr/selectableItemBackground"
 			app:cardCornerRadius="20dp"
-			app:cardElevation="6dp">
+			app:cardElevation="6dp"
+			app:cardUseCompatPadding="true">
 
 			<LinearLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="match_parent"
 				android:orientation="vertical"
-				android:padding="20dp"
-				android:gravity="center_horizontal">
+				android:padding="20dp">
+
+				<TextView
+					android:id="@+id/statusTitle"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:alpha="0.85"
+					android:text="@string/status_section"
+					android:textColor="@color/statusTextOnCard"
+					android:textSize="14sp"
+					android:textStyle="bold" />
 
 				<TextView
 					android:id="@+id/todayStatusText"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="30sp"
-					android:textStyle="bold"
-					android:textColor="@color/statusTextOnCard"
+					android:layout_width="match_parent"
+					android:layout_height="0dp"
+					android:layout_weight="1"
 					android:gravity="center"
-					android:layout_marginBottom="6dp" />
+					android:letterSpacing="0.02"
+					android:textColor="@color/statusTextOnCard"
+					android:textSize="44sp"
+					android:textStyle="bold" />
 
 				<TextView
 					android:id="@+id/tomorrowStatusText"
-					android:layout_width="wrap_content"
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:textSize="20sp"
-					android:textStyle="bold"
+					android:alpha="0.95"
+					android:gravity="center"
 					android:textColor="@color/statusTextOnCard"
-					android:gravity="center" />
-
+					android:textSize="18sp"
+					android:textStyle="bold" />
 			</LinearLayout>
-
 		</com.google.android.material.card.MaterialCardView>
 
-		<!-- WIDGET PROMPT -->
+		<TextView
+			android:id="@+id/previewTitle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="8dp"
+			android:text="@string/preview_title"
+			android:textSize="16sp"
+			android:textStyle="bold" />
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/previewRecyclerView"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="16dp"
+			android:nestedScrollingEnabled="false" />
 
 		<LinearLayout
 			android:id="@+id/widgetPromptContainer"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical"
 			android:layout_marginBottom="16dp"
+			android:orientation="vertical"
 			android:visibility="gone">
 
 			<TextView
@@ -80,16 +129,16 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:text="@string/open_widgets" />
-
 		</LinearLayout>
-
-		<!-- CIKEL HEADER -->
 
 		<com.google.android.material.card.MaterialCardView
 			android:id="@+id/cycleHeader"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="8dp"
+			android:clickable="true"
+			android:focusable="true"
+			android:foreground="?attr/selectableItemBackground"
 			app:cardCornerRadius="14dp"
 			app:cardElevation="3dp">
 
@@ -104,8 +153,8 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
 					android:text="@string/cycle_section"
-					android:textStyle="bold"
-					android:textSize="18sp" />
+					android:textSize="18sp"
+					android:textStyle="bold" />
 
 				<TextView
 					android:id="@+id/cycleArrow"
@@ -113,92 +162,92 @@
 					android:layout_height="wrap_content"
 					android:text="▼"
 					android:textSize="18sp" />
-
 			</LinearLayout>
-
 		</com.google.android.material.card.MaterialCardView>
-
-		<!-- CIKEL SECTION -->
 
 		<LinearLayout
 			android:id="@+id/cycleSection"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical"
 			android:layout_marginBottom="16dp"
-			android:gravity="center_horizontal">
+			android:gravity="center_horizontal"
+			android:orientation="vertical">
 
 			<TextView
 				android:id="@+id/dateText"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="@string/start_date"
-				android:layout_marginBottom="8dp" />
+				android:layout_marginBottom="8dp"
+				android:text="@string/start_date" />
 
 			<Button
 				android:id="@+id/pickDateButton"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="@string/select_date"
-				android:layout_marginBottom="12dp" />
-
-			<RadioGroup
-				android:id="@+id/startDayGroup"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:layout_marginBottom="12dp">
-
-				<RadioButton
-					android:id="@+id/radioA"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/start_day_a" />
-
-				<RadioButton
-					android:id="@+id/radioB"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/start_day_b" />
-
-			</RadioGroup>
+				android:layout_marginBottom="16dp"
+				android:text="@string/select_date" />
 
 			<TextView
-				android:id="@+id/shiftText"
-				android:layout_width="wrap_content"
+				android:id="@+id/cycleDaysLabel"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="@string/cycle_shift"
-				android:layout_marginBottom="8dp" />
+				android:layout_marginBottom="6dp"
+				android:text="@string/cycle_section"
+				android:textSize="16sp"
+				android:textStyle="bold" />
 
-			<LinearLayout
-				android:layout_width="wrap_content"
+			<EditText
+				android:id="@+id/cycleDaysEdit"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="horizontal">
+				android:layout_marginBottom="6dp"
+				android:hint="A,B,C,D"
+				android:inputType="text"
+				android:maxLines="1" />
 
-				<Button
-					android:id="@+id/shiftMinus"
-					android:layout_width="56dp"
-					android:layout_height="wrap_content"
-					android:text="-" />
+			<TextView
+				android:id="@+id/cycleDaysHint"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="16dp"
+				android:text="@string/cycle_days_hint"
+				android:textSize="12sp" />
 
-				<Button
-					android:id="@+id/shiftPlus"
-					android:layout_width="56dp"
-					android:layout_height="wrap_content"
-					android:text="+"
-					android:layout_marginStart="12dp" />
+			<TextView
+				android:id="@+id/firstCycleDayLabel"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="6dp"
+				android:text="@string/first_cycle_day_label"
+				android:textSize="16sp"
+				android:textStyle="bold" />
 
-			</LinearLayout>
+			<EditText
+				android:id="@+id/firstCycleDayEdit"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="6dp"
+				android:hint="A"
+				android:inputType="text"
+				android:maxLength="20"
+				android:maxLines="1" />
 
+			<TextView
+				android:id="@+id/firstCycleDayHint"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/first_cycle_day_hint"
+				android:textSize="12sp" />
 		</LinearLayout>
-
-		<!-- PRAVILA HEADER -->
 
 		<com.google.android.material.card.MaterialCardView
 			android:id="@+id/rulesHeader"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="8dp"
+			android:clickable="true"
+			android:focusable="true"
+			android:foreground="?attr/selectableItemBackground"
 			app:cardCornerRadius="14dp"
 			app:cardElevation="3dp">
 
@@ -213,8 +262,8 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
 					android:text="@string/rules_section"
-					android:textStyle="bold"
-					android:textSize="18sp" />
+					android:textSize="18sp"
+					android:textStyle="bold" />
 
 				<TextView
 					android:id="@+id/rulesArrow"
@@ -222,20 +271,16 @@
 					android:layout_height="wrap_content"
 					android:text="▼"
 					android:textSize="18sp" />
-
 			</LinearLayout>
-
 		</com.google.android.material.card.MaterialCardView>
-
-		<!-- PRAVILA SECTION -->
 
 		<LinearLayout
 			android:id="@+id/rulesSection"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical"
 			android:layout_marginBottom="16dp"
-			android:gravity="center_horizontal">
+			android:gravity="center_horizontal"
+			android:orientation="vertical">
 
 			<com.google.android.material.switchmaterial.SwitchMaterial
 				android:id="@+id/switchSaturdays"
@@ -258,15 +303,24 @@
 				android:text="@string/skip_holidays"
 				app:useMaterialThemeColors="true" />
 
+			<TextView
+				android:id="@+id/rulesInfoText"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:alpha="0.7"
+				android:text="@string/rules_info_text"
+				android:textSize="12sp" />
 		</LinearLayout>
-
-		<!-- PRIKAZ HEADER -->
 
 		<com.google.android.material.card.MaterialCardView
 			android:id="@+id/displayHeader"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="8dp"
+			android:clickable="true"
+			android:focusable="true"
+			android:foreground="?attr/selectableItemBackground"
 			app:cardCornerRadius="14dp"
 			app:cardElevation="3dp">
 
@@ -281,8 +335,8 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
 					android:text="@string/display_section"
-					android:textStyle="bold"
-					android:textSize="18sp" />
+					android:textSize="18sp"
+					android:textStyle="bold" />
 
 				<TextView
 					android:id="@+id/displayArrow"
@@ -290,77 +344,80 @@
 					android:layout_height="wrap_content"
 					android:text="▼"
 					android:textSize="18sp" />
-
 			</LinearLayout>
-
 		</com.google.android.material.card.MaterialCardView>
-
-		<!-- PRIKAZ SECTION -->
 
 		<LinearLayout
 			android:id="@+id/displaySection"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical"
-			android:layout_marginBottom="16dp">
+			android:layout_marginBottom="16dp"
+			android:orientation="vertical">
 
 			<EditText
 				android:id="@+id/prefixEdit"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:layout_marginBottom="16dp"
 				android:hint="@string/prefix_text"
-				android:inputType="text"
-				android:layout_marginBottom="16dp" />
+				android:inputType="text" />
 
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="@string/labels_section"
-				android:textStyle="bold"
+				android:layout_marginBottom="6dp"
+				android:text="@string/display_section"
 				android:textSize="18sp"
-				android:layout_marginBottom="6dp" />
+				android:textStyle="bold" />
+
+			<TextView
+				android:id="@+id/displayInfoText"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="16dp"
+				android:text="@string/display_info_text"
+				android:textSize="12sp" />
 
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="@string/labels_hint"
-				android:textSize="12sp"
-				android:layout_marginBottom="10dp" />
+				android:layout_marginBottom="8dp"
+				android:text="@string/color_theme"
+				android:textSize="16sp"
+				android:textStyle="bold" />
 
-			<EditText
-				android:id="@+id/labelAEdit"
-				android:layout_width="match_parent"
+			<RadioGroup
+				android:id="@+id/themeGroup"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:hint="@string/label_a"
-				android:maxLength="6"
-				android:layout_marginBottom="6dp" />
+				android:orientation="vertical">
 
-			<EditText
-				android:id="@+id/labelBEdit"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:hint="@string/label_b"
-				android:maxLength="6"
-				android:layout_marginBottom="6dp" />
+				<RadioButton
+					android:id="@+id/themeClassic"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/theme_classic" />
 
-			<EditText
-				android:id="@+id/labelXEdit"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:hint="@string/label_x"
-				android:maxLength="6"
-				android:layout_marginBottom="8dp" />
+				<RadioButton
+					android:id="@+id/themePastel"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/theme_pastel" />
 
+				<RadioButton
+					android:id="@+id/themeDark"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/theme_dark" />
+			</RadioGroup>
 		</LinearLayout>
-
-		<!-- DATE CHECK -->
 
 		<Button
 			android:id="@+id/checkDateButton"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/check_date"
-			android:layout_marginBottom="8dp" />
+			android:layout_marginBottom="8dp"
+			android:text="@string/check_date" />
 
 		<TextView
 			android:id="@+id/dateResultText"
@@ -369,38 +426,36 @@
 			android:layout_marginBottom="20dp"
 			android:textSize="20sp" />
 
-		<!-- SAVE -->
-
 		<Button
 			android:id="@+id/saveButton"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/save"
-			android:layout_marginBottom="10dp" />
-
-		<!-- GITHUB -->
+			android:layout_marginBottom="10dp"
+			android:text="@string/save" />
 
 		<TextView
 			android:id="@+id/githubLinkText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="@string/github_project"
-			android:textColor="@android:color/holo_blue_dark"
+			android:layout_gravity="center_horizontal"
+			android:layout_marginBottom="10dp"
+			android:background="?attr/selectableItemBackgroundBorderless"
 			android:clickable="true"
 			android:focusable="true"
-			android:layout_gravity="center_horizontal"
-			android:layout_marginBottom="6dp" />
-
-		<!-- VERSION -->
+			android:paddingStart="8dp"
+			android:paddingTop="6dp"
+			android:paddingEnd="8dp"
+			android:paddingBottom="6dp"
+			android:text="@string/github_project"
+			android:textColor="@android:color/holo_blue_dark" />
 
 		<TextView
 			android:id="@+id/versionText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="v1.1"
-			android:textSize="12sp"
+			android:layout_gravity="center_horizontal"
 			android:alpha="0.7"
-			android:layout_gravity="end" />
-
+			android:text="v1.1"
+			android:textSize="12sp" />
 	</LinearLayout>
 </ScrollView>
