@@ -10,6 +10,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
+import com.dante.abworkdaywidget.data.Prefs
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -80,6 +81,8 @@ class ABWidgetProvider : AppWidgetProvider() {
         views.setTextColor(R.id.abText, todayColor)
         views.setInt(R.id.leftColorBar, "setBackgroundColor", todayColor)
 
+        applyWidgetStyle(context, views)
+
         if (showPrefix) {
             views.setViewVisibility(R.id.prefixText, View.VISIBLE)
             views.setTextViewText(R.id.prefixText, prefix)
@@ -142,6 +145,23 @@ class ABWidgetProvider : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.rootLayout, pendingIntent)
 
         appWidgetManager.updateAppWidget(widgetId, views)
+    }
+
+    private fun applyWidgetStyle(context: Context, views: RemoteViews) {
+        val prefs = context.getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
+
+        val style = prefs.getString(
+            Prefs.KEY_WIDGET_STYLE,
+            Prefs.WIDGET_STYLE_CLASSIC
+        ) ?: Prefs.WIDGET_STYLE_CLASSIC
+
+        if (style == Prefs.WIDGET_STYLE_MINIMAL) {
+            views.setInt(R.id.rootLayout, "setBackgroundResource", R.drawable.bg_widget_minimal)
+            views.setViewVisibility(R.id.leftColorBar, View.GONE)
+        } else {
+            views.setInt(R.id.rootLayout, "setBackgroundResource", R.drawable.bg_widget_classic)
+            views.setViewVisibility(R.id.leftColorBar, View.VISIBLE)
+        }
     }
 
     private fun bindExtraDayRow(
@@ -229,7 +249,6 @@ class ABWidgetProvider : AppWidgetProvider() {
             pendingIntent
         )
     }
-
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)

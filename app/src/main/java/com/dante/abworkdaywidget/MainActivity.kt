@@ -9,33 +9,47 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.Editable
+import android.text.TextWatcher
 import android.transition.AutoTransition
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.RadioButton
-import android.widget.ScrollView
+import android.widget.RadioGroup
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.dante.abworkdaywidget.data.Prefs
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-import android.util.Log
-
 
 class MainActivity : AppCompatActivity() {
+
+    private companion object {
+        const val PREFS_UI = "ui_prefs"
+        const val KEY_LAST_OPEN_SECTION = "last_open_section"
+
+        const val SECTION_CYCLE = "cycle"
+        const val SECTION_RULES = "rules"
+        const val SECTION_DISPLAY = "display"
+    }
+
+    private var hasUnsavedChanges = false
 
     private lateinit var cycleHeader: View
     private lateinit var rulesHeader: View
@@ -48,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var widgetPromptContainer: View
     private lateinit var githubLinkText: TextView
     private lateinit var versionText: TextView
-    private lateinit var mainScrollView: ScrollView
+    private lateinit var mainScrollView: NestedScrollView
 
     private lateinit var cycleSection: View
     private lateinit var rulesSection: View
@@ -98,6 +112,9 @@ class MainActivity : AppCompatActivity() {
         loadSettings()
         updateTodayStatus()
         updateCyclePreview()
+        setupWidgetStyleSettings()
+        setupNotificationSettings()
+        setupChangeListeners()
 
         checkDateButton.setOnClickListener {
             showCheckDatePicker()
@@ -115,7 +132,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         saveButton.setOnClickListener {
-            showSaveConfirmation()
+            if (!hasUnsavedChanges) return@setOnClickListener
+
+            saveSettings()
+            refreshWidget()
+            updateTodayStatus()
+            updateCyclePreview()
+            clearUnsavedChanges()
+
+            Toast.makeText(
+                this,
+                getString(R.string.settings_saved),
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         settingsButton.setOnClickListener {
@@ -125,6 +154,7 @@ class MainActivity : AppCompatActivity() {
                 displaySection.visibility = View.VISIBLE
                 displayArrow.text = "▲"
             }
+            saveLastOpenSection(SECTION_DISPLAY)
 
             displayHeader.post {
                 mainScrollView.smoothScrollTo(0, displayHeader.top)
@@ -155,16 +185,14 @@ class MainActivity : AppCompatActivity() {
         Log.d("LANG_TEST", "save_string=" + getString(R.string.save))
         Log.d("LANG_TEST", "check_date_string=" + getString(R.string.check_date))
 
-
         versionText.text = "v${BuildConfig.VERSION_NAME}"
 
-        setupSection(cycleHeader, cycleSection, cycleArrow)
-        setupSection(rulesHeader, rulesSection, rulesArrow)
-        setupSection(displayHeader, displaySection, displayArrow)
+        setupSection(cycleHeader, cycleSection, cycleArrow, SECTION_CYCLE)
+        setupSection(rulesHeader, rulesSection, rulesArrow, SECTION_RULES)
+        setupSection(displayHeader, displaySection, displayArrow, SECTION_DISPLAY)
 
-        hideAllSections()
-        cycleSection.visibility = View.VISIBLE
-        cycleArrow.text = "▲"
+        restoreLastOpenSection()
+        clearUnsavedChanges()
     }
 
     private fun bindViews() {
@@ -258,7 +286,12 @@ class MainActivity : AppCompatActivity() {
         displaySection.visibility = View.GONE
     }
 
-    private fun setupSection(header: View, section: View, arrow: TextView) {
+    private fun setupSection(
+        header: View,
+        section: View,
+        arrow: TextView,
+        sectionKey: String
+    ) {
         header.setOnClickListener {
             val parent = section.parent as ViewGroup
             TransitionManager.beginDelayedTransition(parent, AutoTransition())
@@ -266,12 +299,14 @@ class MainActivity : AppCompatActivity() {
             if (section.visibility == View.VISIBLE) {
                 section.visibility = View.GONE
                 arrow.text = "▼"
+                saveLastOpenSection("")
             } else {
                 hideAllSections()
                 resetArrows()
 
                 section.visibility = View.VISIBLE
                 arrow.text = "▲"
+                saveLastOpenSection(sectionKey)
             }
         }
     }
@@ -282,18 +317,36 @@ class MainActivity : AppCompatActivity() {
         displayArrow.text = "▼"
     }
 
-    private fun showSaveConfirmation() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.confirm_changes_title)
-            .setMessage(R.string.confirm_changes_message)
-            .setPositiveButton(R.string.yes) { _, _ ->
-                saveSettings()
-                refreshWidget()
-                updateTodayStatus()
-                updateCyclePreview()
+    private fun saveLastOpenSection(sectionKey: String) {
+        getSharedPreferences(PREFS_UI, MODE_PRIVATE)
+            .edit()
+            .putString(KEY_LAST_OPEN_SECTION, sectionKey)
+            .apply()
+    }
+
+    private fun restoreLastOpenSection() {
+        val lastSection = getSharedPreferences(PREFS_UI, MODE_PRIVATE)
+            .getString(KEY_LAST_OPEN_SECTION, SECTION_CYCLE)
+
+        hideAllSections()
+        resetArrows()
+
+        when (lastSection) {
+            SECTION_RULES -> {
+                rulesSection.visibility = View.VISIBLE
+                rulesArrow.text = "▲"
             }
-            .setNegativeButton(R.string.no, null)
-            .show()
+
+            SECTION_DISPLAY -> {
+                displaySection.visibility = View.VISIBLE
+                displayArrow.text = "▲"
+            }
+
+            else -> {
+                cycleSection.visibility = View.VISIBLE
+                cycleArrow.text = "▲"
+            }
+        }
     }
 
     private fun showCheckDatePicker() {
@@ -342,14 +395,10 @@ class MainActivity : AppCompatActivity() {
         val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
             .withLocale(Locale.getDefault())
 
-        val items = (0 until 7).map { offset ->
+        val items = (2..6).map { offset ->
             val date = today.plusDays(offset.toLong())
-            val title = when (offset) {
-                0 -> "Danes"
-                1 -> "Jutri"
-                else -> date.format(dayFormatter).replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                }
+            val title = date.format(dayFormatter).replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
             }
 
             CyclePreviewAdapter.PreviewItem(
@@ -410,6 +459,21 @@ class MainActivity : AppCompatActivity() {
             else -> themeClassic.isChecked = true
         }
 
+        val uiPrefs = getSharedPreferences(Prefs.PREFS_NAME, MODE_PRIVATE)
+        val widgetStyle = uiPrefs.getString(
+            Prefs.KEY_WIDGET_STYLE,
+            Prefs.WIDGET_STYLE_CLASSIC
+        ) ?: Prefs.WIDGET_STYLE_CLASSIC
+
+        findViewById<RadioButton>(R.id.radioClassic).isChecked =
+            widgetStyle == Prefs.WIDGET_STYLE_CLASSIC
+
+        findViewById<RadioButton>(R.id.radioMinimal).isChecked =
+            widgetStyle == Prefs.WIDGET_STYLE_MINIMAL
+
+        val silentSwitch = findViewById<SwitchMaterial?>(R.id.switchSilentNotification)
+        silentSwitch?.isChecked = uiPrefs.getBoolean(Prefs.KEY_SILENT_NOTIFICATION, false)
+
         updateDateText()
     }
 
@@ -450,6 +514,22 @@ class MainActivity : AppCompatActivity() {
             .putBoolean("skipSundays", switchSundays.isChecked)
             .putBoolean("skipHolidays", switchHolidays.isChecked)
             .apply()
+
+        val uiPrefs = getSharedPreferences(Prefs.PREFS_NAME, MODE_PRIVATE)
+
+        val selectedWidgetStyle = if (findViewById<RadioButton>(R.id.radioMinimal).isChecked) {
+            Prefs.WIDGET_STYLE_MINIMAL
+        } else {
+            Prefs.WIDGET_STYLE_CLASSIC
+        }
+
+        val silentSwitch = findViewById<SwitchMaterial?>(R.id.switchSilentNotification)
+        val isSilentNotification = silentSwitch?.isChecked ?: false
+
+        uiPrefs.edit()
+            .putString(Prefs.KEY_WIDGET_STYLE, selectedWidgetStyle)
+            .putBoolean(Prefs.KEY_SILENT_NOTIFICATION, isSilentNotification)
+            .apply()
     }
 
     private fun parseCycleInput(input: String): List<String> {
@@ -483,6 +563,7 @@ class MainActivity : AppCompatActivity() {
             { _, year, month, dayOfMonth ->
                 selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
                 updateDateText()
+                markUnsavedChanges()
             },
             selectedDate.year,
             selectedDate.monthValue - 1,
@@ -513,5 +594,87 @@ class MainActivity : AppCompatActivity() {
             }
             start()
         }
+    }
+
+    private fun setupNotificationSettings() {
+        val prefs = getSharedPreferences(Prefs.PREFS_NAME, MODE_PRIVATE)
+
+        val switch = findViewById<SwitchMaterial?>(R.id.switchSilentNotification) ?: return
+
+        val isSilent = prefs.getBoolean(Prefs.KEY_SILENT_NOTIFICATION, false)
+        switch.isChecked = isSilent
+    }
+
+    private fun setupWidgetStyleSettings() {
+        val prefs = getSharedPreferences(Prefs.PREFS_NAME, MODE_PRIVATE)
+
+        val radioClassic = findViewById<RadioButton>(R.id.radioClassic)
+        val radioMinimal = findViewById<RadioButton>(R.id.radioMinimal)
+
+        val currentStyle = prefs.getString(
+            Prefs.KEY_WIDGET_STYLE,
+            Prefs.WIDGET_STYLE_CLASSIC
+        ) ?: Prefs.WIDGET_STYLE_CLASSIC
+
+        radioClassic.isChecked = currentStyle == Prefs.WIDGET_STYLE_CLASSIC
+        radioMinimal.isChecked = currentStyle == Prefs.WIDGET_STYLE_MINIMAL
+    }
+
+    private fun setupChangeListeners() {
+        switchSaturdays.setOnCheckedChangeListener { _, _ -> markUnsavedChanges() }
+        switchSundays.setOnCheckedChangeListener { _, _ -> markUnsavedChanges() }
+        switchHolidays.setOnCheckedChangeListener { _, _ -> markUnsavedChanges() }
+
+        themeClassic.setOnClickListener { markUnsavedChanges() }
+        themePastel.setOnClickListener { markUnsavedChanges() }
+        themeDark.setOnClickListener { markUnsavedChanges() }
+
+        prefixEdit.addTextChangedListener(SimpleTextWatcher { markUnsavedChanges() })
+        cycleDaysEdit.addTextChangedListener(SimpleTextWatcher { markUnsavedChanges() })
+        firstCycleDayEdit.addTextChangedListener(SimpleTextWatcher { markUnsavedChanges() })
+
+        findViewById<RadioGroup>(R.id.widgetStyleRadioGroup)
+            .setOnCheckedChangeListener { _, _ -> markUnsavedChanges() }
+
+        findViewById<SwitchMaterial?>(R.id.switchSilentNotification)
+            ?.setOnCheckedChangeListener { _, _ -> markUnsavedChanges() }
+    }
+
+    private fun animateSaveButtonActivated() {
+        saveButton.animate().cancel()
+
+        saveButton.scaleX = 0.96f
+        saveButton.scaleY = 0.96f
+
+        saveButton.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(180)
+            .start()
+    }
+
+    private fun updateSaveButtonVisualState() {
+        if (hasUnsavedChanges) {
+            saveButton.isEnabled = true
+            saveButton.alpha = 1f
+        } else {
+            saveButton.isEnabled = false
+            saveButton.alpha = 0.55f
+            saveButton.scaleX = 1f
+            saveButton.scaleY = 1f
+        }
+    }
+
+    private fun markUnsavedChanges() {
+        if (!hasUnsavedChanges) {
+            hasUnsavedChanges = true
+            updateSaveButtonVisualState()
+            animateSaveButtonActivated()
+        }
+    }
+
+    private fun clearUnsavedChanges() {
+        hasUnsavedChanges = false
+        updateSaveButtonVisualState()
     }
 }

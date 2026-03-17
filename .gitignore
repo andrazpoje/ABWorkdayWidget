@@ -11,6 +11,12 @@ keystore.properties
 .idea/
 *.iml
 
+# Android / IntelliJ extras
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+
 # Kotlin
 .kotlin/
 

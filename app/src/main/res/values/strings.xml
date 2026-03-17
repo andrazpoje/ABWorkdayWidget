@@ -8,7 +8,7 @@
     <string name="tomorrow_status">Tomorrow: %1$s</string>
 
     <!-- PREVIEW -->
-    <string name="preview_title">Next 7 days</string>
+    <string name="preview_title">Upcoming days</string>
 
     <!-- CYCLE -->
     <string name="cycle_section">Cycle</string>
@@ -76,5 +76,38 @@
     <string name="today_label">Today</string>
 
     <string name="tomorrow_label">Tomorrow</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_normal_name">AB day notifications</string>
+    <string name="notification_channel_normal_desc">Notifications when the workday cycle changes</string>
+
+    <string name="notification_channel_silent_name">AB day notifications (silent)</string>
+    <string name="notification_channel_silent_desc">Silent notifications when the workday cycle changes</string>
+
+    <string name="notification_day_changed_title">Cycle changed</string>
+    <string name="notification_day_changed_message">Today is %1$s workday.</string>
+
+    <!-- Settings - Notifications -->
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_enable_notifications">Enable notifications</string>
+    <string name="settings_silent_notifications">Silent notification</string>
+    <string name="settings_notifications_description">Notification appears when the day changes.</string>
+
+    <!-- Settings - Widget -->
+    <string name="settings_widget_style_title">Widget appearance</string>
+    <string name="settings_widget_style_description">Choose the widget style.</string>
+    <string name="settings_widget_style_classic">Classic</string>
+    <string name="settings_widget_style_minimal">Minimal</string>
+
+    <string name="notification_day_off_message">Today is not a workday.</string>
+    <string name="notification_generic_message">The work cycle has been updated.</string>
+
+    <string name="notification_today_tomorrow">Today: %1$s\nTomorrow: %2$s</string>
+    <string name="notification_day_off_short">not a workday</string>
+
+    <string name="settings_notification_title">Notifications</string>
+    <string name="settings_silent_notification">Silent notifications (no sound)</string>
+
+    <string name="settings_saved">Settings saved</string>
 
 </resources>

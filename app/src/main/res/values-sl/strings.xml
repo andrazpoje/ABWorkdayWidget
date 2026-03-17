@@ -8,7 +8,7 @@
     <string name="tomorrow_status">Jutri: %1$s</string>
 
     <!-- PREVIEW -->
-    <string name="preview_title">Naslednjih 7 dni</string>
+    <string name="preview_title">Naslednji dnevi</string>
 
     <!-- CYCLE -->
     <string name="cycle_section">Cikel</string>
@@ -75,5 +75,35 @@
 
     <string name="today_label">Danes</string>
     <string name="tomorrow_label">Jutri</string>
+
+    <string name="notification_channel_normal_name">AB delovni cikel obvestila</string>
+    <string name="notification_channel_normal_desc">Notifications when the workday cycle changes</string>
+
+    <string name="notification_channel_silent_name">AB day notifications silent</string>
+    <string name="notification_channel_silent_desc">Silent notifications when the workday cycle changes</string>
+
+    <string name="notification_day_changed_title">Cikel se je spremenil</string>
+    <string name="notification_day_changed_message">Danes je %1$s delovni dan.</string>
+
+    <string name="settings_notifications_title">Obvestila</string>
+    <string name="settings_enable_notifications">Omogoči obvestila</string>
+    <string name="settings_silent_notifications">Tiho obvestilo</string>
+    <string name="settings_notifications_description">Obvestilo se prikaže ob menjavi dneva.</string>
+
+    <string name="settings_widget_style_title">Videz widgeta</string>
+    <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
+    <string name="settings_widget_style_classic">Klasičen</string>
+    <string name="settings_widget_style_minimal">Minimalističen</string>
+
+    <string name="notification_day_off_message">Danes ni delovni dan.</string>
+    <string name="notification_generic_message">Delovni cikel se je posodobil.</string>
+
+    <string name="notification_today_tomorrow">Danes: %1$s\nJutri: %2$s</string>
+    <string name="notification_day_off_short">ni delovni dan</string>
+
+    <string name="settings_notification_title">Obvestila</string>
+    <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
+
+    <string name="settings_saved">Nastavitve shranjene</string>
 
 </resources>

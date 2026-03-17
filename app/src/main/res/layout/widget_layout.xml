@@ -3,7 +3,7 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#AA000000"
+    android:background="@drawable/bg_widget_classic"
     android:orientation="horizontal"
     android:padding="10dp">
 
