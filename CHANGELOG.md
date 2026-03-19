@@ -4,14 +4,46 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.3.0] - 2026-03-17
+
+### ✨ Added
+- Notification when A/B cycle changes
+- Notification shows **today and tomorrow cycle**
+- Option for **silent notifications**
+- **Minimal widget style**
+- Sticky **Save button** with unsaved changes detection
+- App remembers **last opened section** (cycle / rules / display)
+
+### 🎨 Improved
+- Improved UX with **unsaved changes tracking**
+- Save button now only active when needed
+- Cleaner **cycle preview** (no duplicate today/tomorrow)
+- Better navigation between sections
+- More intuitive settings flow
+
+### ⚙️ Technical
+- Centralized notification handling (`NotificationHelper`)
+- Added new preferences for widget style and notifications
+- Improved state handling in `MainActivity`
+- Refactored settings save logic
+- Improved widget update triggering
+
+### 🐞 Fixed
+- Fixed duplicate notification title text
+- Fixed widget style not saving correctly
+- Fixed multiple reference issues in `Prefs`
+- Fixed crashes related to view bindings and layout types
+
+---
+
 ## [1.2.0] - 2026-03-16
 
 ### ✨ Added
 - Widget now displays up to **6 upcoming cycle days**
 - **Dynamic widget layout** depending on widget size
-    - Small → today only
-    - Medium → today + tomorrow
-    - Large → today + next 6 days
+  - Small → today only
+  - Medium → today + tomorrow
+  - Large → today + next 6 days
 - **Today / Danes label** above the main cycle indicator
 - **Cycle color dots** for upcoming days
 - **Left color bar** showing today's cycle color
@@ -37,7 +69,6 @@ All notable changes to this project will be documented in this file.
 - Fixed color rendering issues in future cycle rows
 - Fixed layout problems with longer day names
 
-
 ---
 
 ## [1.1.0] - 2026-03-11
@@ -58,7 +89,6 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Technical
 - Various stability and performance improvements
-
 
 ---
 

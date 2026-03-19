@@ -103,6 +103,7 @@ class ABWidgetProvider : AppWidgetProvider() {
             bindExtraDayRow(
                 context = context,
                 views = views,
+                cycle = cycle,
                 date = today.plusDays(1),
                 titleViewId = R.id.day1Title,
                 valueViewId = R.id.day1Value,
@@ -123,17 +124,64 @@ class ABWidgetProvider : AppWidgetProvider() {
                 showRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Value)
                 showRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Value)
 
-                bindExtraDayRow(context, views, today.plusDays(2), R.id.day2Title, R.id.day2Value, R.id.day2Dot, false)
-                bindExtraDayRow(context, views, today.plusDays(3), R.id.day3Title, R.id.day3Value, R.id.day3Dot, false)
-                bindExtraDayRow(context, views, today.plusDays(4), R.id.day4Title, R.id.day4Value, R.id.day4Dot, false)
-                bindExtraDayRow(context, views, today.plusDays(5), R.id.day5Title, R.id.day5Value, R.id.day5Dot, false)
-                bindExtraDayRow(context, views, today.plusDays(6), R.id.day6Title, R.id.day6Value, R.id.day6Dot, false)
+                bindExtraDayRow(
+                    context,
+                    views,
+                    cycle,
+                    today.plusDays(2),
+                    R.id.day2Title,
+                    R.id.day2Value,
+                    R.id.day2Dot,
+                    false
+                )
+                bindExtraDayRow(
+                    context,
+                    views,
+                    cycle,
+                    today.plusDays(3),
+                    R.id.day3Title,
+                    R.id.day3Value,
+                    R.id.day3Dot,
+                    false
+                )
+                bindExtraDayRow(
+                    context,
+                    views,
+                    cycle,
+                    today.plusDays(4),
+                    R.id.day4Title,
+                    R.id.day4Value,
+                    R.id.day4Dot,
+                    false
+                )
+                bindExtraDayRow(
+                    context,
+                    views,
+                    cycle,
+                    today.plusDays(5),
+                    R.id.day5Title,
+                    R.id.day5Value,
+                    R.id.day5Dot,
+                    false
+                )
+                bindExtraDayRow(
+                    context,
+                    views,
+                    cycle,
+                    today.plusDays(6),
+                    R.id.day6Title,
+                    R.id.day6Value,
+                    R.id.day6Dot,
+                    false
+                )
             }
         } else {
             views.setViewVisibility(R.id.extraDaysContainer, View.GONE)
         }
 
-        val intent = Intent(context, MainActivity::class.java)
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
 
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -167,13 +215,13 @@ class ABWidgetProvider : AppWidgetProvider() {
     private fun bindExtraDayRow(
         context: Context,
         views: RemoteViews,
+        cycle: List<String>,
         date: LocalDate,
         titleViewId: Int,
         valueViewId: Int,
         dotViewId: Int,
         isTomorrow: Boolean
     ) {
-        val cycle = CycleManager.loadCycle(context)
         val label = CycleManager.getCycleDayForDate(context, date)
 
         val title = if (isTomorrow) {

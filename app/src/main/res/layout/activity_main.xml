@@ -5,6 +5,9 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical">
 
+	<!-- =========================================================
+         GLAVNI SCROLL CONTAINER
+         ========================================================= -->
 	<androidx.core.widget.NestedScrollView
 		android:id="@+id/main"
 		android:layout_width="match_parent"
@@ -21,6 +24,9 @@
 			android:paddingEnd="20dp"
 			android:paddingBottom="24dp">
 
+			<!-- =========================================================
+                 HEADER / NASLOV APLIKACIJE
+                 ========================================================= -->
 			<RelativeLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -33,7 +39,7 @@
 					android:layout_centerVertical="true"
 					android:letterSpacing="0.03"
 					android:text="@string/app_name"
-					android:textSize="22sp"
+					android:textSize="24sp"
 					android:textStyle="bold" />
 
 				<ImageButton
@@ -49,6 +55,19 @@
 					android:tint="?attr/colorOnSurface" />
 			</RelativeLayout>
 
+			<!-- Kratek opis pod naslovom -->
+			<TextView
+				android:id="@+id/screenSubtitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="16dp"
+				android:alpha="0.75"
+				android:text="@string/settings_subtitle"
+				android:textSize="14sp" />
+
+			<!-- =========================================================
+                 STATUS KARTICA (Danes / Jutri)
+                 ========================================================= -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/statusCard"
 				android:layout_width="match_parent"
@@ -57,7 +76,7 @@
 				android:clickable="true"
 				android:focusable="true"
 				android:foreground="?attr/selectableItemBackground"
-				app:cardCornerRadius="20dp"
+				app:cardCornerRadius="24dp"
 				app:cardElevation="6dp"
 				app:cardUseCompatPadding="true">
 
@@ -100,6 +119,9 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
+			<!-- =========================================================
+                 PREVIEW NASLEDNJIH DNI
+                 ========================================================= -->
 			<TextView
 				android:id="@+id/previewTitle"
 				android:layout_width="match_parent"
@@ -116,6 +138,9 @@
 				android:layout_marginBottom="20dp"
 				android:nestedScrollingEnabled="false" />
 
+			<!-- =========================================================
+                 OPOZORILO, ČE WIDGET ŠE NI DODAN
+                 ========================================================= -->
 			<LinearLayout
 				android:id="@+id/widgetPromptContainer"
 				android:layout_width="match_parent"
@@ -137,6 +162,9 @@
 					android:text="@string/open_widgets" />
 			</LinearLayout>
 
+			<!-- =========================================================
+                 SECTION HEADER: CYCLE
+                 ========================================================= -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/cycleHeader"
 				android:layout_width="match_parent"
@@ -145,7 +173,7 @@
 				android:clickable="true"
 				android:focusable="true"
 				android:foreground="?attr/selectableItemBackground"
-				app:cardCornerRadius="16dp"
+				app:cardCornerRadius="18dp"
 				app:cardElevation="3dp">
 
 				<LinearLayout
@@ -171,97 +199,139 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
+			<!-- =========================================================
+                 SECTION CONTENT: CYCLE
+                 Tukaj so:
+                 - začetni datum
+                 - input za cikel
+                 - prvi dan cikla
+                 - preveri datum
+                 ========================================================= -->
 			<LinearLayout
 				android:id="@+id/cycleSection"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginBottom="20dp"
-				android:gravity="center_horizontal"
 				android:orientation="vertical"
 				android:visibility="gone">
 
-				<TextView
-					android:id="@+id/dateText"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="8dp"
-					android:text="@string/start_date" />
-
-				<Button
-					android:id="@+id/pickDateButton"
+				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="16dp"
-					android:text="@string/select_date" />
+					app:cardCornerRadius="18dp"
+					app:cardUseCompatPadding="true">
 
-				<TextView
-					android:id="@+id/cycleDaysLabel"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="6dp"
-					android:text="@string/cycle_section"
-					android:textSize="16sp"
-					android:textStyle="bold" />
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:padding="16dp">
 
-				<EditText
-					android:id="@+id/cycleDaysEdit"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="6dp"
-					android:hint="A,B,C,D"
-					android:inputType="text"
-					android:maxLines="1" />
+						<!-- Začetni datum -->
+						<TextView
+							android:id="@+id/dateText"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="8dp"
+							android:text="@string/start_date"
+							android:textSize="15sp"
+							android:textStyle="bold" />
 
-				<TextView
-					android:id="@+id/cycleDaysHint"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="16dp"
-					android:text="@string/cycle_days_hint"
-					android:textSize="12sp" />
+						<Button
+							android:id="@+id/pickDateButton"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="16dp"
+							android:text="@string/select_date" />
 
-				<TextView
-					android:id="@+id/firstCycleDayLabel"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="6dp"
-					android:text="@string/first_cycle_day_label"
-					android:textSize="16sp"
-					android:textStyle="bold" />
+						<!-- Input: Dnevi v ciklu -->
+						<TextView
+							android:id="@+id/cycleDaysLabel"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="6dp"
+							android:text="@string/cycle_days_label"
+							android:textSize="16sp"
+							android:textStyle="bold" />
 
-				<EditText
-					android:id="@+id/firstCycleDayEdit"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="6dp"
-					android:hint="A"
-					android:inputType="text"
-					android:maxLength="20"
-					android:maxLines="1" />
+						<com.google.android.material.textfield.TextInputLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="6dp"
+							android:hint="@string/cycle_days_hint_placeholder">
 
-				<TextView
-					android:id="@+id/firstCycleDayHint"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="16dp"
-					android:text="@string/first_cycle_day_hint"
-					android:textSize="12sp" />
+							<com.google.android.material.textfield.TextInputEditText
+								android:id="@+id/cycleDaysEdit"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:inputType="text"
+								android:maxLines="1" />
+						</com.google.android.material.textfield.TextInputLayout>
 
-				<Button
-					android:id="@+id/checkDateButton"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="8dp"
-					android:text="@string/check_date" />
+						<TextView
+							android:id="@+id/cycleDaysHint"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="16dp"
+							android:text="@string/cycle_days_hint"
+							android:textSize="12sp" />
 
-				<TextView
-					android:id="@+id/dateResultText"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="4dp"
-					android:textSize="20sp" />
+						<!-- Input: Prvi dan cikla -->
+						<TextView
+							android:id="@+id/firstCycleDayLabel"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="6dp"
+							android:text="@string/first_cycle_day_label"
+							android:textSize="16sp"
+							android:textStyle="bold" />
+
+						<com.google.android.material.textfield.TextInputLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="6dp"
+							android:hint="@string/first_cycle_day_placeholder">
+
+							<com.google.android.material.textfield.TextInputEditText
+								android:id="@+id/firstCycleDayEdit"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:inputType="text"
+								android:maxLength="24"
+								android:maxLines="1" />
+						</com.google.android.material.textfield.TextInputLayout>
+
+						<TextView
+							android:id="@+id/firstCycleDayHint"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="16dp"
+							android:text="@string/first_cycle_day_hint"
+							android:textSize="12sp" />
+
+						<!-- Gumb: preveri datum -->
+						<Button
+							android:id="@+id/checkDateButton"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="8dp"
+							android:text="@string/check_date" />
+
+						<!-- Rezultat preverjanja datuma -->
+						<TextView
+							android:id="@+id/dateResultText"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="4dp"
+							android:textSize="20sp"
+							android:textStyle="bold" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
+			<!-- =========================================================
+                 SECTION HEADER: RULES
+                 ========================================================= -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/rulesHeader"
 				android:layout_width="match_parent"
@@ -270,7 +340,7 @@
 				android:clickable="true"
 				android:focusable="true"
 				android:foreground="?attr/selectableItemBackground"
-				app:cardCornerRadius="16dp"
+				app:cardCornerRadius="18dp"
 				app:cardElevation="3dp">
 
 				<LinearLayout
@@ -296,46 +366,122 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
+			<!-- =========================================================
+                 SECTION CONTENT: RULES
+                 Tukaj so:
+                 - preskoči sobote
+                 - preskoči nedelje
+                 - preskoči dela proste dneve
+                 - izbira države za dela proste dneve
+                 - override oznaka za preskočene dni
+                 ========================================================= -->
 			<LinearLayout
 				android:id="@+id/rulesSection"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginBottom="20dp"
-				android:gravity="center_horizontal"
 				android:orientation="vertical"
 				android:visibility="gone">
 
-				<com.google.android.material.switchmaterial.SwitchMaterial
-					android:id="@+id/switchSaturdays"
+				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:text="@string/skip_saturdays"
-					app:useMaterialThemeColors="true" />
+					app:cardCornerRadius="18dp"
+					app:cardUseCompatPadding="true">
 
-				<com.google.android.material.switchmaterial.SwitchMaterial
-					android:id="@+id/switchSundays"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:text="@string/skip_sundays"
-					app:useMaterialThemeColors="true" />
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:padding="16dp">
 
-				<com.google.android.material.switchmaterial.SwitchMaterial
-					android:id="@+id/switchHolidays"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:text="@string/skip_holidays"
-					app:useMaterialThemeColors="true" />
+						<!-- Skip sobote -->
+						<com.google.android.material.switchmaterial.SwitchMaterial
+							android:id="@+id/switchSaturdays"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:text="@string/skip_saturdays"
+							app:useMaterialThemeColors="true" />
 
-				<TextView
-					android:id="@+id/rulesInfoText"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginTop="8dp"
-					android:alpha="0.7"
-					android:text="@string/rules_info_text"
-					android:textSize="12sp" />
+						<!-- Skip nedelje -->
+						<com.google.android.material.switchmaterial.SwitchMaterial
+							android:id="@+id/switchSundays"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:text="@string/skip_sundays"
+							app:useMaterialThemeColors="true" />
+
+						<!-- Skip dela prostih dni -->
+						<com.google.android.material.switchmaterial.SwitchMaterial
+							android:id="@+id/switchHolidays"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:text="@string/skip_holidays"
+							app:useMaterialThemeColors="true" />
+
+						<!-- Izbira države za dela proste dneve -->
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="12dp"
+							android:layout_marginBottom="6dp"
+							android:text="@string/holiday_country_label"
+							android:textSize="16sp"
+							android:textStyle="bold" />
+
+						<com.google.android.material.textfield.TextInputLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:hint="@string/holiday_country_hint">
+
+							<com.google.android.material.textfield.MaterialAutoCompleteTextView
+								android:id="@+id/holidayCountryDropdown"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:inputType="none" />
+						</com.google.android.material.textfield.TextInputLayout>
+
+						<!-- Override prikaza za preskočene dni -->
+						<com.google.android.material.switchmaterial.SwitchMaterial
+							android:id="@+id/switchOverrideSkippedDays"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="12dp"
+							android:text="@string/override_skipped_days"
+							app:useMaterialThemeColors="true" />
+
+						<!-- Oznaka za preskočen dan, npr. Prosto -->
+						<com.google.android.material.textfield.TextInputLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="8dp"
+							android:hint="@string/skipped_day_label">
+
+							<com.google.android.material.textfield.TextInputEditText
+								android:id="@+id/skippedDayLabelEdit"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:inputType="text"
+								android:maxLength="24"
+								android:maxLines="1" />
+						</com.google.android.material.textfield.TextInputLayout>
+
+						<!-- Pojasnilo -->
+						<TextView
+							android:id="@+id/rulesInfoText"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="8dp"
+							android:alpha="0.7"
+							android:text="@string/rules_info_text"
+							android:textSize="12sp" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
+			<!-- =========================================================
+                 SECTION HEADER: DISPLAY
+                 ========================================================= -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/displayHeader"
 				android:layout_width="match_parent"
@@ -344,7 +490,7 @@
 				android:clickable="true"
 				android:focusable="true"
 				android:foreground="?attr/selectableItemBackground"
-				app:cardCornerRadius="16dp"
+				app:cardCornerRadius="18dp"
 				app:cardElevation="3dp">
 
 				<LinearLayout
@@ -370,6 +516,14 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
+			<!-- =========================================================
+                 SECTION CONTENT: DISPLAY
+                 Tukaj so:
+                 - prefix text
+                 - tema barv
+                 - stil widgeta
+                 - obvestila
+                 ========================================================= -->
 			<LinearLayout
 				android:id="@+id/displaySection"
 				android:layout_width="match_parent"
@@ -378,62 +532,98 @@
 				android:orientation="vertical"
 				android:visibility="gone">
 
-				<EditText
-					android:id="@+id/prefixEdit"
+				<!-- Prefix -->
+				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_marginBottom="12dp"
-					android:hint="@string/prefix_text"
-					android:inputType="text" />
+					app:cardCornerRadius="18dp"
+					app:cardUseCompatPadding="true">
 
-				<TextView
-					android:id="@+id/displayInfoText"
+					<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:padding="16dp">
+
+						<com.google.android.material.textfield.TextInputLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:hint="@string/prefix_text">
+
+							<com.google.android.material.textfield.TextInputEditText
+								android:id="@+id/prefixEdit"
+								android:layout_width="match_parent"
+								android:layout_height="wrap_content"
+								android:inputType="text" />
+						</com.google.android.material.textfield.TextInputLayout>
+
+						<TextView
+							android:id="@+id/displayInfoText"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="8dp"
+							android:text="@string/display_info_text"
+							android:textSize="12sp" />
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+
+				<!-- Izbira barvne teme -->
+				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="16dp"
-					android:text="@string/display_info_text"
-					android:textSize="12sp" />
+					android:layout_marginBottom="12dp"
+					app:cardCornerRadius="18dp"
+					app:cardUseCompatPadding="true">
 
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="8dp"
-					android:text="@string/color_theme"
-					android:textSize="16sp"
-					android:textStyle="bold" />
-
-				<RadioGroup
-					android:id="@+id/themeGroup"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="20dp"
-					android:orientation="vertical">
-
-					<RadioButton
-						android:id="@+id/themeClassic"
-						android:layout_width="wrap_content"
+					<LinearLayout
+						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:text="@string/theme_classic" />
+						android:orientation="vertical"
+						android:padding="16dp">
 
-					<RadioButton
-						android:id="@+id/themePastel"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="@string/theme_pastel" />
+						<TextView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginBottom="8dp"
+							android:text="@string/color_theme"
+							android:textSize="16sp"
+							android:textStyle="bold" />
 
-					<RadioButton
-						android:id="@+id/themeDark"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="@string/theme_dark" />
-				</RadioGroup>
+						<RadioGroup
+							android:id="@+id/themeGroup"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:orientation="vertical">
 
+							<RadioButton
+								android:id="@+id/themeClassic"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="@string/theme_classic" />
+
+							<RadioButton
+								android:id="@+id/themePastel"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="@string/theme_pastel" />
+
+							<RadioButton
+								android:id="@+id/themeDark"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="@string/theme_dark" />
+						</RadioGroup>
+					</LinearLayout>
+				</com.google.android.material.card.MaterialCardView>
+
+				<!-- Stil widgeta -->
 				<com.google.android.material.card.MaterialCardView
 					android:id="@+id/cardWidgetStyle"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="16dp"
-					app:cardCornerRadius="16dp"
+					android:layout_marginBottom="12dp"
+					app:cardCornerRadius="18dp"
 					app:cardUseCompatPadding="true">
 
 					<LinearLayout
@@ -477,11 +667,12 @@
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 
+				<!-- Obvestila -->
 				<com.google.android.material.card.MaterialCardView
 					android:id="@+id/cardNotifications"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					app:cardCornerRadius="16dp"
+					app:cardCornerRadius="18dp"
 					app:cardUseCompatPadding="true">
 
 					<LinearLayout
@@ -498,35 +689,48 @@
 							android:textStyle="bold" />
 
 						<com.google.android.material.switchmaterial.SwitchMaterial
-							android:id="@+id/switchSilentNotification"
+							android:id="@+id/switchNotificationsEnabled"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:layout_marginTop="12dp"
+							android:text="@string/settings_notifications_enabled" />
+
+						<com.google.android.material.switchmaterial.SwitchMaterial
+							android:id="@+id/switchSilentNotification"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="8dp"
 							android:text="@string/settings_silent_notification" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
+			<!-- =========================================================
+                 FOOTER
+                 ========================================================= -->
 			<TextView
 				android:id="@+id/versionText"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_gravity="center_horizontal"
+				android:layout_marginTop="4dp"
 				android:alpha="0.7"
-				android:text="v1.3"
+				android:text="v1.4"
 				android:textSize="12sp" />
 
-			<!-- ostane zaradi MainActivity kompatibilnosti, a skrit -->
+			<!-- Skrit GitHub link zaradi kompatibilnosti z MainActivity -->
 			<TextView
 				android:id="@+id/githubLinkText"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:visibility="gone"
-				android:text="GitHub" />
-
+				android:text="GitHub"
+				android:visibility="gone" />
 		</LinearLayout>
 	</androidx.core.widget.NestedScrollView>
 
+	<!-- =========================================================
+         SPODNJI STICKY SAVE GUMB
+         ========================================================= -->
 	<com.google.android.material.card.MaterialCardView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -537,7 +741,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_margin="12dp"
-			android:minHeight="52dp"
+			android:minHeight="54dp"
 			android:text="@string/save"
 			android:textAllCaps="false" />
 	</com.google.android.material.card.MaterialCardView>

@@ -1,211 +1,196 @@
 package com.dante.abworkdaywidget
 
 import android.content.Context
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.Month
-import java.time.format.DateTimeParseException
 
 object CycleManager {
 
-    private const val PREFS_NAME = "ab_cycle_prefs"
-    private const val KEY_CYCLE_DAYS = "cycle_days"
-    private const val KEY_START_DATE = "cycle_start_date"
+    const val PREFS_NAME = "ab_cycle_prefs"
+    const val KEY_CYCLE_DAYS = "cycle_days"
+    const val KEY_CYCLE_START_DATE = "cycle_start_date"
 
-    private const val RULES_PREFS_NAME = "abprefs"
-    private const val KEY_SKIP_SATURDAYS = "skipSaturdays"
-    private const val KEY_SKIP_SUNDAYS = "skipSundays"
-    private const val KEY_SKIP_HOLIDAYS = "skipHolidays"
-
-    private val DEFAULT_CYCLE = listOf("A", "B")
-    private const val OFF_LABEL = "Prosto"
-
-    fun saveCycle(context: Context, days: List<String>) {
-        val cleanedDays = days
+    fun saveCycle(context: Context, cycle: List<String>) {
+        val cleaned = cycle
             .map { it.trim() }
             .filter { it.isNotBlank() }
 
-        val finalDays = if (cleanedDays.isEmpty()) DEFAULT_CYCLE else cleanedDays
+        val finalCycle = if (cleaned.isEmpty()) listOf("A", "B") else cleaned
 
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString(KEY_CYCLE_DAYS, finalDays.joinToString(","))
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_CYCLE_DAYS, finalCycle.joinToString("|"))
             .apply()
     }
 
     fun loadCycle(context: Context): List<String> {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val stored = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CYCLE_DAYS, null)
 
-        val stored = prefs.getString(KEY_CYCLE_DAYS, null)
+        if (stored.isNullOrBlank()) return listOf("A", "B")
 
-        val cycle = stored
-            ?.split(",")
-            ?.map { it.trim() }
-            ?.filter { it.isNotBlank() }
-            ?: DEFAULT_CYCLE
-
-        return if (cycle.isEmpty()) DEFAULT_CYCLE else cycle
+        return stored.split("|")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .ifEmpty { listOf("A", "B") }
     }
 
     fun saveStartDate(context: Context, date: LocalDate) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString(KEY_START_DATE, date.toString())
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_CYCLE_START_DATE, date.toString())
             .apply()
     }
 
     fun loadStartDate(context: Context): LocalDate {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val stored = prefs.getString(KEY_START_DATE, null)
+        val stored = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_CYCLE_START_DATE, null)
 
         return try {
-            if (stored.isNullOrBlank()) {
-                LocalDate.now()
-            } else {
-                LocalDate.parse(stored)
-            }
-        } catch (_: DateTimeParseException) {
+            if (stored.isNullOrBlank()) LocalDate.now() else LocalDate.parse(stored)
+        } catch (_: Exception) {
             LocalDate.now()
         }
     }
 
     fun getCycleDayForDate(context: Context, date: LocalDate): String {
+        val overrideLabel = getSkippedDayOverrideLabelOrNull(context, date)
+        if (overrideLabel != null) {
+            return overrideLabel
+        }
+
         val cycle = loadCycle(context)
+        if (cycle.isEmpty()) return "A"
+
         val startDate = loadStartDate(context)
+        if (date == startDate) return cycle[0]
 
-        if (cycle.isEmpty()) return DEFAULT_CYCLE.first()
+        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
+        val skipSundays = prefs.getBoolean("skipSundays", true)
+        val skipHolidays = prefs.getBoolean("skipHolidays", true)
 
-        if (!isCycleActiveOnDate(context, date)) {
-            return OFF_LABEL
-        }
-
-        val index = getCycleIndexForDate(context, startDate, date, cycle.size)
-        return cycle[index]
-    }
-
-    fun getTodayCycleDay(context: Context): String {
-        return getCycleDayForDate(context, LocalDate.now())
-    }
-
-    private fun getCycleIndexForDate(
-        context: Context,
-        startDate: LocalDate,
-        targetDate: LocalDate,
-        cycleSize: Int
-    ): Int {
-        if (cycleSize <= 0) return 0
-
-        if (targetDate == startDate) return 0
-
-        return if (targetDate.isAfter(startDate)) {
-            val advancedSteps = countActiveDaysBetweenExclusiveStart(
+        return if (date.isAfter(startDate)) {
+            val stepsForward = countIncludedDaysForward(
                 context = context,
-                startExclusive = startDate,
-                endInclusive = targetDate
+                fromExclusive = startDate,
+                toInclusive = date,
+                skipSaturdays = skipSaturdays,
+                skipSundays = skipSundays,
+                skipHolidays = skipHolidays
             )
-            advancedSteps % cycleSize
+            cycle[positiveModulo(stepsForward, cycle.size)]
         } else {
-            val backwardsSteps = countActiveDaysBetweenInclusiveStartExclusiveEnd(
+            val stepsBack = countIncludedDaysBackward(
                 context = context,
-                startInclusive = targetDate,
-                endExclusive = startDate
+                fromInclusive = date,
+                toExclusive = startDate,
+                skipSaturdays = skipSaturdays,
+                skipSundays = skipSundays,
+                skipHolidays = skipHolidays
             )
-            val rawIndex = ((-backwardsSteps) % cycleSize + cycleSize) % cycleSize
-            rawIndex
+            cycle[positiveModulo(-stepsBack, cycle.size)]
         }
     }
 
-    private fun countActiveDaysBetweenExclusiveStart(
-        context: Context,
-        startExclusive: LocalDate,
-        endInclusive: LocalDate
-    ): Int {
-        var count = 0
-        var current = startExclusive.plusDays(1)
+    fun getSkippedDayOverrideLabelOrNull(context: Context, date: LocalDate): String? {
+        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
 
-        while (!current.isAfter(endInclusive)) {
-            if (isCycleActiveOnDate(context, current)) {
-                count++
-            }
-            current = current.plusDays(1)
-        }
+        val overrideEnabled = prefs.getBoolean("overrideSkippedDays", true)
+        if (!overrideEnabled) return null
 
-        return count
-    }
+        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
+        val skipSundays = prefs.getBoolean("skipSundays", true)
+        val skipHolidays = prefs.getBoolean("skipHolidays", true)
 
-    private fun countActiveDaysBetweenInclusiveStartExclusiveEnd(
-        context: Context,
-        startInclusive: LocalDate,
-        endExclusive: LocalDate
-    ): Int {
-        var count = 0
-        var current = startInclusive
-
-        while (current.isBefore(endExclusive)) {
-            if (isCycleActiveOnDate(context, current)) {
-                count++
-            }
-            current = current.plusDays(1)
-        }
-
-        return count
-    }
-
-    private fun isCycleActiveOnDate(context: Context, date: LocalDate): Boolean {
-        val prefs = context.getSharedPreferences(RULES_PREFS_NAME, Context.MODE_PRIVATE)
-
-        val skipSaturdays = prefs.getBoolean(KEY_SKIP_SATURDAYS, true)
-        val skipSundays = prefs.getBoolean(KEY_SKIP_SUNDAYS, true)
-        val skipHolidays = prefs.getBoolean(KEY_SKIP_HOLIDAYS, true)
-
-        if (skipSaturdays && date.dayOfWeek == DayOfWeek.SATURDAY) return false
-        if (skipSundays && date.dayOfWeek == DayOfWeek.SUNDAY) return false
-        if (skipHolidays && isSlovenianPublicHoliday(date)) return false
-
-        return true
-    }
-
-    private fun isSlovenianPublicHoliday(date: LocalDate): Boolean {
-        val fixedHolidays = setOf(
-            LocalDate.of(date.year, Month.JANUARY, 1),
-            LocalDate.of(date.year, Month.JANUARY, 2),
-            LocalDate.of(date.year, Month.FEBRUARY, 8),
-            LocalDate.of(date.year, Month.APRIL, 27),
-            LocalDate.of(date.year, Month.MAY, 1),
-            LocalDate.of(date.year, Month.MAY, 2),
-            LocalDate.of(date.year, Month.JUNE, 25),
-            LocalDate.of(date.year, Month.AUGUST, 15),
-            LocalDate.of(date.year, Month.OCTOBER, 31),
-            LocalDate.of(date.year, Month.NOVEMBER, 1),
-            LocalDate.of(date.year, Month.DECEMBER, 25),
-            LocalDate.of(date.year, Month.DECEMBER, 26)
+        val isSkipped = isSkippedDay(
+            context = context,
+            date = date,
+            skipSaturdays = skipSaturdays,
+            skipSundays = skipSundays,
+            skipHolidays = skipHolidays
         )
 
-        if (date in fixedHolidays) return true
+        if (!isSkipped) return null
 
-        val easterSunday = getEasterSunday(date.year)
-        val easterMonday = easterSunday.plusDays(1)
-        val pentecostSunday = easterSunday.plusDays(49)
-
-        return date == easterMonday || date == pentecostSunday
+        val label = prefs.getString("skippedDayLabel", "Prosto")?.trim().orEmpty()
+        return if (label.isBlank()) "Prosto" else label
     }
 
-    private fun getEasterSunday(year: Int): LocalDate {
-        val a = year % 19
-        val b = year / 100
-        val c = year % 100
-        val d = b / 4
-        val e = b % 4
-        val f = (b + 8) / 25
-        val g = (b - f + 1) / 3
-        val h = (19 * a + b - d - g + 15) % 30
-        val i = c / 4
-        val k = c % 4
-        val l = (32 + 2 * e + 2 * i - h - k) % 7
-        val m = (a + 11 * h + 22 * l) / 451
-        val month = (h + l - 7 * m + 114) / 31
-        val day = ((h + l - 7 * m + 114) % 31) + 1
+    private fun countIncludedDaysForward(
+        context: Context,
+        fromExclusive: LocalDate,
+        toInclusive: LocalDate,
+        skipSaturdays: Boolean,
+        skipSundays: Boolean,
+        skipHolidays: Boolean
+    ): Int {
+        var count = 0
+        var current = fromExclusive.plusDays(1)
 
-        return LocalDate.of(year, month, day)
+        while (!current.isAfter(toInclusive)) {
+            if (isCountedDay(context, current, skipSaturdays, skipSundays, skipHolidays)) {
+                count++
+            }
+            current = current.plusDays(1)
+        }
+
+        return count
+    }
+
+    private fun countIncludedDaysBackward(
+        context: Context,
+        fromInclusive: LocalDate,
+        toExclusive: LocalDate,
+        skipSaturdays: Boolean,
+        skipSundays: Boolean,
+        skipHolidays: Boolean
+    ): Int {
+        var count = 0
+        var current = fromInclusive
+
+        while (current.isBefore(toExclusive)) {
+            if (isCountedDay(context, current, skipSaturdays, skipSundays, skipHolidays)) {
+                count++
+            }
+            current = current.plusDays(1)
+        }
+
+        return count
+    }
+
+    private fun isCountedDay(
+        context: Context,
+        date: LocalDate,
+        skipSaturdays: Boolean,
+        skipSundays: Boolean,
+        skipHolidays: Boolean
+    ): Boolean {
+        return !isSkippedDay(
+            context = context,
+            date = date,
+            skipSaturdays = skipSaturdays,
+            skipSundays = skipSundays,
+            skipHolidays = skipHolidays
+        )
+    }
+
+    private fun isSkippedDay(
+        context: Context,
+        date: LocalDate,
+        skipSaturdays: Boolean,
+        skipSundays: Boolean,
+        skipHolidays: Boolean
+    ): Boolean {
+        val dayOfWeek = date.dayOfWeek.value
+
+        if (skipSaturdays && dayOfWeek == 6) return true
+        if (skipSundays && dayOfWeek == 7) return true
+        if (skipHolidays && HolidayManager.isHoliday(context, date)) return true
+
+        return false
+    }
+
+    private fun positiveModulo(value: Int, mod: Int): Int {
+        return ((value % mod) + mod) % mod
     }
 }

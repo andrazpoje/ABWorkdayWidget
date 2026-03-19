@@ -14,11 +14,9 @@
     <string name="cycle_section">Cikel</string>
     <string name="start_date">Začetni datum: %1$s</string>
     <string name="select_date">Izberi datum</string>
-
     <string name="cycle_days_hint">
         Vnesi oznake cikla, ločene z vejico. Primer: A,B ali Jutro,Popoldne,Nočna,Prosto
     </string>
-
     <string name="first_cycle_day_label">Začetni dan cikla</string>
     <string name="first_cycle_day_hint">
         Ta oznaka velja za izbrani začetni datum.
@@ -28,16 +26,14 @@
     <string name="rules_section">Pravila</string>
     <string name="skip_saturdays">Preskoči sobote</string>
     <string name="skip_sundays">Preskoči nedelje</string>
-    <string name="skip_holidays">Preskoči praznike</string>
-
+    <string name="skip_holidays">Preskoči dela proste dneve</string>
     <string name="rules_info_text">
-        Pravila za preskakovanje prostih dni in praznikov.
+        Določi, ali naj cikel preskoči sobote, nedelje in dela proste dneve.
     </string>
 
     <!-- DISPLAY -->
     <string name="display_section">Prikaz</string>
     <string name="prefix_text">Besedilo pred oznako cikla</string>
-
     <string name="display_info_text">
         Widget prikaže točno oznake, ki jih vneseš v cikel.
     </string>
@@ -53,13 +49,17 @@
         Widget še ni dodan na domači zaslon.
     </string>
     <string name="open_widgets">Odpri widgete</string>
+    <string name="today_label">Danes</string>
+    <string name="tomorrow_label">Jutri</string>
 
     <!-- DATE CHECK -->
     <string name="check_date">Preveri datum</string>
     <string name="date_result">Za ta datum: %1$s</string>
+    <string name="date_result_with_date">Za izbrani datum %1$s je cikel %2$s.</string>
 
     <!-- SAVE -->
     <string name="save">Shrani</string>
+    <string name="settings_saved">Nastavitve shranjene</string>
 
     <!-- DIALOG -->
     <string name="confirm_changes_title">Potrditev sprememb</string>
@@ -72,38 +72,49 @@
     <!-- OTHER -->
     <string name="github_project">Projekt na GitHubu</string>
     <string name="settings">Nastavitve</string>
+    <string name="settings_subtitle">Nastavi cikel, pravila in izgled widgeta.</string>
 
-    <string name="today_label">Danes</string>
-    <string name="tomorrow_label">Jutri</string>
-
+    <!-- Notifications -->
     <string name="notification_channel_normal_name">AB delovni cikel obvestila</string>
-    <string name="notification_channel_normal_desc">Notifications when the workday cycle changes</string>
-
-    <string name="notification_channel_silent_name">AB day notifications silent</string>
-    <string name="notification_channel_silent_desc">Silent notifications when the workday cycle changes</string>
-
+    <string name="notification_channel_normal_desc">Obvestila ob spremembi delovnega cikla</string>
+    <string name="notification_channel_silent_name">AB delovni cikel obvestila brez zvoka</string>
+    <string name="notification_channel_silent_desc">Tiha obvestila ob spremembi delovnega cikla</string>
     <string name="notification_day_changed_title">Cikel se je spremenil</string>
     <string name="notification_day_changed_message">Danes je %1$s delovni dan.</string>
+    <string name="notification_day_off_message">Danes ni delovni dan.</string>
+    <string name="notification_generic_message">Delovni cikel se je posodobil.</string>
+    <string name="notification_today_tomorrow">Danes: %1$s\nJutri: %2$s</string>
+    <string name="notification_day_off_short">ni delovni dan</string>
+    <string name="notification_permission_denied">Dovoljenje za obvestila ni bilo odobreno.</string>
 
-    <string name="settings_notifications_title">Obvestila</string>
-    <string name="settings_enable_notifications">Omogoči obvestila</string>
-    <string name="settings_silent_notifications">Tiho obvestilo</string>
-    <string name="settings_notifications_description">Obvestilo se prikaže ob menjavi dneva.</string>
-
+    <!-- Settings - Widget -->
     <string name="settings_widget_style_title">Videz widgeta</string>
     <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
     <string name="settings_widget_style_classic">Klasičen</string>
     <string name="settings_widget_style_minimal">Minimalističen</string>
 
-    <string name="notification_day_off_message">Danes ni delovni dan.</string>
-    <string name="notification_generic_message">Delovni cikel se je posodobil.</string>
-
-    <string name="notification_today_tomorrow">Danes: %1$s\nJutri: %2$s</string>
-    <string name="notification_day_off_short">ni delovni dan</string>
-
+    <!-- Settings - Notifications -->
     <string name="settings_notification_title">Obvestila</string>
+    <string name="settings_notifications_enabled">Obvestila o spremembi cikla</string>
     <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
 
-    <string name="settings_saved">Nastavitve shranjene</string>
+    <!-- Inputs -->
+    <string name="cycle_days_label">Dnevi v ciklu</string>
+    <string name="cycle_days_hint_placeholder">A, B, Nočna, Prosto</string>
+    <string name="first_cycle_day_placeholder">A</string>
+    <string name="override_skipped_days">Prikaži posebno oznako za preskočene dni</string>
+    <string name="skipped_day_label">Oznaka za preskočen dan</string>
+
+    <!-- Validation -->
+    <string name="error_cycle_empty">Cikel ne sme biti prazen.</string>
+    <string name="error_cycle_invalid_format_detailed">Neveljaven zapis: "%1$s". Uporabi vejice, npr. A, B, C</string>
+    <string name="error_cycle_too_long">Preveč elementov (%1$d). Največ dovoljeno je %2$d</string>
+    <string name="error_label_too_long">Posamezna oznaka dneva ima lahko največ %1$d znakov.</string>
+    <string name="error_label_too_long_detailed">Oznaka "%1$s" je predolga (največ %2$d znakov)</string>
+    <string name="error_first_day_not_in_cycle">Prvi dan "%1$s" ni v ciklu</string>
+
+    <string name="holiday_country_label">Država za dela proste dneve</string>
+    <string name="holiday_country_hint">Izberi državo</string>
+    <string name="holiday_country_slovenia">Slovenija</string>
 
 </resources>

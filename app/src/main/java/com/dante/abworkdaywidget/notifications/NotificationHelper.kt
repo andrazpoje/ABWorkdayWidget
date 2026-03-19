@@ -19,7 +19,7 @@ object NotificationHelper {
 
     fun areNotificationsEnabled(context: Context): Boolean {
         val prefs = context.getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, true)
+        return prefs.getBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, false)
     }
 
     private fun isSilentNotificationEnabled(context: Context): Boolean {
@@ -32,6 +32,8 @@ object NotificationHelper {
         title: String,
         message: String
     ) {
+        if (!areNotificationsEnabled(context)) return
+
         val manager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
