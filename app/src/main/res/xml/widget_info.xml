@@ -8,4 +8,4 @@
     android:initialLayout="@layout/widget_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
-    android:label="AB Workday Widget" />
+    android:label="@string/app_name" />
