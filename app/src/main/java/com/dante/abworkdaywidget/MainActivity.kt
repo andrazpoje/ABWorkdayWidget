@@ -56,6 +56,8 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_NOTIFICATION_PERMISSION = 1001
         const val MAX_CYCLE_ITEMS = 16
         const val MAX_LABEL_LENGTH = 24
+
+        const val KEY_FIRST_CYCLE_DAY = "firstCycleDay"
     }
 
     private var hasUnsavedChanges = false
@@ -307,9 +309,14 @@ class MainActivity : AppCompatActivity() {
 
             val selectedLegacyDate = LocalDate.of(year, month, day)
             val cycleStartDate = if (startIsA) selectedLegacyDate else selectedLegacyDate.minusDays(1)
+            val legacyFirstDay = if (startIsA) labelA else labelB
 
             CycleManager.saveCycle(this, listOf(labelA, labelB))
             CycleManager.saveStartDate(this, cycleStartDate)
+
+            prefs.edit()
+                .putString(KEY_FIRST_CYCLE_DAY, legacyFirstDay)
+                .apply()
         }
 
         if (!prefs.contains("overrideSkippedDays")) {
@@ -317,7 +324,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (!prefs.contains(HolidayManager.KEY_HOLIDAY_COUNTRY)) {
-            prefs.edit().putString(HolidayManager.KEY_HOLIDAY_COUNTRY, HolidayManager.DEFAULT_COUNTRY).apply()
+            prefs.edit()
+                .putString(HolidayManager.KEY_HOLIDAY_COUNTRY, HolidayManager.DEFAULT_COUNTRY)
+                .apply()
         }
     }
 
@@ -496,7 +505,14 @@ class MainActivity : AppCompatActivity() {
         selectedDate = cycleStartDate
 
         cycleDaysEdit.setText(cycle.joinToString(", "))
-        firstCycleDayEdit.setText(cycle.firstOrNull() ?: "A")
+
+        val savedFirstDay = sanitizeLabel(
+            prefs.getString(KEY_FIRST_CYCLE_DAY, cycle.firstOrNull() ?: "A")
+                ?: (cycle.firstOrNull() ?: "A"),
+            cycle.firstOrNull() ?: "A"
+        )
+
+        firstCycleDayEdit.setText(savedFirstDay)
 
         switchSaturdays.isChecked = prefs.getBoolean("skipSaturdays", true)
         switchSundays.isChecked = prefs.getBoolean("skipSundays", true)
@@ -570,7 +586,12 @@ class MainActivity : AppCompatActivity() {
                 CycleThemeManager.saveTheme(this, CycleThemeManager.THEME_CLASSIC)
         }
 
-        firstCycleDayEdit.setText(normalizedCycle.firstOrNull() ?: "A")
+        val selectedFirstDay = sanitizeLabel(
+            firstCycleDayEdit.text.toString(),
+            normalizedCycle.firstOrNull() ?: "A"
+        )
+
+        firstCycleDayEdit.setText(selectedFirstDay)
         cycleDaysEdit.setText(normalizedCycle.joinToString(", "))
 
         val selectedCountryCode = supportedCountries
@@ -582,6 +603,7 @@ class MainActivity : AppCompatActivity() {
             .putInt("startYear", selectedDate.year)
             .putInt("startMonth", selectedDate.monthValue)
             .putInt("startDay", selectedDate.dayOfMonth)
+            .putString(KEY_FIRST_CYCLE_DAY, selectedFirstDay)
             .putString("prefixText", prefixEdit.text.toString().trim())
             .putBoolean("skipSaturdays", switchSaturdays.isChecked)
             .putBoolean("skipSundays", switchSundays.isChecked)
@@ -632,9 +654,8 @@ class MainActivity : AppCompatActivity() {
             return null
         }
 
-        val rawParts = rawInput.split(",")
-
-        val cycle = rawParts
+        val cycle = rawInput
+            .split(",")
             .map { it.trim() }
             .filter { it.isNotBlank() }
 
