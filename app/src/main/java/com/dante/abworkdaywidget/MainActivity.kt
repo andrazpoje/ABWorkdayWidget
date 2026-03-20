@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.app.DatePickerDialog
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -112,7 +113,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var themeDark: RadioButton
 
     lateinit var selectedDate: LocalDate
-    lateinit var supportedCountries: List<HolidayManager.HolidayCountryItem>
+    lateinit var supportedCountries: List<HolidayCountry>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -254,19 +255,60 @@ class MainActivity : AppCompatActivity() {
         previewRecyclerView.isNestedScrollingEnabled = false
     }
 
+    fun buildCountryDisplayList(
+        detectedCode: String,
+        isManual: Boolean
+    ): List<String> {
+        return supportedCountries.map {
+            if (!isManual && it.code == detectedCode) {
+                "${it.displayName} (auto-detected)"
+            } else {
+                it.displayName
+            }
+        }
+    }
+
     fun setupHolidayCountryDropdown() {
-        supportedCountries = HolidayManager.getSupportedCountries(this)
+        supportedCountries = HolidayManager.supportedCountries
 
-        val displayItems = supportedCountries.map { it.displayName }
+        val prefs = getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+        val detectedCode = HolidayManager.getSelectedCountry(this)
+        val isManual = prefs.getBoolean(HolidayManager.KEY_COUNTRY_MANUAL, false)
 
-        val adapter = ArrayAdapter(
+        val displayItems = buildCountryDisplayList(detectedCode, isManual)
+
+        val adapter = object : ArrayAdapter<String>(
             this,
             android.R.layout.simple_list_item_1,
             displayItems
-        )
+        ) {
+            override fun getFilter(): android.widget.Filter {
+                return object : android.widget.Filter() {
+                    override fun performFiltering(constraint: CharSequence?): FilterResults {
+                        return FilterResults().apply {
+                            values = displayItems
+                            count = displayItems.size
+                        }
+                    }
+
+                    override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                        clear()
+                        addAll(displayItems)
+                        notifyDataSetChanged()
+                    }
+
+                    override fun convertResultToString(resultValue: Any?): CharSequence {
+                        return resultValue as String
+                    }
+                }
+            }
+        }
 
         holidayCountryDropdown.setAdapter(adapter)
         holidayCountryDropdown.keyListener = null
+        holidayCountryDropdown.setOnClickListener {
+            holidayCountryDropdown.showDropDown()
+        }
     }
 
     fun migrateLegacySettingsIfNeeded() {
@@ -301,11 +343,7 @@ class MainActivity : AppCompatActivity() {
             prefs.edit().putBoolean("overrideSkippedDays", true).apply()
         }
 
-        if (!prefs.contains(HolidayManager.KEY_HOLIDAY_COUNTRY)) {
-            prefs.edit()
-                .putString(HolidayManager.KEY_HOLIDAY_COUNTRY, HolidayManager.DEFAULT_COUNTRY)
-                .apply()
-        }
+        HolidayManager.ensureCountrySelected(this)
     }
 
     fun showCheckDatePicker() {

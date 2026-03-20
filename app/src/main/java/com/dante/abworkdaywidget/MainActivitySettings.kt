@@ -91,15 +91,20 @@ fun MainActivity.loadSettings() {
     skippedDayLabelEdit.isEnabled = overrideSkippedDays
     skippedDayLabelEdit.alpha = if (overrideSkippedDays) 1f else 0.5f
 
-    val selectedCountryCode = prefs.getString(
-        HolidayManager.KEY_HOLIDAY_COUNTRY,
-        HolidayManager.DEFAULT_COUNTRY
-    ) ?: HolidayManager.DEFAULT_COUNTRY
+    val selectedCountryCode = HolidayManager.getSelectedCountry(this)
 
     val selectedCountry = supportedCountries.firstOrNull { it.code == selectedCountryCode }
         ?: supportedCountries.first()
 
-    holidayCountryDropdown.setText(selectedCountry.displayName, false)
+    val isManual = prefs.getBoolean(HolidayManager.KEY_COUNTRY_MANUAL, false)
+
+    val displayText = if (!isManual && selectedCountry.code == HolidayManager.getSelectedCountry(this)) {
+        "${selectedCountry.displayName} (auto-detected)"
+    } else {
+        selectedCountry.displayName
+    }
+
+    holidayCountryDropdown.setText(displayText, false)
 
     prefixEdit.setText(prefs.getString("prefixText", "") ?: "")
 
@@ -162,7 +167,10 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
     cycleDaysEdit.setText(normalizedCycle.joinToString(", "))
 
     val selectedCountryCode = supportedCountries
-        .firstOrNull { it.displayName == holidayCountryDropdown.text?.toString()?.trim() }
+        .firstOrNull {
+            val selectedText = holidayCountryDropdown.text?.toString()?.trim().orEmpty()
+            selectedText == it.displayName || selectedText.startsWith("${it.displayName} (")
+        }
         ?.code
         ?: HolidayManager.DEFAULT_COUNTRY
 
@@ -177,8 +185,9 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
         .putBoolean("skipHolidays", switchHolidays.isChecked)
         .putBoolean("overrideSkippedDays", switchOverrideSkippedDays.isChecked)
         .putString("skippedDayLabel", sanitizeLabel(skippedDayLabelEdit.text.toString(), "Prosto"))
-        .putString(HolidayManager.KEY_HOLIDAY_COUNTRY, selectedCountryCode)
         .apply()
+
+    HolidayManager.saveSelectedCountry(this, selectedCountryCode)
 
     val uiPrefs = getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
 
