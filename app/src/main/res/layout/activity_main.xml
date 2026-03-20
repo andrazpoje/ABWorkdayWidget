@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/activityRoot"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical">
 
-	<!-- =========================================================
-         GLAVNI SCROLL CONTAINER
-         ========================================================= -->
 	<androidx.core.widget.NestedScrollView
 		android:id="@+id/main"
 		android:layout_width="match_parent"
@@ -24,9 +22,7 @@
 			android:paddingEnd="20dp"
 			android:paddingBottom="24dp">
 
-			<!-- =========================================================
-                 HEADER / NASLOV APLIKACIJE
-                 ========================================================= -->
+			<!-- HEADER -->
 			<RelativeLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -37,7 +33,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_centerVertical="true"
-					android:letterSpacing="0.03"
+					android:letterSpacing="0.02"
 					android:text="@string/app_name"
 					android:textSize="24sp"
 					android:textStyle="bold" />
@@ -55,7 +51,6 @@
 					android:tint="?attr/colorOnSurface" />
 			</RelativeLayout>
 
-			<!-- Kratek opis pod naslovom -->
 			<TextView
 				android:id="@+id/screenSubtitle"
 				android:layout_width="match_parent"
@@ -65,17 +60,12 @@
 				android:text="@string/settings_subtitle"
 				android:textSize="14sp" />
 
-			<!-- =========================================================
-                 STATUS KARTICA (Danes / Jutri)
-                 ========================================================= -->
+			<!-- STATUS CARD -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/statusCard"
 				android:layout_width="match_parent"
 				android:layout_height="180dp"
 				android:layout_marginBottom="20dp"
-				android:clickable="true"
-				android:focusable="true"
-				android:foreground="?attr/selectableItemBackground"
 				app:cardCornerRadius="24dp"
 				app:cardElevation="6dp"
 				app:cardUseCompatPadding="true">
@@ -102,7 +92,6 @@
 						android:layout_height="0dp"
 						android:layout_weight="1"
 						android:gravity="center"
-						android:letterSpacing="0.02"
 						android:textColor="@color/statusTextOnCard"
 						android:textSize="44sp"
 						android:textStyle="bold" />
@@ -111,7 +100,6 @@
 						android:id="@+id/tomorrowStatusText"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:alpha="0.95"
 						android:gravity="center"
 						android:textColor="@color/statusTextOnCard"
 						android:textSize="18sp"
@@ -119,9 +107,7 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- =========================================================
-                 PREVIEW NASLEDNJIH DNI
-                 ========================================================= -->
+			<!-- PREVIEW -->
 			<TextView
 				android:id="@+id/previewTitle"
 				android:layout_width="match_parent"
@@ -138,9 +124,7 @@
 				android:layout_marginBottom="20dp"
 				android:nestedScrollingEnabled="false" />
 
-			<!-- =========================================================
-                 OPOZORILO, ČE WIDGET ŠE NI DODAN
-                 ========================================================= -->
+			<!-- WIDGET PROMPT -->
 			<LinearLayout
 				android:id="@+id/widgetPromptContainer"
 				android:layout_width="match_parent"
@@ -162,9 +146,7 @@
 					android:text="@string/open_widgets" />
 			</LinearLayout>
 
-			<!-- =========================================================
-                 SECTION HEADER: CYCLE
-                 ========================================================= -->
+			<!-- CYCLE HEADER -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/cycleHeader"
 				android:layout_width="match_parent"
@@ -199,14 +181,7 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- =========================================================
-                 SECTION CONTENT: CYCLE
-                 Tukaj so:
-                 - začetni datum
-                 - input za cikel
-                 - prvi dan cikla
-                 - preveri datum
-                 ========================================================= -->
+			<!-- CYCLE SECTION -->
 			<LinearLayout
 				android:id="@+id/cycleSection"
 				android:layout_width="match_parent"
@@ -227,7 +202,6 @@
 						android:orientation="vertical"
 						android:padding="16dp">
 
-						<!-- Začetni datum -->
 						<TextView
 							android:id="@+id/dateText"
 							android:layout_width="wrap_content"
@@ -244,7 +218,6 @@
 							android:layout_marginBottom="16dp"
 							android:text="@string/select_date" />
 
-						<!-- Input: Dnevi v ciklu -->
 						<TextView
 							android:id="@+id/cycleDaysLabel"
 							android:layout_width="match_parent"
@@ -276,7 +249,6 @@
 							android:text="@string/cycle_days_hint"
 							android:textSize="12sp" />
 
-						<!-- Input: Prvi dan cikla -->
 						<TextView
 							android:id="@+id/firstCycleDayLabel"
 							android:layout_width="match_parent"
@@ -309,7 +281,6 @@
 							android:text="@string/first_cycle_day_hint"
 							android:textSize="12sp" />
 
-						<!-- Gumb: preveri datum -->
 						<Button
 							android:id="@+id/checkDateButton"
 							android:layout_width="match_parent"
@@ -317,21 +288,17 @@
 							android:layout_marginBottom="8dp"
 							android:text="@string/check_date" />
 
-						<!-- Rezultat preverjanja datuma -->
 						<TextView
 							android:id="@+id/dateResultText"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:layout_marginBottom="4dp"
 							android:textSize="20sp"
 							android:textStyle="bold" />
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
-			<!-- =========================================================
-                 SECTION HEADER: RULES
-                 ========================================================= -->
+			<!-- RULES HEADER -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/rulesHeader"
 				android:layout_width="match_parent"
@@ -366,15 +333,7 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- =========================================================
-                 SECTION CONTENT: RULES
-                 Tukaj so:
-                 - preskoči sobote
-                 - preskoči nedelje
-                 - preskoči dela proste dneve
-                 - izbira države za dela proste dneve
-                 - override oznaka za preskočene dni
-                 ========================================================= -->
+			<!-- RULES SECTION -->
 			<LinearLayout
 				android:id="@+id/rulesSection"
 				android:layout_width="match_parent"
@@ -395,7 +354,6 @@
 						android:orientation="vertical"
 						android:padding="16dp">
 
-						<!-- Skip sobote -->
 						<com.google.android.material.switchmaterial.SwitchMaterial
 							android:id="@+id/switchSaturdays"
 							android:layout_width="match_parent"
@@ -403,7 +361,6 @@
 							android:text="@string/skip_saturdays"
 							app:useMaterialThemeColors="true" />
 
-						<!-- Skip nedelje -->
 						<com.google.android.material.switchmaterial.SwitchMaterial
 							android:id="@+id/switchSundays"
 							android:layout_width="match_parent"
@@ -411,7 +368,6 @@
 							android:text="@string/skip_sundays"
 							app:useMaterialThemeColors="true" />
 
-						<!-- Skip dela prostih dni -->
 						<com.google.android.material.switchmaterial.SwitchMaterial
 							android:id="@+id/switchHolidays"
 							android:layout_width="match_parent"
@@ -419,7 +375,6 @@
 							android:text="@string/skip_holidays"
 							app:useMaterialThemeColors="true" />
 
-						<!-- Izbira države za dela proste dneve -->
 						<TextView
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
@@ -441,7 +396,6 @@
 								android:inputType="none" />
 						</com.google.android.material.textfield.TextInputLayout>
 
-						<!-- Override prikaza za preskočene dni -->
 						<com.google.android.material.switchmaterial.SwitchMaterial
 							android:id="@+id/switchOverrideSkippedDays"
 							android:layout_width="match_parent"
@@ -450,7 +404,6 @@
 							android:text="@string/override_skipped_days"
 							app:useMaterialThemeColors="true" />
 
-						<!-- Oznaka za preskočen dan, npr. Prosto -->
 						<com.google.android.material.textfield.TextInputLayout
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
@@ -466,7 +419,6 @@
 								android:maxLines="1" />
 						</com.google.android.material.textfield.TextInputLayout>
 
-						<!-- Pojasnilo -->
 						<TextView
 							android:id="@+id/rulesInfoText"
 							android:layout_width="match_parent"
@@ -479,9 +431,7 @@
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
-			<!-- =========================================================
-                 SECTION HEADER: DISPLAY
-                 ========================================================= -->
+			<!-- DISPLAY HEADER -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/displayHeader"
 				android:layout_width="match_parent"
@@ -516,14 +466,7 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- =========================================================
-                 SECTION CONTENT: DISPLAY
-                 Tukaj so:
-                 - prefix text
-                 - tema barv
-                 - stil widgeta
-                 - obvestila
-                 ========================================================= -->
+			<!-- DISPLAY SECTION -->
 			<LinearLayout
 				android:id="@+id/displaySection"
 				android:layout_width="match_parent"
@@ -532,7 +475,6 @@
 				android:orientation="vertical"
 				android:visibility="gone">
 
-				<!-- Prefix -->
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
@@ -568,7 +510,6 @@
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 
-				<!-- Izbira barvne teme -->
 				<com.google.android.material.card.MaterialCardView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
@@ -617,7 +558,6 @@
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 
-				<!-- Stil widgeta -->
 				<com.google.android.material.card.MaterialCardView
 					android:id="@+id/cardWidgetStyle"
 					android:layout_width="match_parent"
@@ -667,7 +607,6 @@
 					</LinearLayout>
 				</com.google.android.material.card.MaterialCardView>
 
-				<!-- Obvestila -->
 				<com.google.android.material.card.MaterialCardView
 					android:id="@+id/cardNotifications"
 					android:layout_width="match_parent"
@@ -705,9 +644,7 @@
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
-			<!-- =========================================================
-                 FOOTER
-                 ========================================================= -->
+			<!-- FOOTER -->
 			<TextView
 				android:id="@+id/versionText"
 				android:layout_width="wrap_content"
@@ -718,7 +655,6 @@
 				android:text="v1.4"
 				android:textSize="12sp" />
 
-			<!-- Skrit GitHub link zaradi kompatibilnosti z MainActivity -->
 			<TextView
 				android:id="@+id/githubLinkText"
 				android:layout_width="wrap_content"
@@ -728,10 +664,9 @@
 		</LinearLayout>
 	</androidx.core.widget.NestedScrollView>
 
-	<!-- =========================================================
-         SPODNJI STICKY SAVE GUMB
-         ========================================================= -->
+	<!-- BOTTOM SAVE BAR -->
 	<com.google.android.material.card.MaterialCardView
+		android:id="@+id/saveBarContainer"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		app:cardElevation="10dp">
@@ -740,7 +675,10 @@
 			android:id="@+id/saveButton"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_margin="12dp"
+			android:layout_marginStart="12dp"
+			android:layout_marginTop="12dp"
+			android:layout_marginEnd="12dp"
+			android:layout_marginBottom="12dp"
 			android:minHeight="54dp"
 			android:text="@string/save"
 			android:textAllCaps="false" />

@@ -72,10 +72,11 @@ class ABWidgetProvider : AppWidgetProvider() {
         val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0)
 
         val mode = resolveWidgetMode(minWidth, minHeight)
+        val isVeryNarrow = minWidth < 170
 
-        val showPrefix = prefix.isNotBlank() && mode != WidgetMode.SMALL
-        val showTodayLabel = mode != WidgetMode.SMALL
-        val showExtraDays = mode != WidgetMode.SMALL
+        val showPrefix = prefix.isNotBlank() && mode != WidgetMode.SMALL && !isVeryNarrow
+        val showTodayLabel = mode != WidgetMode.SMALL && !isVeryNarrow
+        val showExtraDays = mode == WidgetMode.LARGE || (mode == WidgetMode.MEDIUM && !isVeryNarrow)
 
         views.setTextViewText(R.id.abText, todayCycle)
         views.setTextColor(R.id.abText, todayColor)
@@ -261,8 +262,8 @@ class ABWidgetProvider : AppWidgetProvider() {
 
     private fun resolveWidgetMode(minWidth: Int, minHeight: Int): WidgetMode {
         return when {
-            minWidth >= 180 || minHeight >= 220 -> WidgetMode.LARGE
-            minWidth >= 120 || minHeight >= 120 -> WidgetMode.MEDIUM
+            minWidth >= 220 && minHeight >= 180 -> WidgetMode.LARGE
+            minWidth >= 160 && minHeight >= 110 -> WidgetMode.MEDIUM
             else -> WidgetMode.SMALL
         }
     }

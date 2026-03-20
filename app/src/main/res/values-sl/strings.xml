@@ -117,4 +117,10 @@
     <string name="holiday_country_hint">Izberi državo</string>
     <string name="holiday_country_slovenia">Slovenija</string>
 
+    <string name="unsaved_changes_title">Neshranjene spremembe</string>
+    <string name="unsaved_changes_message">Imaš neshranjene spremembe. Ali jih želiš shraniti pred izhodom?</string>
+    <string name="discard">Zavrzi</string>
+
+    <string name="cancel">Prekliči</string>
+
 </resources>

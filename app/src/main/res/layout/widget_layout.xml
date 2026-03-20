@@ -50,7 +50,7 @@
             android:maxLines="1"
             android:text="A"
             android:textColor="#FFFFFF"
-            android:textSize="44sp"
+            android:textSize="36sp"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -277,5 +277,7 @@
             </LinearLayout>
 
         </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>

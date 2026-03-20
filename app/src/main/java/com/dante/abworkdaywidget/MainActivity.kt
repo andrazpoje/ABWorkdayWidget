@@ -25,6 +25,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -36,6 +37,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.abworkdaywidget.data.Prefs
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import java.time.LocalDate
@@ -61,6 +63,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var hasUnsavedChanges = false
+
+    private lateinit var activityRoot: View
+    private lateinit var saveBarContainer: View
 
     private lateinit var cycleHeader: View
     private lateinit var rulesHeader: View
@@ -125,6 +130,8 @@ class MainActivity : AppCompatActivity() {
         setupPreviewRecyclerView()
         setupHolidayCountryDropdown()
         migrateLegacySettingsIfNeeded()
+        applyEdgeToEdgeInsets()
+        setupBackHandling()
 
         updateWidgetHint()
         loadSettings()
@@ -151,20 +158,7 @@ class MainActivity : AppCompatActivity() {
 
         saveButton.setOnClickListener {
             if (!hasUnsavedChanges) return@setOnClickListener
-
-            val validatedCycle = validateAndBuildCycle() ?: return@setOnClickListener
-
-            saveSettings(validatedCycle)
-            refreshWidget()
-            updateTodayStatus()
-            updateCyclePreview()
-            clearUnsavedChanges()
-
-            Toast.makeText(
-                this,
-                getString(R.string.settings_saved),
-                Toast.LENGTH_SHORT
-            ).show()
+            saveChangesAndRefresh()
         }
 
         settingsButton.setOnClickListener {
@@ -189,17 +183,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                v.paddingTop,
-                v.paddingRight,
-                bars.bottom
-            )
-            insets
-        }
-
         Log.d("LANG_TEST", "locale=${Locale.getDefault()}")
         Log.d("LANG_TEST", "resources_locale=${resources.configuration.locales[0].toLanguageTag()}")
         Log.d("LANG_TEST", "save_string=${getString(R.string.save)}")
@@ -216,6 +199,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
+        activityRoot = findViewById(R.id.activityRoot)
+        saveBarContainer = findViewById(R.id.saveBarContainer)
+
         mainScrollView = findViewById(R.id.main)
 
         cycleHeader = findViewById(R.id.cycleHeader)
@@ -267,6 +253,87 @@ class MainActivity : AppCompatActivity() {
         themeClassic = findViewById(R.id.themeClassic)
         themePastel = findViewById(R.id.themePastel)
         themeDark = findViewById(R.id.themeDark)
+    }
+
+    private fun applyEdgeToEdgeInsets() {
+        val scrollBottomPadding = resources.getDimensionPixelSize(R.dimen.main_scroll_bottom_padding)
+        val saveBarExtraBottom = resources.getDimensionPixelSize(R.dimen.save_bar_extra_bottom_padding)
+
+        ViewCompat.setOnApplyWindowInsetsListener(activityRoot) { _, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            mainScrollView.setPadding(
+                mainScrollView.paddingLeft,
+                mainScrollView.paddingTop,
+                mainScrollView.paddingRight,
+                scrollBottomPadding
+            )
+
+            saveBarContainer.setPadding(
+                saveBarContainer.paddingLeft,
+                saveBarContainer.paddingTop,
+                saveBarContainer.paddingRight,
+                systemBars.bottom + saveBarExtraBottom
+            )
+
+            insets
+        }
+    }
+
+    private fun setupBackHandling() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (!hasUnsavedChanges) {
+                    finish()
+                    return
+                }
+
+                showUnsavedChangesDialog(
+                    onSave = {
+                        val saved = saveChangesAndRefresh()
+                        if (saved) finish()
+                    },
+                    onDiscard = {
+                        finish()
+                    }
+                )
+            }
+        })
+    }
+
+    private fun showUnsavedChangesDialog(
+        onSave: () -> Unit,
+        onDiscard: () -> Unit
+    ) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.unsaved_changes_title)
+            .setMessage(R.string.unsaved_changes_message)
+            .setPositiveButton(R.string.save) { _, _ ->
+                onSave()
+            }
+            .setNegativeButton(R.string.discard) { _, _ ->
+                onDiscard()
+            }
+            .setNeutralButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun saveChangesAndRefresh(): Boolean {
+        val validatedCycle = validateAndBuildCycle() ?: return false
+
+        saveSettings(validatedCycle)
+        refreshWidget()
+        updateTodayStatus()
+        updateCyclePreview()
+        clearUnsavedChanges()
+
+        Toast.makeText(
+            this,
+            getString(R.string.settings_saved),
+            Toast.LENGTH_SHORT
+        ).show()
+
+        return true
     }
 
     private fun setupPreviewRecyclerView() {
@@ -871,8 +938,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun animateSaveButtonActivated() {
-        saveButton.animate().cancel()
-
         saveButton.scaleX = 0.96f
         saveButton.scaleY = 0.96f
 

@@ -119,4 +119,10 @@
     <string name="holiday_country_hint">Select country</string>
     <string name="holiday_country_slovenia">Slovenia</string>
 
+    <string name="unsaved_changes_title">Unsaved changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
+    <string name="discard">Discard</string>
+
+    <string name="cancel">Cancel</string>
+
 </resources>
