@@ -103,12 +103,15 @@
     <string name="skipped_day_label">Oznaka za preskočen dan</string>
 
     <!-- Validation -->
-    <string name="error_cycle_empty">Cikel ne sme biti prazen.</string>
+    <string name="error_cycle_empty">Vnesi vsaj en dan cikla</string>
     <string name="error_cycle_invalid_format_detailed">Neveljaven zapis: "%1$s". Uporabi vejice, npr. A, B, C</string>
-    <string name="error_cycle_too_long">Preveč elementov (%1$d). Največ dovoljeno je %2$d</string>
-    <string name="error_label_too_long">Posamezna oznaka dneva ima lahko največ %1$d znakov.</string>
+    <string name="error_cycle_too_many">Preveč elementov (%1$d). Največ dovoljeno: %2$d</string>
+    <string name="error_cycle_empty_item">Prazni vnosi niso dovoljeni</string>
+    <string name="error_cycle_duplicates">Podvojene vrednosti niso dovoljene</string>
+    <string name="error_label_too_long">Posamezna oznaka cikla ima lahko največ %1$d znakov.</string>
     <string name="error_label_too_long_detailed">Oznaka "%1$s" je predolga (največ %2$d znakov)</string>
-    <string name="error_first_day_not_in_cycle">Prvi dan "%1$s" ni v ciklu</string>
+    <string name="error_first_day_not_in_cycle">Začetni dan "%1$s" ni v ciklu</string>
+    <string name="fix_errors">Popravi napake v vnosu</string>
 
     <string name="holiday_country_label">Država za dela proste dneve</string>
     <string name="holiday_country_hint">Izberi državo</string>
@@ -119,7 +122,6 @@
     <string name="discard">Zavrzi</string>
 
     <string name="cancel">Prekliči</string>
-
 
 
 </resources>

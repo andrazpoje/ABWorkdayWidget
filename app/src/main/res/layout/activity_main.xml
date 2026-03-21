@@ -9,8 +9,8 @@
 		android:id="@+id/main"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:fillViewport="true"
-		android:clipToPadding="false">
+		android:clipToPadding="false"
+		android:fillViewport="true">
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -21,17 +21,21 @@
 			android:paddingEnd="20dp"
 			android:paddingBottom="24dp">
 
-			<RelativeLayout
+			<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginBottom="12dp">
+				android:layout_marginBottom="12dp"
+				android:gravity="center_vertical"
+				android:orientation="horizontal">
 
 				<TextView
 					android:id="@+id/appTitle"
-					android:layout_width="wrap_content"
+					android:layout_width="0dp"
 					android:layout_height="wrap_content"
-					android:layout_centerVertical="true"
+					android:layout_weight="1"
+					android:ellipsize="end"
 					android:letterSpacing="0.02"
+					android:maxLines="1"
 					android:text="@string/app_name"
 					android:textSize="24sp"
 					android:textStyle="bold" />
@@ -40,14 +44,13 @@
 					android:id="@+id/settingsButton"
 					android:layout_width="40dp"
 					android:layout_height="40dp"
-					android:layout_alignParentEnd="true"
-					android:layout_centerVertical="true"
+					android:layout_marginStart="12dp"
 					android:background="?attr/selectableItemBackgroundBorderless"
 					android:contentDescription="@string/settings"
 					android:padding="8dp"
-					android:src="@android:drawable/ic_menu_preferences"
-					android:tint="?attr/colorOnSurface" />
-			</RelativeLayout>
+					android:src="@drawable/ic_settings_24"
+					app:tint="?attr/colorOnSurface" />
+			</LinearLayout>
 
 			<TextView
 				android:id="@+id/screenSubtitle"
@@ -61,8 +64,9 @@
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/statusCard"
 				android:layout_width="match_parent"
-				android:layout_height="180dp"
+				android:layout_height="wrap_content"
 				android:layout_marginBottom="20dp"
+				android:minHeight="180dp"
 				app:cardCornerRadius="24dp"
 				app:cardElevation="6dp"
 				app:cardUseCompatPadding="true">
@@ -134,504 +138,22 @@
 					android:layout_height="wrap_content"
 					android:layout_marginBottom="8dp" />
 
-				<Button
+				<com.google.android.material.button.MaterialButton
 					android:id="@+id/openWidgetsButton"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:text="@string/open_widgets" />
+					android:text="@string/open_widgets"
+					app:icon="@drawable/ic_widgets_24"
+					app:iconGravity="textStart"
+					app:iconPadding="8dp"
+					app:iconTint="?attr/colorOnPrimary" />
 			</LinearLayout>
 
-			<com.google.android.material.card.MaterialCardView
-				android:id="@+id/cycleHeader"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="8dp"
-				android:clickable="true"
-				android:focusable="true"
-				android:foreground="?attr/selectableItemBackground"
-				app:cardCornerRadius="18dp"
-				app:cardElevation="3dp">
+			<include layout="@layout/include_cycle_section" />
 
-				<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:padding="16dp">
+			<include layout="@layout/include_rules_section" />
 
-					<TextView
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:text="@string/cycle_section"
-						android:textSize="18sp"
-						android:textStyle="bold" />
-
-					<TextView
-						android:id="@+id/cycleArrow"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="▼"
-						android:textSize="18sp" />
-				</LinearLayout>
-			</com.google.android.material.card.MaterialCardView>
-
-			<LinearLayout
-				android:id="@+id/cycleSection"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="20dp"
-				android:orientation="vertical"
-				android:visibility="gone">
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					app:cardCornerRadius="18dp"
-					app:cardUseCompatPadding="true">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="16dp">
-
-						<TextView
-							android:id="@+id/dateText"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="8dp"
-							android:text="@string/start_date"
-							android:textSize="15sp"
-							android:textStyle="bold" />
-
-						<Button
-							android:id="@+id/pickDateButton"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="16dp"
-							android:text="@string/select_date" />
-
-						<TextView
-							android:id="@+id/cycleDaysLabel"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="6dp"
-							android:text="@string/cycle_days_label"
-							android:textSize="16sp"
-							android:textStyle="bold" />
-
-						<com.google.android.material.textfield.TextInputLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="6dp"
-							android:hint="@string/cycle_days_hint_placeholder">
-
-							<com.google.android.material.textfield.TextInputEditText
-								android:id="@+id/cycleDaysEdit"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:inputType="text"
-								android:maxLines="1" />
-						</com.google.android.material.textfield.TextInputLayout>
-
-						<TextView
-							android:id="@+id/cycleDaysHint"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="16dp"
-							android:text="@string/cycle_days_hint"
-							android:textSize="12sp" />
-
-						<TextView
-							android:id="@+id/firstCycleDayLabel"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="6dp"
-							android:text="@string/first_cycle_day_label"
-							android:textSize="16sp"
-							android:textStyle="bold" />
-
-						<com.google.android.material.textfield.TextInputLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="6dp"
-							android:hint="@string/first_cycle_day_placeholder">
-
-							<com.google.android.material.textfield.TextInputEditText
-								android:id="@+id/firstCycleDayEdit"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:inputType="text"
-								android:maxLength="24"
-								android:maxLines="1" />
-						</com.google.android.material.textfield.TextInputLayout>
-
-						<TextView
-							android:id="@+id/firstCycleDayHint"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="16dp"
-							android:text="@string/first_cycle_day_hint"
-							android:textSize="12sp" />
-
-						<Button
-							android:id="@+id/checkDateButton"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="8dp"
-							android:text="@string/check_date" />
-
-						<TextView
-							android:id="@+id/dateResultText"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:textSize="20sp"
-							android:textStyle="bold" />
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-			</LinearLayout>
-
-			<com.google.android.material.card.MaterialCardView
-				android:id="@+id/rulesHeader"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="8dp"
-				android:clickable="true"
-				android:focusable="true"
-				android:foreground="?attr/selectableItemBackground"
-				app:cardCornerRadius="18dp"
-				app:cardElevation="3dp">
-
-				<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:padding="16dp">
-
-					<TextView
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:text="@string/rules_section"
-						android:textSize="18sp"
-						android:textStyle="bold" />
-
-					<TextView
-						android:id="@+id/rulesArrow"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="▼"
-						android:textSize="18sp" />
-				</LinearLayout>
-			</com.google.android.material.card.MaterialCardView>
-
-			<LinearLayout
-				android:id="@+id/rulesSection"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="20dp"
-				android:orientation="vertical"
-				android:visibility="gone">
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					app:cardCornerRadius="18dp"
-					app:cardUseCompatPadding="true">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="16dp">
-
-						<com.google.android.material.switchmaterial.SwitchMaterial
-							android:id="@+id/switchSaturdays"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:text="@string/skip_saturdays"
-							app:useMaterialThemeColors="true" />
-
-						<com.google.android.material.switchmaterial.SwitchMaterial
-							android:id="@+id/switchSundays"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:text="@string/skip_sundays"
-							app:useMaterialThemeColors="true" />
-
-						<com.google.android.material.switchmaterial.SwitchMaterial
-							android:id="@+id/switchHolidays"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:text="@string/skip_holidays"
-							app:useMaterialThemeColors="true" />
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
-							android:layout_marginBottom="6dp"
-							android:text="@string/holiday_country_label"
-							android:textSize="16sp"
-							android:textStyle="bold" />
-
-						<com.google.android.material.textfield.TextInputLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:hint="@string/holiday_country_hint">
-
-							<com.google.android.material.textfield.MaterialAutoCompleteTextView
-								android:id="@+id/holidayCountryDropdown"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:inputType="none" />
-						</com.google.android.material.textfield.TextInputLayout>
-
-						<com.google.android.material.switchmaterial.SwitchMaterial
-							android:id="@+id/switchOverrideSkippedDays"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
-							android:text="@string/override_skipped_days"
-							app:useMaterialThemeColors="true" />
-
-						<com.google.android.material.textfield.TextInputLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="8dp"
-							android:hint="@string/skipped_day_label">
-
-							<com.google.android.material.textfield.TextInputEditText
-								android:id="@+id/skippedDayLabelEdit"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:inputType="text"
-								android:maxLength="24"
-								android:maxLines="1" />
-						</com.google.android.material.textfield.TextInputLayout>
-
-						<TextView
-							android:id="@+id/rulesInfoText"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="8dp"
-							android:alpha="0.7"
-							android:text="@string/rules_info_text"
-							android:textSize="12sp" />
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-			</LinearLayout>
-
-			<com.google.android.material.card.MaterialCardView
-				android:id="@+id/displayHeader"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="8dp"
-				android:clickable="true"
-				android:focusable="true"
-				android:foreground="?attr/selectableItemBackground"
-				app:cardCornerRadius="18dp"
-				app:cardElevation="3dp">
-
-				<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:padding="16dp">
-
-					<TextView
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:text="@string/display_section"
-						android:textSize="18sp"
-						android:textStyle="bold" />
-
-					<TextView
-						android:id="@+id/displayArrow"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="▼"
-						android:textSize="18sp" />
-				</LinearLayout>
-			</com.google.android.material.card.MaterialCardView>
-
-			<LinearLayout
-				android:id="@+id/displaySection"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginBottom="20dp"
-				android:orientation="vertical"
-				android:visibility="gone">
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="12dp"
-					app:cardCornerRadius="18dp"
-					app:cardUseCompatPadding="true">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="16dp">
-
-						<com.google.android.material.textfield.TextInputLayout
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:hint="@string/prefix_text">
-
-							<com.google.android.material.textfield.TextInputEditText
-								android:id="@+id/prefixEdit"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:inputType="text" />
-						</com.google.android.material.textfield.TextInputLayout>
-
-						<TextView
-							android:id="@+id/displayInfoText"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="8dp"
-							android:text="@string/display_info_text"
-							android:textSize="12sp" />
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="12dp"
-					app:cardCornerRadius="18dp"
-					app:cardUseCompatPadding="true">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="16dp">
-
-						<TextView
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginBottom="8dp"
-							android:text="@string/color_theme"
-							android:textSize="16sp"
-							android:textStyle="bold" />
-
-						<RadioGroup
-							android:id="@+id/themeGroup"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:orientation="vertical">
-
-							<RadioButton
-								android:id="@+id/themeClassic"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:text="@string/theme_classic" />
-
-							<RadioButton
-								android:id="@+id/themePastel"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:text="@string/theme_pastel" />
-
-							<RadioButton
-								android:id="@+id/themeDark"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:text="@string/theme_dark" />
-						</RadioGroup>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:id="@+id/cardWidgetStyle"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_marginBottom="12dp"
-					app:cardCornerRadius="18dp"
-					app:cardUseCompatPadding="true">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="16dp">
-
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="@string/settings_widget_style_title"
-							android:textSize="16sp"
-							android:textStyle="bold" />
-
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="4dp"
-							android:text="@string/settings_widget_style_description"
-							android:textSize="13sp" />
-
-						<RadioGroup
-							android:id="@+id/widgetStyleRadioGroup"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp">
-
-							<RadioButton
-								android:id="@+id/radioClassic"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:text="@string/settings_widget_style_classic" />
-
-							<RadioButton
-								android:id="@+id/radioMinimal"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:text="@string/settings_widget_style_minimal" />
-						</RadioGroup>
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-
-				<com.google.android.material.card.MaterialCardView
-					android:id="@+id/cardNotifications"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					app:cardCornerRadius="18dp"
-					app:cardUseCompatPadding="true">
-
-					<LinearLayout
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:padding="16dp">
-
-						<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="@string/settings_notification_title"
-							android:textSize="16sp"
-							android:textStyle="bold" />
-
-						<com.google.android.material.switchmaterial.SwitchMaterial
-							android:id="@+id/switchNotificationsEnabled"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="12dp"
-							android:text="@string/settings_notifications_enabled" />
-
-						<com.google.android.material.switchmaterial.SwitchMaterial
-							android:id="@+id/switchSilentNotification"
-							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_marginTop="8dp"
-							android:text="@string/settings_silent_notification" />
-					</LinearLayout>
-				</com.google.android.material.card.MaterialCardView>
-			</LinearLayout>
+			<include layout="@layout/include_display_section" />
 
 			<TextView
 				android:id="@+id/versionText"
@@ -640,7 +162,7 @@
 				android:layout_gravity="center_horizontal"
 				android:layout_marginTop="4dp"
 				android:alpha="0.7"
-				android:text="v1.5"
+				android:text=""
 				android:textSize="12sp" />
 
 			<TextView
@@ -665,14 +187,17 @@
 		android:paddingEnd="16dp"
 		android:paddingBottom="10dp">
 
-		<Button
+		<com.google.android.material.button.MaterialButton
 			android:id="@+id/saveButton"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:minHeight="48dp"
 			android:text="@string/save"
-			android:textAllCaps="false" />
-
+			android:textAllCaps="false"
+			app:icon="@drawable/ic_save_24"
+			app:iconGravity="textStart"
+			app:iconPadding="8dp"
+			app:iconTint="?attr/colorOnPrimary" />
 	</LinearLayout>
 
 </FrameLayout>

@@ -1,31 +1,38 @@
 package com.dante.abworkdaywidget
 
-import android.content.res.Resources
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.graphics.Insets
+import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.FrameLayout
 
 fun MainActivity.applyEdgeToEdgeInsets() {
     val extraSpacing = resources.getDimensionPixelSize(R.dimen.save_bar_extra_bottom_padding)
 
     ViewCompat.setOnApplyWindowInsetsListener(activityRoot) { _, insets ->
+        val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
         val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
         val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
         val bottomInset = maxOf(navBars.bottom, imeInsets.bottom)
+
+        activityRoot.setPadding(
+            activityRoot.paddingLeft,
+            statusBars.top,
+            activityRoot.paddingRight,
+            activityRoot.paddingBottom
+        )
 
         saveBarContainer.post {
             val saveBarHeight = saveBarContainer.height
 
             mainScrollView.setPadding(
-                mainScrollView.paddingLeft,
-                mainScrollView.paddingTop,
-                mainScrollView.paddingRight,
+                0,
+                0,
+                0,
                 saveBarHeight + bottomInset + extraSpacing
             )
 
@@ -47,15 +54,15 @@ fun MainActivity.hideAllSections() {
 }
 
 fun MainActivity.resetArrows() {
-    cycleArrow.text = "▼"
-    rulesArrow.text = "▼"
-    displayArrow.text = "▼"
+    cycleArrow.setImageResource(R.drawable.ic_expand_more_24)
+    rulesArrow.setImageResource(R.drawable.ic_expand_more_24)
+    displayArrow.setImageResource(R.drawable.ic_expand_more_24)
 }
 
 fun MainActivity.setupSection(
     header: View,
     section: View,
-    arrow: TextView,
+    arrow: ImageView,
     sectionKey: String
 ) {
     header.setOnClickListener {
@@ -64,14 +71,14 @@ fun MainActivity.setupSection(
 
         if (section.visibility == View.VISIBLE) {
             section.visibility = View.GONE
-            arrow.text = "▼"
+            arrow.setImageResource(R.drawable.ic_expand_more_24)
             saveLastOpenSection("")
         } else {
             hideAllSections()
             resetArrows()
 
             section.visibility = View.VISIBLE
-            arrow.text = "▲"
+            arrow.setImageResource(R.drawable.ic_expand_less_24)
             saveLastOpenSection(sectionKey)
         }
     }
@@ -94,17 +101,17 @@ fun MainActivity.restoreLastOpenSection() {
     when (lastSection) {
         MainActivity.SECTION_RULES -> {
             rulesSection.visibility = View.VISIBLE
-            rulesArrow.text = "▲"
+            rulesArrow.setImageResource(R.drawable.ic_expand_less_24)
         }
 
         MainActivity.SECTION_DISPLAY -> {
             displaySection.visibility = View.VISIBLE
-            displayArrow.text = "▲"
+            displayArrow.setImageResource(R.drawable.ic_expand_less_24)
         }
 
         else -> {
             cycleSection.visibility = View.VISIBLE
-            cycleArrow.text = "▲"
+            cycleArrow.setImageResource(R.drawable.ic_expand_less_24)
         }
     }
 }

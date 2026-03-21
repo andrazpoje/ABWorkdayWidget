@@ -107,12 +107,16 @@
     <string name="skipped_day_label">Skipped day label</string>
 
     <!-- Validation -->
-    <string name="error_cycle_empty">Cycle must not be empty.</string>
+    <!-- Validation -->
+    <string name="error_cycle_empty">Enter at least one cycle day</string>
     <string name="error_cycle_invalid_format_detailed">Invalid format: "%1$s". Use commas, e.g. A, B, C</string>
-    <string name="error_cycle_too_long">Too many items (%1$d). Maximum allowed is %2$d</string>
+    <string name="error_cycle_too_many">Too many items (%1$d). Maximum allowed is %2$d</string>
+    <string name="error_cycle_empty_item">Empty items are not allowed</string>
+    <string name="error_cycle_duplicates">Duplicate values are not allowed</string>
     <string name="error_label_too_long">Each cycle label can have up to %1$d characters.</string>
     <string name="error_label_too_long_detailed">Label "%1$s" is too long (max %2$d characters)</string>
     <string name="error_first_day_not_in_cycle">First day "%1$s" is not in cycle</string>
+    <string name="fix_errors">Please fix input errors</string>
 
     <string name="holiday_country_label">Country for non-working days</string>
     <string name="holiday_country_hint">Select country</string>
@@ -123,7 +127,6 @@
     <string name="discard">Discard</string>
 
     <string name="cancel">Cancel</string>
-
 
 
 </resources>

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.activity.OnBackPressedCallback
 import com.dante.abworkdaywidget.data.Prefs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 fun MainActivity.setupBackHandling() {
     onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -64,20 +65,24 @@ fun MainActivity.saveChangesAndRefresh(): Boolean {
 fun MainActivity.loadSettings() {
     val prefs = getSharedPreferences("abprefs", Context.MODE_PRIVATE)
 
-    val cycle = CycleManager.loadCycle(this)
+    val cycle = CycleManager.loadCycle(this).ifEmpty { listOf("A", "B") }
     val cycleStartDate = CycleManager.loadStartDate(this)
 
     selectedDate = cycleStartDate
 
     cycleDaysEdit.setText(cycle.joinToString(", "))
 
+    val savedFirstDayRaw = prefs.getString(
+        MainActivity.KEY_FIRST_CYCLE_DAY,
+        cycle.firstOrNull() ?: "A"
+    ) ?: (cycle.firstOrNull() ?: "A")
+
     val savedFirstDay = sanitizeLabel(
-        prefs.getString(MainActivity.KEY_FIRST_CYCLE_DAY, cycle.firstOrNull() ?: "A")
-            ?: (cycle.firstOrNull() ?: "A"),
+        savedFirstDayRaw,
         cycle.firstOrNull() ?: "A"
     )
 
-    firstCycleDayEdit.setText(savedFirstDay)
+    refreshFirstCycleDayDropdown(savedFirstDay)
 
     switchSaturdays.isChecked = prefs.getBoolean("skipSaturdays", true)
     switchSundays.isChecked = prefs.getBoolean("skipSundays", true)
@@ -98,11 +103,12 @@ fun MainActivity.loadSettings() {
 
     val isManual = prefs.getBoolean(HolidayManager.KEY_COUNTRY_MANUAL, false)
 
-    val displayText = if (!isManual && selectedCountry.code == HolidayManager.getSelectedCountry(this)) {
-        "${selectedCountry.displayName} (auto-detected)"
-    } else {
-        selectedCountry.displayName
-    }
+    val displayText =
+        if (!isManual && selectedCountry.code == HolidayManager.getSelectedCountry(this)) {
+            "${selectedCountry.displayName} (auto-detected)"
+        } else {
+            selectedCountry.displayName
+        }
 
     holidayCountryDropdown.setText(displayText, false)
 
@@ -126,10 +132,8 @@ fun MainActivity.loadSettings() {
     findViewById<android.widget.RadioButton>(R.id.radioMinimal).isChecked =
         widgetStyle == Prefs.WIDGET_STYLE_MINIMAL
 
-    val enabledSwitch =
-        findViewById<com.google.android.material.switchmaterial.SwitchMaterial?>(R.id.switchNotificationsEnabled)
-    val silentSwitch =
-        findViewById<com.google.android.material.switchmaterial.SwitchMaterial?>(R.id.switchSilentNotification)
+    val enabledSwitch = findViewById<SwitchMaterial?>(R.id.switchNotificationsEnabled)
+    val silentSwitch = findViewById<SwitchMaterial?>(R.id.switchSilentNotification)
 
     val notificationsEnabled = uiPrefs.getBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, false)
     val silentEnabled = uiPrefs.getBoolean(Prefs.KEY_SILENT_NOTIFICATION, false)
@@ -159,12 +163,14 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
     }
 
     val selectedFirstDay = sanitizeLabel(
-        firstCycleDayEdit.text.toString(),
+        firstCycleDayDropdown.text?.toString().orEmpty(),
         normalizedCycle.firstOrNull() ?: "A"
     )
 
-    firstCycleDayEdit.setText(selectedFirstDay)
+    firstCycleDayDropdown.setText(selectedFirstDay, false)
     cycleDaysEdit.setText(normalizedCycle.joinToString(", "))
+
+    refreshFirstCycleDayDropdown(selectedFirstDay)
 
     val selectedCountryCode = supportedCountries
         .firstOrNull {
@@ -191,16 +197,15 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
 
     val uiPrefs = getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
 
-    val selectedWidgetStyle = if (findViewById<android.widget.RadioButton>(R.id.radioMinimal).isChecked) {
-        Prefs.WIDGET_STYLE_MINIMAL
-    } else {
-        Prefs.WIDGET_STYLE_CLASSIC
-    }
+    val selectedWidgetStyle =
+        if (findViewById<android.widget.RadioButton>(R.id.radioMinimal).isChecked) {
+            Prefs.WIDGET_STYLE_MINIMAL
+        } else {
+            Prefs.WIDGET_STYLE_CLASSIC
+        }
 
-    val enabledSwitch =
-        findViewById<com.google.android.material.switchmaterial.SwitchMaterial?>(R.id.switchNotificationsEnabled)
-    val silentSwitch =
-        findViewById<com.google.android.material.switchmaterial.SwitchMaterial?>(R.id.switchSilentNotification)
+    val enabledSwitch = findViewById<SwitchMaterial?>(R.id.switchNotificationsEnabled)
+    val silentSwitch = findViewById<SwitchMaterial?>(R.id.switchSilentNotification)
 
     val notificationsEnabled = enabledSwitch?.isChecked ?: false
     val silentEnabled = if (notificationsEnabled) {
@@ -232,10 +237,7 @@ fun MainActivity.validateAndBuildCycle(): List<String>? {
         return null
     }
 
-    val cycle = rawInput
-        .split(",")
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
+    val cycle = parseCycleInput(rawInput)
 
     if (cycle.isEmpty()) {
         showError(getString(R.string.error_cycle_empty))
@@ -243,7 +245,23 @@ fun MainActivity.validateAndBuildCycle(): List<String>? {
     }
 
     if (cycle.size > MainActivity.MAX_CYCLE_ITEMS) {
-        showError(getString(R.string.error_cycle_too_long, cycle.size, MainActivity.MAX_CYCLE_ITEMS))
+        showError(
+            getString(
+                R.string.error_cycle_too_many,
+                cycle.size,
+                MainActivity.MAX_CYCLE_ITEMS
+            )
+        )
+        return null
+    }
+
+    val duplicateExists = cycle
+        .map { it.lowercase() }
+        .toSet()
+        .size != cycle.size
+
+    if (duplicateExists) {
+        showError(getString(R.string.error_cycle_duplicates))
         return null
     }
 
@@ -260,7 +278,7 @@ fun MainActivity.validateAndBuildCycle(): List<String>? {
     }
 
     val selectedFirstDay = sanitizeLabel(
-        firstCycleDayEdit.text.toString(),
+        firstCycleDayDropdown.text?.toString().orEmpty(),
         cycle.firstOrNull() ?: "A"
     )
 
@@ -292,28 +310,14 @@ fun MainActivity.validateAndBuildCycle(): List<String>? {
         return null
     }
 
-    val normalizedCycle = ensureFirstDayAtStart(cycle, selectedFirstDay)
-
-    if (normalizedCycle.isEmpty()) {
-        showError(getString(R.string.error_cycle_empty))
-        return null
-    }
-
-    return normalizedCycle
+    return cycle
 }
 
-fun MainActivity.ensureFirstDayAtStart(
-    cycle: List<String>,
-    firstDay: String
-): List<String> {
-    val index = cycle.indexOfFirst { it.equals(firstDay, ignoreCase = true) }
-    if (index <= 0) return cycle
-    if (index == -1) return cycle
-
-    val firstPart = cycle.subList(index, cycle.size)
-    val secondPart = cycle.subList(0, index)
-
-    return firstPart + secondPart
+fun MainActivity.parseCycleInput(rawInput: String): List<String> {
+    return rawInput
+        .split(",")
+        .map { sanitizeLabel(it, "") }
+        .filter { it.isNotBlank() }
 }
 
 fun MainActivity.sanitizeLabel(text: String, fallback: String): String {

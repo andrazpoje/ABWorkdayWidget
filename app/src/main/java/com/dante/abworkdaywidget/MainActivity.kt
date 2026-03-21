@@ -16,9 +16,9 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -26,21 +26,21 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.abworkdaywidget.data.Prefs
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -68,9 +68,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var rulesHeader: View
     lateinit var displayHeader: View
 
-    lateinit var cycleArrow: TextView
-    lateinit var rulesArrow: TextView
-    lateinit var displayArrow: TextView
+    lateinit var cycleDaysInputLayout: TextInputLayout
+
+    lateinit var cycleArrow: ImageView
+    lateinit var rulesArrow: ImageView
+    lateinit var displayArrow: ImageView
 
     lateinit var widgetPromptContainer: View
     lateinit var githubLinkText: TextView
@@ -82,10 +84,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var displaySection: View
 
     lateinit var dateText: TextView
-    lateinit var pickDateButton: Button
+    lateinit var pickDateButton: MaterialButton
 
     lateinit var cycleDaysEdit: EditText
-    lateinit var firstCycleDayEdit: EditText
+    lateinit var firstCycleDayDropdown: MaterialAutoCompleteTextView
 
     lateinit var statusCard: MaterialCardView
     lateinit var todayStatusText: TextView
@@ -101,9 +103,9 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var holidayCountryDropdown: MaterialAutoCompleteTextView
 
-    lateinit var saveButton: Button
-    lateinit var checkDateButton: Button
-    lateinit var openWidgetsButton: Button
+    lateinit var saveButton: MaterialButton
+    lateinit var checkDateButton: MaterialButton
+    lateinit var openWidgetsButton: MaterialButton
 
     lateinit var dateResultText: TextView
     lateinit var widgetHint: TextView
@@ -120,13 +122,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         setContentView(R.layout.activity_main)
 
         bindViews()
+        setupFirstCycleDayDropdown()
         saveBarContainer.visibility = View.GONE
         setupPreviewRecyclerView()
         setupHolidayCountryDropdown()
@@ -159,6 +159,12 @@ class MainActivity : AppCompatActivity() {
 
         saveButton.setOnClickListener {
             if (!hasUnsavedChanges) return@setOnClickListener
+
+            if (!validateCycleInput()) {
+                Toast.makeText(this, getString(R.string.fix_errors), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             saveChangesAndRefresh()
         }
 
@@ -167,7 +173,7 @@ class MainActivity : AppCompatActivity() {
                 hideAllSections()
                 resetArrows()
                 displaySection.visibility = View.VISIBLE
-                displayArrow.text = "▲"
+                displayArrow.setImageResource(R.drawable.ic_expand_less_24)
             }
             saveLastOpenSection(SECTION_DISPLAY)
 
@@ -225,8 +231,9 @@ class MainActivity : AppCompatActivity() {
         dateText = findViewById(R.id.dateText)
         pickDateButton = findViewById(R.id.pickDateButton)
 
+        cycleDaysInputLayout = findViewById(R.id.cycleDaysInputLayout)
         cycleDaysEdit = findViewById(R.id.cycleDaysEdit)
-        firstCycleDayEdit = findViewById(R.id.firstCycleDayEdit)
+        firstCycleDayDropdown = findViewById(R.id.firstCycleDayDropdown)
 
         switchSaturdays = findViewById(R.id.switchSaturdays)
         switchSundays = findViewById(R.id.switchSundays)
@@ -256,6 +263,47 @@ class MainActivity : AppCompatActivity() {
         themeDark = findViewById(R.id.themeDark)
     }
 
+    fun validateCycleInput(): Boolean {
+        val raw = cycleDaysEdit.text?.toString().orEmpty().trim()
+        val parts = raw.split(",").map { it.trim() }
+
+        if (raw.isBlank() || parts.all { it.isEmpty() }) {
+            cycleDaysInputLayout.error = getString(R.string.error_cycle_empty)
+            return false
+        }
+
+        if (parts.any { it.isEmpty() }) {
+            cycleDaysInputLayout.error = getString(R.string.error_cycle_empty_item)
+            return false
+        }
+
+        if (parts.size > MAX_CYCLE_ITEMS) {
+            cycleDaysInputLayout.error = getString(
+                R.string.error_cycle_too_many,
+                parts.size,
+                MAX_CYCLE_ITEMS
+            )
+            return false
+        }
+
+        if (parts.any { it.length > MAX_LABEL_LENGTH }) {
+            cycleDaysInputLayout.error = getString(
+                R.string.error_label_too_long,
+                MAX_LABEL_LENGTH
+            )
+            return false
+        }
+
+        val distinct = parts.map { it.lowercase(Locale.getDefault()) }.toSet()
+        if (distinct.size != parts.size) {
+            cycleDaysInputLayout.error = getString(R.string.error_cycle_duplicates)
+            return false
+        }
+
+        cycleDaysInputLayout.error = null
+        return true
+    }
+
     fun setupPreviewRecyclerView() {
         previewAdapter = CyclePreviewAdapter()
         previewRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -273,6 +321,64 @@ class MainActivity : AppCompatActivity() {
             } else {
                 it.displayName
             }
+        }
+    }
+
+    fun parseCycleLabels(raw: String): List<String> {
+        return raw.split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .mapIndexed { index, label ->
+                sanitizeLabel(label, "Day ${index + 1}").take(MAX_LABEL_LENGTH)
+            }
+            .take(MAX_CYCLE_ITEMS)
+    }
+
+    fun getCurrentCycleLabelsFromInput(): List<String> {
+        return parseCycleLabels(cycleDaysEdit.text?.toString().orEmpty())
+    }
+
+    fun refreshFirstCycleDayDropdown(preferredValue: String? = null) {
+        val cycleLabels = getCurrentCycleLabelsFromInput()
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            cycleLabels
+        )
+
+        firstCycleDayDropdown.setAdapter(adapter)
+
+        if (cycleLabels.isEmpty()) {
+            firstCycleDayDropdown.setText("", false)
+            firstCycleDayDropdown.isEnabled = false
+            return
+        }
+
+        firstCycleDayDropdown.isEnabled = true
+
+        val currentValue = preferredValue
+            ?: firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
+
+        val finalValue = when {
+            currentValue in cycleLabels -> currentValue
+            else -> cycleLabels.first()
+        }
+
+        firstCycleDayDropdown.setText(finalValue, false)
+    }
+
+    fun setupFirstCycleDayDropdown() {
+        firstCycleDayDropdown.keyListener = null
+        firstCycleDayDropdown.setOnClickListener {
+            if (firstCycleDayDropdown.adapter != null && firstCycleDayDropdown.adapter.count > 0) {
+                firstCycleDayDropdown.showDropDown()
+            }
+        }
+
+        firstCycleDayDropdown.setOnItemClickListener { _, _, _, _ ->
+            clearDateCheckResult()
+            markUnsavedChanges()
         }
     }
 
@@ -595,11 +701,8 @@ class MainActivity : AppCompatActivity() {
 
         cycleDaysEdit.addTextChangedListener {
             clearDateCheckResult()
-            markUnsavedChanges()
-        }
-
-        firstCycleDayEdit.addTextChangedListener {
-            clearDateCheckResult()
+            refreshFirstCycleDayDropdown()
+            validateCycleInput()
             markUnsavedChanges()
         }
 
