@@ -4,7 +4,7 @@
     <string name="app_name">Delovni cikel</string>
 
     <!-- STATUS -->
-    <string name="status_section">Status</string>
+    <string name="status_section">Today</string>
     <string name="tomorrow_status">Jutri: %1$s</string>
 
     <!-- PREVIEW -->
@@ -17,10 +17,9 @@
     <string name="cycle_days_hint">
         Vnesi oznake cikla, ločene z vejico. Primer: A,B ali Jutro,Popoldne,Nočna,Prosto
     </string>
-    <string name="first_cycle_day_label">Začetni dan cikla</string>
-    <string name="first_cycle_day_hint">
-        Ta oznaka velja za izbrani začetni datum.
-    </string>
+    <string name="first_cycle_day_label">Dan cikla na začetni datum</string>
+    <string name="first_cycle_day_hint">Vnesi eno oznako iz cikla, ki velja na izbrani začetni datum.</string>
+    <string name="first_cycle_day_placeholder">Npr. A</string>
 
     <!-- RULES -->
     <string name="rules_section">Pravila</string>
@@ -49,8 +48,6 @@
         Widget še ni dodan na domači zaslon.
     </string>
     <string name="open_widgets">Odpri widgete</string>
-    <string name="today_label">Danes</string>
-    <string name="tomorrow_label">Jutri</string>
 
     <!-- DATE CHECK -->
     <string name="check_date">Preveri datum</string>
@@ -101,7 +98,7 @@
     <!-- Inputs -->
     <string name="cycle_days_label">Dnevi v ciklu</string>
     <string name="cycle_days_hint_placeholder">A, B, Nočna, Prosto</string>
-    <string name="first_cycle_day_placeholder">A</string>
+
     <string name="override_skipped_days">Prikaži posebno oznako za preskočene dni</string>
     <string name="skipped_day_label">Oznaka za preskočen dan</string>
 
@@ -122,5 +119,7 @@
     <string name="discard">Zavrzi</string>
 
     <string name="cancel">Prekliči</string>
+
+
 
 </resources>

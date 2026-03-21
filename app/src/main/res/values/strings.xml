@@ -4,7 +4,7 @@
     <string name="app_name">Work Cycle</string>
 
     <!-- STATUS -->
-    <string name="status_section">Status</string>
+    <string name="status_section">Today</string>
     <string name="tomorrow_status">Tomorrow: %1$s</string>
 
     <!-- PREVIEW -->
@@ -19,10 +19,9 @@
         Enter cycle labels separated by commas. Example: A,B or Morning,Afternoon,Night,Off
     </string>
 
-    <string name="first_cycle_day_label">First cycle day</string>
-    <string name="first_cycle_day_hint">
-        This label applies to the selected start date.
-    </string>
+    <string name="first_cycle_day_label">Cycle day on start date</string>
+    <string name="first_cycle_day_hint">Enter one label from the cycle that applies to the selected start date.</string>
+    <string name="first_cycle_day_placeholder">E.g. A</string>
 
     <!-- RULES -->
     <string name="rules_section">Rules</string>
@@ -103,7 +102,7 @@
     <!-- Inputs -->
     <string name="cycle_days_label">Cycle days</string>
     <string name="cycle_days_hint_placeholder">A, B, Night, Free</string>
-    <string name="first_cycle_day_placeholder">A</string>
+
     <string name="override_skipped_days">Show custom label on skipped days</string>
     <string name="skipped_day_label">Skipped day label</string>
 
@@ -124,5 +123,7 @@
     <string name="discard">Discard</string>
 
     <string name="cancel">Cancel</string>
+
+
 
 </resources>

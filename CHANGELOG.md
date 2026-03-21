@@ -4,6 +4,50 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.5.0] - 2026-03-21
+
+### ✨ Added
+- Support for **multiple countries (SI, AT, HR)** for public holidays
+- **Country selector** for holiday calculation
+- **Auto-detect country** (SIM / locale based)
+- Auto-selected country is now labeled as **(auto-detected)**
+- **Holiday caching** for improved performance
+- Improved **status display** with day + cycle (e.g. "Sob. A")
+- Confirmation dialog when leaving with **unsaved changes**
+
+### 🎨 Improved
+- Redesigned **status card** (focus on today’s cycle)
+- Replaced generic "Status" with contextual **"Today / Danes"**
+- Improved clarity of **cycle configuration inputs**
+- Better UX for **start day selection**
+- Cleaner and more modern **overall layout**
+- Improved widget consistency across devices
+
+### ⚙️ Technical
+- Refactored `HolidayManager` for multi-country support
+- Centralized holiday logic (`isHoliday(context, date)`)
+- Added fallback logic for invalid/missing country selection
+- Improved SharedPreferences handling and defaults
+- Codebase split into smaller files (`MainActivityUI`, `MainActivitySettings`, etc.)
+- Improved date formatting using `TextStyle`
+
+### 🐞 Fixed
+- Fixed bug where **start day was saved as "A,B" instead of single value**
+- Fixed empty cycle label in status display
+- Fixed skipped day returning blank label
+- Fixed duplicate resource issues (app icon)
+- Fixed layout issues on smaller devices (e.g. A52)
+- Fixed Save button click area issues
+- Fixed unresolved references after refactor
+
+### 🌍 Localization
+- Updated Slovenian and English translations
+- Improved wording for cycle configuration
+- Changed "Skip holidays" → more accurate meaning (work-free days)
+
+
+---
+
 ## [1.4.1] - 2026-03-20
 
 ### 🐛 Fixed

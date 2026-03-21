@@ -378,13 +378,16 @@ class MainActivity : AppCompatActivity() {
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
 
+        todayStatusText.text = formatDayLabel(today)
+
+        tomorrowStatusText.text = getString(
+            R.string.tomorrow_status,
+            formatDayLabel(tomorrow)
+        )
+
         val todayLabel = CycleManager.getCycleDayForDate(this, today)
-        val tomorrowLabel = CycleManager.getCycleDayForDate(this, tomorrow)
-
-        todayStatusText.text = todayLabel
-        tomorrowStatusText.text = getString(R.string.tomorrow_status, tomorrowLabel)
-
         val cycle = CycleManager.loadCycle(this)
+
         val cardColor = CycleColorHelper.getBackgroundColor(
             context = this,
             label = todayLabel,
@@ -394,6 +397,20 @@ class MainActivity : AppCompatActivity() {
         animateStatusCardColor(cardColor)
         todayStatusText.setTextColor(ContextCompat.getColor(this, android.R.color.white))
         tomorrowStatusText.setTextColor(ContextCompat.getColor(this, android.R.color.white))
+    }
+
+    private fun formatDayLabel(date: LocalDate): String {
+        val locale = Locale.getDefault()
+
+        val dayName = date.dayOfWeek
+            .getDisplayName(java.time.format.TextStyle.SHORT, locale)
+            .replaceFirstChar { it.titlecase(locale) }
+
+        val cycleLabel = CycleManager.getCycleDayForDate(this, date)
+            .trim()
+            .ifBlank { "?" }
+
+        return "$dayName $cycleLabel"
     }
 
     fun updateCyclePreview() {
