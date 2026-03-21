@@ -1,37 +1,43 @@
 package com.dante.abworkdaywidget
 
+import android.content.res.Resources
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.content.Context
+import android.widget.FrameLayout
 
 fun MainActivity.applyEdgeToEdgeInsets() {
-    val scrollBottomPadding = resources.getDimensionPixelSize(R.dimen.main_scroll_bottom_padding)
-    val saveBarExtraBottom = resources.getDimensionPixelSize(R.dimen.save_bar_extra_bottom_padding)
+    val extraSpacing = resources.getDimensionPixelSize(R.dimen.save_bar_extra_bottom_padding)
 
     ViewCompat.setOnApplyWindowInsetsListener(activityRoot) { _, insets ->
-        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+        val bottomInset = maxOf(navBars.bottom, imeInsets.bottom)
 
-        mainScrollView.setPadding(
-            mainScrollView.paddingLeft,
-            mainScrollView.paddingTop,
-            mainScrollView.paddingRight,
-            scrollBottomPadding
-        )
+        saveBarContainer.post {
+            val saveBarHeight = saveBarContainer.height
 
-        saveBarContainer.setPadding(
-            saveBarContainer.paddingLeft,
-            saveBarContainer.paddingTop,
-            saveBarContainer.paddingRight,
-            systemBars.bottom + saveBarExtraBottom
-        )
+            mainScrollView.setPadding(
+                mainScrollView.paddingLeft,
+                mainScrollView.paddingTop,
+                mainScrollView.paddingRight,
+                saveBarHeight + bottomInset + extraSpacing
+            )
+
+            val lp = saveBarContainer.layoutParams as FrameLayout.LayoutParams
+            lp.bottomMargin = bottomInset
+            saveBarContainer.layoutParams = lp
+        }
 
         insets
     }
+
+    ViewCompat.requestApplyInsets(activityRoot)
 }
 
 fun MainActivity.hideAllSections() {
@@ -72,14 +78,14 @@ fun MainActivity.setupSection(
 }
 
 fun MainActivity.saveLastOpenSection(sectionKey: String) {
-    getSharedPreferences(MainActivity.PREFS_UI, Context.MODE_PRIVATE)
+    getSharedPreferences(MainActivity.PREFS_UI, android.content.Context.MODE_PRIVATE)
         .edit()
         .putString(MainActivity.KEY_LAST_OPEN_SECTION, sectionKey)
         .apply()
 }
 
 fun MainActivity.restoreLastOpenSection() {
-    val lastSection = getSharedPreferences(MainActivity.PREFS_UI, Context.MODE_PRIVATE)
+    val lastSection = getSharedPreferences(MainActivity.PREFS_UI, android.content.Context.MODE_PRIVATE)
         .getString(MainActivity.KEY_LAST_OPEN_SECTION, MainActivity.SECTION_CYCLE)
 
     hideAllSections()

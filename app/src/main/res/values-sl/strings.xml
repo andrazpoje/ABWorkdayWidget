@@ -4,7 +4,7 @@
     <string name="app_name">Delovni cikel</string>
 
     <!-- STATUS -->
-    <string name="status_section">Today</string>
+    <string name="status_section">Danes</string>
     <string name="tomorrow_status">Jutri: %1$s</string>
 
     <!-- PREVIEW -->

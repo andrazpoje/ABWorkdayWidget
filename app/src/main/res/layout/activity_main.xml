@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/activityRoot"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:orientation="vertical">
+	android:layout_height="match_parent">
 
 	<androidx.core.widget.NestedScrollView
 		android:id="@+id/main"
 		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		android:layout_weight="1"
-		android:fillViewport="true">
+		android:layout_height="match_parent"
+		android:fillViewport="true"
+		android:clipToPadding="false">
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -22,7 +21,6 @@
 			android:paddingEnd="20dp"
 			android:paddingBottom="24dp">
 
-			<!-- HEADER -->
 			<RelativeLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
@@ -60,7 +58,6 @@
 				android:text="@string/settings_subtitle"
 				android:textSize="14sp" />
 
-			<!-- STATUS CARD -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/statusCard"
 				android:layout_width="match_parent"
@@ -107,7 +104,6 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- PREVIEW -->
 			<TextView
 				android:id="@+id/previewTitle"
 				android:layout_width="match_parent"
@@ -124,7 +120,6 @@
 				android:layout_marginBottom="20dp"
 				android:nestedScrollingEnabled="false" />
 
-			<!-- WIDGET PROMPT -->
 			<LinearLayout
 				android:id="@+id/widgetPromptContainer"
 				android:layout_width="match_parent"
@@ -146,7 +141,6 @@
 					android:text="@string/open_widgets" />
 			</LinearLayout>
 
-			<!-- CYCLE HEADER -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/cycleHeader"
 				android:layout_width="match_parent"
@@ -181,7 +175,6 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- CYCLE SECTION -->
 			<LinearLayout
 				android:id="@+id/cycleSection"
 				android:layout_width="match_parent"
@@ -298,7 +291,6 @@
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
-			<!-- RULES HEADER -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/rulesHeader"
 				android:layout_width="match_parent"
@@ -333,7 +325,6 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- RULES SECTION -->
 			<LinearLayout
 				android:id="@+id/rulesSection"
 				android:layout_width="match_parent"
@@ -431,7 +422,6 @@
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
-			<!-- DISPLAY HEADER -->
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/displayHeader"
 				android:layout_width="match_parent"
@@ -466,7 +456,6 @@
 				</LinearLayout>
 			</com.google.android.material.card.MaterialCardView>
 
-			<!-- DISPLAY SECTION -->
 			<LinearLayout
 				android:id="@+id/displaySection"
 				android:layout_width="match_parent"
@@ -644,7 +633,6 @@
 				</com.google.android.material.card.MaterialCardView>
 			</LinearLayout>
 
-			<!-- FOOTER -->
 			<TextView
 				android:id="@+id/versionText"
 				android:layout_width="wrap_content"
@@ -652,7 +640,7 @@
 				android:layout_gravity="center_horizontal"
 				android:layout_marginTop="4dp"
 				android:alpha="0.7"
-				android:text="v1.4"
+				android:text="v1.5"
 				android:textSize="12sp" />
 
 			<TextView
@@ -664,24 +652,27 @@
 		</LinearLayout>
 	</androidx.core.widget.NestedScrollView>
 
-	<!-- BOTTOM SAVE BAR -->
-	<com.google.android.material.card.MaterialCardView
+	<LinearLayout
 		android:id="@+id/saveBarContainer"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		app:cardElevation="10dp">
+		android:layout_gravity="bottom"
+		android:background="?attr/colorSurface"
+		android:elevation="10dp"
+		android:orientation="vertical"
+		android:paddingStart="16dp"
+		android:paddingTop="10dp"
+		android:paddingEnd="16dp"
+		android:paddingBottom="10dp">
 
 		<Button
 			android:id="@+id/saveButton"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="12dp"
-			android:layout_marginTop="12dp"
-			android:layout_marginEnd="12dp"
-			android:layout_marginBottom="12dp"
-			android:minHeight="54dp"
+			android:minHeight="48dp"
 			android:text="@string/save"
 			android:textAllCaps="false" />
-	</com.google.android.material.card.MaterialCardView>
 
-</LinearLayout>
+	</LinearLayout>
+
+</FrameLayout>

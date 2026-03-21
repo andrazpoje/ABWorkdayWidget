@@ -38,6 +38,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -119,7 +122,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        setContentView(R.layout.activity_main)
+
         bindViews()
+        saveBarContainer.visibility = View.GONE
         setupPreviewRecyclerView()
         setupHolidayCountryDropdown()
         migrateLegacySettingsIfNeeded()
@@ -617,13 +625,28 @@ class MainActivity : AppCompatActivity() {
 
     fun updateSaveButtonVisualState() {
         if (hasUnsavedChanges) {
+            if (saveBarContainer.visibility != View.VISIBLE) {
+                saveBarContainer.visibility = View.VISIBLE
+                saveBarContainer.alpha = 0f
+                saveBarContainer.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+            }
+
             saveButton.isEnabled = true
             saveButton.alpha = 1f
         } else {
             saveButton.isEnabled = false
-            saveButton.alpha = 0.55f
-            saveButton.scaleX = 1f
-            saveButton.scaleY = 1f
+            saveButton.alpha = 0.6f
+
+            saveBarContainer.animate()
+                .alpha(0f)
+                .setDuration(150)
+                .withEndAction {
+                    saveBarContainer.visibility = View.GONE
+                }
+                .start()
         }
     }
 

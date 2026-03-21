@@ -73,12 +73,24 @@ class ABWidgetProvider : AppWidgetProvider() {
 
         val mode = resolveWidgetMode(minWidth, minHeight)
         val isVeryNarrow = minWidth < 170
+        val isSingleCellLike = minWidth < 110
+        val canShowFullMainLabel = minWidth >= 140
 
         val showPrefix = prefix.isNotBlank() && mode != WidgetMode.SMALL && !isVeryNarrow
         val showTodayLabel = mode != WidgetMode.SMALL && !isVeryNarrow
-        val showExtraDays = mode == WidgetMode.LARGE || (mode == WidgetMode.MEDIUM && !isVeryNarrow)
 
-        views.setTextViewText(R.id.abText, todayCycle)
+        val rowsToShow = resolveExtraRows(minWidth, minHeight)
+
+        val skippedOverride = CycleManager.getSkippedDayOverrideLabelOrNull(context, today)
+
+        val displayTodayCycle = when {
+            skippedOverride != null && isSingleCellLike -> "X"
+            canShowFullMainLabel -> todayCycle
+            skippedOverride != null -> "X"
+            else -> formatCompactWidgetLabel(todayCycle)
+        }
+
+        views.setTextViewText(R.id.abText, displayTodayCycle)
         views.setTextColor(R.id.abText, todayColor)
         views.setInt(R.id.leftColorBar, "setBackgroundColor", todayColor)
 
@@ -98,7 +110,7 @@ class ABWidgetProvider : AppWidgetProvider() {
             views.setViewVisibility(R.id.todayLabelText, View.GONE)
         }
 
-        if (showExtraDays) {
+        if (rowsToShow > 0) {
             views.setViewVisibility(R.id.extraDaysContainer, View.VISIBLE)
 
             bindExtraDayRow(
@@ -112,69 +124,54 @@ class ABWidgetProvider : AppWidgetProvider() {
                 isTomorrow = true
             )
 
-            if (mode == WidgetMode.MEDIUM) {
-                hideRow(views, R.id.day2Dot, R.id.day2Title, R.id.day2Value)
-                hideRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Value)
-                hideRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Value)
-                hideRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Value)
-                hideRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Value)
-            } else {
+            if (rowsToShow >= 2) {
                 showRow(views, R.id.day2Dot, R.id.day2Title, R.id.day2Value)
-                showRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Value)
-                showRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Value)
-                showRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Value)
-                showRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Value)
+                bindExtraDayRow(
+                    context, views, cycle, today.plusDays(2),
+                    R.id.day2Title, R.id.day2Value, R.id.day2Dot, false
+                )
+            } else {
+                hideRow(views, R.id.day2Dot, R.id.day2Title, R.id.day2Value)
+            }
 
+            if (rowsToShow >= 3) {
+                showRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Value)
                 bindExtraDayRow(
-                    context,
-                    views,
-                    cycle,
-                    today.plusDays(2),
-                    R.id.day2Title,
-                    R.id.day2Value,
-                    R.id.day2Dot,
-                    false
+                    context, views, cycle, today.plusDays(3),
+                    R.id.day3Title, R.id.day3Value, R.id.day3Dot, false
                 )
+            } else {
+                hideRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Value)
+            }
+
+            if (rowsToShow >= 4) {
+                showRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Value)
                 bindExtraDayRow(
-                    context,
-                    views,
-                    cycle,
-                    today.plusDays(3),
-                    R.id.day3Title,
-                    R.id.day3Value,
-                    R.id.day3Dot,
-                    false
+                    context, views, cycle, today.plusDays(4),
+                    R.id.day4Title, R.id.day4Value, R.id.day4Dot, false
                 )
+            } else {
+                hideRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Value)
+            }
+
+            if (rowsToShow >= 5) {
+                showRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Value)
                 bindExtraDayRow(
-                    context,
-                    views,
-                    cycle,
-                    today.plusDays(4),
-                    R.id.day4Title,
-                    R.id.day4Value,
-                    R.id.day4Dot,
-                    false
+                    context, views, cycle, today.plusDays(5),
+                    R.id.day5Title, R.id.day5Value, R.id.day5Dot, false
                 )
+            } else {
+                hideRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Value)
+            }
+
+            if (rowsToShow >= 6) {
+                showRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Value)
                 bindExtraDayRow(
-                    context,
-                    views,
-                    cycle,
-                    today.plusDays(5),
-                    R.id.day5Title,
-                    R.id.day5Value,
-                    R.id.day5Dot,
-                    false
+                    context, views, cycle, today.plusDays(6),
+                    R.id.day6Title, R.id.day6Value, R.id.day6Dot, false
                 )
-                bindExtraDayRow(
-                    context,
-                    views,
-                    cycle,
-                    today.plusDays(6),
-                    R.id.day6Title,
-                    R.id.day6Value,
-                    R.id.day6Dot,
-                    false
-                )
+            } else {
+                hideRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Value)
             }
         } else {
             views.setViewVisibility(R.id.extraDaysContainer, View.GONE)
@@ -260,11 +257,49 @@ class ABWidgetProvider : AppWidgetProvider() {
         views.setViewVisibility(valueId, View.VISIBLE)
     }
 
+    private fun formatCompactWidgetLabel(label: String): String {
+        val trimmed = label.trim()
+
+        if (trimmed.isBlank()) return "X"
+
+        return when {
+            trimmed.length <= 2 -> trimmed
+            else -> trimmed.take(1).uppercase(Locale.getDefault())
+        }
+    }
+
     private fun resolveWidgetMode(minWidth: Int, minHeight: Int): WidgetMode {
         return when {
             minWidth >= 220 && minHeight >= 180 -> WidgetMode.LARGE
             minWidth >= 160 && minHeight >= 110 -> WidgetMode.MEDIUM
             else -> WidgetMode.SMALL
+        }
+    }
+
+    /**
+     * How many upcoming rows to show:
+     * 0 = only main label
+     * 1 = tomorrow only
+     * 2..6 = more days ahead
+     */
+    private fun resolveExtraRows(minWidth: Int, minHeight: Int): Int {
+        return when {
+            // very small / 1x1
+            minWidth < 110 || minHeight < 70 -> 0
+
+            // 2x1-ish: enough for tomorrow
+            minWidth >= 110 && minHeight < 110 -> 1
+
+            // medium height
+            minWidth >= 140 && minHeight >= 110 && minHeight < 180 -> 2
+
+            // taller widgets
+            minWidth >= 140 && minHeight >= 180 && minHeight < 250 -> 4
+
+            // large/tall widgets
+            minWidth >= 140 && minHeight >= 250 -> 6
+
+            else -> 1
         }
     }
 
