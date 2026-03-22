@@ -17,7 +17,6 @@ import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -86,6 +85,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var dateText: TextView
     lateinit var pickDateButton: MaterialButton
 
+    lateinit var presetDropdown: MaterialAutoCompleteTextView
+    lateinit var applyPresetButton: MaterialButton
+
     lateinit var cycleDaysEdit: EditText
     lateinit var firstCycleDayDropdown: MaterialAutoCompleteTextView
 
@@ -111,7 +113,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var widgetHint: TextView
     lateinit var prefixEdit: EditText
     lateinit var skippedDayLabelEdit: EditText
-    lateinit var settingsButton: ImageButton
 
     lateinit var themeClassic: RadioButton
     lateinit var themePastel: RadioButton
@@ -127,6 +128,7 @@ class MainActivity : AppCompatActivity() {
 
         bindViews()
         setupFirstCycleDayDropdown()
+        setupPresetDropdown()
         saveBarContainer.visibility = View.GONE
         setupPreviewRecyclerView()
         setupHolidayCountryDropdown()
@@ -141,6 +143,7 @@ class MainActivity : AppCompatActivity() {
         setupWidgetStyleSettings()
         setupNotificationSettings()
         setupChangeListeners()
+        setupBottomNavigation()
 
         checkDateButton.setOnClickListener {
             showCheckDatePicker()
@@ -168,17 +171,30 @@ class MainActivity : AppCompatActivity() {
             saveChangesAndRefresh()
         }
 
-        settingsButton.setOnClickListener {
-            if (displaySection.visibility != View.VISIBLE) {
-                hideAllSections()
-                resetArrows()
-                displaySection.visibility = View.VISIBLE
-                displayArrow.setImageResource(R.drawable.ic_expand_less_24)
-            }
-            saveLastOpenSection(SECTION_DISPLAY)
+        applyPresetButton.setOnClickListener {
+            val selectedName = presetDropdown.text?.toString()?.trim().orEmpty()
+            val preset = CyclePresetProvider.findByDisplayName(this, selectedName)
+                ?: return@setOnClickListener
 
-            displayHeader.post {
-                mainScrollView.smoothScrollTo(0, displayHeader.top)
+            if (!wouldPresetChangeCurrentState(preset)) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.preset_already_applied),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            val currentCycleText = cycleDaysEdit.text?.toString()?.trim().orEmpty()
+            val currentFirstDayText = firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
+            val hasMeaningfulInput = currentCycleText.isNotBlank() || currentFirstDayText.isNotBlank()
+
+            if (hasMeaningfulInput) {
+                showApplyPresetDialog(preset) {
+                    applyPreset(preset)
+                }
+            } else {
+                applyPreset(preset)
             }
         }
 
@@ -189,11 +205,6 @@ class MainActivity : AppCompatActivity() {
             )
             startActivity(intent)
         }
-
-        Log.d("LANG_TEST", "locale=${Locale.getDefault()}")
-        Log.d("LANG_TEST", "resources_locale=${resources.configuration.locales[0].toLanguageTag()}")
-        Log.d("LANG_TEST", "save_string=${getString(R.string.save)}")
-        Log.d("LANG_TEST", "check_date_string=${getString(R.string.check_date)}")
 
         versionText.text = "v${BuildConfig.VERSION_NAME}"
 
@@ -231,6 +242,9 @@ class MainActivity : AppCompatActivity() {
         dateText = findViewById(R.id.dateText)
         pickDateButton = findViewById(R.id.pickDateButton)
 
+        presetDropdown = findViewById(R.id.presetDropdown)
+        applyPresetButton = findViewById(R.id.applyPresetButton)
+
         cycleDaysInputLayout = findViewById(R.id.cycleDaysInputLayout)
         cycleDaysEdit = findViewById(R.id.cycleDaysEdit)
         firstCycleDayDropdown = findViewById(R.id.firstCycleDayDropdown)
@@ -255,8 +269,6 @@ class MainActivity : AppCompatActivity() {
         tomorrowStatusText = findViewById(R.id.tomorrowStatusText)
 
         previewRecyclerView = findViewById(R.id.previewRecyclerView)
-
-        settingsButton = findViewById(R.id.settingsButton)
 
         themeClassic = findViewById(R.id.themeClassic)
         themePastel = findViewById(R.id.themePastel)
@@ -338,6 +350,65 @@ class MainActivity : AppCompatActivity() {
         return parseCycleLabels(cycleDaysEdit.text?.toString().orEmpty())
     }
 
+    fun getCurrentCycleInputState(): Pair<List<String>, String> {
+        val currentCycle = parseCycleLabels(cycleDaysEdit.text?.toString().orEmpty())
+        val currentFirstDay = firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
+        return currentCycle to currentFirstDay
+    }
+
+    fun wouldPresetChangeCurrentState(preset: CyclePreset): Boolean {
+        val (currentCycle, currentFirstDay) = getCurrentCycleInputState()
+
+        val normalizedPresetCycle = preset.cycleDaysProvider(this).map {
+            sanitizeLabel(it, "").take(MAX_LABEL_LENGTH)
+        }
+
+        val normalizedPresetFirstDay = sanitizeLabel(
+            preset.defaultFirstDayProvider(this),
+            normalizedPresetCycle.firstOrNull() ?: ""
+        ).take(MAX_LABEL_LENGTH)
+
+        return currentCycle != normalizedPresetCycle || currentFirstDay != normalizedPresetFirstDay
+    }
+
+    fun applyPreset(preset: CyclePreset) {
+        val labels = preset.cycleDaysProvider(this)
+        val firstDay = preset.defaultFirstDayProvider(this)
+
+        cycleDaysEdit.setText(labels.joinToString(", "))
+        refreshFirstCycleDayDropdown(firstDay)
+        clearDateCheckResult()
+        validateCycleInput()
+        markUnsavedChanges()
+
+        Toast.makeText(
+            this,
+            getString(R.string.preset_applied, getString(preset.nameRes)),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    fun showApplyPresetDialog(
+        preset: CyclePreset,
+        onConfirm: () -> Unit
+    ) {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.apply_preset_title)
+            .setMessage(
+                getString(
+                    R.string.apply_preset_message,
+                    getString(preset.nameRes)
+                )
+            )
+            .setPositiveButton(R.string.apply_preset) { _: android.content.DialogInterface, _: Int ->
+                onConfirm()
+            }
+            .setNegativeButton(R.string.cancel) { dialog: android.content.DialogInterface, _: Int ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     fun refreshFirstCycleDayDropdown(preferredValue: String? = null) {
         val cycleLabels = getCurrentCycleLabelsFromInput()
 
@@ -378,6 +449,28 @@ class MainActivity : AppCompatActivity() {
 
         firstCycleDayDropdown.setOnItemClickListener { _, _, _, _ ->
             clearDateCheckResult()
+            markUnsavedChanges()
+        }
+    }
+
+    fun setupPresetDropdown() {
+        val presets = CyclePresetProvider.getPresets()
+        val names = presets.map { getString(it.nameRes) }
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            names
+        )
+
+        presetDropdown.setAdapter(adapter)
+        presetDropdown.keyListener = null
+
+        presetDropdown.setOnClickListener {
+            presetDropdown.showDropDown()
+        }
+
+        presetDropdown.setOnItemClickListener { _, _, _, _ ->
             markUnsavedChanges()
         }
     }

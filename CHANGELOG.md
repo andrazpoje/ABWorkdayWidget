@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.6] - 2026-03-22
+
+### ✨ Added
+- New **Calendar view** (monthly overview of cycle)
+- **Bottom navigation** (Home / Calendar / More)
+- New **More screen**:
+  - Contact author
+  - Report a bug
+  - Open GitHub project
+  - Support development (donate)
+- **Cycle presets** for quick setup (A/B, shifts, etc.)
+- Email integration for **feedback and bug reporting**
+
+### 🎨 Improved
+- Unified **header across all screens**
+- Cleaner and more consistent **Material UI**
+- Improved **More screen layout** (cards + navigation)
+- Better visual hierarchy and spacing
+- Icons consistency across app
+
+### ⚙️ Technical
+- Refactored navigation (removed deprecated transitions)
+- Improved calendar refresh logic after cycle changes
+- Cleaned unused resources (strings, layouts)
+- Improved error handling (email / external intents fallback)
+- Codebase cleanup and modularization
+
+### 🐛 Fixed
+- Calendar not updating after cycle change
+- Missing translations in presets
+- Multiple unresolved references in presets logic
+- Various minor UI and stability fixes
+
+---
+
 ## [1.5] - 2026-03-21
 
 ### ✨ Added

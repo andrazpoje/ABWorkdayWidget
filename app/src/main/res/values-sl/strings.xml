@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- APP -->
     <string name="app_name">Delovni cikel</string>
+    <string name="app_header_title">Delovni cikel</string>
+    <string name="settings_subtitle">Nastavi cikel, pravila in izgled widgeta.</string>
 
     <!-- STATUS -->
     <string name="status_section">Danes</string>
+    <string name="today_label">Danes</string>
+    <string name="tomorrow_label">Jutri</string>
     <string name="tomorrow_status">Jutri: %1$s</string>
 
     <!-- PREVIEW -->
@@ -14,64 +19,94 @@
     <string name="cycle_section">Cikel</string>
     <string name="start_date">Začetni datum: %1$s</string>
     <string name="select_date">Izberi datum</string>
-    <string name="cycle_days_hint">
-        Vnesi oznake cikla, ločene z vejico. Primer: A,B ali Jutro,Popoldne,Nočna,Prosto
-    </string>
+    <string name="cycle_days_label">Dnevi v ciklu</string>
+    <string name="cycle_days_hint_placeholder">A, B, Nočna, Prosto</string>
+    <string name="cycle_days_hint">Vnesi oznake cikla, ločene z vejico. Primer: A,B ali Jutro,Popoldne,Nočna,Prosto</string>
     <string name="first_cycle_day_label">Dan cikla na začetni datum</string>
     <string name="first_cycle_day_hint">Vnesi eno oznako iz cikla, ki velja na izbrani začetni datum.</string>
-    <string name="first_cycle_day_placeholder">Npr. A</string>
+
+    <!-- PRESETS -->
+    <string name="preset_label">Predloga</string>
+    <string name="preset_hint">Izberi predlogo</string>
+    <string name="apply_preset_title">Uporabi predlogo</string>
+    <string name="apply_preset">Uporabi predlogo</string>
+    <string name="apply_preset_message">To bo prepisalo trenutne nastavitve cikla s predlogo »%1$s«.</string>
+    <string name="preset_already_applied">Ta predloga je že uporabljena</string>
+    <string name="preset_applied">Predloga uporabljena: %1$s</string>
+
+    <string name="preset_ab">A / B</string>
+    <string name="preset_shift_4">Jutranja / Popoldanska / Nočna / Prosto</string>
+    <string name="preset_day_night">Dan / Noč / Počitek / Prosto</string>
+    <string name="preset_numbers">1 / 2 / 3 / 4</string>
+    <string name="preset_work">Delo / Pozna / Nočna / Prosto</string>
+
+    <string name="label_morning">Jutranja</string>
+    <string name="label_afternoon">Popoldanska</string>
+    <string name="label_night">Nočna</string>
+    <string name="label_off">Prosto</string>
+    <string name="label_day">Dan</string>
+    <string name="label_recovery">Počitek</string>
 
     <!-- RULES -->
     <string name="rules_section">Pravila</string>
     <string name="skip_saturdays">Preskoči sobote</string>
     <string name="skip_sundays">Preskoči nedelje</string>
     <string name="skip_holidays">Preskoči dela proste dneve</string>
-    <string name="rules_info_text">
-        Določi, ali naj cikel preskoči sobote, nedelje in dela proste dneve.
-    </string>
+    <string name="rules_info_text">Določi, ali naj cikel preskoči sobote, nedelje in dela proste dneve.</string>
+    <string name="holiday_country_label">Država za dela proste dneve</string>
+    <string name="holiday_country_hint">Izberi državo</string>
+    <string name="override_skipped_days">Prikaži posebno oznako za preskočene dni</string>
+    <string name="skipped_day_label">Oznaka za preskočen dan</string>
 
     <!-- DISPLAY -->
     <string name="display_section">Prikaz</string>
     <string name="prefix_text">Besedilo pred oznako cikla</string>
-    <string name="display_info_text">
-        Widget prikaže točno oznake, ki jih vneseš v cikel.
-    </string>
+    <string name="display_info_text">Widget prikaže točno oznake, ki jih vneseš v cikel.</string>
 
-    <!-- COLOR THEMES -->
+    <!-- THEMES -->
     <string name="color_theme">Barvna tema</string>
     <string name="theme_classic">Klasična</string>
     <string name="theme_pastel">Pastelna</string>
     <string name="theme_dark">Temna</string>
 
     <!-- WIDGET -->
-    <string name="widget_not_added_short">
-        Widget še ni dodan na domači zaslon.
-    </string>
+    <string name="widget_not_added_short">Widget še ni dodan na domači zaslon.</string>
     <string name="open_widgets">Odpri widgete</string>
+    <string name="settings_widget_style_title">Videz widgeta</string>
+    <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
+    <string name="settings_widget_style_classic">Klasičen</string>
+    <string name="settings_widget_style_minimal">Minimalističen</string>
 
     <!-- DATE CHECK -->
     <string name="check_date">Preveri datum</string>
-    <string name="date_result">Za ta datum: %1$s</string>
     <string name="date_result_with_date">Za izbrani datum %1$s je cikel %2$s.</string>
 
-    <!-- SAVE -->
+    <!-- SAVE / COMMON -->
     <string name="save">Shrani</string>
     <string name="settings_saved">Nastavitve shranjene</string>
+    <string name="cancel">Prekliči</string>
+    <string name="discard">Zavrzi</string>
+    <string name="close">Zapri</string>
 
-    <!-- DIALOG -->
-    <string name="confirm_changes_title">Potrditev sprememb</string>
-    <string name="confirm_changes_message">
-        Te spremembe vplivajo na izračun cikla. Ali želiš nadaljevati?
-    </string>
-    <string name="yes">Da</string>
-    <string name="no">Ne</string>
+    <!-- UNSAVED CHANGES -->
+    <string name="unsaved_changes_title">Neshranjene spremembe</string>
+    <string name="unsaved_changes_message">Imaš neshranjene spremembe. Ali jih želiš shraniti pred izhodom?</string>
 
-    <!-- OTHER -->
-    <string name="github_project">Projekt na GitHubu</string>
-    <string name="settings">Nastavitve</string>
-    <string name="settings_subtitle">Nastavi cikel, pravila in izgled widgeta.</string>
+    <!-- VALIDATION -->
+    <string name="error_cycle_empty">Vnesi vsaj en dan cikla</string>
+    <string name="error_cycle_invalid_format_detailed">Neveljaven zapis: "%1$s". Uporabi vejice, npr. A, B, C</string>
+    <string name="error_cycle_too_many">Preveč elementov (%1$d). Največ dovoljeno: %2$d</string>
+    <string name="error_cycle_empty_item">Prazni vnosi niso dovoljeni</string>
+    <string name="error_cycle_duplicates">Podvojene vrednosti niso dovoljene</string>
+    <string name="error_label_too_long">Posamezna oznaka cikla ima lahko največ %1$d znakov.</string>
+    <string name="error_label_too_long_detailed">Oznaka "%1$s" je predolga (največ %2$d znakov)</string>
+    <string name="error_first_day_not_in_cycle">Začetni dan "%1$s" ni v ciklu</string>
+    <string name="fix_errors">Popravi napake v vnosu</string>
 
-    <!-- Notifications -->
+    <!-- NOTIFICATIONS -->
+    <string name="settings_notification_title">Obvestila</string>
+    <string name="settings_notifications_enabled">Obvestila o spremembi cikla</string>
+    <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
     <string name="notification_channel_normal_name">AB delovni cikel obvestila</string>
     <string name="notification_channel_normal_desc">Obvestila ob spremembi delovnega cikla</string>
     <string name="notification_channel_silent_name">AB delovni cikel obvestila brez zvoka</string>
@@ -84,44 +119,43 @@
     <string name="notification_day_off_short">ni delovni dan</string>
     <string name="notification_permission_denied">Dovoljenje za obvestila ni bilo odobreno.</string>
 
-    <!-- Settings - Widget -->
-    <string name="settings_widget_style_title">Videz widgeta</string>
-    <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
-    <string name="settings_widget_style_classic">Klasičen</string>
-    <string name="settings_widget_style_minimal">Minimalističen</string>
+    <!-- MORE / NAVIGATION -->
+    <string name="more_calendar_title">Koledar cikla</string>
+    <string name="more_calendar_subtitle">Pregled cikla skozi mesec</string>
+    <string name="more_contact_title">Kontaktiraj avtorja</string>
+    <string name="more_contact_subtitle">Pošlji vprašanje ali povratno informacijo</string>
+    <string name="more_github_title">GitHub</string>
+    <string name="more_github_subtitle">Odpri repozitorij projekta</string>
+    <string name="more_report_bug_title">Sporoči napako</string>
+    <string name="more_report_bug_subtitle">Pošlji povratne informacije ali prijavi težavo</string>
+    <string name="more_donate_title">Podpri razvoj</string>
+    <string name="more_donate_subtitle">Pomagaj izboljšati aplikacijo</string>
+    <string name="more_version_placeholder">Verzija</string>
 
-    <!-- Settings - Notifications -->
-    <string name="settings_notification_title">Obvestila</string>
-    <string name="settings_notifications_enabled">Obvestila o spremembi cikla</string>
-    <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
+    <string name="nav_home">Domov</string>
+    <string name="nav_calendar">Koledar</string>
+    <string name="nav_more">Več</string>
 
-    <!-- Inputs -->
-    <string name="cycle_days_label">Dnevi v ciklu</string>
-    <string name="cycle_days_hint_placeholder">A, B, Nočna, Prosto</string>
+    <!-- CALENDAR -->
+    <string name="calendar_previous_month">Prejšnji mesec</string>
+    <string name="calendar_next_month">Naslednji mesec</string>
+    <string name="calendar_day_cycle">Dan cikla</string>
+    <string name="calendar_day_holiday">Status dneva</string>
 
-    <string name="override_skipped_days">Prikaži posebno oznako za preskočene dni</string>
-    <string name="skipped_day_label">Oznaka za preskočen dan</string>
+    <string-array name="week_days_short">
+        <item>Pon</item>
+        <item>Tor</item>
+        <item>Sre</item>
+        <item>Čet</item>
+        <item>Pet</item>
+        <item>Sob</item>
+        <item>Ned</item>
+    </string-array>
 
-    <!-- Validation -->
-    <string name="error_cycle_empty">Vnesi vsaj en dan cikla</string>
-    <string name="error_cycle_invalid_format_detailed">Neveljaven zapis: "%1$s". Uporabi vejice, npr. A, B, C</string>
-    <string name="error_cycle_too_many">Preveč elementov (%1$d). Največ dovoljeno: %2$d</string>
-    <string name="error_cycle_empty_item">Prazni vnosi niso dovoljeni</string>
-    <string name="error_cycle_duplicates">Podvojene vrednosti niso dovoljene</string>
-    <string name="error_label_too_long">Posamezna oznaka cikla ima lahko največ %1$d znakov.</string>
-    <string name="error_label_too_long_detailed">Oznaka "%1$s" je predolga (največ %2$d znakov)</string>
-    <string name="error_first_day_not_in_cycle">Začetni dan "%1$s" ni v ciklu</string>
-    <string name="fix_errors">Popravi napake v vnosu</string>
-
-    <string name="holiday_country_label">Država za dela proste dneve</string>
-    <string name="holiday_country_hint">Izberi državo</string>
-    <string name="holiday_country_slovenia">Slovenija</string>
-
-    <string name="unsaved_changes_title">Neshranjene spremembe</string>
-    <string name="unsaved_changes_message">Imaš neshranjene spremembe. Ali jih želiš shraniti pred izhodom?</string>
-    <string name="discard">Zavrzi</string>
-
-    <string name="cancel">Prekliči</string>
-
+    <string name="email_subject_contact">%1$s - Feedback</string>
+    <string name="email_subject_bug_report">%1$s - Bug report</string>
+    <string name="email_body_bug_report">Describe the issue:\n\n---\nApp version: %1$s\nDevice: %2$s\nAndroid: %3$s\n</string>
+    <string name="no_email_app_found">No email app found</string>
+    <string name="unable_to_open_link">Unable to open link</string>
 
 </resources>

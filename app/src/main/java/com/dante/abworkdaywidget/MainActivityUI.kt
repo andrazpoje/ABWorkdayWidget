@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 
 fun MainActivity.applyEdgeToEdgeInsets() {
     val extraSpacing = resources.getDimensionPixelSize(R.dimen.save_bar_extra_bottom_padding)
+    val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
 
     ViewCompat.setOnApplyWindowInsetsListener(activityRoot) { _, insets ->
         val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
@@ -28,17 +29,22 @@ fun MainActivity.applyEdgeToEdgeInsets() {
 
         saveBarContainer.post {
             val saveBarHeight = saveBarContainer.height
+            val bottomNavHeight = bottomNav.height
 
             mainScrollView.setPadding(
                 0,
                 0,
                 0,
-                saveBarHeight + bottomInset + extraSpacing
+                saveBarHeight + bottomNavHeight + bottomInset + extraSpacing
             )
 
-            val lp = saveBarContainer.layoutParams as FrameLayout.LayoutParams
-            lp.bottomMargin = bottomInset
-            saveBarContainer.layoutParams = lp
+            val saveBarLp = saveBarContainer.layoutParams as FrameLayout.LayoutParams
+            saveBarLp.bottomMargin = bottomNavHeight + bottomInset
+            saveBarContainer.layoutParams = saveBarLp
+
+            val navLp = bottomNav.layoutParams as FrameLayout.LayoutParams
+            navLp.bottomMargin = bottomInset
+            bottomNav.layoutParams = navLp
         }
 
         insets

@@ -1,4 +1,7 @@
 package com.dante.abworkdaywidget
 
-class CalendarDayItem {
-}
+import java.time.LocalDate
+
+data class CalendarDayItem(
+    val date: LocalDate?
+)

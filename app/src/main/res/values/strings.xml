@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- APP -->
     <string name="app_name">Work Cycle</string>
+    <string name="app_header_title">Work Cycle</string>
+    <string name="settings_subtitle">Set your cycle, rules and widget appearance.</string>
 
     <!-- STATUS -->
     <string name="status_section">Today</string>
+    <string name="today_label">Today</string>
+    <string name="tomorrow_label">Tomorrow</string>
     <string name="tomorrow_status">Tomorrow: %1$s</string>
 
     <!-- PREVIEW -->
@@ -14,68 +19,94 @@
     <string name="cycle_section">Cycle</string>
     <string name="start_date">Start date: %1$s</string>
     <string name="select_date">Select date</string>
-
-    <string name="cycle_days_hint">
-        Enter cycle labels separated by commas. Example: A,B or Morning,Afternoon,Night,Off
-    </string>
-
+    <string name="cycle_days_label">Cycle days</string>
+    <string name="cycle_days_hint_placeholder">A, B, Night, Free</string>
+    <string name="cycle_days_hint">Enter cycle labels separated by commas. Example: A,B or Morning,Afternoon,Night,Off</string>
     <string name="first_cycle_day_label">Cycle day on start date</string>
     <string name="first_cycle_day_hint">Enter one label from the cycle that applies to the selected start date.</string>
-    <string name="first_cycle_day_placeholder">E.g. A</string>
+
+    <!-- PRESETS -->
+    <string name="preset_label">Preset</string>
+    <string name="preset_hint">Choose preset</string>
+    <string name="apply_preset_title">Apply preset</string>
+    <string name="apply_preset">Apply preset</string>
+    <string name="apply_preset_message">This will replace the current cycle settings with preset "%1$s".</string>
+    <string name="preset_already_applied">This preset is already applied</string>
+    <string name="preset_applied">Preset applied: %1$s</string>
+
+    <string name="preset_ab">A / B</string>
+    <string name="preset_shift_4">Morning / Afternoon / Night / Off</string>
+    <string name="preset_day_night">Day / Night / Recovery / Off</string>
+    <string name="preset_numbers">1 / 2 / 3 / 4</string>
+    <string name="preset_work">Work / Late / Night / Off</string>
+
+    <string name="label_morning">Morning</string>
+    <string name="label_afternoon">Afternoon</string>
+    <string name="label_night">Night</string>
+    <string name="label_off">Off</string>
+    <string name="label_day">Day</string>
+    <string name="label_recovery">Recovery</string>
 
     <!-- RULES -->
     <string name="rules_section">Rules</string>
     <string name="skip_saturdays">Skip Saturdays</string>
     <string name="skip_sundays">Skip Sundays</string>
     <string name="skip_holidays">Skip non-working days</string>
-    <string name="rules_info_text">
-        Choose whether the cycle should skip Saturdays, Sundays and non-working days.
-    </string>
+    <string name="rules_info_text">Choose whether the cycle should skip Saturdays, Sundays and non-working days.</string>
+    <string name="holiday_country_label">Country for non-working days</string>
+    <string name="holiday_country_hint">Select country</string>
+    <string name="override_skipped_days">Show custom label on skipped days</string>
+    <string name="skipped_day_label">Skipped day label</string>
 
     <!-- DISPLAY -->
     <string name="display_section">Display</string>
     <string name="prefix_text">Text before cycle label</string>
-    <string name="display_info_text">
-        The widget shows exactly the labels entered in the cycle.
-    </string>
+    <string name="display_info_text">The widget shows exactly the labels entered in the cycle.</string>
 
-    <!-- COLOR THEMES -->
+    <!-- THEMES -->
     <string name="color_theme">Color theme</string>
     <string name="theme_classic">Classic</string>
     <string name="theme_pastel">Pastel</string>
     <string name="theme_dark">Dark</string>
 
     <!-- WIDGET -->
-    <string name="widget_not_added_short">
-        The widget has not been added to the home screen yet.
-    </string>
+    <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
     <string name="open_widgets">Open widgets</string>
-    <string name="today_label">Today</string>
-    <string name="tomorrow_label">Tomorrow</string>
+    <string name="settings_widget_style_title">Widget appearance</string>
+    <string name="settings_widget_style_description">Choose the widget style.</string>
+    <string name="settings_widget_style_classic">Classic</string>
+    <string name="settings_widget_style_minimal">Minimal</string>
 
     <!-- DATE CHECK -->
     <string name="check_date">Check date</string>
-    <string name="date_result">For this date: %1$s</string>
     <string name="date_result_with_date">For selected date %1$s, the cycle is %2$s.</string>
 
-    <!-- SAVE -->
+    <!-- SAVE / COMMON -->
     <string name="save">Save</string>
     <string name="settings_saved">Settings saved</string>
+    <string name="cancel">Cancel</string>
+    <string name="discard">Discard</string>
+    <string name="close">Close</string>
 
-    <!-- DIALOG -->
-    <string name="confirm_changes_title">Confirm changes</string>
-    <string name="confirm_changes_message">
-        These changes will affect the cycle calculation. Do you want to continue?
-    </string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <!-- UNSAVED CHANGES -->
+    <string name="unsaved_changes_title">Unsaved changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
 
-    <!-- OTHER -->
-    <string name="github_project">Project on GitHub</string>
-    <string name="settings">Settings</string>
-    <string name="settings_subtitle">Set your cycle, rules and widget appearance.</string>
+    <!-- VALIDATION -->
+    <string name="error_cycle_empty">Enter at least one cycle day</string>
+    <string name="error_cycle_invalid_format_detailed">Invalid format: "%1$s". Use commas, e.g. A, B, C</string>
+    <string name="error_cycle_too_many">Too many items (%1$d). Maximum allowed is %2$d</string>
+    <string name="error_cycle_empty_item">Empty items are not allowed</string>
+    <string name="error_cycle_duplicates">Duplicate values are not allowed</string>
+    <string name="error_label_too_long">Each cycle label can have up to %1$d characters.</string>
+    <string name="error_label_too_long_detailed">Label "%1$s" is too long (max %2$d characters)</string>
+    <string name="error_first_day_not_in_cycle">First day "%1$s" is not in cycle</string>
+    <string name="fix_errors">Please fix input errors</string>
 
-    <!-- Notifications -->
+    <!-- NOTIFICATIONS -->
+    <string name="settings_notification_title">Notifications</string>
+    <string name="settings_notifications_enabled">Cycle change notifications</string>
+    <string name="settings_silent_notification">Silent notifications (no sound)</string>
     <string name="notification_channel_normal_name">AB day notifications</string>
     <string name="notification_channel_normal_desc">Notifications when the workday cycle changes</string>
     <string name="notification_channel_silent_name">AB day notifications (silent)</string>
@@ -88,45 +119,43 @@
     <string name="notification_day_off_short">not a workday</string>
     <string name="notification_permission_denied">Notification permission was not granted.</string>
 
-    <!-- Settings - Widget -->
-    <string name="settings_widget_style_title">Widget appearance</string>
-    <string name="settings_widget_style_description">Choose the widget style.</string>
-    <string name="settings_widget_style_classic">Classic</string>
-    <string name="settings_widget_style_minimal">Minimal</string>
+    <!-- MORE / NAVIGATION -->
+    <string name="more_calendar_title">Cycle calendar</string>
+    <string name="more_calendar_subtitle">View the cycle across the month</string>
+    <string name="more_contact_title">Contact author</string>
+    <string name="more_contact_subtitle">Send feedback or questions</string>
+    <string name="more_github_title">GitHub</string>
+    <string name="more_github_subtitle">Open project repository</string>
+    <string name="more_report_bug_title">Report a bug</string>
+    <string name="more_report_bug_subtitle">Send feedback or report an issue</string>
+    <string name="more_donate_title">Support development</string>
+    <string name="more_donate_subtitle">Help improve the app</string>
+    <string name="more_version_placeholder">Version</string>
 
-    <!-- Settings - Notifications -->
-    <string name="settings_notification_title">Notifications</string>
-    <string name="settings_notifications_enabled">Cycle change notifications</string>
-    <string name="settings_silent_notification">Silent notifications (no sound)</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_more">More</string>
 
-    <!-- Inputs -->
-    <string name="cycle_days_label">Cycle days</string>
-    <string name="cycle_days_hint_placeholder">A, B, Night, Free</string>
+    <!-- CALENDAR -->
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_day_cycle">Cycle day</string>
+    <string name="calendar_day_holiday">Day status</string>
 
-    <string name="override_skipped_days">Show custom label on skipped days</string>
-    <string name="skipped_day_label">Skipped day label</string>
+    <string-array name="week_days_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
 
-    <!-- Validation -->
-    <!-- Validation -->
-    <string name="error_cycle_empty">Enter at least one cycle day</string>
-    <string name="error_cycle_invalid_format_detailed">Invalid format: "%1$s". Use commas, e.g. A, B, C</string>
-    <string name="error_cycle_too_many">Too many items (%1$d). Maximum allowed is %2$d</string>
-    <string name="error_cycle_empty_item">Empty items are not allowed</string>
-    <string name="error_cycle_duplicates">Duplicate values are not allowed</string>
-    <string name="error_label_too_long">Each cycle label can have up to %1$d characters.</string>
-    <string name="error_label_too_long_detailed">Label "%1$s" is too long (max %2$d characters)</string>
-    <string name="error_first_day_not_in_cycle">First day "%1$s" is not in cycle</string>
-    <string name="fix_errors">Please fix input errors</string>
-
-    <string name="holiday_country_label">Country for non-working days</string>
-    <string name="holiday_country_hint">Select country</string>
-    <string name="holiday_country_slovenia">Slovenia</string>
-
-    <string name="unsaved_changes_title">Unsaved changes</string>
-    <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
-    <string name="discard">Discard</string>
-
-    <string name="cancel">Cancel</string>
-
+    <string name="email_subject_contact">%1$s - Feedback</string>
+    <string name="email_subject_bug_report">%1$s - Bug report</string>
+    <string name="email_body_bug_report">Describe the issue:\n\n---\nApp version: %1$s\nDevice: %2$s\nAndroid: %3$s\n</string>
+    <string name="no_email_app_found">No email app found</string>
+    <string name="unable_to_open_link">Unable to open link</string>
 
 </resources>
