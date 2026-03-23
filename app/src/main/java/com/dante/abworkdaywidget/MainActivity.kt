@@ -13,7 +13,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -25,7 +24,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,6 +38,11 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -62,6 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var activityRoot: View
     lateinit var saveBarContainer: View
+    lateinit var bottomBarsContainer: View
 
     lateinit var cycleHeader: View
     lateinit var rulesHeader: View
@@ -106,10 +110,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var holidayCountryDropdown: MaterialAutoCompleteTextView
 
     lateinit var saveButton: MaterialButton
-    lateinit var checkDateButton: MaterialButton
     lateinit var openWidgetsButton: MaterialButton
 
-    lateinit var dateResultText: TextView
     lateinit var widgetHint: TextView
     lateinit var prefixEdit: EditText
     lateinit var skippedDayLabelEdit: EditText
@@ -118,36 +120,46 @@ class MainActivity : AppCompatActivity() {
     lateinit var themePastel: RadioButton
     lateinit var themeDark: RadioButton
 
-    lateinit var selectedDate: LocalDate
+    lateinit var appThemeSystem: RadioButton
+    lateinit var appThemeLight: RadioButton
+    lateinit var appThemeDark: RadioButton
+
+    var selectedDate: LocalDate = LocalDate.now()
     lateinit var supportedCountries: List<HolidayCountry>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContentView(R.layout.activity_main)
 
         bindViews()
+        applyTopInsetToScrollView()
+
         setupFirstCycleDayDropdown()
         setupPresetDropdown()
-        saveBarContainer.visibility = View.GONE
         setupPreviewRecyclerView()
         setupHolidayCountryDropdown()
         migrateLegacySettingsIfNeeded()
-        applyEdgeToEdgeInsets()
-        setupBackHandling()
-
-        updateWidgetHint()
         loadSettings()
-        updateTodayStatus()
-        updateCyclePreview()
         setupWidgetStyleSettings()
         setupNotificationSettings()
         setupChangeListeners()
-        setupBottomNavigation()
+        updateTodayStatus()
+        updateCyclePreview()
+        updateWidgetHint()
 
-        checkDateButton.setOnClickListener {
-            showCheckDatePicker()
-        }
+        versionText.text = "v${BuildConfig.VERSION_NAME}"
+
+        setupSection(cycleHeader, cycleSection, cycleArrow, SECTION_CYCLE)
+        setupSection(rulesHeader, rulesSection, rulesArrow, SECTION_RULES)
+        setupSection(displayHeader, displaySection, displayArrow, SECTION_DISPLAY)
+
+        restoreLastOpenSection()
+        clearUnsavedChanges()
+
+        updateSystemBarIconContrast(activityRoot)
+        setupBottomNavigation(R.id.nav_home)
 
         openWidgetsButton.setOnClickListener {
             try {
@@ -206,20 +218,41 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        versionText.text = "v${BuildConfig.VERSION_NAME}"
+        setupBackHandling()
+    }
 
-        setupSection(cycleHeader, cycleSection, cycleArrow, SECTION_CYCLE)
-        setupSection(rulesHeader, rulesSection, rulesArrow, SECTION_RULES)
-        setupSection(displayHeader, displaySection, displayArrow, SECTION_DISPLAY)
+    private val Int.dp: Int
+        get() = (this * resources.displayMetrics.density).toInt()
 
-        restoreLastOpenSection()
-        clearUnsavedChanges()
+
+    private fun applyTopStatusBarInset() {
+        val mainContentContainer = findViewById<View>(R.id.mainContentContainer)
+
+        val initialLeft = mainContentContainer.paddingLeft
+        val initialTop = mainContentContainer.paddingTop
+        val initialRight = mainContentContainer.paddingRight
+        val initialBottom = mainContentContainer.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(mainContentContainer) { view, insets ->
+            val topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+
+            view.setPadding(
+                initialLeft,
+                initialTop + topInset,
+                initialRight,
+                initialBottom
+            )
+
+            insets
+        }
+
+        ViewCompat.requestApplyInsets(mainContentContainer)
     }
 
     fun bindViews() {
         activityRoot = findViewById(R.id.activityRoot)
         saveBarContainer = findViewById(R.id.saveBarContainer)
-
+        bottomBarsContainer = findViewById(R.id.bottomBarsContainer)
         mainScrollView = findViewById(R.id.main)
 
         cycleHeader = findViewById(R.id.cycleHeader)
@@ -257,10 +290,7 @@ class MainActivity : AppCompatActivity() {
         holidayCountryDropdown = findViewById(R.id.holidayCountryDropdown)
 
         saveButton = findViewById(R.id.saveButton)
-        checkDateButton = findViewById(R.id.checkDateButton)
         openWidgetsButton = findViewById(R.id.openWidgetsButton)
-
-        dateResultText = findViewById(R.id.dateResultText)
         prefixEdit = findViewById(R.id.prefixEdit)
         skippedDayLabelEdit = findViewById(R.id.skippedDayLabelEdit)
 
@@ -273,6 +303,28 @@ class MainActivity : AppCompatActivity() {
         themeClassic = findViewById(R.id.themeClassic)
         themePastel = findViewById(R.id.themePastel)
         themeDark = findViewById(R.id.themeDark)
+
+        appThemeSystem = findViewById(R.id.appThemeSystem)
+        appThemeLight = findViewById(R.id.appThemeLight)
+        appThemeDark = findViewById(R.id.appThemeDark)
+    }
+
+    private fun applyTopInsetToScrollView() {
+        val scrollView = findViewById<NestedScrollView>(R.id.main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(activityRoot) { _, insets ->
+            val topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+
+            val lp = scrollView.layoutParams as ViewGroup.MarginLayoutParams
+            if (lp.topMargin != topInset) {
+                lp.topMargin = topInset
+                scrollView.layoutParams = lp
+            }
+
+            insets
+        }
+
+        ViewCompat.requestApplyInsets(activityRoot)
     }
 
     fun validateCycleInput(): Boolean {
@@ -377,6 +429,7 @@ class MainActivity : AppCompatActivity() {
 
         cycleDaysEdit.setText(labels.joinToString(", "))
         refreshFirstCycleDayDropdown(firstDay)
+        updatePresetSelectionState()
         clearDateCheckResult()
         validateCycleInput()
         markUnsavedChanges()
@@ -449,13 +502,13 @@ class MainActivity : AppCompatActivity() {
 
         firstCycleDayDropdown.setOnItemClickListener { _, _, _, _ ->
             clearDateCheckResult()
-            markUnsavedChanges()
+            updatePresetSelectionState(markAsChanged = true)
         }
     }
 
     fun setupPresetDropdown() {
         val presets = CyclePresetProvider.getPresets()
-        val names = presets.map { getString(it.nameRes) }
+        val names = presets.map { getString(it.nameRes) } + getString(R.string.preset_custom)
 
         val adapter = ArrayAdapter(
             this,
@@ -471,6 +524,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         presetDropdown.setOnItemClickListener { _, _, _, _ ->
+            val selectedName = presetDropdown.text?.toString()?.trim().orEmpty()
+            val isCustom = selectedName == getString(R.string.preset_custom)
+            applyPresetButton.isEnabled = !isCustom
+            applyPresetButton.alpha = if (isCustom) 0.5f else 1f
+        }
+    }
+
+    fun updatePresetSelectionState(markAsChanged: Boolean = false) {
+        val matchedPreset = CyclePresetProvider.getPresets().firstOrNull { preset ->
+            !wouldPresetChangeCurrentState(preset)
+        }
+
+        val presetText = matchedPreset
+            ?.let { getString(it.nameRes) }
+            ?: getString(R.string.preset_custom)
+
+        if (presetDropdown.text?.toString() != presetText) {
+            presetDropdown.setText(presetText, false)
+        }
+
+        applyPresetButton.isEnabled = matchedPreset == null
+        applyPresetButton.alpha = if (matchedPreset == null) 1f else 0.5f
+
+        if (markAsChanged) {
             markUnsavedChanges()
         }
     }
@@ -551,34 +628,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         HolidayManager.ensureCountrySelected(this)
-    }
-
-    fun showCheckDatePicker() {
-        val today = LocalDate.now()
-
-        val dialog = DatePickerDialog(
-            this,
-            { _, year, month, dayOfMonth ->
-                val date = LocalDate.of(year, month + 1, dayOfMonth)
-                val label = CycleManager.getCycleDayForDate(this, date)
-
-                val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-                    .withLocale(Locale.getDefault())
-
-                val formattedDate = date.format(formatter)
-
-                dateResultText.text = getString(
-                    R.string.date_result_with_date,
-                    formattedDate,
-                    label
-                )
-            },
-            today.year,
-            today.monthValue - 1,
-            today.dayOfMonth
-        )
-
-        dialog.show()
     }
 
     fun updateTodayStatus() {
@@ -684,9 +733,7 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    fun clearDateCheckResult() {
-        dateResultText.text = ""
-    }
+    fun clearDateCheckResult() = Unit
 
     fun updateDateText() {
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
@@ -788,6 +835,10 @@ class MainActivity : AppCompatActivity() {
         themePastel.setOnClickListener { markUnsavedChanges() }
         themeDark.setOnClickListener { markUnsavedChanges() }
 
+        appThemeSystem.setOnClickListener { markUnsavedChanges() }
+        appThemeLight.setOnClickListener { markUnsavedChanges() }
+        appThemeDark.setOnClickListener { markUnsavedChanges() }
+
         prefixEdit.addTextChangedListener {
             markUnsavedChanges()
         }
@@ -796,7 +847,7 @@ class MainActivity : AppCompatActivity() {
             clearDateCheckResult()
             refreshFirstCycleDayDropdown()
             validateCycleInput()
-            markUnsavedChanges()
+            updatePresetSelectionState(markAsChanged = true)
         }
 
         skippedDayLabelEdit.addTextChangedListener {
@@ -836,13 +887,16 @@ class MainActivity : AppCompatActivity() {
             saveButton.isEnabled = false
             saveButton.alpha = 0.6f
 
-            saveBarContainer.animate()
-                .alpha(0f)
-                .setDuration(150)
-                .withEndAction {
-                    saveBarContainer.visibility = View.GONE
-                }
-                .start()
+            if (saveBarContainer.visibility != View.GONE) {
+                saveBarContainer.animate()
+                    .alpha(0f)
+                    .setDuration(150)
+                    .withEndAction {
+                        saveBarContainer.visibility = View.GONE
+                        saveBarContainer.alpha = 1f
+                    }
+                    .start()
+            }
         }
     }
 

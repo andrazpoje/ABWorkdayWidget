@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v1.6.1
+
+### 🐛 Fixed
+- Fixed **Main screen overlapping the Android status bar**
+- Fixed **inconsistent edge-to-edge behavior** compared to Calendar and More screens
+- Fixed issue where **saved settings were not loaded after app restart**
+- Fixed crash caused by uninitialized `selectedDate`
+- Fixed **start date showing placeholder (%1$s) instead of formatted value**
+
+### ⚙️ Technical
+- Unified window insets handling (status bar + navigation bar)
+- Removed conflicting inset listeners causing layout issues
+- Restored correct initialization flow in `onCreate()`
+- Improved stability of settings persistence
+
+---
+
 ## [1.6] - 2026-03-22
 
 ### ✨ Added

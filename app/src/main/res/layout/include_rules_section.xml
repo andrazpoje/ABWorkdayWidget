@@ -93,12 +93,14 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/holiday_country_hint">
+                    android:hint="@string/holiday_country_hint"
+                    style="@style/AppExposedDropdown">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/holidayCountryDropdown"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:minHeight="60dp"
                         android:clickable="true"
                         android:focusable="false"
                         android:inputType="none"

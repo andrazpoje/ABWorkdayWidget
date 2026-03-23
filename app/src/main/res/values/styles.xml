@@ -8,4 +8,8 @@
         <item name="android:alpha">0.7</item>
     </style>
 
+
+    <style name="AppExposedDropdown" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Material3.Corner.Medium</item>
+    </style>
 </resources>

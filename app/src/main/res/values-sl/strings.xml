@@ -32,6 +32,16 @@
     <string name="apply_preset">Uporabi predlogo</string>
     <string name="apply_preset_message">To bo prepisalo trenutne nastavitve cikla s predlogo »%1$s«.</string>
     <string name="preset_already_applied">Ta predloga je že uporabljena</string>
+
+    <string name="preset_custom">Po meri</string>
+    <string name="app_theme">Tema aplikacije</string>
+    <string name="theme_system">Sistemska</string>
+    <string name="theme_light">Svetla</string>
+    <string name="theme_dark_mode">Temna</string>
+    <string name="more_statistics_title">Statistika</string>
+    <string name="more_statistics_subtitle">Načrtovano za prihodnjo verzijo</string>
+    <string name="statistics_button">Statistika</string>
+
     <string name="preset_applied">Predloga uporabljena: %1$s</string>
 
     <string name="preset_ab">A / B</string>

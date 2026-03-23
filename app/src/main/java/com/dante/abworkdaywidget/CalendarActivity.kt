@@ -1,22 +1,23 @@
 package com.dante.abworkdaywidget
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import android.view.LayoutInflater
-import android.view.View
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.button.MaterialButton
 
 class CalendarActivity : AppCompatActivity() {
 
@@ -28,10 +29,16 @@ class CalendarActivity : AppCompatActivity() {
     private lateinit var displayedMonth: LocalDate
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
+        setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_calendar)
 
-        setupBottomNavigation()
+        findViewById<View>(R.id.calendarContentContainer).applySystemBarInsetsToPadding(addTop = true)
+        findViewById<BottomNavigationView>(R.id.bottomNavigation).applySystemBarInsetsToPadding(addBottom = true)
+        updateSystemBarIconContrast(findViewById(R.id.calendarRoot))
+
+        setupBottomNavigation(R.id.nav_calendar)
 
         recycler = findViewById(R.id.calendarRecycler)
         monthTitle = findViewById(R.id.monthTitle)
@@ -61,7 +68,6 @@ class CalendarActivity : AppCompatActivity() {
         renderMonth(displayedMonth)
     }
 
-    // --- WEEK HEADER ---
     private fun setupWeekHeader() {
         val header = findViewById<LinearLayout>(R.id.weekHeader)
         val days = resources.getStringArray(R.array.week_days_short)
@@ -85,7 +91,6 @@ class CalendarActivity : AppCompatActivity() {
         }
     }
 
-    // --- RENDER MONTH ---
     private fun renderMonth(monthDate: LocalDate) {
         monthTitle.text =
             monthDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
@@ -113,7 +118,6 @@ class CalendarActivity : AppCompatActivity() {
         )
     }
 
-    // --- BUILD GRID ---
     private fun buildMonth(date: LocalDate): List<CalendarDayItem> {
         val start = date.withDayOfMonth(1)
         val end = date.withDayOfMonth(date.lengthOfMonth())
@@ -150,7 +154,6 @@ class CalendarActivity : AppCompatActivity() {
         }
     }
 
-    // --- CLICK HANDLER ---
     private fun showDayDetails(date: LocalDate) {
         val label = CycleManager.getCycleDayForDate(this, date)
 

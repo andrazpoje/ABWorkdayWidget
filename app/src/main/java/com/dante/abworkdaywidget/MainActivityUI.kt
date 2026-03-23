@@ -4,53 +4,52 @@ import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 
 fun MainActivity.applyEdgeToEdgeInsets() {
-    val extraSpacing = resources.getDimensionPixelSize(R.dimen.save_bar_extra_bottom_padding)
-    val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
+    val mainContentContainer = findViewById<View>(R.id.mainContentContainer)
 
-    ViewCompat.setOnApplyWindowInsetsListener(activityRoot) { _, insets ->
+    val initialContentLeft = mainContentContainer.paddingLeft
+    val initialContentTop = mainContentContainer.paddingTop
+    val initialContentRight = mainContentContainer.paddingRight
+    val initialContentBottom = mainContentContainer.paddingBottom
+
+    val initialBottomBarsLeft = bottomBarsContainer.paddingLeft
+    val initialBottomBarsTop = bottomBarsContainer.paddingTop
+    val initialBottomBarsRight = bottomBarsContainer.paddingRight
+    val initialBottomBarsBottom = bottomBarsContainer.paddingBottom
+
+    ViewCompat.setOnApplyWindowInsetsListener(mainContentContainer) { view, insets ->
         val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-        val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
 
-        val bottomInset = maxOf(navBars.bottom, imeInsets.bottom)
-
-        activityRoot.setPadding(
-            activityRoot.paddingLeft,
-            statusBars.top,
-            activityRoot.paddingRight,
-            activityRoot.paddingBottom
+        view.updatePadding(
+            left = initialContentLeft,
+            top = initialContentTop + statusBars.top,
+            right = initialContentRight,
+            bottom = initialContentBottom
         )
-
-        saveBarContainer.post {
-            val saveBarHeight = saveBarContainer.height
-            val bottomNavHeight = bottomNav.height
-
-            mainScrollView.setPadding(
-                0,
-                0,
-                0,
-                saveBarHeight + bottomNavHeight + bottomInset + extraSpacing
-            )
-
-            val saveBarLp = saveBarContainer.layoutParams as FrameLayout.LayoutParams
-            saveBarLp.bottomMargin = bottomNavHeight + bottomInset
-            saveBarContainer.layoutParams = saveBarLp
-
-            val navLp = bottomNav.layoutParams as FrameLayout.LayoutParams
-            navLp.bottomMargin = bottomInset
-            bottomNav.layoutParams = navLp
-        }
 
         insets
     }
 
-    ViewCompat.requestApplyInsets(activityRoot)
+    ViewCompat.setOnApplyWindowInsetsListener(bottomBarsContainer) { view, insets ->
+        val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+
+        view.updatePadding(
+            left = initialBottomBarsLeft,
+            top = initialBottomBarsTop,
+            right = initialBottomBarsRight,
+            bottom = initialBottomBarsBottom + navigationBars.bottom
+        )
+
+        insets
+    }
+
+    ViewCompat.requestApplyInsets(mainContentContainer)
+    ViewCompat.requestApplyInsets(bottomBarsContainer)
 }
 
 fun MainActivity.hideAllSections() {
@@ -98,8 +97,10 @@ fun MainActivity.saveLastOpenSection(sectionKey: String) {
 }
 
 fun MainActivity.restoreLastOpenSection() {
-    val lastSection = getSharedPreferences(MainActivity.PREFS_UI, android.content.Context.MODE_PRIVATE)
-        .getString(MainActivity.KEY_LAST_OPEN_SECTION, MainActivity.SECTION_CYCLE)
+    val lastSection = getSharedPreferences(
+        MainActivity.PREFS_UI,
+        android.content.Context.MODE_PRIVATE
+    ).getString(MainActivity.KEY_LAST_OPEN_SECTION, MainActivity.SECTION_CYCLE)
 
     hideAllSections()
     resetArrows()

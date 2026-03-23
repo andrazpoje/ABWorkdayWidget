@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.card.MaterialCardView
 
 class MoreActivity : AppCompatActivity() {
@@ -20,10 +21,16 @@ class MoreActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
+        setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_more)
 
-        setupBottomNavigation()
+        findViewById<View>(R.id.moreContentContainer).applySystemBarInsetsToPadding(addTop = true)
+        findViewById<BottomNavigationView>(R.id.bottomNavigation).applySystemBarInsetsToPadding(addBottom = true)
+        updateSystemBarIconContrast(findViewById(R.id.moreRoot))
+
+        setupBottomNavigation(R.id.nav_more)
 
         findViewById<TextView>(R.id.moreVersion).text = "v${BuildConfig.VERSION_NAME}"
 

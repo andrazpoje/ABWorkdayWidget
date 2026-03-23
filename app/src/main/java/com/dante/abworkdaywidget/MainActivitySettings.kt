@@ -120,6 +120,12 @@ fun MainActivity.loadSettings() {
         else -> themeClassic.isChecked = true
     }
 
+    when (AppThemeManager.loadTheme(this)) {
+        AppThemeManager.THEME_LIGHT -> appThemeLight.isChecked = true
+        AppThemeManager.THEME_DARK -> appThemeDark.isChecked = true
+        else -> appThemeSystem.isChecked = true
+    }
+
     val uiPrefs = getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
     val widgetStyle = uiPrefs.getString(
         Prefs.KEY_WIDGET_STYLE,
@@ -143,6 +149,7 @@ fun MainActivity.loadSettings() {
     silentSwitch?.isEnabled = notificationsEnabled
 
     updateDateText()
+    updatePresetSelectionState()
 }
 
 fun MainActivity.saveSettings(normalizedCycle: List<String>) {
@@ -161,6 +168,14 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
         else ->
             CycleThemeManager.saveTheme(this, CycleThemeManager.THEME_CLASSIC)
     }
+
+    val selectedAppTheme = when {
+        appThemeLight.isChecked -> AppThemeManager.THEME_LIGHT
+        appThemeDark.isChecked -> AppThemeManager.THEME_DARK
+        else -> AppThemeManager.THEME_SYSTEM
+    }
+    AppThemeManager.saveTheme(this, selectedAppTheme)
+    AppThemeManager.apply(selectedAppTheme)
 
     val selectedFirstDay = sanitizeLabel(
         firstCycleDayDropdown.text?.toString().orEmpty(),

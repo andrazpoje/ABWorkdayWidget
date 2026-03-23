@@ -32,6 +32,16 @@
     <string name="apply_preset">Apply preset</string>
     <string name="apply_preset_message">This will replace the current cycle settings with preset "%1$s".</string>
     <string name="preset_already_applied">This preset is already applied</string>
+
+    <string name="preset_custom">Custom</string>
+    <string name="app_theme">App theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark_mode">Dark</string>
+    <string name="more_statistics_title">Statistics</string>
+    <string name="more_statistics_subtitle">Planned for a future version</string>
+    <string name="statistics_button">Statistics</string>
+
     <string name="preset_applied">Preset applied: %1$s</string>
 
     <string name="preset_ab">A / B</string>

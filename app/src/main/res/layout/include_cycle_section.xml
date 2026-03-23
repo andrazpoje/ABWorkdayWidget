@@ -74,12 +74,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:hint="@string/preset_hint">
+                    android:hint="@string/preset_hint"
+                    style="@style/AppExposedDropdown">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/presetDropdown"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:minHeight="60dp"
                         android:clickable="true"
                         android:focusable="false"
                         android:inputType="none"
@@ -158,12 +160,14 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/first_cycle_day_label">
+                    android:hint="@string/first_cycle_day_label"
+                    style="@style/AppExposedDropdown">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/firstCycleDayDropdown"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:minHeight="60dp"
                         android:clickable="true"
                         android:focusable="false"
                         android:inputType="none"
@@ -178,21 +182,11 @@
                     android:text="@string/first_cycle_day_hint"
                     android:textSize="12sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/checkDateButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/check_date"
-                    app:icon="@drawable/ic_today_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp"
-                    app:iconTint="?attr/colorOnPrimary" />
-
                 <TextView
                     android:id="@+id/dateResultText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>

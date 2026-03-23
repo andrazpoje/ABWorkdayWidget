@@ -7,6 +7,11 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:background="?attr/colorSurface"
-    android:elevation="8dp"
+    android:elevation="12dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    app:itemHorizontalTranslationEnabled="false"
+    app:itemIconSize="24dp"
+    app:itemRippleColor="?attr/colorControlHighlight"
     app:labelVisibilityMode="labeled"
     app:menu="@menu/bottom_nav_menu" />
