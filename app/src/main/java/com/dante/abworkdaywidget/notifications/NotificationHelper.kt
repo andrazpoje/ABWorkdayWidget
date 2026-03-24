@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.dante.abworkdaywidget.MainActivity
 import com.dante.abworkdaywidget.R
@@ -70,7 +69,6 @@ object NotificationHelper {
     }
 
     private fun createChannels(context: Context, manager: NotificationManager) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
         val normalChannel = NotificationChannel(
             CHANNEL_NORMAL,
@@ -78,6 +76,7 @@ object NotificationHelper {
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             description = context.getString(R.string.notification_channel_normal_desc)
+            enableLights(true)
         }
 
         val silentChannel = NotificationChannel(
@@ -88,9 +87,9 @@ object NotificationHelper {
             description = context.getString(R.string.notification_channel_silent_desc)
             setSound(null, null)
             enableVibration(false)
+            setShowBadge(false)
         }
 
-        manager.createNotificationChannel(normalChannel)
-        manager.createNotificationChannel(silentChannel)
+        manager.createNotificationChannels(listOf(normalChannel, silentChannel))
     }
 }

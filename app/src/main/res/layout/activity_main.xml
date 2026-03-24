@@ -141,7 +141,7 @@
 				android:id="@+id/githubLinkText"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="GitHub"
+				android:text="@string/github"
 				android:visibility="gone" />
 		</LinearLayout>
 	</androidx.core.widget.NestedScrollView>

@@ -3,16 +3,13 @@ package com.dante.abworkdaywidget
 import android.content.Context
 import android.telephony.TelephonyManager
 import java.time.LocalDate
-import java.time.MonthDay
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import androidx.core.content.edit
 
 object HolidayManager {
 
-    const val KEY_HOLIDAY_COUNTRY = "holidayCountry"
     const val DEFAULT_COUNTRY = "SI"
-
-    const val KEY_COUNTRY_MANUAL = "holidayCountryManual"
 
     val supportedCountries = listOf(
         HolidayCountry("SI", "Slovenija"),
@@ -29,23 +26,24 @@ object HolidayManager {
     private val holidayCache = ConcurrentHashMap<String, ConcurrentHashMap<Int, Set<LocalDate>>>()
 
     fun ensureCountrySelected(context: Context) {
-        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
-        val isManual = prefs.getBoolean(KEY_COUNTRY_MANUAL, false)
+        val isManual = prefs.getBoolean(AppPrefs.KEY_COUNTRY_MANUAL, false)
         if (isManual) return
 
-        if (prefs.contains(KEY_HOLIDAY_COUNTRY)) return
+        if (prefs.contains(AppPrefs.KEY_HOLIDAY_COUNTRY)) return
 
         val detected = detectInitialCountry(context)
 
-        prefs.edit()
-            .putString(KEY_HOLIDAY_COUNTRY, detected)
-            .apply()
+        prefs.edit {
+            putString(AppPrefs.KEY_HOLIDAY_COUNTRY, detected)
+        }
     }
 
     fun getSelectedCountry(context: Context): String {
-        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
-        return prefs.getString(KEY_HOLIDAY_COUNTRY, null)
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+        return prefs.getString(AppPrefs.KEY_HOLIDAY_COUNTRY, null)
             ?.uppercase(Locale.ROOT)
             ?.takeIf { it in supportedCountryCodes }
             ?: DEFAULT_COUNTRY
@@ -56,11 +54,11 @@ object HolidayManager {
             .takeIf { it in supportedCountryCodes }
             ?: DEFAULT_COUNTRY
 
-        context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_HOLIDAY_COUNTRY, normalized)
-            .putBoolean(KEY_COUNTRY_MANUAL, true) // 🔥 ključni del
-            .apply()
+        context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+            .edit {
+                putString(AppPrefs.KEY_HOLIDAY_COUNTRY, normalized)
+                putBoolean(AppPrefs.KEY_COUNTRY_MANUAL, true)
+            }
     }
 
     fun isHoliday(context: Context, date: LocalDate): Boolean {

@@ -12,17 +12,17 @@ object ABLogic {
 
     fun getLetterForDate(context: Context, date: LocalDate): String {
 
-        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
-        val startYear = prefs.getInt("startYear", 2026)
-        val startMonth = prefs.getInt("startMonth", 3)
-        val startDay = prefs.getInt("startDay", 2)
+        val startYear = prefs.getInt(AppPrefs.KEY_START_YEAR, 2026)
+        val startMonth = prefs.getInt(AppPrefs.KEY_START_MONTH, 3)
+        val startDay = prefs.getInt(AppPrefs.KEY_START_DAY, 2)
 
-        val startIsA = prefs.getBoolean("startIsA", true)
+        val startIsA = prefs.getBoolean(AppPrefs.KEY_START_IS_A, true)
 
-        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
-        val skipSundays = prefs.getBoolean("skipSundays", true)
-        val skipHolidays = prefs.getBoolean("skipHolidays", true)
+        val skipSaturdays = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
+        val skipSundays = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
+        val skipHolidays = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
 
         val startDate = LocalDate.of(startYear, startMonth, startDay)
 
@@ -30,7 +30,7 @@ object ABLogic {
             return "X"
         }
 
-        val shift = prefs.getInt("cycleShift", 0)
+        val shift = prefs.getInt(AppPrefs.KEY_CYCLE_SHIFT, 0)
 
         val workDays = countWorkDays(
             startDate,
@@ -59,11 +59,6 @@ object ABLogic {
         if (skipSundays && date.dayOfWeek == DayOfWeek.SUNDAY) return true
         if (skipHolidays && WorkdayUtil.isWorkFreeDay(date)) return true
         return false
-    }
-
-    private fun isWeekend(date: LocalDate): Boolean {
-        return date.dayOfWeek == DayOfWeek.SATURDAY ||
-            date.dayOfWeek == DayOfWeek.SUNDAY
     }
 
     private fun countWorkDays(

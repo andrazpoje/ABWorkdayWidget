@@ -1,5 +1,6 @@
 package com.dante.abworkdaywidget
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +15,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     /**
      * Main content view that should be pushed below the status bar.
-     * Use the top-level scroll/container view, not an inner child.
      */
     protected abstract val topInsetTargetView: View
 
@@ -25,7 +25,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     /**
      * Optional save/action bar above the bottom navigation.
-     * Only screens that need IME-safe bottom handling should override this.
      */
     protected open val imeInsetTargetView: View? = null
 
@@ -43,14 +42,47 @@ abstract class BaseActivity : AppCompatActivity() {
         setupDefaultEdgeToEdge()
 
         topInsetTargetView.applyTopStatusBarInsetAsMargin()
-
         bottomNavigationView?.applyBottomNavInsetAsPadding()
         imeInsetTargetView?.applyBottomSystemInsetWithImeAsPadding()
 
         updateSystemBarIconContrast(activityRootView)
 
-        selectedBottomNavItemId?.let { itemId ->
-            setupBottomNavigation(itemId)
+        val bottomNav = bottomNavigationView
+        val selectedItemId = selectedBottomNavItemId
+
+        if (bottomNav != null && selectedItemId != null) {
+            setupBottomNavigation(selectedItemId)
+            syncBottomNavigationSelection(selectedItemId)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val bottomNav = bottomNavigationView
+        val selectedItemId = selectedBottomNavItemId
+
+        if (bottomNav != null && selectedItemId != null) {
+            syncBottomNavigationSelection(selectedItemId)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        val bottomNav = bottomNavigationView
+        val selectedItemId = selectedBottomNavItemId
+
+        if (bottomNav != null && selectedItemId != null) {
+            syncBottomNavigationSelection(selectedItemId)
+        }
+    }
+
+    private fun syncBottomNavigationSelection(itemId: Int) {
+        val bottomNav = bottomNavigationView ?: return
+        if (bottomNav.selectedItemId != itemId) {
+            bottomNav.selectedItemId = itemId
         }
     }
 }

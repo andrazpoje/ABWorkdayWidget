@@ -1,15 +1,12 @@
 package com.dante.abworkdaywidget
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -18,6 +15,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import android.view.ViewGroup
 
 class CalendarActivity : BaseActivity() {
 
@@ -30,7 +28,7 @@ class CalendarActivity : BaseActivity() {
     override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
         get() = findViewById(R.id.bottomNavigation)
 
-    override val selectedBottomNavItemId: Int?
+    override val selectedBottomNavItemId: Int
         get() = R.id.nav_calendar
 
     private lateinit var recycler: RecyclerView
@@ -98,10 +96,16 @@ class CalendarActivity : BaseActivity() {
     }
 
     private fun renderMonth(monthDate: LocalDate) {
-        monthTitle.text =
-            monthDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-                .replaceFirstChar { it.titlecase(Locale.getDefault()) } +
-                    " ${monthDate.year}"
+
+        val monthName = monthDate.month
+            .getDisplayName(TextStyle.FULL, Locale.getDefault())
+            .replaceFirstChar { it.titlecase(Locale.getDefault()) }
+
+        monthTitle.text = getString(
+            R.string.calendar_month_year,
+            monthName,
+            monthDate.year
+        )
 
         val items = buildMonth(monthDate)
 
@@ -110,7 +114,7 @@ class CalendarActivity : BaseActivity() {
             getLabel = { date ->
                 CycleManager.getCycleDayForDate(this, date)
             },
-            getBackgroundColor = { date, label ->
+            getBackgroundColor = { _, label ->
                 val cycle = CycleManager.loadCycle(this)
                 CycleColorHelper.getBackgroundColor(
                     context = this,
@@ -170,8 +174,8 @@ class CalendarActivity : BaseActivity() {
         val isHoliday = HolidayManager.isHoliday(this, date)
 
         val dialog = BottomSheetDialog(this)
-        val view = LayoutInflater.from(this)
-            .inflate(R.layout.bottom_sheet_day_details, null, false)
+        val parent = findViewById<ViewGroup>(android.R.id.content)
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_day_details, parent, false)
 
         val title = view.findViewById<TextView>(R.id.dayDetailsTitle)
         val cycleLabel = view.findViewById<TextView>(R.id.dayDetailsCycleLabel)
@@ -180,7 +184,6 @@ class CalendarActivity : BaseActivity() {
 
         title.text = dateText
         cycleLabel.text = label
-
         holidayCard.visibility = if (isHoliday) View.VISIBLE else View.GONE
 
         closeButton.setOnClickListener {

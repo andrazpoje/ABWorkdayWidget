@@ -5,32 +5,26 @@ import java.time.LocalDate
 object WorkdayUtil {
 
     fun isWorkFreeDay(date: LocalDate): Boolean {
-
         val y = date.year
+        val easterMonday = easterDate(y).plusDays(1)
 
-        val fixed = listOf(
-            LocalDate.of(y,1,1),
-            LocalDate.of(y,1,2),
-            LocalDate.of(y,2,8),
-            LocalDate.of(y,4,27),
-            LocalDate.of(y,5,1),
-            LocalDate.of(y,5,2),
-            LocalDate.of(y,6,25),
-            LocalDate.of(y,8,15),
-            LocalDate.of(y,10,31),
-            LocalDate.of(y,11,1),
-            LocalDate.of(y,12,25),
-            LocalDate.of(y,12,26)
+        val holidays = setOf(
+            LocalDate.of(y, 1, 1),
+            LocalDate.of(y, 1, 2),
+            LocalDate.of(y, 2, 8),
+            LocalDate.of(y, 4, 27),
+            LocalDate.of(y, 5, 1),
+            LocalDate.of(y, 5, 2),
+            LocalDate.of(y, 6, 25),
+            LocalDate.of(y, 8, 15),
+            LocalDate.of(y, 10, 31),
+            LocalDate.of(y, 11, 1),
+            LocalDate.of(y, 12, 25),
+            LocalDate.of(y, 12, 26),
+            easterMonday
         )
 
-        if (fixed.contains(date)) return true
-
-        val easter = easterDate(y)
-        val easterMonday = easter.plusDays(1)
-
-        if (date == easterMonday) return true
-
-        return false
+        return date in holidays
     }
 
     private fun easterDate(year:Int): LocalDate {

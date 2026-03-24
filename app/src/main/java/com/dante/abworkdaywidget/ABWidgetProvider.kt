@@ -53,8 +53,8 @@ class ABWidgetProvider : AppWidgetProvider() {
         val today = LocalDate.now()
         val todayCycle = CycleManager.getCycleDayForDate(context, today)
 
-        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
-        val prefix = prefs.getString("prefixText", "") ?: ""
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+        val prefix = prefs.getString(AppPrefs.KEY_PREFIX_TEXT, "") ?: ""
 
         val todayColor = CycleColorHelper.getBackgroundColor(
             context = context,
@@ -283,23 +283,13 @@ class ABWidgetProvider : AppWidgetProvider() {
      * 2..6 = more days ahead
      */
     private fun resolveExtraRows(minWidth: Int, minHeight: Int): Int {
+        if (minWidth < 110 || minHeight < 70) return 0
+
         return when {
-            // very small / 1x1
-            minWidth < 110 || minHeight < 70 -> 0
-
-            // 2x1-ish: enough for tomorrow
-            minWidth >= 110 && minHeight < 110 -> 1
-
-            // medium height
-            minWidth >= 140 && minHeight >= 110 && minHeight < 180 -> 2
-
-            // taller widgets
-            minWidth >= 140 && minHeight >= 180 && minHeight < 250 -> 4
-
-            // large/tall widgets
-            minWidth >= 140 && minHeight >= 250 -> 6
-
-            else -> 1
+            minHeight < 110 -> 1
+            minHeight < 180 -> 2
+            minHeight < 250 -> 4
+            else -> 6
         }
     }
 

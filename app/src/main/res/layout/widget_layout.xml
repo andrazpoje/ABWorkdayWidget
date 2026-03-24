@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -27,19 +28,22 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text=""
+            android:text="@null"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:text="Shift" />
 
         <TextView
             android:id="@+id/todayLabelText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Today"
+            android:text="@null"
             android:textColor="#CCFFFFFF"
             android:textSize="12sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:text="Today"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/abText"
@@ -48,10 +52,11 @@
             android:layout_marginBottom="6dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="A"
+            android:text="@null"
             android:textColor="#FFFFFF"
             android:textSize="36sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="A" />
 
         <LinearLayout
             android:id="@+id/extraDaysContainer"
@@ -60,11 +65,12 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <!-- DAY 1 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <LinearLayout
                     android:id="@+id/day1Dot"
@@ -78,10 +84,9 @@
                     android:id="@+id/day1Title"
                     android:layout_width="72dp"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#CCFFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    tools:text="Wed" />
 
                 <TextView
                     android:id="@+id/day1Value"
@@ -89,18 +94,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="A" />
             </LinearLayout>
 
+            <!-- DAY 2 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <LinearLayout
                     android:id="@+id/day2Dot"
@@ -114,10 +119,9 @@
                     android:id="@+id/day2Title"
                     android:layout_width="72dp"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#CCFFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    tools:text="Thu" />
 
                 <TextView
                     android:id="@+id/day2Value"
@@ -125,18 +129,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="B" />
             </LinearLayout>
 
+            <!-- DAY 3 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <LinearLayout
                     android:id="@+id/day3Dot"
@@ -150,10 +154,9 @@
                     android:id="@+id/day3Title"
                     android:layout_width="72dp"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#CCFFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    tools:text="Fri" />
 
                 <TextView
                     android:id="@+id/day3Value"
@@ -161,18 +164,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="A" />
             </LinearLayout>
 
+            <!-- DAY 4 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <LinearLayout
                     android:id="@+id/day4Dot"
@@ -186,10 +189,9 @@
                     android:id="@+id/day4Title"
                     android:layout_width="72dp"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#CCFFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    tools:text="Sat" />
 
                 <TextView
                     android:id="@+id/day4Value"
@@ -197,18 +199,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="X" />
             </LinearLayout>
 
+            <!-- DAY 5 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <LinearLayout
                     android:id="@+id/day5Dot"
@@ -222,10 +224,9 @@
                     android:id="@+id/day5Title"
                     android:layout_width="72dp"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#CCFFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    tools:text="Sun" />
 
                 <TextView
                     android:id="@+id/day5Value"
@@ -233,18 +234,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="A" />
             </LinearLayout>
 
+            <!-- DAY 6 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <LinearLayout
                     android:id="@+id/day6Dot"
@@ -258,10 +259,9 @@
                     android:id="@+id/day6Title"
                     android:layout_width="72dp"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#CCFFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    tools:text="Mon" />
 
                 <TextView
                     android:id="@+id/day6Value"
@@ -269,11 +269,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="B" />
             </LinearLayout>
 
         </LinearLayout>

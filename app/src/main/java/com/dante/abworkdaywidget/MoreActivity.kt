@@ -2,14 +2,12 @@ package com.dante.abworkdaywidget
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.core.net.toUri
 import com.google.android.material.card.MaterialCardView
 
 class MoreActivity : BaseActivity() {
@@ -23,7 +21,7 @@ class MoreActivity : BaseActivity() {
     override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
         get() = findViewById(R.id.bottomNavigation)
 
-    override val selectedBottomNavItemId: Int?
+    override val selectedBottomNavItemId: Int
         get() = R.id.nav_more
 
     companion object {
@@ -38,7 +36,8 @@ class MoreActivity : BaseActivity() {
 
         setupBaseUi()
 
-        findViewById<TextView>(R.id.moreVersion).text = "v${BuildConfig.VERSION_NAME}"
+        findViewById<TextView>(R.id.moreVersion).text =
+            getString(R.string.app_version, BuildConfig.VERSION_NAME)
 
         findViewById<MaterialCardView>(R.id.cardOpenCalendar).setOnClickListener {
             startActivity(Intent(this, CalendarActivity::class.java))
@@ -65,7 +64,7 @@ class MoreActivity : BaseActivity() {
         val subject = getString(R.string.email_subject_contact, getString(R.string.app_name))
 
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = "mailto:".toUri()
             putExtra(Intent.EXTRA_EMAIL, arrayOf(AUTHOR_EMAIL))
             putExtra(Intent.EXTRA_SUBJECT, subject)
         }
@@ -86,7 +85,7 @@ class MoreActivity : BaseActivity() {
         )
 
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = "mailto:".toUri()
             putExtra(Intent.EXTRA_EMAIL, arrayOf(AUTHOR_EMAIL))
             putExtra(Intent.EXTRA_SUBJECT, subject)
             putExtra(Intent.EXTRA_TEXT, body)
@@ -114,7 +113,7 @@ class MoreActivity : BaseActivity() {
     }
 
     private fun openUrl(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {

@@ -2,10 +2,9 @@ package com.dante.abworkdaywidget
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 
 object AppThemeManager {
-    private const val PREFS = "abprefs"
-    private const val KEY_APP_THEME = "app_theme"
 
     const val THEME_SYSTEM = "system"
     const val THEME_LIGHT = "light"
@@ -16,15 +15,14 @@ object AppThemeManager {
     }
 
     fun saveTheme(context: Context, theme: String) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_APP_THEME, theme)
-            .apply()
+        context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE).edit {
+            putString(AppPrefs.KEY_APP_THEME, theme)
+        }
     }
 
     fun loadTheme(context: Context): String {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_APP_THEME, THEME_SYSTEM) ?: THEME_SYSTEM
+        return context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+            .getString(AppPrefs.KEY_APP_THEME, THEME_SYSTEM) ?: THEME_SYSTEM
     }
 
     fun apply(theme: String) {

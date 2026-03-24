@@ -2,9 +2,13 @@ package com.dante.abworkdaywidget
 
 import android.content.Context
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.edit
 import com.dante.abworkdaywidget.data.Prefs
+import com.dante.abworkdaywidget.util.parseCycleInput
+import com.dante.abworkdaywidget.util.sanitizeLabel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
+import androidx.core.widget.addTextChangedListener
 
 fun MainActivity.setupBackHandling() {
     onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -63,7 +67,7 @@ fun MainActivity.saveChangesAndRefresh(): Boolean {
 }
 
 fun MainActivity.loadSettings() {
-    val prefs = getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+    val prefs = getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
     val cycle = CycleManager.loadCycle(this).ifEmpty { listOf("A", "B") }
     val cycleStartDate = CycleManager.loadStartDate(this)
@@ -73,7 +77,7 @@ fun MainActivity.loadSettings() {
     cycleDaysEdit.setText(cycle.joinToString(", "))
 
     val savedFirstDayRaw = prefs.getString(
-        MainActivity.KEY_FIRST_CYCLE_DAY,
+        AppPrefs.KEY_FIRST_CYCLE_DAY,
         cycle.firstOrNull() ?: "A"
     ) ?: (cycle.firstOrNull() ?: "A")
 
@@ -84,12 +88,15 @@ fun MainActivity.loadSettings() {
 
     refreshFirstCycleDayDropdown(savedFirstDay)
 
-    switchSaturdays.isChecked = prefs.getBoolean("skipSaturdays", true)
-    switchSundays.isChecked = prefs.getBoolean("skipSundays", true)
-    switchHolidays.isChecked = prefs.getBoolean("skipHolidays", true)
+    switchSaturdays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
+    switchSundays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
+    switchHolidays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
 
-    val overrideSkippedDays = prefs.getBoolean("overrideSkippedDays", true)
-    val skippedDayLabel = prefs.getString("skippedDayLabel", "Prosto") ?: "Prosto"
+    val overrideSkippedDays = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
+    val skippedDayLabel = prefs.getString(
+        AppPrefs.KEY_SKIPPED_LABEL,
+        AppPrefs.DEFAULT_SKIPPED_LABEL
+    ) ?: AppPrefs.DEFAULT_SKIPPED_LABEL
 
     switchOverrideSkippedDays.isChecked = overrideSkippedDays
     skippedDayLabelEdit.setText(skippedDayLabel)
@@ -101,7 +108,7 @@ fun MainActivity.loadSettings() {
     val selectedCountry = supportedCountries.firstOrNull { it.code == selectedCountryCode }
         ?: supportedCountries.first()
 
-    val isManual = prefs.getBoolean(HolidayManager.KEY_COUNTRY_MANUAL, false)
+    val isManual = prefs.getBoolean(AppPrefs.KEY_COUNTRY_MANUAL, false)
 
     val displayText =
         if (!isManual && selectedCountry.code == HolidayManager.getSelectedCountry(this)) {
@@ -112,7 +119,7 @@ fun MainActivity.loadSettings() {
 
     holidayCountryDropdown.setText(displayText, false)
 
-    prefixEdit.setText(prefs.getString("prefixText", "") ?: "")
+    prefixEdit.setText(prefs.getString(AppPrefs.KEY_PREFIX_TEXT, "") ?: "")
 
     when (CycleThemeManager.loadTheme(this)) {
         CycleThemeManager.THEME_PASTEL -> themePastel.isChecked = true
@@ -153,7 +160,7 @@ fun MainActivity.loadSettings() {
 }
 
 fun MainActivity.saveSettings(normalizedCycle: List<String>) {
-    val prefs = getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+    val prefs = getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
     CycleManager.saveCycle(this, normalizedCycle)
     CycleManager.saveStartDate(this, selectedDate)
@@ -195,18 +202,21 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
         ?.code
         ?: HolidayManager.DEFAULT_COUNTRY
 
-    prefs.edit()
-        .putInt("startYear", selectedDate.year)
-        .putInt("startMonth", selectedDate.monthValue)
-        .putInt("startDay", selectedDate.dayOfMonth)
-        .putString(MainActivity.KEY_FIRST_CYCLE_DAY, selectedFirstDay)
-        .putString("prefixText", prefixEdit.text.toString().trim())
-        .putBoolean("skipSaturdays", switchSaturdays.isChecked)
-        .putBoolean("skipSundays", switchSundays.isChecked)
-        .putBoolean("skipHolidays", switchHolidays.isChecked)
-        .putBoolean("overrideSkippedDays", switchOverrideSkippedDays.isChecked)
-        .putString("skippedDayLabel", sanitizeLabel(skippedDayLabelEdit.text.toString(), "Prosto"))
-        .apply()
+    prefs.edit {
+        putInt(AppPrefs.KEY_START_YEAR, selectedDate.year)
+        putInt(AppPrefs.KEY_START_MONTH, selectedDate.monthValue)
+        putInt(AppPrefs.KEY_START_DAY, selectedDate.dayOfMonth)
+        putString(AppPrefs.KEY_FIRST_CYCLE_DAY, selectedFirstDay)
+        putString(AppPrefs.KEY_PREFIX_TEXT, prefixEdit.text.toString().trim())
+        putBoolean(AppPrefs.KEY_SKIP_SATURDAYS, switchSaturdays.isChecked)
+        putBoolean(AppPrefs.KEY_SKIP_SUNDAYS, switchSundays.isChecked)
+        putBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, switchHolidays.isChecked)
+        putBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, switchOverrideSkippedDays.isChecked)
+        putString(
+            AppPrefs.KEY_SKIPPED_LABEL,
+            sanitizeLabel(skippedDayLabelEdit.text.toString(), AppPrefs.DEFAULT_SKIPPED_LABEL)
+        )
+    }
 
     HolidayManager.saveSelectedCountry(this, selectedCountryCode)
 
@@ -229,11 +239,11 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
         false
     }
 
-    uiPrefs.edit()
-        .putString(Prefs.KEY_WIDGET_STYLE, selectedWidgetStyle)
-        .putBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, notificationsEnabled)
-        .putBoolean(Prefs.KEY_SILENT_NOTIFICATION, silentEnabled)
-        .apply()
+    uiPrefs.edit {
+        putString(Prefs.KEY_WIDGET_STYLE, selectedWidgetStyle)
+        putBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, notificationsEnabled)
+        putBoolean(Prefs.KEY_SILENT_NOTIFICATION, silentEnabled)
+    }
 }
 
 fun MainActivity.validateAndBuildCycle(): List<String>? {
@@ -313,7 +323,10 @@ fun MainActivity.validateAndBuildCycle(): List<String>? {
         return null
     }
 
-    val skippedOverrideLabel = sanitizeLabel(skippedDayLabelEdit.text.toString(), "Prosto")
+    val skippedOverrideLabel = sanitizeLabel(
+        skippedDayLabelEdit.text.toString(),
+        AppPrefs.DEFAULT_SKIPPED_LABEL
+    )
     if (skippedOverrideLabel.length > MainActivity.MAX_LABEL_LENGTH) {
         showError(
             getString(
@@ -328,16 +341,142 @@ fun MainActivity.validateAndBuildCycle(): List<String>? {
     return cycle
 }
 
-fun MainActivity.parseCycleInput(rawInput: String): List<String> {
-    return rawInput
-        .split(",")
-        .map { sanitizeLabel(it, "") }
-        .filter { it.isNotBlank() }
+fun MainActivity.migrateLegacySettingsIfNeeded() {
+    val cyclePrefs = getSharedPreferences(CycleManager.PREFS_NAME, Context.MODE_PRIVATE)
+    val hasCycle = cyclePrefs.contains(CycleManager.KEY_CYCLE_DAYS)
+    val hasStartDate = cyclePrefs.contains(CycleManager.KEY_CYCLE_START_DATE)
+
+    val prefs = getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+    if (!hasCycle || !hasStartDate) {
+        val year = prefs.getInt(AppPrefs.KEY_START_YEAR, 2026)
+        val month = prefs.getInt(AppPrefs.KEY_START_MONTH, 3)
+        val day = prefs.getInt(AppPrefs.KEY_START_DAY, 2)
+        val startIsA = prefs.getBoolean(AppPrefs.KEY_START_IS_A, true)
+
+        val labelA = sanitizeLabel(prefs.getString(AppPrefs.KEY_LABEL_A, "A") ?: "A", "A")
+        val labelB = sanitizeLabel(prefs.getString(AppPrefs.KEY_LABEL_B, "B") ?: "B", "B")
+
+        val selectedLegacyDate = java.time.LocalDate.of(year, month, day)
+        val cycleStartDate = if (startIsA) selectedLegacyDate else selectedLegacyDate.minusDays(1)
+        val legacyFirstDay = if (startIsA) labelA else labelB
+
+        CycleManager.saveCycle(this, listOf(labelA, labelB))
+        CycleManager.saveStartDate(this, cycleStartDate)
+
+        prefs.edit {
+            putString(AppPrefs.KEY_FIRST_CYCLE_DAY, legacyFirstDay)
+        }
+    }
+
+    if (!prefs.contains(AppPrefs.KEY_OVERRIDE_SKIPPED)) {
+        prefs.edit {
+            putBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
+        }
+    }
+
+    HolidayManager.ensureCountrySelected(this)
 }
 
-fun MainActivity.sanitizeLabel(text: String, fallback: String): String {
-    val cleaned = text.trim().replace(Regex("\\s+"), " ")
-    return if (cleaned.isEmpty()) fallback else cleaned
+fun MainActivity.setupWidgetStyleSettings() {
+    val prefs = getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
+
+    val radioClassic = findViewById<android.widget.RadioButton>(R.id.radioClassic)
+    val radioMinimal = findViewById<android.widget.RadioButton>(R.id.radioMinimal)
+
+    val currentStyle = prefs.getString(
+        Prefs.KEY_WIDGET_STYLE,
+        Prefs.WIDGET_STYLE_CLASSIC
+    ) ?: Prefs.WIDGET_STYLE_CLASSIC
+
+    radioClassic.isChecked = currentStyle == Prefs.WIDGET_STYLE_CLASSIC
+    radioMinimal.isChecked = currentStyle == Prefs.WIDGET_STYLE_MINIMAL
+}
+
+fun MainActivity.setupNotificationSettings() {
+    val prefs = getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
+
+    val enabledSwitch = findViewById<SwitchMaterial?>(R.id.switchNotificationsEnabled) ?: return
+    val silentSwitch = findViewById<SwitchMaterial?>(R.id.switchSilentNotification) ?: return
+
+    val notificationsEnabled = prefs.getBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, false)
+    val silentEnabled = prefs.getBoolean(Prefs.KEY_SILENT_NOTIFICATION, false)
+
+    enabledSwitch.isChecked = notificationsEnabled
+    silentSwitch.isChecked = notificationsEnabled && silentEnabled
+    silentSwitch.isEnabled = notificationsEnabled
+
+    enabledSwitch.setOnCheckedChangeListener { _, isChecked ->
+        silentSwitch.isEnabled = isChecked
+
+        if (!isChecked) {
+            silentSwitch.isChecked = false
+        } else {
+            requestNotificationPermissionIfNeeded()
+        }
+
+        markUnsavedChanges()
+    }
+
+    silentSwitch.setOnCheckedChangeListener { _, _ ->
+        markUnsavedChanges()
+    }
+}
+
+fun MainActivity.setupChangeListeners() {
+    switchSaturdays.setOnCheckedChangeListener { _, _ ->
+        clearDateCheckResult()
+        markUnsavedChanges()
+    }
+
+    switchSundays.setOnCheckedChangeListener { _, _ ->
+        clearDateCheckResult()
+        markUnsavedChanges()
+    }
+
+    switchHolidays.setOnCheckedChangeListener { _, _ ->
+        clearDateCheckResult()
+        markUnsavedChanges()
+    }
+
+    switchOverrideSkippedDays.setOnCheckedChangeListener { _, isChecked ->
+        skippedDayLabelEdit.isEnabled = isChecked
+        skippedDayLabelEdit.alpha = if (isChecked) 1f else 0.5f
+        clearDateCheckResult()
+        markUnsavedChanges()
+    }
+
+    holidayCountryDropdown.setOnItemClickListener { _, _, _, _ ->
+        clearDateCheckResult()
+        markUnsavedChanges()
+    }
+
+    themeClassic.setOnClickListener { markUnsavedChanges() }
+    themePastel.setOnClickListener { markUnsavedChanges() }
+    themeDark.setOnClickListener { markUnsavedChanges() }
+
+    appThemeSystem.setOnClickListener { markUnsavedChanges() }
+    appThemeLight.setOnClickListener { markUnsavedChanges() }
+    appThemeDark.setOnClickListener { markUnsavedChanges() }
+
+    prefixEdit.addTextChangedListener {
+        markUnsavedChanges()
+    }
+
+    cycleDaysEdit.addTextChangedListener {
+        clearDateCheckResult()
+        refreshFirstCycleDayDropdown()
+        validateCycleInput()
+        updatePresetSelectionState(markAsChanged = true)
+    }
+
+    skippedDayLabelEdit.addTextChangedListener {
+        clearDateCheckResult()
+        markUnsavedChanges()
+    }
+
+    findViewById<android.widget.RadioGroup>(R.id.widgetStyleRadioGroup)
+        .setOnCheckedChangeListener { _, _ -> markUnsavedChanges() }
 }
 
 fun MainActivity.showError(message: String) {

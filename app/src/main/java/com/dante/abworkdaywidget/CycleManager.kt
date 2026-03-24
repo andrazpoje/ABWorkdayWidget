@@ -2,6 +2,7 @@ package com.dante.abworkdaywidget
 
 import android.content.Context
 import java.time.LocalDate
+import androidx.core.content.edit
 
 object CycleManager {
 
@@ -14,12 +15,12 @@ object CycleManager {
             .map { it.trim() }
             .filter { it.isNotBlank() }
 
-        val finalCycle = if (cleaned.isEmpty()) listOf("A", "B") else cleaned
+        val finalCycle = cleaned.ifEmpty { listOf("A", "B") }
 
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_CYCLE_DAYS, finalCycle.joinToString("|"))
-            .apply()
+            .edit {
+                putString(KEY_CYCLE_DAYS, finalCycle.joinToString("|"))
+            }
     }
 
     fun loadCycle(context: Context): List<String> {
@@ -36,9 +37,9 @@ object CycleManager {
 
     fun saveStartDate(context: Context, date: LocalDate) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_CYCLE_START_DATE, date.toString())
-            .apply()
+            .edit {
+                putString(KEY_CYCLE_START_DATE, date.toString())
+            }
     }
 
     fun loadStartDate(context: Context): LocalDate {
@@ -64,10 +65,10 @@ object CycleManager {
         val startDate = loadStartDate(context)
         if (date == startDate) return cycle[0]
 
-        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
-        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
-        val skipSundays = prefs.getBoolean("skipSundays", true)
-        val skipHolidays = prefs.getBoolean("skipHolidays", true)
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+        val skipSaturdays = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
+        val skipSundays = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
+        val skipHolidays = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
 
         return if (date.isAfter(startDate)) {
             val stepsForward = countIncludedDaysForward(
@@ -93,14 +94,14 @@ object CycleManager {
     }
 
     fun getSkippedDayOverrideLabelOrNull(context: Context, date: LocalDate): String? {
-        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
-        val overrideEnabled = prefs.getBoolean("overrideSkippedDays", true)
+        val overrideEnabled = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
         if (!overrideEnabled) return null
 
-        val skipSaturdays = prefs.getBoolean("skipSaturdays", true)
-        val skipSundays = prefs.getBoolean("skipSundays", true)
-        val skipHolidays = prefs.getBoolean("skipHolidays", true)
+        val skipSaturdays = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
+        val skipSundays = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
+        val skipHolidays = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
 
         val isSkipped = isSkippedDay(
             context = context,
@@ -112,8 +113,12 @@ object CycleManager {
 
         if (!isSkipped) return null
 
-        val label = prefs.getString("skippedDayLabel", "Prosto")?.trim().orEmpty()
-        return if (label.isBlank()) "Prosto" else label
+        val label = prefs.getString(AppPrefs.KEY_SKIPPED_LABEL, AppPrefs.DEFAULT_SKIPPED_LABEL)
+            ?.trim()
+            .orEmpty()
+            .ifBlank { AppPrefs.DEFAULT_SKIPPED_LABEL }
+
+        return label
     }
 
     private fun countIncludedDaysForward(

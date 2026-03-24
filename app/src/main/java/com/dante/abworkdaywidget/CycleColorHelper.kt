@@ -2,6 +2,7 @@ package com.dante.abworkdaywidget
 
 import android.content.Context
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.toColorInt
 
 object CycleColorHelper {
 
@@ -37,23 +38,23 @@ object CycleColorHelper {
     }
 
     private fun isSkippedOverrideActiveForLabel(context: Context, label: String): Boolean {
-        val prefs = context.getSharedPreferences("abprefs", Context.MODE_PRIVATE)
-        val overrideEnabled = prefs.getBoolean("overrideSkippedDays", true)
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+        val overrideEnabled = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
         if (!overrideEnabled) return false
 
-        val skippedOverrideLabel = prefs.getString("skippedDayLabel", "Prosto")
+        val skippedOverrideLabel = prefs.getString(AppPrefs.KEY_SKIPPED_LABEL, AppPrefs.DEFAULT_SKIPPED_LABEL)
             ?.trim()
             .takeUnless { it.isNullOrBlank() }
-            ?: "Prosto"
+            ?: AppPrefs.DEFAULT_SKIPPED_LABEL
 
         return label.trim().equals(skippedOverrideLabel, ignoreCase = true)
     }
 
     private fun getSkippedDayColor(context: Context): Int {
         return when (CycleThemeManager.loadTheme(context)) {
-            CycleThemeManager.THEME_PASTEL -> android.graphics.Color.parseColor("#90A4AE")
-            CycleThemeManager.THEME_DARK -> android.graphics.Color.parseColor("#455A64")
-            else -> android.graphics.Color.parseColor("#78909C")
+            CycleThemeManager.THEME_PASTEL -> "#90A4AE".toColorInt()
+            CycleThemeManager.THEME_DARK -> "#455A64".toColorInt()
+            else -> "#78909C".toColorInt()
         }
     }
 
@@ -68,7 +69,7 @@ object CycleColorHelper {
             "#5D4037",
             "#455A64"
         )
-        return android.graphics.Color.parseColor(palette[index % palette.size])
+        return palette[index % palette.size].toColorInt()
     }
 
     private fun getPastelColor(index: Int): Int {
@@ -82,7 +83,7 @@ object CycleColorHelper {
             "#A1887F",
             "#90A4AE"
         )
-        return android.graphics.Color.parseColor(palette[index % palette.size])
+        return palette[index % palette.size].toColorInt()
     }
 
     private fun getDarkColor(index: Int): Int {
@@ -96,7 +97,7 @@ object CycleColorHelper {
             "#3E2723",
             "#263238"
         )
-        return android.graphics.Color.parseColor(palette[index % palette.size])
+        return palette[index % palette.size].toColorInt()
     }
 
     fun getTextColorForBackground(backgroundColor: Int): Int {

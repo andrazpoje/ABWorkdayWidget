@@ -1,12 +1,14 @@
 package com.dante.abworkdaywidget
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.abworkdaywidget.databinding.ItemCyclePreviewBinding
 
-class CyclePreviewAdapter : RecyclerView.Adapter<CyclePreviewAdapter.PreviewViewHolder>() {
+class CyclePreviewAdapter :
+    ListAdapter<CyclePreviewAdapter.PreviewItem, CyclePreviewAdapter.PreviewViewHolder>(PreviewDiffCallback()) {
 
     data class PreviewItem(
         val title: String,
@@ -14,14 +16,11 @@ class CyclePreviewAdapter : RecyclerView.Adapter<CyclePreviewAdapter.PreviewView
         val cycleLabel: String
     )
 
-    private val items = mutableListOf<PreviewItem>()
     private var cycleLabels: List<String> = emptyList()
 
     fun submitList(newItems: List<PreviewItem>, cycle: List<String>) {
-        items.clear()
-        items.addAll(newItems)
         cycleLabels = cycle
-        notifyDataSetChanged()
+        submitList(newItems)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewViewHolder {
@@ -31,10 +30,8 @@ class CyclePreviewAdapter : RecyclerView.Adapter<CyclePreviewAdapter.PreviewView
     }
 
     override fun onBindViewHolder(holder: PreviewViewHolder, position: Int) {
-        holder.bind(items[position], cycleLabels)
+        holder.bind(getItem(position), cycleLabels)
     }
-
-    override fun getItemCount(): Int = items.size
 
     class PreviewViewHolder(
         private val binding: ItemCyclePreviewBinding
@@ -53,11 +50,23 @@ class CyclePreviewAdapter : RecyclerView.Adapter<CyclePreviewAdapter.PreviewView
                 cycle = cycle
             )
 
-            binding.root.setCardBackgroundColor(bgColor)
+            val textColor = CycleColorHelper.getTextColorForBackground(bgColor)
 
-            binding.dayTitleText.setTextColor(Color.WHITE)
-            binding.dayDateText.setTextColor(Color.WHITE)
-            binding.dayCycleText.setTextColor(Color.WHITE)
+            binding.root.setCardBackgroundColor(bgColor)
+            binding.dayTitleText.setTextColor(textColor)
+            binding.dayDateText.setTextColor(textColor)
+            binding.dayCycleText.setTextColor(textColor)
+        }
+    }
+
+    private class PreviewDiffCallback : DiffUtil.ItemCallback<PreviewItem>() {
+        override fun areItemsTheSame(oldItem: PreviewItem, newItem: PreviewItem): Boolean {
+            return oldItem.title == newItem.title &&
+                    oldItem.dateText == newItem.dateText
+        }
+
+        override fun areContentsTheSame(oldItem: PreviewItem, newItem: PreviewItem): Boolean {
+            return oldItem == newItem
         }
     }
 }

@@ -18,6 +18,9 @@ All notable changes to this project will be documented in this file.
 - Cleaner and more structured settings layout
 - Improved visual hierarchy on main screen
 - Better consistency across different screen sizes
+- Unified status bar and top layout across screens
+- Improved alignment and spacing in Calendar screen
+- New adaptive launcher icon (Material-style, consistent across devices)
 
 ### 🔁 Changed
 - Introduced preset vs custom cycle logic
@@ -26,8 +29,18 @@ All notable changes to this project will be documented in this file.
 - Removed "Preveri datum / Check date" feature
 - Improved navigation flow between screens
 
+### 🐛 Fixes
+- Fixed bottom navigation active state (Home highlight)
+- Fixed RemoteViews unsupported view issue in widget
+- Fixed widget layout orientation warning
+- Fixed receiver parameter warnings in Kotlin
+- Fixed duplicate resource issue (launcher background)
+- Fixed minor layout inconsistencies across screens
+
 ### ⚙️ Technical
+- Introduced BaseActivity for shared UI behavior
 - Refactored navigation into reusable helper
+- Moved utility functions into util package (sanitizeLabel, parsing)
 - Improved activity structure for better scalability
 - Prepared foundation for future features (statistics, templates, manual mode)
 

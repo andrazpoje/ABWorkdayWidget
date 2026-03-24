@@ -6,6 +6,8 @@ package com.dante.abworkdaywidget
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.app.Activity
+import android.os.Build
 
 fun AppCompatActivity.setupBottomNavigation(selectedItemId: Int) {
     val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation) ?: return
@@ -23,7 +25,7 @@ fun AppCompatActivity.setupBottomNavigation(selectedItemId: Int) {
                     Intent(this, MainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 )
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                applyNavTransition()
                 true
             }
 
@@ -32,7 +34,7 @@ fun AppCompatActivity.setupBottomNavigation(selectedItemId: Int) {
                     Intent(this, CalendarActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 )
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                applyNavTransition()
                 true
             }
 
@@ -41,11 +43,24 @@ fun AppCompatActivity.setupBottomNavigation(selectedItemId: Int) {
                     Intent(this, MoreActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 )
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                applyNavTransition()
                 true
             }
 
             else -> false
         }
+    }
+}
+
+fun Activity.applyNavTransition() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        overrideActivityTransition(
+            Activity.OVERRIDE_TRANSITION_OPEN,
+            0,
+            0
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        overridePendingTransition(0, 0)
     }
 }

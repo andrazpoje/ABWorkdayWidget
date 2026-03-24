@@ -10,6 +10,4 @@ object Prefs {
 
     const val WIDGET_STYLE_CLASSIC = "classic"
     const val WIDGET_STYLE_MINIMAL = "minimal"
-
-    const val KEY_COUNTRY_MANUAL = "holidayCountryManual"
 }
