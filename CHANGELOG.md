@@ -4,6 +4,71 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v1.7
+
+### ✨ Added
+- Added bottom navigation with 3 sections (Home, Calendar, More)
+- Added new Calendar screen for full month overview
+- Added Statistics button (disabled for now)
+- Added theme switch (System, Light, Dark)
+
+### 🎨 Improved
+- Improved overall UI consistency and spacing
+- Larger and more user-friendly dropdown/select inputs
+- Cleaner and more structured settings layout
+- Improved visual hierarchy on main screen
+- Better consistency across different screen sizes
+
+### 🔁 Changed
+- Introduced preset vs custom cycle logic
+- Preset remains selected until user modifies values
+- Custom state is shown when manually adjusted
+- Removed "Preveri datum / Check date" feature
+- Improved navigation flow between screens
+
+### ⚙️ Technical
+- Refactored navigation into reusable helper
+- Improved activity structure for better scalability
+- Prepared foundation for future features (statistics, templates, manual mode)
+
+---
+
+## v1.6.2
+
+### 🐛 Fixed
+- Fixed app crash on launch caused by navigation setup
+- Fixed screen flickering due to repeated activity reloads
+- Fixed Main screen overlapping the Android status bar
+- Fixed inconsistent bottom navigation height in MainActivity
+- Fixed edge-to-edge inconsistencies across different screens
+
+### ⚙️ Technical
+- Implemented proper edge-to-edge (WindowInsets) handling
+- Unified handling of status bar, navigation bar and IME (keyboard) insets
+- Ensured bottom inset is applied only to BottomNavigationView
+- Removed incorrect inset usage on parent containers
+- Improved layout stability across devices and Android versions
+
+---
+
+## v1.6.1
+
+### 🐛 Fixed
+- Fixed **Main screen overlapping the Android status bar**
+- Fixed **inconsistent edge-to-edge behavior** compared to Calendar and More screens
+- Fixed issue where **saved settings were not loaded after app restart**
+- Fixed crash caused by uninitialized `selectedDate`
+- Fixed **start date showing placeholder (%1$s) instead of formatted value**
+
+### ⚙️ Technical
+- Unified window insets handling (status bar + navigation bar)
+- Removed conflicting inset listeners causing layout issues
+- Restored correct initialization flow in `onCreate()`
+- Improved stability of settings persistence
+
+
+---
+
 ## v1.6.1
 
 ### 🐛 Fixed
