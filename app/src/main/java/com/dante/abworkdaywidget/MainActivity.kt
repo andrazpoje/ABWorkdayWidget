@@ -41,7 +41,7 @@ import java.util.Locale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.view.ViewGroup
-
+import androidx.core.view.updatePadding
 
 
 class MainActivity : AppCompatActivity() {
@@ -131,10 +131,43 @@ class MainActivity : AppCompatActivity() {
         AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
 
+        setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_main)
 
         bindViews()
-        applyTopInsetToScrollView()
+        // EDGE-TO-EDGE RULES (IMPORTANT - DO NOT MODIFY LIGHTLY)
+        //
+        // Top inset:
+        // - Applied as MARGIN on mainScrollView (NOT padding)
+        // - Reason: prevents content from going under status bar reliably
+        //
+        // Bottom inset:
+        // - MUST be applied ONLY to BottomNavigationView
+        // - DO NOT apply to bottomBarsContainer → causes nav bar to become taller
+        //
+        // IME (keyboard) inset:
+        // - Applied ONLY to saveBarContainer
+        // - Ensures save bar is visible above keyboard
+        //
+        // If broken:
+        // - Bottom nav becomes too tall → inset applied to wrong parent
+        // - Content overlaps status bar → wrong top inset usage
+        mainScrollView.applyTopStatusBarInsetAsMargin()
+        val bottomNavigation = findViewById<View>(R.id.bottomNavigation)
+        val saveBarContainer = findViewById<View>(R.id.saveBarContainer)
+
+        bottomNavigation.applyBottomSystemInsetWithImeAsPadding()
+
+        ViewCompat.setOnApplyWindowInsetsListener(saveBarContainer) { view, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val navInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+
+            view.updatePadding(
+                bottom = maxOf(imeInsets.bottom, navInsets.bottom)
+            )
+
+            insets
+        }
 
         setupFirstCycleDayDropdown()
         setupPresetDropdown()
@@ -308,25 +341,6 @@ class MainActivity : AppCompatActivity() {
         appThemeLight = findViewById(R.id.appThemeLight)
         appThemeDark = findViewById(R.id.appThemeDark)
     }
-
-    private fun applyTopInsetToScrollView() {
-        val scrollView = findViewById<NestedScrollView>(R.id.main)
-
-        ViewCompat.setOnApplyWindowInsetsListener(activityRoot) { _, insets ->
-            val topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-
-            val lp = scrollView.layoutParams as ViewGroup.MarginLayoutParams
-            if (lp.topMargin != topInset) {
-                lp.topMargin = topInset
-                scrollView.layoutParams = lp
-            }
-
-            insets
-        }
-
-        ViewCompat.requestApplyInsets(activityRoot)
-    }
-
     fun validateCycleInput(): Boolean {
         val raw = cycleDaysEdit.text?.toString().orEmpty().trim()
         val parts = raw.split(",").map { it.trim() }

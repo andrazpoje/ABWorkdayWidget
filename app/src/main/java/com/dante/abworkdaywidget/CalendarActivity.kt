@@ -34,10 +34,11 @@ class CalendarActivity : AppCompatActivity() {
         setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_calendar)
 
-        findViewById<View>(R.id.calendarContentContainer).applySystemBarInsetsToPadding(addTop = true)
-        findViewById<BottomNavigationView>(R.id.bottomNavigation).applySystemBarInsetsToPadding(addBottom = true)
-        updateSystemBarIconContrast(findViewById(R.id.calendarRoot))
+        findViewById<View>(R.id.calendarContentContainer).applyTopSystemBarInsetAsPadding()
+        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
+            .applyBottomNavInsetAsPadding()
 
+        updateSystemBarIconContrast(findViewById(R.id.calendarRoot))
         setupBottomNavigation(R.id.nav_calendar)
 
         recycler = findViewById(R.id.calendarRecycler)

@@ -1,3 +1,6 @@
+// NOTE:
+// This MUST be used instead of applying inset to parent container.
+// Applying inset to parent will visually increase BottomNavigationView height.
 package com.dante.abworkdaywidget
 
 import android.content.Intent

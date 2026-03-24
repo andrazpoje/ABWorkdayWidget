@@ -5,52 +5,6 @@ import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
-
-fun MainActivity.applyEdgeToEdgeInsets() {
-    val mainContentContainer = findViewById<View>(R.id.mainContentContainer)
-
-    val initialContentLeft = mainContentContainer.paddingLeft
-    val initialContentTop = mainContentContainer.paddingTop
-    val initialContentRight = mainContentContainer.paddingRight
-    val initialContentBottom = mainContentContainer.paddingBottom
-
-    val initialBottomBarsLeft = bottomBarsContainer.paddingLeft
-    val initialBottomBarsTop = bottomBarsContainer.paddingTop
-    val initialBottomBarsRight = bottomBarsContainer.paddingRight
-    val initialBottomBarsBottom = bottomBarsContainer.paddingBottom
-
-    ViewCompat.setOnApplyWindowInsetsListener(mainContentContainer) { view, insets ->
-        val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-
-        view.updatePadding(
-            left = initialContentLeft,
-            top = initialContentTop + statusBars.top,
-            right = initialContentRight,
-            bottom = initialContentBottom
-        )
-
-        insets
-    }
-
-    ViewCompat.setOnApplyWindowInsetsListener(bottomBarsContainer) { view, insets ->
-        val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-
-        view.updatePadding(
-            left = initialBottomBarsLeft,
-            top = initialBottomBarsTop,
-            right = initialBottomBarsRight,
-            bottom = initialBottomBarsBottom + navigationBars.bottom
-        )
-
-        insets
-    }
-
-    ViewCompat.requestApplyInsets(mainContentContainer)
-    ViewCompat.requestApplyInsets(bottomBarsContainer)
-}
 
 fun MainActivity.hideAllSections() {
     cycleSection.visibility = View.GONE

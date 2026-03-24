@@ -9,7 +9,6 @@
     android:background="?attr/colorSurface"
     android:elevation="12dp"
     android:paddingTop="6dp"
-    android:paddingBottom="6dp"
     app:itemHorizontalTranslationEnabled="false"
     app:itemIconSize="24dp"
     app:itemRippleColor="?attr/colorControlHighlight"

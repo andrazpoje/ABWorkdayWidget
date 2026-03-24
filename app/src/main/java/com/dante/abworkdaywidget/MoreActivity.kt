@@ -26,10 +26,11 @@ class MoreActivity : AppCompatActivity() {
         setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_more)
 
-        findViewById<View>(R.id.moreContentContainer).applySystemBarInsetsToPadding(addTop = true)
-        findViewById<BottomNavigationView>(R.id.bottomNavigation).applySystemBarInsetsToPadding(addBottom = true)
-        updateSystemBarIconContrast(findViewById(R.id.moreRoot))
+        findViewById<View>(R.id.moreContentContainer).applyTopSystemBarInsetAsPadding()
+        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
+            .applyBottomNavInsetAsPadding()
 
+        updateSystemBarIconContrast(findViewById(R.id.moreRoot))
         setupBottomNavigation(R.id.nav_more)
 
         findViewById<TextView>(R.id.moreVersion).text = "v${BuildConfig.VERSION_NAME}"
