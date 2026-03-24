@@ -12,7 +12,19 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.card.MaterialCardView
 
-class MoreActivity : AppCompatActivity() {
+class MoreActivity : BaseActivity() {
+
+    override val activityRootView: View
+        get() = findViewById(R.id.moreRoot)
+
+    override val topInsetTargetView: View
+        get() = findViewById(R.id.moreContentContainer)
+
+    override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
+        get() = findViewById(R.id.bottomNavigation)
+
+    override val selectedBottomNavItemId: Int?
+        get() = R.id.nav_more
 
     companion object {
         private const val AUTHOR_EMAIL = "danteprodukcija@gmail.com"
@@ -21,17 +33,10 @@ class MoreActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
-        setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_more)
 
-        findViewById<View>(R.id.moreContentContainer).applyTopSystemBarInsetAsPadding()
-        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
-            .applyBottomNavInsetAsPadding()
-
-        updateSystemBarIconContrast(findViewById(R.id.moreRoot))
-        setupBottomNavigation(R.id.nav_more)
+        setupBaseUi()
 
         findViewById<TextView>(R.id.moreVersion).text = "v${BuildConfig.VERSION_NAME}"
 

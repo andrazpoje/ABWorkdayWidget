@@ -1,22 +1,3 @@
-// GLOBAL EDGE-TO-EDGE STRATEGY
-//
-// This project uses STRICT inset rules:
-//
-// 1) Top (status bar):
-//    - MainActivity → margin on scroll container
-//    - Other activities → padding on content container
-//
-// 2) Bottom (navigation bar):
-//    - ALWAYS apply to BottomNavigationView directly
-//    - NEVER apply to parent containers (causes layout inflation)
-//
-// 3) IME (keyboard):
-//    - Apply ONLY to views that must stay above keyboard (e.g. save bar)
-//
-// Breaking these rules will cause:
-// - inconsistent bottom nav sizes
-// - content overlapping system bars
-// - layout flickering or resizing issues
 package com.dante.abworkdaywidget
 
 import android.content.res.Configuration
@@ -45,21 +26,19 @@ fun ComponentActivity.updateSystemBarIconContrast(anchorView: View) {
     controller.isAppearanceLightNavigationBars = !isDarkMode
 }
 
-fun View.applyTopSystemBarInsetAsPadding() {
-    val initialLeft = paddingLeft
-    val initialTop = paddingTop
-    val initialRight = paddingRight
-    val initialBottom = paddingBottom
+fun View.applyTopStatusBarInsetAsMargin() {
+    val lp = layoutParams as? ViewGroup.MarginLayoutParams ?: return
+    val initialTopMargin = lp.topMargin
 
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-        val statusBars: Insets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+        val topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+        val marginLp = view.layoutParams as ViewGroup.MarginLayoutParams
+        val targetMargin = initialTopMargin + topInset
 
-        view.updatePadding(
-            left = initialLeft,
-            top = initialTop + statusBars.top,
-            right = initialRight,
-            bottom = initialBottom
-        )
+        if (marginLp.topMargin != targetMargin) {
+            marginLp.topMargin = targetMargin
+            view.layoutParams = marginLp
+        }
 
         insets
     }
@@ -82,26 +61,6 @@ fun View.applyBottomNavInsetAsPadding() {
             right = initialRight,
             bottom = initialBottom + navigationBars.bottom
         )
-
-        insets
-    }
-
-    ViewCompat.requestApplyInsets(this)
-}
-
-fun View.applyTopStatusBarInsetAsMargin() {
-    val lp = layoutParams as? ViewGroup.MarginLayoutParams ?: return
-    val initialTopMargin = lp.topMargin
-
-    ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-        val topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-        val marginLp = view.layoutParams as ViewGroup.MarginLayoutParams
-
-        val targetMargin = initialTopMargin + topInset
-        if (marginLp.topMargin != targetMargin) {
-            marginLp.topMargin = targetMargin
-            view.layoutParams = marginLp
-        }
 
         insets
     }

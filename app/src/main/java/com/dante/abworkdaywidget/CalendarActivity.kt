@@ -19,7 +19,19 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-class CalendarActivity : AppCompatActivity() {
+class CalendarActivity : BaseActivity() {
+
+    override val activityRootView: View
+        get() = findViewById(R.id.calendarRoot)
+
+    override val topInsetTargetView: View
+        get() = findViewById(R.id.calendarContentContainer)
+
+    override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
+        get() = findViewById(R.id.bottomNavigation)
+
+    override val selectedBottomNavItemId: Int?
+        get() = R.id.nav_calendar
 
     private lateinit var recycler: RecyclerView
     private lateinit var monthTitle: TextView
@@ -29,17 +41,10 @@ class CalendarActivity : AppCompatActivity() {
     private lateinit var displayedMonth: LocalDate
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
-        setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_calendar)
 
-        findViewById<View>(R.id.calendarContentContainer).applyTopSystemBarInsetAsPadding()
-        findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottomNavigation)
-            .applyBottomNavInsetAsPadding()
-
-        updateSystemBarIconContrast(findViewById(R.id.calendarRoot))
-        setupBottomNavigation(R.id.nav_calendar)
+        setupBaseUi()
 
         recycler = findViewById(R.id.calendarRecycler)
         monthTitle = findViewById(R.id.monthTitle)

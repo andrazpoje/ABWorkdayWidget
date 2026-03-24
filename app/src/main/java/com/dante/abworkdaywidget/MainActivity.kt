@@ -44,7 +44,7 @@ import android.view.ViewGroup
 import androidx.core.view.updatePadding
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     companion object {
         const val PREFS_UI = "ui_prefs"
@@ -60,6 +60,21 @@ class MainActivity : AppCompatActivity() {
 
         const val KEY_FIRST_CYCLE_DAY = "firstCycleDay"
     }
+
+    override val activityRootView: View
+        get() = activityRoot
+
+    override val topInsetTargetView: View
+        get() = mainScrollView
+
+    override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
+        get() = findViewById(R.id.bottomNavigation)
+
+    override val imeInsetTargetView: View?
+        get() = saveBarContainer
+
+    override val selectedBottomNavItemId: Int?
+        get() = R.id.nav_home
 
     var hasUnsavedChanges = false
 
@@ -128,46 +143,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var supportedCountries: List<HolidayCountry>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
 
-        setupDefaultEdgeToEdge()
         setContentView(R.layout.activity_main)
-
         bindViews()
-        // EDGE-TO-EDGE RULES (IMPORTANT - DO NOT MODIFY LIGHTLY)
-        //
-        // Top inset:
-        // - Applied as MARGIN on mainScrollView (NOT padding)
-        // - Reason: prevents content from going under status bar reliably
-        //
-        // Bottom inset:
-        // - MUST be applied ONLY to BottomNavigationView
-        // - DO NOT apply to bottomBarsContainer → causes nav bar to become taller
-        //
-        // IME (keyboard) inset:
-        // - Applied ONLY to saveBarContainer
-        // - Ensures save bar is visible above keyboard
-        //
-        // If broken:
-        // - Bottom nav becomes too tall → inset applied to wrong parent
-        // - Content overlaps status bar → wrong top inset usage
-        mainScrollView.applyTopStatusBarInsetAsMargin()
-        val bottomNavigation = findViewById<View>(R.id.bottomNavigation)
-        val saveBarContainer = findViewById<View>(R.id.saveBarContainer)
 
-        bottomNavigation.applyBottomSystemInsetWithImeAsPadding()
-
-        ViewCompat.setOnApplyWindowInsetsListener(saveBarContainer) { view, insets ->
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-            val navInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-
-            view.updatePadding(
-                bottom = maxOf(imeInsets.bottom, navInsets.bottom)
-            )
-
-            insets
-        }
+        setupBaseUi()
 
         setupFirstCycleDayDropdown()
         setupPresetDropdown()
@@ -190,9 +171,6 @@ class MainActivity : AppCompatActivity() {
 
         restoreLastOpenSection()
         clearUnsavedChanges()
-
-        updateSystemBarIconContrast(activityRoot)
-        setupBottomNavigation(R.id.nav_home)
 
         openWidgetsButton.setOnClickListener {
             try {
