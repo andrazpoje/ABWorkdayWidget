@@ -9,7 +9,7 @@
     android:elevation="12dp"
     android:paddingTop="6dp"
     app:itemHorizontalTranslationEnabled="false"
-    app:itemIconSize="24dp"
+    app:itemIconSize="26dp"
     app:itemRippleColor="?attr/colorControlHighlight"
     app:labelVisibilityMode="labeled"
     app:menu="@menu/bottom_nav_menu" />

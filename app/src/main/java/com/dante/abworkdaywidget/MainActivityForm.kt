@@ -85,11 +85,11 @@ fun MainActivity.buildCountryDisplayList(
     isManual: Boolean
 ): List<String> {
     return supportedCountries.map {
-        if (!isManual && it.code == detectedCode) {
-            "${it.displayName} (auto-detected)"
-        } else {
-            it.displayName
-        }
+        HolidayManager.getCountryDisplayNameWithAutoDetected(
+            context = this,
+            countryCode = it.code,
+            isAutoDetected = !isManual && it.code == detectedCode
+        )
     }
 }
 

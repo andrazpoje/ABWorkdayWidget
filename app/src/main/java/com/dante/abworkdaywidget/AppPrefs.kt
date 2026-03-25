@@ -4,6 +4,11 @@ object AppPrefs {
 
     const val NAME = "ab_prefs"
 
+    const val KEY_LAST_SEEN_WHATS_NEW_VERSION = "last_seen_whats_new_version"
+
+    const val KEY_APP_LANGUAGE = "app_language"
+    const val APP_LANGUAGE_SYSTEM = "system"
+
     // legacy start-date based A/B settings
     const val KEY_START_YEAR = "startYear"
     const val KEY_START_MONTH = "startMonth"

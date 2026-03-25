@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="whats_new_version_format">Različica %1$s</string>
+    <string name="whats_new_title">Kaj je novega</string>
+
+    <string name="whats_new_content">
+• Nov zaslon za statistiko (pregled A / B / prostih dni)\n
+• Izboljšan koledar (čistejši izgled + swipe navigacija)\n
+• Dodana podpora za nove države (Italija, Madžarska)\n
+• Izboljšana izbira države z zastavicami in samodejnim zaznavanjem\n
+• Splošne izboljšave videza in uporabniške izkušnje
+</string>
+
+    <string name="more_whats_new_title">Kaj je novega</string>
+    <string name="more_whats_new_subtitle">Poglej novosti v zadnji verziji</string>
+    <string name="more_check_updates_title">Preveri posodobitve</string>
+    <string name="more_check_updates_subtitle">Odpri Google Play in preveri novejšo verzijo</string>
+    <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
+    <string name="ok">V redu</string>
+
+    <string name="statistics_title">Statistika</string>
+    <string name="statistics_this_month">Ta mesec</string>
+    <string name="statistics_this_year">To leto</string>
+    <string name="statistics_total_days">Skupaj dni: %1$d</string>
+
+    <string name="more_statistics_title">Statistika</string>
+    <string name="more_statistics_subtitle">Poglej število dni cikla za mesec in leto</string>
 
     <!-- APP -->
     <string name="app_name">Delovni cikel</string>
@@ -38,8 +63,6 @@
     <string name="theme_system">Sistemska</string>
     <string name="theme_light">Svetla</string>
     <string name="theme_dark_mode">Temna</string>
-    <string name="more_statistics_title">Statistika</string>
-    <string name="more_statistics_subtitle">Načrtovano za prihodnjo verzijo</string>
 
     <string name="preset_applied">Predloga uporabljena: %1$s</string>
 
@@ -167,5 +190,14 @@
 
     <string name="calendar_month_year">%1$s %2$d</string>
     <string name="github">GitHub</string>
+
+    <string name="country_auto_detected_format">%1$s (samodejno)</string>
+
+    <string name="country_slovenia">Slovenija</string>
+    <string name="country_austria">Avstrija</string>
+    <string name="country_croatia">Hrvaška</string>
+    <string name="country_italy">Italija</string>
+    <string name="country_hungary">Madžarska</string>
+
 
 </resources>

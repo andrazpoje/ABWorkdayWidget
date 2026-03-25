@@ -2,19 +2,21 @@ package com.dante.abworkdaywidget
 
 import android.content.Context
 import android.telephony.TelephonyManager
+import androidx.core.content.edit
 import java.time.LocalDate
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import androidx.core.content.edit
 
 object HolidayManager {
 
     const val DEFAULT_COUNTRY = "SI"
 
     val supportedCountries = listOf(
-        HolidayCountry("SI", "Slovenija"),
-        HolidayCountry("AT", "Austria"),
-        HolidayCountry("HR", "Croatia")
+        HolidayCountry("SI", R.string.country_slovenia),
+        HolidayCountry("AT", R.string.country_austria),
+        HolidayCountry("HR", R.string.country_croatia),
+        HolidayCountry("IT", R.string.country_italy),
+        HolidayCountry("HU", R.string.country_hungary)
     )
 
     private val supportedCountryCodes = supportedCountries.map { it.code }.toSet()
@@ -61,6 +63,27 @@ object HolidayManager {
             }
     }
 
+    fun getCountryDisplayName(context: Context, countryCode: String): String {
+        val country = supportedCountries.firstOrNull {
+            it.code.equals(countryCode, ignoreCase = true)
+        } ?: supportedCountries.first()
+
+        return context.getString(country.nameResId)
+    }
+
+    fun getCountryDisplayNameWithAutoDetected(
+        context: Context,
+        countryCode: String,
+        isAutoDetected: Boolean
+    ): String {
+        val baseName = getCountryDisplayNameWithFlag(context, countryCode)
+        return if (isAutoDetected) {
+            context.getString(R.string.country_auto_detected_format, baseName)
+        } else {
+            baseName
+        }
+    }
+
     fun isHoliday(context: Context, date: LocalDate): Boolean {
         val country = getSelectedCountry(context)
         val holidaysForYear = getHolidaysForYear(country, date.year)
@@ -74,10 +97,29 @@ object HolidayManager {
         }
     }
 
+    fun getCountryFlag(countryCode: String): String {
+        return when (countryCode.uppercase(Locale.ROOT)) {
+            "SI" -> "\uD83C\uDDF8\uD83C\uDDEE"
+            "AT" -> "\uD83C\uDDE6\uD83C\uDDF9"
+            "HR" -> "\uD83C\uDDED\uD83C\uDDF7"
+            "IT" -> "\uD83C\uDDEE\uD83C\uDDF9"
+            "HU" -> "\uD83C\uDDED\uD83C\uDDFA"
+            else -> ""
+        }
+    }
+
+    fun getCountryDisplayNameWithFlag(context: Context, countryCode: String): String {
+        val flag = getCountryFlag(countryCode)
+        val name = getCountryDisplayName(context, countryCode)
+        return if (flag.isNotBlank()) "$flag $name" else name
+    }
+
     private fun buildHolidaySet(country: String, year: Int): Set<LocalDate> {
         return when (country) {
             "AT" -> buildAustriaHolidays(year)
             "HR" -> buildCroatiaHolidays(year)
+            "IT" -> buildItalyHolidays(year)
+            "HU" -> buildHungaryHolidays(year)
             else -> buildSloveniaHolidays(year)
         }
     }
@@ -179,6 +221,49 @@ object HolidayManager {
             LocalDate.of(year, 12, 25),
             LocalDate.of(year, 12, 26),
             easter.plusDays(1) // Easter Monday
+        )
+    }
+
+    // ========================
+    // 🇮🇹 ITALY
+    // ========================
+
+    private fun buildItalyHolidays(year: Int): Set<LocalDate> {
+        val easter = easterSunday(year)
+
+        return setOf(
+            LocalDate.of(year, 1, 1),   // New Year's Day
+            LocalDate.of(year, 1, 6),   // Epiphany
+            LocalDate.of(year, 4, 25),  // Liberation Day
+            LocalDate.of(year, 5, 1),   // Labour Day
+            LocalDate.of(year, 6, 2),   // Republic Day
+            LocalDate.of(year, 8, 15),  // Assumption Day
+            LocalDate.of(year, 11, 1),  // All Saints' Day
+            LocalDate.of(year, 12, 8),  // Immaculate Conception
+            LocalDate.of(year, 12, 25), // Christmas Day
+            LocalDate.of(year, 12, 26), // St. Stephen's Day
+            easter.plusDays(1)          // Easter Monday
+        )
+    }
+
+    // ========================
+    // 🇭🇺 HUNGARY
+    // ========================
+
+    private fun buildHungaryHolidays(year: Int): Set<LocalDate> {
+        val easter = easterSunday(year)
+
+        return setOf(
+            LocalDate.of(year, 1, 1),   // New Year's Day
+            LocalDate.of(year, 3, 15),  // National Day
+            LocalDate.of(year, 5, 1),   // Labour Day
+            LocalDate.of(year, 8, 20),  // State Foundation Day
+            LocalDate.of(year, 10, 23), // National Day
+            LocalDate.of(year, 11, 1),  // All Saints' Day
+            LocalDate.of(year, 12, 25), // Christmas Day
+            LocalDate.of(year, 12, 26), // Second Day of Christmas
+            easter.plusDays(1),         // Easter Monday
+            easter.plusDays(50)         // Whit Monday
         )
     }
 

@@ -17,11 +17,19 @@
 		tools:targetApi="33">
 
 		<activity
+			android:name=".WhatsNewActivity"
+			android:exported="false" />
+
+		<activity
 			android:name=".MoreActivity"
 			android:exported="false" />
 
 		<activity
 			android:name=".CalendarActivity"
+			android:exported="false" />
+
+		<activity
+			android:name=".StatisticsActivity"
 			android:exported="false" />
 
 		<activity
@@ -33,6 +41,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+
 
 		<receiver
 			android:name=".ABWidgetProvider"

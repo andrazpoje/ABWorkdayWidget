@@ -110,12 +110,11 @@ fun MainActivity.loadSettings() {
 
     val isManual = prefs.getBoolean(AppPrefs.KEY_COUNTRY_MANUAL, false)
 
-    val displayText =
-        if (!isManual && selectedCountry.code == HolidayManager.getSelectedCountry(this)) {
-            "${selectedCountry.displayName} (auto-detected)"
-        } else {
-            selectedCountry.displayName
-        }
+    val displayText = HolidayManager.getCountryDisplayNameWithAutoDetected(
+        context = this,
+        countryCode = selectedCountry.code,
+        isAutoDetected = !isManual && selectedCountry.code == HolidayManager.getSelectedCountry(this)
+    )
 
     holidayCountryDropdown.setText(displayText, false)
 
@@ -194,10 +193,21 @@ fun MainActivity.saveSettings(normalizedCycle: List<String>) {
 
     refreshFirstCycleDayDropdown(selectedFirstDay)
 
+    val selectedText = holidayCountryDropdown.text?.toString()?.trim().orEmpty()
+
     val selectedCountryCode = supportedCountries
         .firstOrNull {
-            val selectedText = holidayCountryDropdown.text?.toString()?.trim().orEmpty()
-            selectedText == it.displayName || selectedText.startsWith("${it.displayName} (")
+            val plainName = HolidayManager.getCountryDisplayName(this, it.code)
+            val flaggedName = HolidayManager.getCountryDisplayNameWithFlag(this, it.code)
+            val autoName = HolidayManager.getCountryDisplayNameWithAutoDetected(
+                context = this,
+                countryCode = it.code,
+                isAutoDetected = true
+            )
+
+            selectedText == plainName ||
+                    selectedText == flaggedName ||
+                    selectedText == autoName
         }
         ?.code
         ?: HolidayManager.DEFAULT_COUNTRY

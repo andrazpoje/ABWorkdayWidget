@@ -1,10 +1,14 @@
 package com.dante.abworkdaywidget
 
 import android.os.Bundle
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -15,7 +19,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import android.view.ViewGroup
+import kotlin.math.abs
+
 
 class CalendarActivity : BaseActivity() {
 
@@ -37,6 +42,7 @@ class CalendarActivity : BaseActivity() {
     private lateinit var nextMonthButton: ImageButton
 
     private lateinit var displayedMonth: LocalDate
+    private lateinit var gestureDetector: GestureDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,17 +59,17 @@ class CalendarActivity : BaseActivity() {
 
         recycler.layoutManager = GridLayoutManager(this, 7)
 
+        setupMonthSwipe()
+
         displayedMonth = LocalDate.now().withDayOfMonth(1)
         renderMonth(displayedMonth)
 
         previousMonthButton.setOnClickListener {
-            displayedMonth = displayedMonth.minusMonths(1).withDayOfMonth(1)
-            renderMonth(displayedMonth)
+            goToPreviousMonth()
         }
 
         nextMonthButton.setOnClickListener {
-            displayedMonth = displayedMonth.plusMonths(1).withDayOfMonth(1)
-            renderMonth(displayedMonth)
+            goToNextMonth()
         }
     }
 
@@ -93,6 +99,60 @@ class CalendarActivity : BaseActivity() {
             }
             header.addView(tv)
         }
+    }
+
+    private fun setupMonthSwipe() {
+        gestureDetector = GestureDetector(
+            this,
+            object : GestureDetector.SimpleOnGestureListener() {
+
+                private val swipeThreshold = 120
+                private val swipeVelocityThreshold = 120
+
+                override fun onDown(e: MotionEvent): Boolean = true
+
+                override fun onFling(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float
+                ): Boolean {
+                    if (e1 == null) return false
+
+                    val diffX = e2.x - e1.x
+                    val diffY = e2.y - e1.y
+
+                    if (abs(diffX) > abs(diffY) &&
+                        abs(diffX) > swipeThreshold &&
+                        abs(velocityX) > swipeVelocityThreshold
+                    ) {
+                        if (diffX > 0) {
+                            goToPreviousMonth()
+                        } else {
+                            goToNextMonth()
+                        }
+                        return true
+                    }
+
+                    return false
+                }
+            }
+        )
+
+        recycler.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            false
+        }
+    }
+
+    private fun goToPreviousMonth() {
+        displayedMonth = displayedMonth.minusMonths(1).withDayOfMonth(1)
+        renderMonth(displayedMonth)
+    }
+
+    private fun goToNextMonth() {
+        displayedMonth = displayedMonth.plusMonths(1).withDayOfMonth(1)
+        renderMonth(displayedMonth)
     }
 
     private fun renderMonth(monthDate: LocalDate) {

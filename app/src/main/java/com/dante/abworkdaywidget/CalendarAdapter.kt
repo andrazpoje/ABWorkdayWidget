@@ -1,5 +1,6 @@
 package com.dante.abworkdaywidget
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
@@ -34,18 +35,35 @@ class CalendarAdapter(
         val item = items[position]
         val date = item.date
 
+        // ========================
+        // PRAZNA CELICA
+        // ========================
         if (date == null) {
             holder.dayNumber.text = ""
             holder.dayLabel.text = ""
-            holder.dayCard.setCardBackgroundColor(
-                ContextCompat.getColor(context, android.R.color.transparent)
-            )
+
+            holder.dayNumber.alpha = 0f
+            holder.dayLabel.alpha = 0f
+
+            holder.dayCard.setCardBackgroundColor(Color.TRANSPARENT)
             holder.dayCard.strokeWidth = 0
+            holder.dayCard.cardElevation = 0f
+
             holder.dayCard.isClickable = false
             holder.dayCard.isFocusable = false
             holder.dayCard.setOnClickListener(null)
+
             return
         }
+
+        // ========================
+        // NORMALNA CELICA (reset!)
+        // ========================
+        holder.dayNumber.alpha = 1f
+        holder.dayLabel.alpha = 1f
+
+        holder.dayCard.isClickable = true
+        holder.dayCard.isFocusable = true
 
         val label = getLabel(date)
         val isToday = date == LocalDate.now()
@@ -67,8 +85,8 @@ class CalendarAdapter(
             ContextCompat.getColor(context, android.R.color.transparent)
         }
 
-        holder.dayCard.isClickable = true
-        holder.dayCard.isFocusable = true
+        holder.dayCard.cardElevation = 0f
+
         holder.dayCard.setOnClickListener {
             onDayClick(date)
         }

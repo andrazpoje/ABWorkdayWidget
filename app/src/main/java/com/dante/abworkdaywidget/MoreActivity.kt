@@ -39,8 +39,12 @@ class MoreActivity : BaseActivity() {
         findViewById<TextView>(R.id.moreVersion).text =
             getString(R.string.app_version, BuildConfig.VERSION_NAME)
 
-        findViewById<MaterialCardView>(R.id.cardOpenCalendar).setOnClickListener {
-            startActivity(Intent(this, CalendarActivity::class.java))
+        findViewById<MaterialCardView>(R.id.cardWhatsNew).setOnClickListener {
+            startActivity(Intent(this, WhatsNewActivity::class.java))
+        }
+
+        findViewById<MaterialCardView>(R.id.cardCheckUpdates).setOnClickListener {
+            openAppInPlayStore()
         }
 
         findViewById<MaterialCardView>(R.id.cardContactAuthor).setOnClickListener {
@@ -57,6 +61,10 @@ class MoreActivity : BaseActivity() {
 
         findViewById<MaterialCardView>(R.id.cardDonate).setOnClickListener {
             openUrl(DONATE_URL)
+        }
+
+        findViewById<MaterialCardView>(R.id.cardStatistics).setOnClickListener {
+            startActivity(Intent(this, StatisticsActivity::class.java))
         }
     }
 
@@ -103,6 +111,35 @@ class MoreActivity : BaseActivity() {
                 getString(R.string.no_email_app_found),
                 Toast.LENGTH_SHORT
             ).show()
+        } catch (_: Exception) {
+            Toast.makeText(
+                this,
+                getString(R.string.unable_to_open_link),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun openAppInPlayStore() {
+        val packageName = packageName
+        val marketIntent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+        val webIntent = Intent(
+            Intent.ACTION_VIEW,
+            "https://play.google.com/store/apps/details?id=$packageName".toUri()
+        )
+
+        try {
+            startActivity(marketIntent)
+        } catch (_: ActivityNotFoundException) {
+            try {
+                startActivity(webIntent)
+            } catch (_: Exception) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.unable_to_open_link),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         } catch (_: Exception) {
             Toast.makeText(
                 this,

@@ -121,6 +121,7 @@ class MainActivity : BaseActivity() {
     lateinit var supportedCountries: List<HolidayCountry>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppLanguageManager.applySavedLanguage(this)
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
@@ -149,6 +150,15 @@ class MainActivity : BaseActivity() {
 
         restoreLastOpenSection()
         clearUnsavedChanges()
+
+        showWhatsNewIfAppUpdated(savedInstanceState)
+
+        openWidgetsButton.setOnClickListener {
+            try {
+                startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
+            } catch (_: Exception) {
+            }
+        }
 
         openWidgetsButton.setOnClickListener {
             try {
@@ -208,6 +218,22 @@ class MainActivity : BaseActivity() {
         }
 
         setupBackHandling()
+    }
+
+    private fun showWhatsNewIfAppUpdated(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) return
+
+        val prefs = getSharedPreferences(AppPrefs.NAME, MODE_PRIVATE)
+        val currentVersion = BuildConfig.VERSION_NAME
+        val lastSeenVersion = prefs.getString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, null)
+
+        if (lastSeenVersion != currentVersion) {
+            prefs.edit()
+                .putString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, currentVersion)
+                .apply()
+
+            startActivity(Intent(this, WhatsNewActivity::class.java))
+        }
     }
 
     fun bindViews() {

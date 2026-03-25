@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v1.8
+
+### ✨ Added
+- New **Statistics screen** (overview of A / B / Off days)
+- Support for additional countries: **Italy (IT)** and **Hungary (HU)**
+- Country selection now includes **flag indicators** for better clarity
+- Preparation for **manual language selection** (foundation implemented)
+
+### 🎨 Improved
+- **Calendar redesign**
+  - Removed empty/placeholder cells for cleaner layout
+  - Added **swipe navigation** between months
+- Improved **country selection UI**
+  - Auto-detected country clearly labeled
+  - Localized country names (based on app language)
+- Updated **What’s New screen**
+  - Localized content (EN / SL)
+  - Cleaner version display format
+- Improved **icon consistency** across the app (Material style alignment)
+- General UI polish and consistency improvements
+
+### ⚙️ Technical
+- Refactored holiday handling to support multiple countries more cleanly
+- Added caching improvements for holiday calculations
+- Introduced base structure for future **app language switching**
+- Code cleanup and preparation for upcoming 2.0 features
+
+---
+
 ## v1.7.1
 
 ### 🐛 Fixed
@@ -101,27 +130,9 @@ All notable changes to this project will be documented in this file.
 - Restored correct initialization flow in `onCreate()`
 - Improved stability of settings persistence
 
-
 ---
 
-## v1.6.1
-
-### 🐛 Fixed
-- Fixed **Main screen overlapping the Android status bar**
-- Fixed **inconsistent edge-to-edge behavior** compared to Calendar and More screens
-- Fixed issue where **saved settings were not loaded after app restart**
-- Fixed crash caused by uninitialized `selectedDate`
-- Fixed **start date showing placeholder (%1$s) instead of formatted value**
-
-### ⚙️ Technical
-- Unified window insets handling (status bar + navigation bar)
-- Removed conflicting inset listeners causing layout issues
-- Restored correct initialization flow in `onCreate()`
-- Improved stability of settings persistence
-
----
-
-## [1.6] - 2026-03-22
+## v1.6
 
 ### ✨ Added
 - New **Calendar view** (monthly overview of cycle)
@@ -156,7 +167,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.5] - 2026-03-21
+## v1.5
 
 ### ✨ Added
 - Support for **multiple countries (SI, AT, HR)** for public holidays
@@ -213,7 +224,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.4.1] - 2026-03-20
+## v1.4.1
 
 ### 🐛 Fixed
 - Fixed issue where "First cycle day" was not saved correctly
@@ -226,7 +237,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.4.0] - 2026-03-19
+## v1.4
 
 ### ✨ Added
 - Advanced **cycle validation system** (empty input, format, max items, label length)
@@ -260,7 +271,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.3.0] - 2026-03-17
+## v1.3
 
 ### ✨ Added
 - Notification when A/B cycle changes
@@ -292,7 +303,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.2.0] - 2026-03-16
+## v1.2
 
 ### ✨ Added
 - Widget now displays up to **6 upcoming cycle days**
@@ -327,7 +338,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.1.0] - 2026-03-11
+## v1.1
 
 ### ✨ Added
 - Completely redesigned user interface
@@ -348,7 +359,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.0.0] - 2026-03-07
+## v1.0
 
 ### ✨ Initial release
 - Widget displays **A/B work cycle**
