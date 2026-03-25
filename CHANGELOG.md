@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v1.7.1
+
+### 🐛 Fixed
+- Fixed dropdown selection issues (presets, start day, holiday country)
+- Fixed incorrect initial values in cycle configuration
+- Fixed widget layout compatibility issues (RemoteViews)
+- Fixed launcher icon configuration and adaptive icon behavior
+- Fixed minor resource and configuration inconsistencies
+
+### 🎨 Improved
+- Improved launcher icon rendering across different Android versions and launchers
+- Better consistency of dropdown behavior (non-editable + full list display)
+- Minor UI polish and spacing adjustments
+
+### ⚙️ Technical
+- Continued refactor of MainActivity into smaller helper classes
+- Moved utility logic into dedicated util package
+- Cleaned up unused resources and reduced lint warnings
+- Improved resource structure (mipmap, icons, themes)
+
+---
+
 ## v1.7
 
 ### ✨ Added

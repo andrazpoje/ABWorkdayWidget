@@ -5,6 +5,8 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.dante.abworkdaywidget.util.sanitizeLabel
 import java.util.Locale
+import android.widget.Filter
+import android.widget.Filterable
 
 fun MainActivity.validateCycleInput(): Boolean {
     val raw = cycleDaysEdit.text?.toString().orEmpty().trim()
@@ -46,6 +48,36 @@ fun MainActivity.validateCycleInput(): Boolean {
 
     cycleDaysInputLayout.error = null
     return true
+}
+
+private fun MainActivity.createNoFilterAdapter(items: List<String>): ArrayAdapter<String> {
+    return object : ArrayAdapter<String>(
+        this,
+        android.R.layout.simple_list_item_1,
+        items
+    ), Filterable {
+
+        override fun getFilter(): Filter {
+            return object : Filter() {
+                override fun performFiltering(constraint: CharSequence?): FilterResults {
+                    return FilterResults().apply {
+                        values = items
+                        count = items.size
+                    }
+                }
+
+                override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                    clear()
+                    addAll(items)
+                    notifyDataSetChanged()
+                }
+
+                override fun convertResultToString(resultValue: Any?): CharSequence {
+                    return resultValue as String
+                }
+            }
+        }
+    }
 }
 
 fun MainActivity.buildCountryDisplayList(
@@ -138,12 +170,7 @@ fun MainActivity.showApplyPresetDialog(
 fun MainActivity.refreshFirstCycleDayDropdown(preferredValue: String? = null) {
     val cycleLabels = getCurrentCycleLabelsFromInput()
 
-    val adapter = ArrayAdapter(
-        this,
-        android.R.layout.simple_list_item_1,
-        cycleLabels
-    )
-
+    val adapter = createNoFilterAdapter(cycleLabels)
     firstCycleDayDropdown.setAdapter(adapter)
 
     if (cycleLabels.isEmpty()) {
@@ -183,11 +210,7 @@ fun MainActivity.setupPresetDropdown() {
     val presets = CyclePresetProvider.getPresets()
     val names = presets.map { getString(it.nameRes) } + getString(R.string.preset_custom)
 
-    val adapter = ArrayAdapter(
-        this,
-        android.R.layout.simple_list_item_1,
-        names
-    )
+    val adapter = createNoFilterAdapter(names)
 
     presetDropdown.setAdapter(adapter)
     presetDropdown.keyListener = null
@@ -234,32 +257,7 @@ fun MainActivity.setupHolidayCountryDropdown() {
 
     val displayItems = buildCountryDisplayList(detectedCode, isManual)
 
-    val adapter = object : ArrayAdapter<String>(
-        this,
-        android.R.layout.simple_list_item_1,
-        displayItems
-    ) {
-        override fun getFilter(): android.widget.Filter {
-            return object : android.widget.Filter() {
-                override fun performFiltering(constraint: CharSequence?): FilterResults {
-                    return FilterResults().apply {
-                        values = displayItems
-                        count = displayItems.size
-                    }
-                }
-
-                override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                    clear()
-                    addAll(displayItems)
-                    notifyDataSetChanged()
-                }
-
-                override fun convertResultToString(resultValue: Any?): CharSequence {
-                    return resultValue as String
-                }
-            }
-        }
-    }
+    val adapter = createNoFilterAdapter(displayItems)
 
     holidayCountryDropdown.setAdapter(adapter)
     holidayCountryDropdown.keyListener = null
