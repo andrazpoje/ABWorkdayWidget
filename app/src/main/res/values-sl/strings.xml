@@ -1,34 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="whats_new_version_format">Različica %1$s</string>
+
+    <!-- WHAT'S NEW -->
+    <string name="whats_new_version_format">Verzija %1$s</string>
     <string name="whats_new_title">Kaj je novega</string>
-
     <string name="whats_new_content">
-• Nov zaslon za statistiko (pregled A / B / prostih dni)\n
-• Izboljšan koledar (čistejši izgled + swipe navigacija)\n
-• Dodana podpora za nove države (Italija, Madžarska)\n
-• Izboljšana izbira države z zastavicami in samodejnim zaznavanjem\n
-• Splošne izboljšave videza in uporabniške izkušnje
+• Nov zaslon Statistika (pregled A / B / Prosto)\n
+• Izboljšave koledarja (čist prikaz + swipe navigacija)\n
+• Podpora za dodatne države (Italija, Madžarska)\n
+• Izboljšan izbor države z zastavicami in samodejnim zaznavanjem\n
+• Dodelave uporabniškega vmesnika in uporabniške izkušnje
 </string>
-
-    <string name="more_whats_new_title">Kaj je novega</string>
-    <string name="more_whats_new_subtitle">Poglej novosti v zadnji verziji</string>
-    <string name="more_check_updates_title">Preveri posodobitve</string>
-    <string name="more_check_updates_subtitle">Odpri Google Play in preveri novejšo verzijo</string>
     <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
-    <string name="ok">V redu</string>
 
+    <!-- STATISTICS -->
     <string name="statistics_title">Statistika</string>
     <string name="statistics_this_month">Ta mesec</string>
     <string name="statistics_this_year">To leto</string>
     <string name="statistics_total_days">Skupaj dni: %1$d</string>
-
     <string name="more_statistics_title">Statistika</string>
     <string name="more_statistics_subtitle">Poglej število dni cikla za mesec in leto</string>
+
+    <!-- SETTINGS -->
+    <string name="settings_title">Nastavitve</string>
+    <string name="settings_appearance_title">Videz</string>
+    <string name="settings_widget_title">Widget</string>
+    <string name="settings_about_title">O aplikaciji</string>
+    <string name="settings_notifications_title">Obvestila</string>
+    <string name="settings_widget_style_title">Videz widgeta</string>
+    <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
+    <string name="settings_widget_style_classic">Klasičen</string>
+    <string name="settings_widget_style_minimal">Minimalističen</string>
+    <string name="settings_notifications_enabled">Obvestila o spremembi cikla</string>
+    <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
+
+    <!-- compatibility keys if any old XML still references them -->
+    <string name="widget_style_classic">Klasičen</string>
+    <string name="widget_style_minimal">Minimalističen</string>
+    <string name="notifications_enabled">Omogoči obvestila</string>
+    <string name="silent_notification">Tiha obvestila</string>
+
+    <!-- HELP -->
+    <string name="help_title">Pomoč</string>
+    <string name="help_getting_started_title">Kako začeti</string>
+    <string name="help_getting_started_content">1. Nastavi začetni datum.\n2. Izberi prvi dan cikla.\n3. Nastavi pravila preskakovanja in oznake.\n4. Shrani spremembe.\n5. Dodaj widget na domači zaslon.</string>
+    <string name="help_calculation_title">Kako deluje izračun cikla</string>
+    <string name="help_calculation_content">Izbrani začetni datum je referenčna točka cikla. Prvi dan cikla je oznaka, dodeljena temu datumu. Cikel napreduje samo na vključenih dnevih. Preskočeni vikendi in prazniki cikla ne premaknejo naprej.</string>
+    <string name="help_presets_title">Predloge</string>
+    <string name="help_presets_content">Predloge samodejno izpolnijo polja cikla z vnaprej določenimi vrednostmi. Če cikel nato ročno spremeniš, se predloga spremeni v Po meri.</string>
+    <string name="help_widget_title">Widget</string>
+    <string name="help_widget_content">Widget lahko dodaš prek izbire widgetov na domačem zaslonu. Widget se samodejno posodablja in uporablja shranjene nastavitve aplikacije. Slog widgeta vpliva samo na videz.</string>
+    <string name="help_faq_title">Pogosta vprašanja</string>
+    <string name="help_faq_content">Zakaj se cikel na nekatere dni ne spremeni?\nKer so lahko vikendi ali prazniki preskočeni.\n\nZakaj je widget drugačen kot aplikacija?\nPreveri shranjene nastavitve in slog widgeta.\n\nZakaj obvestila ne delujejo?\nPreveri, ali so obvestila omogočena in ali je dovoljenje odobreno.</string>
+
+    <!-- COMMON -->
+    <string name="ok">V redu</string>
+    <string name="cancel">Prekliči</string>
+    <string name="save">Shrani</string>
+    <string name="discard">Zavrzi</string>
+    <string name="close">Zapri</string>
+    <string name="revert">Povrni</string>
+    <string name="reverted">Spremembe povrnjene</string>
 
     <!-- APP -->
     <string name="app_name">Delovni cikel</string>
     <string name="app_header_title">Delovni cikel</string>
+    <string name="app_version">v%1$s</string>
     <string name="settings_subtitle">Nastavi cikel, pravila in izgled widgeta.</string>
 
     <!-- STATUS -->
@@ -45,8 +82,8 @@
     <string name="start_date">Začetni datum: %1$s</string>
     <string name="select_date">Izberi datum</string>
     <string name="cycle_days_label">Dnevi v ciklu</string>
-    <string name="cycle_days_hint_placeholder">A, B, Nočna, Prosto</string>
-    <string name="cycle_days_hint">Vnesi oznake cikla, ločene z vejicami. Primer: A, B ali Jutro, Popoldne, Nočna, Prosto</string>
+    <string name="cycle_days_hint_placeholder">A, B, Jutranja, Popoldanska, Nočna</string>
+    <string name="cycle_days_hint">Vnesi oznake cikla, ločene z vejicami. Primer: A, B ali Jutranja, Popoldanska, Nočna</string>
     <string name="first_cycle_day_label">Dan cikla na začetni datum</string>
     <string name="first_cycle_day_hint">Vnesi eno oznako iz cikla, ki velja na izbrani začetni datum.</string>
 
@@ -57,19 +94,23 @@
     <string name="apply_preset">Uporabi predlogo</string>
     <string name="apply_preset_message">To bo prepisalo trenutne nastavitve cikla s predlogo »%1$s«.</string>
     <string name="preset_already_applied">Ta predloga je že izbrana</string>
-
     <string name="preset_custom">Po meri</string>
+    <string name="preset_applied">Predloga uporabljena: %1$s</string>
+    <string name="preset_ab">A / B</string>
+    <string name="preset_two_shift">2-izmensko</string>
+    <string name="preset_three_shift">3-izmensko</string>
+
+    <!-- THEMES -->
     <string name="app_theme">Tema aplikacije</string>
     <string name="theme_system">Sistemska</string>
     <string name="theme_light">Svetla</string>
     <string name="theme_dark_mode">Temna</string>
+    <string name="color_theme">Barvna tema</string>
+    <string name="theme_classic">Klasična</string>
+    <string name="theme_pastel">Pastelna</string>
+    <string name="theme_dark">Temna</string>
 
-    <string name="preset_applied">Predloga uporabljena: %1$s</string>
-
-    <string name="preset_ab">A / B</string>
-    <string name="preset_shift_4">Jutranja / Popoldanska / Nočna / Prosto</string>
-    <string name="preset_day_night">Dan / Noč / Počitek / Prosto</string>
-
+    <!-- LABELS -->
     <string name="label_morning">Jutranja</string>
     <string name="label_afternoon">Popoldanska</string>
     <string name="label_night">Nočna</string>
@@ -93,28 +134,12 @@
     <string name="prefix_text">Besedilo pred oznako cikla</string>
     <string name="display_info_text">Widget prikaže točno oznake, ki jih vneseš v cikel.</string>
 
-    <!-- THEMES -->
-    <string name="color_theme">Barvna tema</string>
-    <string name="theme_classic">Klasična</string>
-    <string name="theme_pastel">Pastelna</string>
-    <string name="theme_dark">Temna</string>
-
     <!-- WIDGET -->
     <string name="widget_not_added_short">Widget še ni dodan na domači zaslon.</string>
     <string name="open_widgets">Odpri widgete</string>
-    <string name="settings_widget_style_title">Videz widgeta</string>
-    <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
-    <string name="settings_widget_style_classic">Klasičen</string>
-    <string name="settings_widget_style_minimal">Minimalističen</string>
 
-    <!-- SAVE / COMMON -->
-    <string name="save">Shrani</string>
+    <!-- SAVE / DIALOG -->
     <string name="settings_saved">Nastavitve shranjene</string>
-    <string name="cancel">Prekliči</string>
-    <string name="discard">Zavrzi</string>
-    <string name="close">Zapri</string>
-
-    <!-- UNSAVED CHANGES -->
     <string name="unsaved_changes_title">Neshranjene spremembe</string>
     <string name="unsaved_changes_message">Imaš neshranjene spremembe. Ali jih želiš shraniti pred izhodom?</string>
 
@@ -136,8 +161,6 @@
 
     <!-- NOTIFICATIONS -->
     <string name="settings_notification_title">Obvestila</string>
-    <string name="settings_notifications_enabled">Obvestila o spremembi cikla</string>
-    <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
     <string name="notification_channel_normal_name">AB delovni cikel obvestila</string>
     <string name="notification_channel_normal_desc">Obvestila ob spremembi delovnega cikla</string>
     <string name="notification_channel_silent_name">AB delovni cikel obvestila brez zvoka</string>
@@ -149,6 +172,10 @@
     <string name="notification_permission_denied">Dovoljenje za obvestila ni bilo odobreno.</string>
 
     <!-- MORE / NAVIGATION -->
+    <string name="more_whats_new_title">Kaj je novega</string>
+    <string name="more_whats_new_subtitle">Poglej novosti v zadnji verziji</string>
+    <string name="more_check_updates_title">Preveri posodobitve</string>
+    <string name="more_check_updates_subtitle">Odpri Google Play in preveri novejšo verzijo</string>
     <string name="more_calendar_title">Koledar cikla</string>
     <string name="more_calendar_subtitle">Pregled cikla skozi mesec</string>
     <string name="more_contact_title">Kontaktiraj avtorja</string>
@@ -159,7 +186,6 @@
     <string name="more_report_bug_subtitle">Pošlji povratne informacije ali prijavi težavo</string>
     <string name="more_donate_title">Podpri razvoj</string>
     <string name="more_donate_subtitle">Pomagaj izboljšati aplikacijo</string>
-
     <string name="nav_home">Domov</string>
     <string name="nav_calendar">Koledar</string>
     <string name="nav_more">Več</string>
@@ -169,6 +195,7 @@
     <string name="calendar_next_month">Naslednji mesec</string>
     <string name="calendar_day_cycle">Dan cikla</string>
     <string name="calendar_day_holiday">Status dneva</string>
+    <string name="calendar_month_year">%1$s %2$d</string>
 
     <string-array name="week_days_short">
         <item>Pon</item>
@@ -180,24 +207,20 @@
         <item>Ned</item>
     </string-array>
 
+    <!-- EMAIL / LINKS -->
     <string name="email_subject_contact">%1$s - Povratne informacije</string>
     <string name="email_subject_bug_report">%1$s - Prijava napake</string>
     <string name="email_body_bug_report">Opiši težavo:\n\n---\nVerzija aplikacije: %1$s\nNaprava: %2$s\nAndroid: %3$s\n</string>
     <string name="no_email_app_found">Aplikacija za e-pošto ni bila najdena</string>
     <string name="unable_to_open_link">Povezave ni bilo mogoče odpreti</string>
-
-    <string name="app_version">v%1$s</string>
-
-    <string name="calendar_month_year">%1$s %2$d</string>
     <string name="github">GitHub</string>
 
+    <!-- COUNTRIES -->
     <string name="country_auto_detected_format">%1$s (samodejno)</string>
-
     <string name="country_slovenia">Slovenija</string>
     <string name="country_austria">Avstrija</string>
     <string name="country_croatia">Hrvaška</string>
     <string name="country_italy">Italija</string>
     <string name="country_hungary">Madžarska</string>
-
 
 </resources>

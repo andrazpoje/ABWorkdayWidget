@@ -3,12 +3,11 @@ package com.dante.abworkdaywidget.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.dante.abworkdaywidget.CycleManager
 import com.dante.abworkdaywidget.R
 import com.dante.abworkdaywidget.notifications.NotificationHelper
 import com.dante.abworkdaywidget.widget.WidgetUpdater
-import com.dante.abworkdaywidget.workday.WorkdayRepository
 import java.time.LocalDate
-import com.dante.abworkdaywidget.ABLogic
 
 class DayChangeReceiver : BroadcastReceiver() {
 
@@ -17,40 +16,25 @@ class DayChangeReceiver : BroadcastReceiver() {
             Intent.ACTION_DATE_CHANGED -> {
                 WidgetUpdater.updateAllWidgets(context)
 
-                if (NotificationHelper.areNotificationsEnabled(context)) {
-                    val todayLabel = WorkdayRepository.getTodayLabel(context)
-                    val tomorrowLabel = ABLogic.getLetterForDate(
-                        context,
-                        LocalDate.now().plusDays(1)
-                    )
+                if (!NotificationHelper.areNotificationsEnabled(context)) return
 
-                    val message = when (todayLabel) {
-                        "A", "B" -> {
-                            context.getString(
-                                R.string.notification_today_tomorrow,
-                                todayLabel,
-                                tomorrowLabel
-                            )
-                        }
-                        "X" -> {
-                            val todayText = context.getString(R.string.notification_day_off_short)
-                            context.getString(
-                                R.string.notification_today_tomorrow,
-                                todayText,
-                                tomorrowLabel
-                            )
-                        }
-                        else -> {
-                            context.getString(R.string.notification_generic_message)
-                        }
-                    }
+                val today = LocalDate.now()
+                val tomorrow = today.plusDays(1)
 
-                    NotificationHelper.showDayChangeNotification(
-                        context = context,
-                        title = context.getString(R.string.notification_day_changed_title),
-                        message = message
-                    )
-                }
+                val todayLabel = CycleManager.getCycleDayForDate(context, today)
+                val tomorrowLabel = CycleManager.getCycleDayForDate(context, tomorrow)
+
+                val message = context.getString(
+                    R.string.notification_today_tomorrow,
+                    todayLabel,
+                    tomorrowLabel
+                )
+
+                NotificationHelper.showDayChangeNotification(
+                    context = context,
+                    title = context.getString(R.string.notification_day_changed_title),
+                    message = message
+                )
             }
 
             Intent.ACTION_TIME_CHANGED,

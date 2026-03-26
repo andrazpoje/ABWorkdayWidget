@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- WHAT'S NEW -->
     <string name="whats_new_version_format">Version %1$s</string>
     <string name="whats_new_title">What’s New</string>
-
     <string name="whats_new_content">
 • New Statistics screen (A / B / Off overview)\n
 • Calendar improvements (clean layout + swipe navigation)\n
@@ -10,29 +11,61 @@
 • Improved country selection with flags and auto-detection\n
 • UI polish and consistency improvements
 </string>
-
-    <string name="more_whats_new_title">What’s New</string>
-    <string name="more_whats_new_subtitle">See what changed in the latest version</string>
-    <string name="more_check_updates_title">Check for updates</string>
-    <string name="more_check_updates_subtitle">Open Google Play to check for a newer version</string>
     <string name="whats_new_view_full_changelog">View full changelog</string>
-    <string name="ok">OK</string>
 
+    <!-- STATISTICS -->
     <string name="statistics_title">Statistics</string>
     <string name="statistics_this_month">This month</string>
     <string name="statistics_this_year">This year</string>
     <string name="statistics_total_days">Total days: %1$d</string>
-
     <string name="more_statistics_title">Statistics</string>
     <string name="more_statistics_subtitle">View cycle counts for this month and year</string>
 
+    <!-- SETTINGS -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_widget_title">Widget</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_widget_style_title">Widget appearance</string>
+    <string name="settings_widget_style_description">Choose the widget style.</string>
+    <string name="settings_widget_style_classic">Classic</string>
+    <string name="settings_widget_style_minimal">Minimal</string>
+    <string name="settings_notifications_enabled">Cycle change notifications</string>
+    <string name="settings_silent_notification">Silent notifications (no sound)</string>
 
+    <!-- compatibility keys if any old XML still references them -->
+    <string name="widget_style_classic">Classic</string>
+    <string name="widget_style_minimal">Minimal</string>
+    <string name="notifications_enabled">Enable notifications</string>
+    <string name="silent_notification">Silent notifications</string>
 
+    <!-- HELP -->
+    <string name="help_title">Help</string>
+    <string name="help_getting_started_title">Getting started</string>
+    <string name="help_getting_started_content">1. Set the start date.\n2. Choose the first cycle day.\n3. Configure skip rules and labels.\n4. Save your changes.\n5. Add the widget to your home screen.</string>
+    <string name="help_calculation_title">How cycle calculation works</string>
+    <string name="help_calculation_content">The selected start date is the reference point for the cycle. The first cycle day is the label assigned to that date. The cycle advances only on included days. Skipped weekends and holidays do not move the cycle forward.</string>
+    <string name="help_presets_title">Presets</string>
+    <string name="help_presets_content">Presets fill the cycle fields with ready-made values. If you later edit the cycle manually, the preset changes to Custom.</string>
+    <string name="help_widget_title">Widget</string>
+    <string name="help_widget_content">You can add the widget from your launcher’s widget picker. The widget updates automatically and uses the saved app settings. Widget style affects appearance only.</string>
+    <string name="help_faq_title">FAQ</string>
+    <string name="help_faq_content">Why does the cycle not change on some days?\nBecause weekends or holidays may be skipped.\n\nWhy is the widget different from the app?\nCheck saved settings and widget style.\n\nWhy are notifications not working?\nMake sure notifications are enabled and permission is granted.</string>
 
+    <!-- COMMON -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="discard">Discard</string>
+    <string name="close">Close</string>
+    <string name="revert">Revert</string>
+    <string name="reverted">Changes reverted</string>
 
     <!-- APP -->
     <string name="app_name">Work Cycle</string>
     <string name="app_header_title">Work Cycle</string>
+    <string name="app_version">Version %1$s</string>
     <string name="settings_subtitle">Set your cycle, rules and widget appearance.</string>
 
     <!-- STATUS -->
@@ -49,8 +82,8 @@
     <string name="start_date">Start date: %1$s</string>
     <string name="select_date">Select date</string>
     <string name="cycle_days_label">Cycle days</string>
-    <string name="cycle_days_hint_placeholder">A, B, Night, Off</string>
-    <string name="cycle_days_hint">Enter cycle labels separated by commas. Example: A,B or Morning,Afternoon,Night,Off</string>
+    <string name="cycle_days_hint_placeholder">A, B, Morning, Afternoon, Night</string>
+    <string name="cycle_days_hint">Enter cycle labels separated by commas. Example: A, B or Morning, Afternoon, Night</string>
     <string name="first_cycle_day_label">Cycle day on start date</string>
     <string name="first_cycle_day_hint">Enter one label from the cycle that applies to the selected start date.</string>
 
@@ -61,26 +94,26 @@
     <string name="apply_preset">Apply preset</string>
     <string name="apply_preset_message">This will replace the current cycle settings with preset "%1$s".</string>
     <string name="preset_already_applied">This preset is already applied</string>
-
     <string name="preset_custom">Custom</string>
+    <string name="preset_applied">Preset applied: %1$s</string>
+    <string name="preset_ab">A / B</string>
+    <string name="preset_two_shift">2-shift</string>
+    <string name="preset_three_shift">3-shift</string>
+
+    <!-- THEMES -->
     <string name="app_theme">App theme</string>
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark_mode">Dark</string>
+    <string name="color_theme">Color theme</string>
+    <string name="theme_classic">Classic</string>
+    <string name="theme_pastel">Pastel</string>
+    <string name="theme_dark">Dark</string>
 
-
-    <string name="preset_applied">Preset applied: %1$s</string>
-
-    <string name="preset_ab">A / B</string>
-    <string name="preset_shift_4">Morning / Afternoon / Night / Off</string>
-    <string name="preset_day_night">Day / Night / Recovery / Off</string>
-
+    <!-- LABELS -->
     <string name="label_morning">Morning</string>
     <string name="label_afternoon">Afternoon</string>
     <string name="label_night">Night</string>
-    <string name="label_off">Off</string>
-    <string name="label_day">Day</string>
-    <string name="label_recovery">Recovery</string>
 
     <!-- RULES -->
     <string name="rules_section">Rules</string>
@@ -98,28 +131,12 @@
     <string name="prefix_text">Text before cycle label</string>
     <string name="display_info_text">The widget shows exactly the labels entered in the cycle.</string>
 
-    <!-- THEMES -->
-    <string name="color_theme">Color theme</string>
-    <string name="theme_classic">Classic</string>
-    <string name="theme_pastel">Pastel</string>
-    <string name="theme_dark">Dark</string>
-
     <!-- WIDGET -->
     <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
     <string name="open_widgets">Open widgets</string>
-    <string name="settings_widget_style_title">Widget appearance</string>
-    <string name="settings_widget_style_description">Choose the widget style.</string>
-    <string name="settings_widget_style_classic">Classic</string>
-    <string name="settings_widget_style_minimal">Minimal</string>
 
-    <!-- SAVE / COMMON -->
-    <string name="save">Save</string>
+    <!-- SAVE / DIALOG -->
     <string name="settings_saved">Settings saved</string>
-    <string name="cancel">Cancel</string>
-    <string name="discard">Discard</string>
-    <string name="close">Close</string>
-
-    <!-- UNSAVED CHANGES -->
     <string name="unsaved_changes_title">Unsaved changes</string>
     <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
 
@@ -139,8 +156,6 @@
 
     <!-- NOTIFICATIONS -->
     <string name="settings_notification_title">Notifications</string>
-    <string name="settings_notifications_enabled">Cycle change notifications</string>
-    <string name="settings_silent_notification">Silent notifications (no sound)</string>
     <string name="notification_channel_normal_name">AB day notifications</string>
     <string name="notification_channel_normal_desc">Notifications when the workday cycle changes</string>
     <string name="notification_channel_silent_name">AB day notifications (silent)</string>
@@ -152,6 +167,10 @@
     <string name="notification_permission_denied">Notification permission was not granted.</string>
 
     <!-- MORE / NAVIGATION -->
+    <string name="more_whats_new_title">What’s New</string>
+    <string name="more_whats_new_subtitle">See what changed in the latest version</string>
+    <string name="more_check_updates_title">Check for updates</string>
+    <string name="more_check_updates_subtitle">Open Google Play to check for a newer version</string>
     <string name="more_calendar_title">Cycle calendar</string>
     <string name="more_calendar_subtitle">View the cycle across the month</string>
     <string name="more_contact_title">Contact author</string>
@@ -162,7 +181,6 @@
     <string name="more_report_bug_subtitle">Send feedback or report an issue</string>
     <string name="more_donate_title">Support development</string>
     <string name="more_donate_subtitle">Help improve the app</string>
-
     <string name="nav_home">Home</string>
     <string name="nav_calendar">Calendar</string>
     <string name="nav_more">More</string>
@@ -172,6 +190,7 @@
     <string name="calendar_next_month">Next month</string>
     <string name="calendar_day_cycle">Cycle day</string>
     <string name="calendar_day_holiday">Day status</string>
+    <string name="calendar_month_year">%1$s %2$d</string>
 
     <string-array name="week_days_short">
         <item>Mon</item>
@@ -183,20 +202,16 @@
         <item>Sun</item>
     </string-array>
 
+    <!-- EMAIL / LINKS -->
     <string name="email_subject_contact">%1$s - Feedback</string>
     <string name="email_subject_bug_report">%1$s - Bug report</string>
     <string name="email_body_bug_report">Describe the issue:\n\n---\nApp version: %1$s\nDevice: %2$s\nAndroid version: %3$s\n</string>
     <string name="no_email_app_found">No email app found</string>
     <string name="unable_to_open_link">Unable to open link</string>
-
-    <string name="app_version">Version %1$s</string>
-
-    <string name="calendar_month_year">%1$s %2$d</string>
     <string name="github">GitHub</string>
 
-
+    <!-- COUNTRIES -->
     <string name="country_auto_detected_format">%1$s (auto-detected)</string>
-
     <string name="country_slovenia">Slovenia</string>
     <string name="country_austria">Austria</string>
     <string name="country_croatia">Croatia</string>

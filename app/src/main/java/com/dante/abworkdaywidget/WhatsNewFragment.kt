@@ -7,37 +7,42 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 
-class WhatsNewActivity : BaseActivity() {
-
-    override val activityRootView: View
-        get() = findViewById(R.id.whatsNewRoot)
-
-    override val topInsetTargetView: View
-        get() = findViewById(R.id.whatsNewContentContainer)
+class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {
 
     companion object {
         private const val CHANGELOG_URL =
             "https://github.com/andrazpoje/ABWorkdayWidget/blob/master/CHANGELOG.md"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_whats_new)
+    private lateinit var whatsNewContentContainer: View
+    private lateinit var whatsNewVersion: TextView
+    private lateinit var buttonFullChangelog: MaterialButton
 
-        setupBaseUi()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        findViewById<TextView>(R.id.whatsNewVersion).text =
+        bindViews(view)
+
+        view.findViewById<View>(R.id.whatsNewScrollView).applySystemBarsBottomInsetAsPadding()
+        whatsNewContentContainer.applySystemBarsHorizontalInsetAsPadding()
+
+        whatsNewVersion.text =
             getString(R.string.whats_new_version_format, BuildConfig.VERSION_NAME)
 
-        findViewById<MaterialButton>(R.id.buttonFullChangelog).setOnClickListener {
+        buttonFullChangelog.setOnClickListener {
             openChangelog()
         }
 
-        findViewById<MaterialButton>(R.id.buttonWhatsNewOk).setOnClickListener {
-            finish()
-        }
+    }
+
+    private fun bindViews(root: View) {
+        whatsNewContentContainer = root.findViewById(R.id.whatsNewContentContainer)
+        whatsNewVersion = root.findViewById(R.id.whatsNewVersion)
+        buttonFullChangelog = root.findViewById(R.id.buttonFullChangelog)
     }
 
     private fun openChangelog() {
@@ -46,13 +51,13 @@ class WhatsNewActivity : BaseActivity() {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(
-                this,
+                requireContext(),
                 getString(R.string.unable_to_open_link),
                 Toast.LENGTH_SHORT
             ).show()
         } catch (_: Exception) {
             Toast.makeText(
-                this,
+                requireContext(),
                 getString(R.string.unable_to_open_link),
                 Toast.LENGTH_SHORT
             ).show()

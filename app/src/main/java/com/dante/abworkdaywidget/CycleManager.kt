@@ -1,8 +1,9 @@
 package com.dante.abworkdaywidget
 
 import android.content.Context
-import java.time.LocalDate
 import androidx.core.content.edit
+import com.dante.abworkdaywidget.util.sanitizeLabel
+import java.time.LocalDate
 
 object CycleManager {
 
@@ -63,14 +64,16 @@ object CycleManager {
         if (cycle.isEmpty()) return "A"
 
         val startDate = loadStartDate(context)
-        if (date == startDate) return cycle[0]
+        val startIndex = loadFirstCycleDayIndex(context, cycle)
 
         val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
         val skipSaturdays = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
         val skipSundays = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
         val skipHolidays = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
 
-        return if (date.isAfter(startDate)) {
+        return if (date == startDate) {
+            cycle[startIndex]
+        } else if (date.isAfter(startDate)) {
             val stepsForward = countIncludedDaysForward(
                 context = context,
                 fromExclusive = startDate,
@@ -79,7 +82,7 @@ object CycleManager {
                 skipSundays = skipSundays,
                 skipHolidays = skipHolidays
             )
-            cycle[positiveModulo(stepsForward, cycle.size)]
+            cycle[positiveModulo(startIndex + stepsForward, cycle.size)]
         } else {
             val stepsBack = countIncludedDaysBackward(
                 context = context,
@@ -89,8 +92,26 @@ object CycleManager {
                 skipSundays = skipSundays,
                 skipHolidays = skipHolidays
             )
-            cycle[positiveModulo(-stepsBack, cycle.size)]
+            cycle[positiveModulo(startIndex - stepsBack, cycle.size)]
         }
+    }
+
+    private fun loadFirstCycleDayIndex(context: Context, cycle: List<String>): Int {
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+        val savedFirstDayRaw = prefs.getString(
+            AppPrefs.KEY_FIRST_CYCLE_DAY,
+            cycle.firstOrNull() ?: "A"
+        ) ?: (cycle.firstOrNull() ?: "A")
+
+        val savedFirstDay = sanitizeLabel(
+            savedFirstDayRaw,
+            cycle.firstOrNull() ?: "A"
+        )
+
+        val index = cycle.indexOfFirst { it.equals(savedFirstDay, ignoreCase = true) }
+
+        return if (index >= 0) index else 0
     }
 
     fun getSkippedDayOverrideLabelOrNull(context: Context, date: LocalDate): String? {

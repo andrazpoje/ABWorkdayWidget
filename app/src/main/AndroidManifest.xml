@@ -17,22 +17,6 @@
 		tools:targetApi="33">
 
 		<activity
-			android:name=".WhatsNewActivity"
-			android:exported="false" />
-
-		<activity
-			android:name=".MoreActivity"
-			android:exported="false" />
-
-		<activity
-			android:name=".CalendarActivity"
-			android:exported="false" />
-
-		<activity
-			android:name=".StatisticsActivity"
-			android:exported="false" />
-
-		<activity
 			android:name=".MainActivity"
 			android:exported="true">
 
@@ -44,20 +28,16 @@
 
 
 		<receiver
-			android:name=".ABWidgetProvider"
-			android:exported="false">
+			android:name=".receivers.DayChangeReceiver"
+			android:enabled="true"
+			android:exported="true">
 
 			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 				<action android:name="android.intent.action.DATE_CHANGED" />
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.TIME_SET" />
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
 			</intent-filter>
-
-			<meta-data
-				android:name="android.appwidget.provider"
-				android:resource="@xml/widget_info" />
 		</receiver>
 
 	</application>

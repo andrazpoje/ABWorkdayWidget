@@ -8,21 +8,11 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.card.MaterialCardView
 
-class MoreActivity : BaseActivity() {
-
-    override val activityRootView: View
-        get() = findViewById(R.id.moreRoot)
-
-    override val topInsetTargetView: View
-        get() = findViewById(R.id.moreContentContainer)
-
-    override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
-        get() = findViewById(R.id.bottomNavigation)
-
-    override val selectedBottomNavItemId: Int
-        get() = R.id.nav_more
+class MoreFragment : Fragment(R.layout.fragment_more) {
 
     companion object {
         private const val AUTHOR_EMAIL = "danteprodukcija@gmail.com"
@@ -30,42 +20,53 @@ class MoreActivity : BaseActivity() {
         private const val GITHUB_URL = "https://github.com/andrazpoje/ABWorkdayWidget"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_more)
+    private lateinit var moreRoot: View
+    private lateinit var moreContentContainer: View
+    private lateinit var moreVersion: TextView
 
-        setupBaseUi()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        findViewById<TextView>(R.id.moreVersion).text =
-            getString(R.string.app_version, BuildConfig.VERSION_NAME)
+        bindViews(view)
 
-        findViewById<MaterialCardView>(R.id.cardWhatsNew).setOnClickListener {
-            startActivity(Intent(this, WhatsNewActivity::class.java))
+        view.findViewById<View>(R.id.moreScrollView).applySystemBarsBottomInsetAsPadding()
+        moreContentContainer.applySystemBarsHorizontalInsetAsPadding()
+
+        moreVersion.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
+
+        view.findViewById<MaterialCardView>(R.id.cardWhatsNew).setOnClickListener {
+            findNavController().navigate(R.id.action_moreFragment_to_whatsNewFragment)
         }
 
-        findViewById<MaterialCardView>(R.id.cardCheckUpdates).setOnClickListener {
+        view.findViewById<MaterialCardView>(R.id.cardCheckUpdates).setOnClickListener {
             openAppInPlayStore()
         }
 
-        findViewById<MaterialCardView>(R.id.cardContactAuthor).setOnClickListener {
+        view.findViewById<MaterialCardView>(R.id.cardContactAuthor).setOnClickListener {
             contactAuthor()
         }
 
-        findViewById<MaterialCardView>(R.id.cardOpenGithub).setOnClickListener {
+        view.findViewById<MaterialCardView>(R.id.cardOpenGithub).setOnClickListener {
             openUrl(GITHUB_URL)
         }
 
-        findViewById<MaterialCardView>(R.id.cardReportBug).setOnClickListener {
+        view.findViewById<MaterialCardView>(R.id.cardReportBug).setOnClickListener {
             reportBug()
         }
 
-        findViewById<MaterialCardView>(R.id.cardDonate).setOnClickListener {
+        view.findViewById<MaterialCardView>(R.id.cardDonate).setOnClickListener {
             openUrl(DONATE_URL)
         }
 
-        findViewById<MaterialCardView>(R.id.cardStatistics).setOnClickListener {
-            startActivity(Intent(this, StatisticsActivity::class.java))
+        view.findViewById<MaterialCardView>(R.id.cardStatistics).setOnClickListener {
+            findNavController().navigate(R.id.action_moreFragment_to_statisticsFragment)
         }
+    }
+
+    private fun bindViews(root: View) {
+        moreRoot = root
+        moreContentContainer = root.findViewById(R.id.moreContentContainer)
+        moreVersion = root.findViewById(R.id.moreVersion)
     }
 
     private fun contactAuthor() {
@@ -107,13 +108,13 @@ class MoreActivity : BaseActivity() {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(
-                this,
+                requireContext(),
                 getString(R.string.no_email_app_found),
                 Toast.LENGTH_SHORT
             ).show()
         } catch (_: Exception) {
             Toast.makeText(
-                this,
+                requireContext(),
                 getString(R.string.unable_to_open_link),
                 Toast.LENGTH_SHORT
             ).show()
@@ -121,7 +122,7 @@ class MoreActivity : BaseActivity() {
     }
 
     private fun openAppInPlayStore() {
-        val packageName = packageName
+        val packageName = requireContext().packageName
         val marketIntent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
         val webIntent = Intent(
             Intent.ACTION_VIEW,
@@ -135,14 +136,14 @@ class MoreActivity : BaseActivity() {
                 startActivity(webIntent)
             } catch (_: Exception) {
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     getString(R.string.unable_to_open_link),
                     Toast.LENGTH_SHORT
                 ).show()
             }
         } catch (_: Exception) {
             Toast.makeText(
-                this,
+                requireContext(),
                 getString(R.string.unable_to_open_link),
                 Toast.LENGTH_SHORT
             ).show()
@@ -155,13 +156,13 @@ class MoreActivity : BaseActivity() {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(
-                this,
+                requireContext(),
                 getString(R.string.unable_to_open_link),
                 Toast.LENGTH_SHORT
             ).show()
         } catch (_: Exception) {
             Toast.makeText(
-                this,
+                requireContext(),
                 getString(R.string.unable_to_open_link),
                 Toast.LENGTH_SHORT
             ).show()

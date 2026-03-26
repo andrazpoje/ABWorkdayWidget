@@ -1,299 +1,116 @@
 package com.dante.abworkdaywidget
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.RadioButton
-import android.widget.TextView
-import android.widget.Toast
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
-import androidx.core.widget.NestedScrollView
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import com.google.android.material.textfield.TextInputLayout
-import java.time.LocalDate
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import com.dante.abworkdaywidget.databinding.ActivityMainBinding
 
-class MainActivity : BaseActivity() {
+class MainActivity : AppCompatActivity() {
 
     companion object {
-        const val PREFS_UI = "ui_prefs"
-        const val KEY_LAST_OPEN_SECTION = "last_open_section"
-
-        const val SECTION_CYCLE = "cycle"
-        const val SECTION_RULES = "rules"
-        const val SECTION_DISPLAY = "display"
-
         const val REQUEST_NOTIFICATION_PERMISSION = 1001
-        const val MAX_CYCLE_ITEMS = 16
-        const val MAX_LABEL_LENGTH = 24
     }
 
-    override val activityRootView: View
-        get() = activityRoot
-
-    override val topInsetTargetView: View
-        get() = findViewById(R.id.main)
-
-    override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
-        get() = findViewById(R.id.bottomNavigation)
-
-    override val imeInsetTargetView: View
-        get() = saveBarContainer
-
-    override val selectedBottomNavItemId: Int
-        get() = R.id.nav_home
-
-    var hasUnsavedChanges = false
-
-    lateinit var activityRoot: View
-    lateinit var saveBarContainer: View
-    lateinit var bottomBarsContainer: View
-
-    lateinit var cycleHeader: View
-    lateinit var rulesHeader: View
-    lateinit var displayHeader: View
-
-    lateinit var cycleDaysInputLayout: TextInputLayout
-
-    lateinit var cycleArrow: ImageView
-    lateinit var rulesArrow: ImageView
-    lateinit var displayArrow: ImageView
-
-    lateinit var widgetPromptContainer: View
-    lateinit var githubLinkText: TextView
-    lateinit var versionText: TextView
-    lateinit var mainScrollView: NestedScrollView
-
-    lateinit var cycleSection: View
-    lateinit var rulesSection: View
-    lateinit var displaySection: View
-
-    lateinit var dateText: TextView
-    lateinit var pickDateButton: MaterialButton
-
-    lateinit var presetDropdown: MaterialAutoCompleteTextView
-    lateinit var applyPresetButton: MaterialButton
-
-    lateinit var cycleDaysEdit: EditText
-    lateinit var firstCycleDayDropdown: MaterialAutoCompleteTextView
-
-    lateinit var statusCard: MaterialCardView
-    lateinit var todayStatusText: TextView
-    lateinit var tomorrowStatusText: TextView
-
-    lateinit var previewRecyclerView: RecyclerView
-    lateinit var previewAdapter: CyclePreviewAdapter
-
-    lateinit var switchSaturdays: SwitchMaterial
-    lateinit var switchSundays: SwitchMaterial
-    lateinit var switchHolidays: SwitchMaterial
-    lateinit var switchOverrideSkippedDays: SwitchMaterial
-
-    lateinit var holidayCountryDropdown: MaterialAutoCompleteTextView
-
-    lateinit var saveButton: MaterialButton
-    lateinit var openWidgetsButton: MaterialButton
-
-    lateinit var widgetHint: TextView
-    lateinit var prefixEdit: EditText
-    lateinit var skippedDayLabelEdit: EditText
-
-    lateinit var themeClassic: RadioButton
-    lateinit var themePastel: RadioButton
-    lateinit var themeDark: RadioButton
-
-    lateinit var appThemeSystem: RadioButton
-    lateinit var appThemeLight: RadioButton
-    lateinit var appThemeDark: RadioButton
-
-    var selectedDate: LocalDate = LocalDate.now()
-    lateinit var supportedCountries: List<HolidayCountry>
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var navHostFragment: NavHostFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppLanguageManager.applySavedLanguage(this)
+        AppThemeManager.applyFromPreferences(this)
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
-        bindViews()
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        setupBaseUi()
+        setupDefaultEdgeToEdge()
 
-        setupFirstCycleDayDropdown()
-        setupPresetDropdown()
-        setupPreviewRecyclerView()
-        setupHolidayCountryDropdown()
-        migrateLegacySettingsIfNeeded()
-        loadSettings()
-        setupWidgetStyleSettings()
-        setupNotificationSettings()
-        setupChangeListeners()
-        updateTodayStatus()
-        updateCyclePreview()
-        updateWidgetHint()
+        binding.toolbar.applyTopStatusBarInsetAsMargin()
+        binding.bottomNavigation.applyBottomNavInsetAsPadding()
+        updateSystemBarIconContrast(binding.root)
 
-        versionText.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
+        setSupportActionBar(binding.toolbar)
 
-        setupSection(cycleHeader, cycleSection, cycleArrow, SECTION_CYCLE)
-        setupSection(rulesHeader, rulesSection, rulesArrow, SECTION_RULES)
-        setupSection(displayHeader, displaySection, displayArrow, SECTION_DISPLAY)
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        restoreLastOpenSection()
-        clearUnsavedChanges()
-
-        showWhatsNewIfAppUpdated(savedInstanceState)
-
-        openWidgetsButton.setOnClickListener {
-            try {
-                startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
-            } catch (_: Exception) {
-            }
-        }
-
-        openWidgetsButton.setOnClickListener {
-            try {
-                startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
-            } catch (_: Exception) {
-            }
-        }
-
-        pickDateButton.setOnClickListener {
-            showDatePicker()
-        }
-
-        saveButton.setOnClickListener {
-            if (!hasUnsavedChanges) return@setOnClickListener
-
-            if (!validateCycleInput()) {
-                Toast.makeText(this, getString(R.string.fix_errors), Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            saveChangesAndRefresh()
-        }
-
-        applyPresetButton.setOnClickListener {
-            val selectedName = presetDropdown.text?.toString()?.trim().orEmpty()
-            val preset = CyclePresetProvider.findByDisplayName(this, selectedName)
-                ?: return@setOnClickListener
-
-            if (!wouldPresetChangeCurrentState(preset)) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.preset_already_applied),
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            }
-
-            val currentCycleText = cycleDaysEdit.text?.toString()?.trim().orEmpty()
-            val currentFirstDayText = firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
-            val hasMeaningfulInput = currentCycleText.isNotBlank() || currentFirstDayText.isNotBlank()
-
-            if (hasMeaningfulInput) {
-                showApplyPresetDialog(preset) {
-                    applyPreset(preset)
-                }
-            } else {
-                applyPreset(preset)
-            }
-        }
-
-        githubLinkText.setOnClickListener {
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                "https://github.com/andrazpoje/ABWorkdayWidget".toUri()
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.homeFragment,
+                R.id.calendarFragment,
+                R.id.moreFragment
             )
-            startActivity(intent)
-        }
+        )
 
-        setupBackHandling()
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.bottomNavigation.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val appName = getString(R.string.app_name)
+
+            val suffix = when (destination.id) {
+                R.id.homeFragment -> ""
+                R.id.calendarFragment -> getString(R.string.nav_calendar)
+                R.id.moreFragment -> getString(R.string.nav_more)
+                R.id.statisticsFragment -> getString(R.string.statistics_title)
+                R.id.whatsNewFragment -> getString(R.string.whats_new_title)
+                R.id.settingsFragment -> getString(R.string.settings_title)
+                R.id.helpFragment -> getString(R.string.help_title)
+                else -> ""
+            }
+
+            binding.toolbar.title = if (suffix.isEmpty()) {
+                appName
+            } else {
+                "$appName - $suffix"
+            }
+
+            invalidateOptionsMenu()
+        }
     }
 
-    private fun showWhatsNewIfAppUpdated(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null) return
-
-        val prefs = getSharedPreferences(AppPrefs.NAME, MODE_PRIVATE)
-        val currentVersion = BuildConfig.VERSION_NAME
-        val lastSeenVersion = prefs.getString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, null)
-
-        if (lastSeenVersion != currentVersion) {
-            prefs.edit()
-                .putString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, currentVersion)
-                .apply()
-
-            startActivity(Intent(this, WhatsNewActivity::class.java))
-        }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_toolbar_menu, menu)
+        return true
     }
 
-    fun bindViews() {
-        activityRoot = findViewById(R.id.activityRoot)
-        saveBarContainer = findViewById(R.id.saveBarContainer)
-        bottomBarsContainer = findViewById(R.id.bottomBarsContainer)
-        mainScrollView = findViewById(R.id.main)
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val destinationId = navHostFragment.navController.currentDestination?.id
 
-        cycleHeader = findViewById(R.id.cycleHeader)
-        rulesHeader = findViewById(R.id.rulesHeader)
-        displayHeader = findViewById(R.id.displayHeader)
+        val showActions = destinationId == R.id.homeFragment ||
+                destinationId == R.id.calendarFragment ||
+                destinationId == R.id.moreFragment
 
-        cycleArrow = findViewById(R.id.cycleArrow)
-        rulesArrow = findViewById(R.id.rulesArrow)
-        displayArrow = findViewById(R.id.displayArrow)
+        menu.findItem(R.id.action_settings)?.isVisible = showActions
+        menu.findItem(R.id.action_help)?.isVisible = showActions
 
-        widgetPromptContainer = findViewById(R.id.widgetPromptContainer)
-        githubLinkText = findViewById(R.id.githubLinkText)
-        versionText = findViewById(R.id.versionText)
+        return super.onPrepareOptionsMenu(menu)
+    }
 
-        cycleSection = findViewById(R.id.cycleSection)
-        rulesSection = findViewById(R.id.rulesSection)
-        displaySection = findViewById(R.id.displaySection)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                navHostFragment.navController.navigate(R.id.settingsFragment)
+                true
+            }
 
-        widgetHint = findViewById(R.id.widgetHint)
-        dateText = findViewById(R.id.dateText)
-        pickDateButton = findViewById(R.id.pickDateButton)
+            R.id.action_help -> {
+                navHostFragment.navController.navigate(R.id.helpFragment)
+                true
+            }
 
-        presetDropdown = findViewById(R.id.presetDropdown)
-        applyPresetButton = findViewById(R.id.applyPresetButton)
-
-        cycleDaysInputLayout = findViewById(R.id.cycleDaysInputLayout)
-        cycleDaysEdit = findViewById(R.id.cycleDaysEdit)
-        firstCycleDayDropdown = findViewById(R.id.firstCycleDayDropdown)
-
-        switchSaturdays = findViewById(R.id.switchSaturdays)
-        switchSundays = findViewById(R.id.switchSundays)
-        switchHolidays = findViewById(R.id.switchHolidays)
-        switchOverrideSkippedDays = findViewById(R.id.switchOverrideSkippedDays)
-
-        holidayCountryDropdown = findViewById(R.id.holidayCountryDropdown)
-
-        saveButton = findViewById(R.id.saveButton)
-        openWidgetsButton = findViewById(R.id.openWidgetsButton)
-        prefixEdit = findViewById(R.id.prefixEdit)
-        skippedDayLabelEdit = findViewById(R.id.skippedDayLabelEdit)
-
-        statusCard = findViewById(R.id.statusCard)
-        todayStatusText = findViewById(R.id.todayStatusText)
-        tomorrowStatusText = findViewById(R.id.tomorrowStatusText)
-
-        previewRecyclerView = findViewById(R.id.previewRecyclerView)
-
-        themeClassic = findViewById(R.id.themeClassic)
-        themePastel = findViewById(R.id.themePastel)
-        themeDark = findViewById(R.id.themeDark)
-
-        appThemeSystem = findViewById(R.id.appThemeSystem)
-        appThemeLight = findViewById(R.id.appThemeLight)
-        appThemeDark = findViewById(R.id.appThemeDark)
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     fun requestNotificationPermissionIfNeeded() {
@@ -314,6 +131,10 @@ class MainActivity : BaseActivity() {
         )
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        return navHostFragment.navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -326,25 +147,18 @@ class MainActivity : BaseActivity() {
         val granted = grantResults.isNotEmpty() &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED
 
-        if (!granted) {
-            val enabledSwitch = findViewById<SwitchMaterial?>(R.id.switchNotificationsEnabled)
-            val silentSwitch = findViewById<SwitchMaterial?>(R.id.switchSilentNotification)
+        if (granted) return
 
-            enabledSwitch?.setOnCheckedChangeListener(null)
-            silentSwitch?.setOnCheckedChangeListener(null)
+        val currentFragment = navHostFragment.childFragmentManager.primaryNavigationFragment
 
-            enabledSwitch?.isChecked = false
-            silentSwitch?.isChecked = false
-            silentSwitch?.isEnabled = false
+        if (currentFragment is HomeFragment) {
+            currentFragment.onNotificationPermissionDenied()
+            return
+        }
 
-            setupNotificationSettings()
-            markUnsavedChanges()
-
-            Toast.makeText(
-                this,
-                getString(R.string.notification_permission_denied),
-                Toast.LENGTH_SHORT
-            ).show()
+        if (currentFragment is SettingsFragment) {
+            recreate()
+            return
         }
     }
 }

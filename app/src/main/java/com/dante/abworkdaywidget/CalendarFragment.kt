@@ -2,13 +2,15 @@ package com.dante.abworkdaywidget
 
 import android.os.Bundle
 import android.view.GestureDetector
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-
+import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -21,43 +23,32 @@ import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.abs
 
+class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
-class CalendarActivity : BaseActivity() {
-
-    override val activityRootView: View
-        get() = findViewById(R.id.calendarRoot)
-
-    override val topInsetTargetView: View
-        get() = findViewById(R.id.calendarContentContainer)
-
-    override val bottomNavigationView: com.google.android.material.bottomnavigation.BottomNavigationView?
-        get() = findViewById(R.id.bottomNavigation)
-
-    override val selectedBottomNavItemId: Int
-        get() = R.id.nav_calendar
+    private lateinit var calendarRoot: View
+    private lateinit var calendarContentContainer: View
+    private lateinit var calendarScrollView: NestedScrollView
 
     private lateinit var recycler: RecyclerView
     private lateinit var monthTitle: TextView
     private lateinit var previousMonthButton: ImageButton
     private lateinit var nextMonthButton: ImageButton
+    private lateinit var weekHeader: LinearLayout
 
     private lateinit var displayedMonth: LocalDate
     private lateinit var gestureDetector: GestureDetector
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_calendar)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        setupBaseUi()
+        bindViews(view)
 
-        recycler = findViewById(R.id.calendarRecycler)
-        monthTitle = findViewById(R.id.monthTitle)
-        previousMonthButton = findViewById(R.id.previousMonthButton)
-        nextMonthButton = findViewById(R.id.nextMonthButton)
+        calendarScrollView.applySystemBarsBottomInsetAsPadding()
+        calendarContentContainer.applySystemBarsHorizontalInsetAsPadding()
 
         setupWeekHeader()
 
-        recycler.layoutManager = GridLayoutManager(this, 7)
+        recycler.layoutManager = GridLayoutManager(requireContext(), 7)
 
         setupMonthSwipe()
 
@@ -75,17 +66,30 @@ class CalendarActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        renderMonth(displayedMonth)
+        if (::displayedMonth.isInitialized) {
+            renderMonth(displayedMonth)
+        }
+    }
+
+    private fun bindViews(root: View) {
+        calendarRoot = root
+        calendarContentContainer = root.findViewById(R.id.calendarContentContainer)
+        calendarScrollView = root.findViewById(R.id.calendarScrollView)
+
+        recycler = root.findViewById(R.id.calendarRecycler)
+        monthTitle = root.findViewById(R.id.monthTitle)
+        previousMonthButton = root.findViewById(R.id.previousMonthButton)
+        nextMonthButton = root.findViewById(R.id.nextMonthButton)
+        weekHeader = root.findViewById(R.id.weekHeader)
     }
 
     private fun setupWeekHeader() {
-        val header = findViewById<LinearLayout>(R.id.weekHeader)
         val days = resources.getStringArray(R.array.week_days_short)
 
-        header.removeAllViews()
+        weekHeader.removeAllViews()
 
         for (day in days) {
-            val tv = TextView(this).apply {
+            val tv = TextView(requireContext()).apply {
                 text = day
                 layoutParams = LinearLayout.LayoutParams(
                     0,
@@ -97,13 +101,13 @@ class CalendarActivity : BaseActivity() {
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
                 alpha = 0.7f
             }
-            header.addView(tv)
+            weekHeader.addView(tv)
         }
     }
 
     private fun setupMonthSwipe() {
         gestureDetector = GestureDetector(
-            this,
+            requireContext(),
             object : GestureDetector.SimpleOnGestureListener() {
 
                 private val swipeThreshold = 120
@@ -156,7 +160,6 @@ class CalendarActivity : BaseActivity() {
     }
 
     private fun renderMonth(monthDate: LocalDate) {
-
         val monthName = monthDate.month
             .getDisplayName(TextStyle.FULL, Locale.getDefault())
             .replaceFirstChar { it.titlecase(Locale.getDefault()) }
@@ -172,12 +175,12 @@ class CalendarActivity : BaseActivity() {
         recycler.adapter = CalendarAdapter(
             items = items,
             getLabel = { date ->
-                CycleManager.getCycleDayForDate(this, date)
+                CycleManager.getCycleDayForDate(requireContext(), date)
             },
             getBackgroundColor = { _, label ->
-                val cycle = CycleManager.loadCycle(this)
+                val cycle = CycleManager.loadCycle(requireContext())
                 CycleColorHelper.getBackgroundColor(
-                    context = this,
+                    context = requireContext(),
                     label = label,
                     cycle = cycle
                 )
@@ -225,17 +228,18 @@ class CalendarActivity : BaseActivity() {
     }
 
     private fun showDayDetails(date: LocalDate) {
-        val label = CycleManager.getCycleDayForDate(this, date)
+        val label = CycleManager.getCycleDayForDate(requireContext(), date)
 
         val dateText = date.format(
             DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.getDefault())
         )
 
-        val isHoliday = HolidayManager.isHoliday(this, date)
+        val isHoliday = HolidayManager.isHoliday(requireContext(), date)
 
-        val dialog = BottomSheetDialog(this)
-        val parent = findViewById<ViewGroup>(android.R.id.content)
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_day_details, parent, false)
+        val dialog = BottomSheetDialog(requireContext())
+        val parent = requireActivity().findViewById<ViewGroup>(android.R.id.content)
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.bottom_sheet_day_details, parent, false)
 
         val title = view.findViewById<TextView>(R.id.dayDetailsTitle)
         val cycleLabel = view.findViewById<TextView>(R.id.dayDetailsCycleLabel)

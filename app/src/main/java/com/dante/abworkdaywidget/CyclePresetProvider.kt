@@ -14,14 +14,12 @@ object CyclePresetProvider {
         ),
 
         CyclePreset(
-            id = "shift_4",
-            nameRes = R.string.preset_shift_4,
+            id = "two_shift",
+            nameRes = R.string.preset_two_shift,
             cycleDaysProvider = { context ->
                 listOf(
                     context.getString(R.string.label_morning),
-                    context.getString(R.string.label_afternoon),
-                    context.getString(R.string.label_night),
-                    context.getString(R.string.label_off)
+                    context.getString(R.string.label_afternoon)
                 )
             },
             defaultFirstDayProvider = { context ->
@@ -30,18 +28,17 @@ object CyclePresetProvider {
         ),
 
         CyclePreset(
-            id = "day_night",
-            nameRes = R.string.preset_day_night,
+            id = "three_shift",
+            nameRes = R.string.preset_three_shift,
             cycleDaysProvider = { context ->
                 listOf(
-                    context.getString(R.string.label_day),
-                    context.getString(R.string.label_night),
-                    context.getString(R.string.label_recovery),
-                    context.getString(R.string.label_off)
+                    context.getString(R.string.label_morning),
+                    context.getString(R.string.label_afternoon),
+                    context.getString(R.string.label_night)
                 )
             },
             defaultFirstDayProvider = { context ->
-                context.getString(R.string.label_day)
+                context.getString(R.string.label_morning)
             }
         )
     )

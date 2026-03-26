@@ -5,13 +5,8 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.edit
 import androidx.core.view.isVisible
-import com.dante.abworkdaywidget.MainActivity.Companion.KEY_LAST_OPEN_SECTION
-import com.dante.abworkdaywidget.MainActivity.Companion.PREFS_UI
-import com.dante.abworkdaywidget.MainActivity.Companion.SECTION_CYCLE
-import com.dante.abworkdaywidget.MainActivity.Companion.SECTION_DISPLAY
-import com.dante.abworkdaywidget.MainActivity.Companion.SECTION_RULES
 
-fun MainActivity.setupSection(
+fun HomeFragment.setupSection(
     header: View,
     section: View,
     arrow: ImageView,
@@ -33,40 +28,39 @@ fun MainActivity.setupSection(
     }
 }
 
-fun MainActivity.hideAllSections() {
+fun HomeFragment.hideAllSections() {
     cycleSection.isVisible = false
     rulesSection.isVisible = false
     displaySection.isVisible = false
 }
 
-fun MainActivity.resetArrows() {
+fun HomeFragment.resetArrows() {
     cycleArrow.setImageResource(R.drawable.ic_expand_more_24)
     rulesArrow.setImageResource(R.drawable.ic_expand_more_24)
     displayArrow.setImageResource(R.drawable.ic_expand_more_24)
 }
 
-fun MainActivity.saveLastOpenSection(sectionKey: String) {
-    getSharedPreferences(PREFS_UI, Context.MODE_PRIVATE).edit {
-        putString(KEY_LAST_OPEN_SECTION, sectionKey)
+fun HomeFragment.saveLastOpenSection(sectionKey: String) {
+    requireContext().getSharedPreferences(HomeFragment.PREFS_UI, Context.MODE_PRIVATE).edit {
+        putString(HomeFragment.KEY_LAST_OPEN_SECTION, sectionKey)
     }
 }
 
-fun MainActivity.restoreLastOpenSection() {
-    val lastSection = getSharedPreferences(
-        PREFS_UI,
-        Context.MODE_PRIVATE
-    ).getString(KEY_LAST_OPEN_SECTION, SECTION_CYCLE)
+fun HomeFragment.restoreLastOpenSection() {
+    val lastSection = requireContext()
+        .getSharedPreferences(HomeFragment.PREFS_UI, Context.MODE_PRIVATE)
+        .getString(HomeFragment.KEY_LAST_OPEN_SECTION, HomeFragment.SECTION_CYCLE)
 
     hideAllSections()
     resetArrows()
 
     when (lastSection) {
-        SECTION_RULES -> {
+        HomeFragment.SECTION_RULES -> {
             rulesSection.isVisible = true
             rulesArrow.setImageResource(R.drawable.ic_expand_less_24)
         }
 
-        SECTION_DISPLAY -> {
+        HomeFragment.SECTION_DISPLAY -> {
             displaySection.isVisible = true
             displayArrow.setImageResource(R.drawable.ic_expand_less_24)
         }

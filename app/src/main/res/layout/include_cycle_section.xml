@@ -73,7 +73,7 @@
                     android:id="@+id/presetInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="16dp"
                     android:hint="@string/preset_hint"
                     style="@style/AppExposedDropdown">
 
@@ -88,12 +88,6 @@
                         android:maxLines="1" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/applyPresetButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="@string/apply_preset" />
 
                 <TextView
                     android:id="@+id/dateText"
@@ -157,9 +151,22 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <com.google.android.material.textfield.TextInputLayout
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/firstCycleDayChipGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:singleSelection="true"
+                    app:selectionRequired="true"
+                    app:singleLine="false"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="8dp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/firstCycleDayInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:hint="@string/first_cycle_day_label"
                     style="@style/AppExposedDropdown">
 
