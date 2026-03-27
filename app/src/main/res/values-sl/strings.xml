@@ -5,13 +5,15 @@
     <string name="whats_new_version_format">Verzija %1$s</string>
     <string name="whats_new_title">Kaj je novega</string>
     <string name="whats_new_content">
-• Nov zaslon Statistika (pregled A / B / Prosto)\n
-• Izboljšave koledarja (čist prikaz + swipe navigacija)\n
-• Podpora za dodatne države (Italija, Madžarska)\n
-• Izboljšan izbor države z zastavicami in samodejnim zaznavanjem\n
-• Dodelave uporabniškega vmesnika in uporabniške izkušnje
+- Nov zaslon Nastavitve, Pomoč in Statistika
+- Izbira prvega dne cikla z chips UI
+- Podpora za Italijo in Madžarsko
+- Izboljšana stabilnost obvestil (fallback za nekatere naprave)
+- Popravljen prikaz gumbov Shrani/Povrni
+- Splošne izboljšave in popravki
 </string>
     <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
+
 
     <!-- STATISTICS -->
     <string name="statistics_title">Statistika</string>
@@ -23,7 +25,7 @@
 
     <!-- SETTINGS -->
     <string name="settings_title">Nastavitve</string>
-    <string name="settings_appearance_title">Videz</string>
+    <string name="settings_appearance_title">Videz aplikacije</string>
     <string name="settings_widget_title">Widget</string>
     <string name="settings_about_title">O aplikaciji</string>
     <string name="settings_notifications_title">Obvestila</string>
@@ -41,7 +43,7 @@
     <string name="silent_notification">Tiha obvestila</string>
 
     <!-- HELP -->
-    <string name="help_title">Pomoč</string>
+    <string name="help_title">Pomoč in navodila</string>
     <string name="help_getting_started_title">Kako začeti</string>
     <string name="help_getting_started_content">1. Nastavi začetni datum.\n2. Izberi prvi dan cikla.\n3. Nastavi pravila preskakovanja in oznake.\n4. Shrani spremembe.\n5. Dodaj widget na domači zaslon.</string>
     <string name="help_calculation_title">Kako deluje izračun cikla</string>
@@ -85,7 +87,7 @@
     <string name="cycle_days_hint_placeholder">A, B, Jutranja, Popoldanska, Nočna</string>
     <string name="cycle_days_hint">Vnesi oznake cikla, ločene z vejicami. Primer: A, B ali Jutranja, Popoldanska, Nočna</string>
     <string name="first_cycle_day_label">Dan cikla na začetni datum</string>
-    <string name="first_cycle_day_hint">Vnesi eno oznako iz cikla, ki velja na izbrani začetni datum.</string>
+    <string name="first_cycle_day_hint">Izberi oznako iz cikla, ki velja na izbrani začetni datum.</string>
 
     <!-- PRESETS -->
     <string name="preset_label">Predloga</string>
@@ -102,7 +104,7 @@
 
     <!-- THEMES -->
     <string name="app_theme">Tema aplikacije</string>
-    <string name="theme_system">Sistemska</string>
+    <string name="theme_system">Po sistemu</string>
     <string name="theme_light">Svetla</string>
     <string name="theme_dark_mode">Temna</string>
     <string name="color_theme">Barvna tema</string>
@@ -172,7 +174,7 @@
     <string name="notification_permission_denied">Dovoljenje za obvestila ni bilo odobreno.</string>
 
     <!-- MORE / NAVIGATION -->
-    <string name="more_whats_new_title">Kaj je novega</string>
+    <string name="more_whats_new_title">Novosti</string>
     <string name="more_whats_new_subtitle">Poglej novosti v zadnji verziji</string>
     <string name="more_check_updates_title">Preveri posodobitve</string>
     <string name="more_check_updates_subtitle">Odpri Google Play in preveri novejšo verzijo</string>
@@ -222,5 +224,10 @@
     <string name="country_croatia">Hrvaška</string>
     <string name="country_italy">Italija</string>
     <string name="country_hungary">Madžarska</string>
+
+    <string name="home_next_7_days_subtitle">Pregled naslednjih 7 dni</string>
+    <string name="non_working_day_label">Dela prosti dan</string>
+
+    <string name="widget_add_manual_hint">Na domačem zaslonu naredi dolg pritisk, odpri Pripomočki in dodaj AB Workday Widget.</string>
 
 </resources>

@@ -9,12 +9,16 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.dante.abworkdaywidget.data.Prefs
+import com.dante.abworkdaywidget.notifications.MidnightAlarmScheduler
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.textfield.TextInputEditText
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
@@ -28,6 +32,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private lateinit var appThemeSystem: RadioButton
     private lateinit var appThemeLight: RadioButton
     private lateinit var appThemeDark: RadioButton
+
+    private lateinit var themeClassic: RadioButton
+    private lateinit var themePastel: RadioButton
+    private lateinit var themeDark: RadioButton
+    private lateinit var prefixEdit: TextInputEditText
 
     private lateinit var widgetStyleClassic: RadioButton
     private lateinit var widgetStyleMinimal: RadioButton
@@ -62,6 +71,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         appThemeLight = root.findViewById(R.id.settingsAppThemeLight)
         appThemeDark = root.findViewById(R.id.settingsAppThemeDark)
 
+        themeClassic = root.findViewById(R.id.settingsThemeClassic)
+        themePastel = root.findViewById(R.id.settingsThemePastel)
+        themeDark = root.findViewById(R.id.settingsThemeDark)
+        prefixEdit = root.findViewById(R.id.settingsPrefixEdit)
+
         widgetStyleClassic = root.findViewById(R.id.settingsWidgetStyleClassic)
         widgetStyleMinimal = root.findViewById(R.id.settingsWidgetStyleMinimal)
 
@@ -78,6 +92,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             AppThemeManager.THEME_LIGHT -> appThemeLight.isChecked = true
             AppThemeManager.THEME_DARK -> appThemeDark.isChecked = true
             else -> appThemeSystem.isChecked = true
+        }
+
+        prefixEdit.setText(
+            requireContext()
+                .getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+                .getString(AppPrefs.KEY_PREFIX_TEXT, "") ?: ""
+        )
+
+        when (CycleThemeManager.loadTheme(requireContext())) {
+            CycleThemeManager.THEME_PASTEL -> themePastel.isChecked = true
+            CycleThemeManager.THEME_DARK -> themeDark.isChecked = true
+            else -> themeClassic.isChecked = true
         }
 
         val prefs = requireContext().getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
@@ -112,6 +138,24 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (!isInitializing) saveAppTheme(AppThemeManager.THEME_DARK)
         }
 
+        themeClassic.setOnClickListener {
+            if (!isInitializing) saveCycleTheme(CycleThemeManager.THEME_CLASSIC)
+        }
+
+        themePastel.setOnClickListener {
+            if (!isInitializing) saveCycleTheme(CycleThemeManager.THEME_PASTEL)
+        }
+
+        themeDark.setOnClickListener {
+            if (!isInitializing) saveCycleTheme(CycleThemeManager.THEME_DARK)
+        }
+
+        prefixEdit.doAfterTextChanged {
+            if (!isInitializing) {
+                savePrefixText(it?.toString().orEmpty())
+            }
+        }
+
         widgetStyleClassic.setOnClickListener {
             if (!isInitializing) saveWidgetStyle(Prefs.WIDGET_STYLE_CLASSIC)
         }
@@ -123,17 +167,47 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         switchNotificationsEnabled.setOnCheckedChangeListener { _, isChecked ->
             if (isInitializing) return@setOnCheckedChangeListener
 
-            switchSilentNotification.isEnabled = isChecked
-            if (!isChecked) {
-                switchSilentNotification.isChecked = false
-            } else {
-                (activity as? MainActivity)?.requestNotificationPermissionIfNeeded()
-            }
+            if (isChecked) {
+                val mainActivity = activity as? MainActivity
+                if (mainActivity == null) {
+                    isInitializing = true
+                    switchNotificationsEnabled.isChecked = false
+                    switchSilentNotification.isChecked = false
+                    switchSilentNotification.isEnabled = false
+                    isInitializing = false
 
-            saveNotificationSettings(
-                enabled = isChecked,
-                silent = if (isChecked) switchSilentNotification.isChecked else false
-            )
+                    saveNotificationSettings(enabled = false, silent = false)
+                    MidnightAlarmScheduler.cancel(requireContext())
+                    return@setOnCheckedChangeListener
+                }
+
+                mainActivity.requestNotificationPermissionIfNeeded { granted ->
+                    if (granted) {
+                        switchSilentNotification.isEnabled = true
+
+                        saveNotificationSettings(
+                            enabled = true,
+                            silent = switchSilentNotification.isChecked
+                        )
+                        MidnightAlarmScheduler.scheduleNext(requireContext())
+                    } else {
+                        isInitializing = true
+                        switchNotificationsEnabled.isChecked = false
+                        switchSilentNotification.isChecked = false
+                        switchSilentNotification.isEnabled = false
+                        isInitializing = false
+
+                        saveNotificationSettings(enabled = false, silent = false)
+                        MidnightAlarmScheduler.cancel(requireContext())
+                    }
+                }
+            } else {
+                switchSilentNotification.isChecked = false
+                switchSilentNotification.isEnabled = false
+
+                saveNotificationSettings(enabled = false, silent = false)
+                MidnightAlarmScheduler.cancel(requireContext())
+            }
         }
 
         switchSilentNotification.setOnCheckedChangeListener { _, isChecked ->
@@ -159,25 +233,41 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         AppThemeManager.apply(theme)
     }
 
+    private fun savePrefixText(prefix: String) {
+        val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+        prefs.edit {
+            putString(AppPrefs.KEY_PREFIX_TEXT, prefix.trim())
+        }
+        refreshWidget()
+    }
+
+    private fun saveCycleTheme(theme: String) {
+        CycleThemeManager.saveTheme(requireContext(), theme)
+        refreshWidget()
+    }
+
     private fun saveWidgetStyle(style: String) {
         val prefs = requireContext().getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString(Prefs.KEY_WIDGET_STYLE, style)
-            .apply()
+        prefs.edit {
+            putString(Prefs.KEY_WIDGET_STYLE, style)
+        }
+        refreshWidget()
+    }
 
+    private fun saveNotificationSettings(enabled: Boolean, silent: Boolean) {
+        val prefs = requireContext().getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit {
+            putBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, enabled)
+            putBoolean(Prefs.KEY_SILENT_NOTIFICATION, silent)
+        }
+    }
+
+    private fun refreshWidget() {
         val manager = AppWidgetManager.getInstance(requireContext())
         val ids = manager.getAppWidgetIds(
             ComponentName(requireContext(), ABWidgetProvider::class.java)
         )
         ABWidgetProvider().onUpdate(requireContext(), manager, ids)
-    }
-
-    private fun saveNotificationSettings(enabled: Boolean, silent: Boolean) {
-        val prefs = requireContext().getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putBoolean(Prefs.KEY_NOTIFICATIONS_ENABLED, enabled)
-            .putBoolean(Prefs.KEY_SILENT_NOTIFICATION, silent)
-            .apply()
     }
 
     private fun openChangelog() {

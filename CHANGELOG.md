@@ -4,6 +4,58 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v1.9
+
+## ✨ Added
+
+- New Settings screen (configuration moved out of Home)
+- New Help screen with instructions and FAQ
+- New Statistics screen (overview of A / B / Off days)
+- First cycle day selection with chips UI
+- Toolbar icons for Settings and Help
+- Support for additional countries: Italy (IT) and Hungary (HU)
+- Added fallback mechanism for daily updates
+
+## 🎨 Improved
+
+- Refactored to single-activity + fragments architecture
+- Cleaner and more focused Home screen
+- Improved What’s New screen (no duplicate titles)
+- Clearer settings labels and descriptions
+- Updated wording (e.g. "Select a label")
+- Removed redundant "More" subtitles
+- Improved dropdown behavior
+- Better top bar titles
+- Improved layout spacing (Save/Revert)
+- General UI polish
+
+## 🐞 Fixed
+
+- Fixed Save / Revert buttons showing incorrectly
+- Fixed false detection of unsaved changes
+- Fixed navigation state issues
+- Fixed preset selection marking changes incorrectly
+- Fixed dropdown not showing items
+- Fixed chip color rendering
+- Fixed resource linking errors
+- Fixed toolbar/navigation inconsistencies
+- Fixed status bar alignment
+- Fixed notification permission handling
+- Fixed multiple crashes
+
+## ⚙️ Technical
+
+- Introduced proper form state comparison logic
+- Improved HomeFragment lifecycle handling
+- Refactored change listeners
+- Centralized navigation and toolbar
+- Cleaned string resources (EN + SL)
+- Improved SharedPreferences handling
+- Removed unused code
+- Prepared for future features
+
+---
+
 ## v1.8
 
 ### ✨ Added

@@ -2,16 +2,22 @@
 <resources>
 
     <!-- WHAT'S NEW -->
-    <string name="whats_new_version_format">Version %1$s</string>
-    <string name="whats_new_title">What’s New</string>
     <string name="whats_new_content">
-• New Statistics screen (A / B / Off overview)\n
-• Calendar improvements (clean layout + swipe navigation)\n
-• Support for additional countries (Italy, Hungary)\n
-• Improved country selection with flags and auto-detection\n
-• UI polish and consistency improvements
+- New Settings, Help and Statistics screens
+- First cycle day selection with chips UI
+- Support for Italy and Hungary
+- Improved notification reliability (fallback for some devices)
+- Fixed Save/Revert button behavior
+- General improvements and bug fixes
 </string>
     <string name="whats_new_view_full_changelog">View full changelog</string>
+
+    <string name="label_day">Day</string>
+    <string name="label_off">Off</string>
+    <string name="label_recovery">Recovery</string>
+
+    <string name="whats_new_title">What’s New</string>
+    <string name="whats_new_version_format">Version %1$s</string>
 
     <!-- STATISTICS -->
     <string name="statistics_title">Statistics</string>
@@ -23,7 +29,7 @@
 
     <!-- SETTINGS -->
     <string name="settings_title">Settings</string>
-    <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_appearance_title">App Appearance</string>
     <string name="settings_widget_title">Widget</string>
     <string name="settings_about_title">About</string>
     <string name="settings_notifications_title">Notifications</string>
@@ -41,7 +47,7 @@
     <string name="silent_notification">Silent notifications</string>
 
     <!-- HELP -->
-    <string name="help_title">Help</string>
+    <string name="help_title">Help &amp; guide</string>
     <string name="help_getting_started_title">Getting started</string>
     <string name="help_getting_started_content">1. Set the start date.\n2. Choose the first cycle day.\n3. Configure skip rules and labels.\n4. Save your changes.\n5. Add the widget to your home screen.</string>
     <string name="help_calculation_title">How cycle calculation works</string>
@@ -85,7 +91,7 @@
     <string name="cycle_days_hint_placeholder">A, B, Morning, Afternoon, Night</string>
     <string name="cycle_days_hint">Enter cycle labels separated by commas. Example: A, B or Morning, Afternoon, Night</string>
     <string name="first_cycle_day_label">Cycle day on start date</string>
-    <string name="first_cycle_day_hint">Enter one label from the cycle that applies to the selected start date.</string>
+    <string name="first_cycle_day_hint">Select a label from the cycle that applies to the selected start date.</string>
 
     <!-- PRESETS -->
     <string name="preset_label">Preset</string>
@@ -102,7 +108,7 @@
 
     <!-- THEMES -->
     <string name="app_theme">App theme</string>
-    <string name="theme_system">System</string>
+    <string name="theme_system">Follow system</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark_mode">Dark</string>
     <string name="color_theme">Color theme</string>
@@ -217,5 +223,10 @@
     <string name="country_croatia">Croatia</string>
     <string name="country_italy">Italy</string>
     <string name="country_hungary">Hungary</string>
+
+    <string name="home_next_7_days_subtitle">Next 7 days overview</string>
+    <string name="non_working_day_label">Non-working day</string>
+
+    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the AB Workday Widget.</string>
 
 </resources>

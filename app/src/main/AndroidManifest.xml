@@ -26,6 +26,18 @@
 			</intent-filter>
 		</activity>
 
+		<receiver
+			android:name=".ABWidgetProvider"
+			android:exported="false">
+
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+
+			<meta-data
+				android:name="android.appwidget.provider"
+				android:resource="@xml/widget_info" />
+		</receiver>
 
 		<receiver
 			android:name=".receivers.DayChangeReceiver"
@@ -37,6 +49,7 @@
 				<action android:name="android.intent.action.TIME_SET" />
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="com.dante.abworkdaywidget.action.MIDNIGHT_FALLBACK" />
 			</intent-filter>
 		</receiver>
 

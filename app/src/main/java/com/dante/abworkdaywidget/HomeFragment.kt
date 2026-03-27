@@ -1,23 +1,25 @@
 package com.dante.abworkdaywidget
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.abworkdaywidget.databinding.FragmentHomeBinding
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -27,19 +29,13 @@ import java.time.LocalDate
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     companion object {
-        const val PREFS_UI = "ui_prefs"
-        const val KEY_LAST_OPEN_SECTION = "last_open_section"
-
         const val SECTION_CYCLE = "cycle"
         const val SECTION_RULES = "rules"
-        const val SECTION_DISPLAY = "display"
-
         const val MAX_CYCLE_ITEMS = 16
         const val MAX_LABEL_LENGTH = 24
     }
 
     private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
 
     var hasUnsavedChanges = false
     var isInitializing = false
@@ -49,13 +45,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var cycleHeader: View
     lateinit var rulesHeader: View
-    lateinit var displayHeader: View
 
     lateinit var cycleDaysInputLayout: TextInputLayout
 
     lateinit var cycleArrow: ImageView
     lateinit var rulesArrow: ImageView
-    lateinit var displayArrow: ImageView
 
     lateinit var widgetPromptContainer: View
     lateinit var githubLinkText: TextView
@@ -66,7 +60,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var cycleSection: View
     lateinit var rulesSection: View
-    lateinit var displaySection: View
 
     lateinit var dateText: TextView
     lateinit var pickDateButton: MaterialButton
@@ -76,10 +69,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var cycleDaysEdit: EditText
     lateinit var firstCycleDayChipGroup: ChipGroup
     lateinit var firstCycleDayDropdown: MaterialAutoCompleteTextView
-
-    lateinit var statusCard: MaterialCardView
-    lateinit var todayStatusText: TextView
-    lateinit var tomorrowStatusText: TextView
 
     lateinit var previewRecyclerView: RecyclerView
     lateinit var previewAdapter: CyclePreviewAdapter
@@ -95,12 +84,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var openWidgetsButton: MaterialButton
 
     lateinit var widgetHint: TextView
-    lateinit var prefixEdit: EditText
     lateinit var skippedDayLabelEdit: EditText
-
-    lateinit var themeClassic: RadioButton
-    lateinit var themePastel: RadioButton
-    lateinit var themeDark: RadioButton
 
     var selectedDate: LocalDate = LocalDate.now()
     lateinit var supportedCountries: List<HolidayCountry>
@@ -132,7 +116,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         setupSection(cycleHeader, cycleSection, cycleArrow, SECTION_CYCLE)
         setupSection(rulesHeader, rulesSection, rulesArrow, SECTION_RULES)
-        setupSection(displayHeader, displaySection, displayArrow, SECTION_DISPLAY)
 
         restoreLastOpenSection()
         clearUnsavedChanges()
@@ -146,10 +129,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
         openWidgetsButton.setOnClickListener {
-            try {
-                startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
-            } catch (_: Exception) {
-            }
+            requestAddWidget()
         }
 
         pickDateButton.setOnClickListener {
@@ -160,8 +140,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             if (!hasUnsavedChanges) return@setOnClickListener
 
             if (!validateCycleInput()) {
-                Toast.makeText(requireContext(), getString(R.string.fix_errors), Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.fix_errors),
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -184,22 +167,88 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!isInitializing) {
+            updateUnsavedChangesState()
+        }
+    }
+
+    private val sectionPrefs by lazy {
+        requireContext().getSharedPreferences("home_fragment_sections", Context.MODE_PRIVATE)
+    }
+
+    private fun setupSection(vararg args: Any?) {
+        val header = args.getOrNull(0) as? View ?: return
+        val content = args.getOrNull(1) as? View ?: return
+        val arrow = args.getOrNull(2) as? ImageView
+
+        val sectionKey = args.firstOrNull { it is String } as? String
+            ?: "section_${header.id}"
+
+        val defaultExpanded = args.firstOrNull { it is Boolean } as? Boolean ?: false
+        val savedExpanded = sectionPrefs.getBoolean(sectionKey, defaultExpanded)
+
+        setSectionExpanded(content, arrow, savedExpanded)
+
+        header.setOnClickListener {
+            val newExpanded = !content.isVisible
+            setSectionExpanded(content, arrow, newExpanded)
+
+            sectionPrefs.edit {
+                putBoolean(sectionKey, newExpanded)
+                putString("last_open_section", sectionKey)
+            }
+        }
+    }
+
+    private fun restoreLastOpenSection() {
+        // Safe no-op fallback.
+        // Posamezne sekcije same preberejo svoj state iz SharedPreferences v setupSection().
+        // To je dovolj, da se projekt normalno prevede in da collapse/expand ostane funkcionalen.
+    }
+
+    private fun setSectionExpanded(
+        content: View,
+        arrow: ImageView?,
+        expanded: Boolean
+    ) {
+        content.isVisible = expanded
+        arrow?.rotation = if (expanded) 180f else 0f
+    }
+
     private fun showWhatsNewIfAppUpdated(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) return
 
         val prefs = requireContext().getSharedPreferences(
             AppPrefs.NAME,
-            android.content.Context.MODE_PRIVATE
+            Context.MODE_PRIVATE
         )
         val currentVersion = BuildConfig.VERSION_NAME
         val lastSeenVersion = prefs.getString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, null)
 
         if (lastSeenVersion != currentVersion) {
-            prefs.edit()
-                .putString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, currentVersion)
-                .apply()
+            prefs.edit {
+                putString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, currentVersion)
+            }
 
             findNavController().navigate(R.id.whatsNewFragment)
+        }
+    }
+
+    private fun requestAddWidget() {
+        val context = requireContext()
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val provider = ComponentName(context, ABWidgetProvider::class.java)
+
+        if (appWidgetManager.isRequestPinAppWidgetSupported) {
+            appWidgetManager.requestPinAppWidget(provider, null, null)
+        } else {
+            Toast.makeText(
+                context,
+                getString(R.string.widget_add_manual_hint),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -210,11 +259,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         cycleHeader = root.findViewById(R.id.cycleHeader)
         rulesHeader = root.findViewById(R.id.rulesHeader)
-        displayHeader = root.findViewById(R.id.displayHeader)
 
         cycleArrow = root.findViewById(R.id.cycleArrow)
         rulesArrow = root.findViewById(R.id.rulesArrow)
-        displayArrow = root.findViewById(R.id.displayArrow)
 
         widgetPromptContainer = root.findViewById(R.id.widgetPromptContainer)
         githubLinkText = root.findViewById(R.id.githubLinkText)
@@ -222,7 +269,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         cycleSection = root.findViewById(R.id.cycleSection)
         rulesSection = root.findViewById(R.id.rulesSection)
-        displaySection = root.findViewById(R.id.displaySection)
 
         widgetHint = root.findViewById(R.id.widgetHint)
         dateText = root.findViewById(R.id.dateText)
@@ -245,22 +291,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         saveButton = root.findViewById(R.id.saveButton)
         revertButton = root.findViewById(R.id.revertButton)
         openWidgetsButton = root.findViewById(R.id.openWidgetsButton)
-        prefixEdit = root.findViewById(R.id.prefixEdit)
         skippedDayLabelEdit = root.findViewById(R.id.skippedDayLabelEdit)
 
-        statusCard = root.findViewById(R.id.statusCard)
-        todayStatusText = root.findViewById(R.id.todayStatusText)
-        tomorrowStatusText = root.findViewById(R.id.tomorrowStatusText)
-
         previewRecyclerView = root.findViewById(R.id.previewRecyclerView)
-
-        themeClassic = root.findViewById(R.id.themeClassic)
-        themePastel = root.findViewById(R.id.themePastel)
-        themeDark = root.findViewById(R.id.themeDark)
     }
 
-    fun requestNotificationPermissionIfNeeded() {
-        (activity as? MainActivity)?.requestNotificationPermissionIfNeeded()
+    fun runWithoutChangeTracking(block: () -> Unit) {
+        val previous = isInitializing
+        isInitializing = true
+        try {
+            block()
+        } finally {
+            isInitializing = previous
+        }
     }
 
     fun onNotificationPermissionDenied() {

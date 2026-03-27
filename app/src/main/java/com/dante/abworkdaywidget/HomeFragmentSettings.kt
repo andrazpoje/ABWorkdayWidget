@@ -43,100 +43,81 @@ fun HomeFragment.saveChangesAndRefresh(): Boolean {
     return true
 }
 
-fun HomeFragment.loadSettings() {
-    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+private data class HomeFormState(
+    val cycle: List<String>,
+    val selectedDate: java.time.LocalDate,
+    val firstDay: String,
+    val skipSaturdays: Boolean,
+    val skipSundays: Boolean,
+    val skipHolidays: Boolean,
+    val overrideSkippedDays: Boolean,
+    val skippedDayLabel: String,
+    val countryCode: String
+)
 
-    val cycle = CycleManager.loadCycle(requireContext()).ifEmpty { listOf("A", "B") }
-    val cycleStartDate = CycleManager.loadStartDate(requireContext())
+fun HomeFragment.updateUnsavedChangesState() {
+    val currentState = buildCurrentFormState()
+    val savedState = buildSavedFormState()
 
-    selectedDate = cycleStartDate
-
-    cycleDaysEdit.setText(cycle.joinToString(", "))
-
-    val savedFirstDayRaw = prefs.getString(
-        AppPrefs.KEY_FIRST_CYCLE_DAY,
-        cycle.firstOrNull() ?: "A"
-    ) ?: (cycle.firstOrNull() ?: "A")
-
-    val savedFirstDay = sanitizeLabel(
-        savedFirstDayRaw,
-        cycle.firstOrNull() ?: "A"
-    )
-
-    refreshFirstCycleDayDropdown(savedFirstDay)
-
-    switchSaturdays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
-    switchSundays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
-    switchHolidays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
-
-    val overrideSkippedDays = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
-    val skippedDayLabel = prefs.getString(
-        AppPrefs.KEY_SKIPPED_LABEL,
-        AppPrefs.DEFAULT_SKIPPED_LABEL
-    ) ?: AppPrefs.DEFAULT_SKIPPED_LABEL
-
-    switchOverrideSkippedDays.isChecked = overrideSkippedDays
-    skippedDayLabelEdit.setText(skippedDayLabel)
-    skippedDayLabelEdit.isEnabled = overrideSkippedDays
-    skippedDayLabelEdit.alpha = if (overrideSkippedDays) 1f else 0.5f
-
-    val selectedCountryCode = HolidayManager.getSelectedCountry(requireContext())
-
-    val selectedCountry = supportedCountries.firstOrNull { it.code == selectedCountryCode }
-        ?: supportedCountries.first()
-
-    val isManual = prefs.getBoolean(AppPrefs.KEY_COUNTRY_MANUAL, false)
-
-    val displayText = HolidayManager.getCountryDisplayNameWithAutoDetected(
-        context = requireContext(),
-        countryCode = selectedCountry.code,
-        isAutoDetected = !isManual && selectedCountry.code == HolidayManager.getSelectedCountry(requireContext())
-    )
-
-    holidayCountryDropdown.setText(displayText, false)
-
-    prefixEdit.setText(prefs.getString(AppPrefs.KEY_PREFIX_TEXT, "") ?: "")
-
-    when (CycleThemeManager.loadTheme(requireContext())) {
-        CycleThemeManager.THEME_PASTEL -> themePastel.isChecked = true
-        CycleThemeManager.THEME_DARK -> themeDark.isChecked = true
-        else -> themeClassic.isChecked = true
+    if (currentState == savedState) {
+        clearUnsavedChanges()
+    } else {
+        markUnsavedChanges()
     }
-
-    updateDateText()
-    updatePresetSelectionState()
 }
 
-fun HomeFragment.saveSettings(normalizedCycle: List<String>) {
-    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-
-    CycleManager.saveCycle(requireContext(), normalizedCycle)
-    CycleManager.saveStartDate(requireContext(), selectedDate)
-
-    when {
-        themePastel.isChecked ->
-            CycleThemeManager.saveTheme(requireContext(), CycleThemeManager.THEME_PASTEL)
-
-        themeDark.isChecked ->
-            CycleThemeManager.saveTheme(requireContext(), CycleThemeManager.THEME_DARK)
-
-        else ->
-            CycleThemeManager.saveTheme(requireContext(), CycleThemeManager.THEME_CLASSIC)
-    }
-
-    val selectedFirstDay = sanitizeLabel(
+private fun HomeFragment.buildCurrentFormState(): HomeFormState {
+    val currentCycle = parseCycleLabels(cycleDaysEdit.text?.toString().orEmpty())
+    val currentFirstDay = sanitizeLabel(
         firstCycleDayDropdown.text?.toString().orEmpty(),
-        normalizedCycle.firstOrNull() ?: "A"
+        currentCycle.firstOrNull() ?: "A"
     )
 
-    firstCycleDayDropdown.setText(selectedFirstDay, false)
-    cycleDaysEdit.setText(normalizedCycle.joinToString(", "))
+    return HomeFormState(
+        cycle = currentCycle,
+        selectedDate = selectedDate,
+        firstDay = currentFirstDay,
+        skipSaturdays = switchSaturdays.isChecked,
+        skipSundays = switchSundays.isChecked,
+        skipHolidays = switchHolidays.isChecked,
+        overrideSkippedDays = switchOverrideSkippedDays.isChecked,
+        skippedDayLabel = sanitizeLabel(
+            skippedDayLabelEdit.text?.toString().orEmpty(),
+            AppPrefs.DEFAULT_SKIPPED_LABEL
+        ),
+        countryCode = resolveSelectedCountryCodeFromUi()
+    )
+}
 
-    refreshFirstCycleDayDropdown(selectedFirstDay)
+private fun HomeFragment.buildSavedFormState(): HomeFormState {
+    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+    val savedCycle = CycleManager.loadCycle(requireContext()).ifEmpty { listOf("A", "B") }
+    val savedDate = CycleManager.loadStartDate(requireContext())
+    val savedFirstDay = sanitizeLabel(
+        prefs.getString(AppPrefs.KEY_FIRST_CYCLE_DAY, savedCycle.firstOrNull() ?: "A").orEmpty(),
+        savedCycle.firstOrNull() ?: "A"
+    )
 
+    return HomeFormState(
+        cycle = savedCycle,
+        selectedDate = savedDate,
+        firstDay = savedFirstDay,
+        skipSaturdays = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true),
+        skipSundays = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true),
+        skipHolidays = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true),
+        overrideSkippedDays = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true),
+        skippedDayLabel = sanitizeLabel(
+            prefs.getString(AppPrefs.KEY_SKIPPED_LABEL, AppPrefs.DEFAULT_SKIPPED_LABEL).orEmpty(),
+            AppPrefs.DEFAULT_SKIPPED_LABEL
+        ),
+        countryCode = HolidayManager.getSelectedCountry(requireContext())
+    )
+}
+
+private fun HomeFragment.resolveSelectedCountryCodeFromUi(): String {
     val selectedText = holidayCountryDropdown.text?.toString()?.trim().orEmpty()
 
-    val selectedCountryCode = supportedCountries
+    return supportedCountries
         .firstOrNull {
             val plainName = HolidayManager.getCountryDisplayName(requireContext(), it.code)
             val flaggedName = HolidayManager.getCountryDisplayNameWithFlag(requireContext(), it.code)
@@ -147,18 +128,94 @@ fun HomeFragment.saveSettings(normalizedCycle: List<String>) {
             )
 
             selectedText == plainName ||
-                    selectedText == flaggedName ||
-                    selectedText == autoName
+                selectedText == flaggedName ||
+                selectedText == autoName
         }
         ?.code
         ?: HolidayManager.DEFAULT_COUNTRY
+}
+
+fun HomeFragment.loadSettings() {
+    runWithoutChangeTracking {
+        val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+        val cycle = CycleManager.loadCycle(requireContext()).ifEmpty { listOf("A", "B") }
+        val cycleStartDate = CycleManager.loadStartDate(requireContext())
+
+        selectedDate = cycleStartDate
+        cycleDaysEdit.setText(cycle.joinToString(", "))
+
+        val savedFirstDayRaw = prefs.getString(
+            AppPrefs.KEY_FIRST_CYCLE_DAY,
+            cycle.firstOrNull() ?: "A"
+        ) ?: (cycle.firstOrNull() ?: "A")
+
+        val savedFirstDay = sanitizeLabel(
+            savedFirstDayRaw,
+            cycle.firstOrNull() ?: "A"
+        )
+
+        refreshFirstCycleDayDropdown(savedFirstDay)
+
+        switchSaturdays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
+        switchSundays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
+        switchHolidays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
+
+        val overrideSkippedDays = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
+        val skippedDayLabel = prefs.getString(
+            AppPrefs.KEY_SKIPPED_LABEL,
+            AppPrefs.DEFAULT_SKIPPED_LABEL
+        ) ?: AppPrefs.DEFAULT_SKIPPED_LABEL
+
+        switchOverrideSkippedDays.isChecked = overrideSkippedDays
+        skippedDayLabelEdit.setText(skippedDayLabel)
+        skippedDayLabelEdit.isEnabled = overrideSkippedDays
+        skippedDayLabelEdit.alpha = if (overrideSkippedDays) 1f else 0.5f
+
+        val selectedCountryCode = HolidayManager.getSelectedCountry(requireContext())
+        val selectedCountry = supportedCountries.firstOrNull { it.code == selectedCountryCode }
+            ?: supportedCountries.first()
+
+        val isManual = prefs.getBoolean(AppPrefs.KEY_COUNTRY_MANUAL, false)
+
+        val displayText = HolidayManager.getCountryDisplayNameWithAutoDetected(
+            context = requireContext(),
+            countryCode = selectedCountry.code,
+            isAutoDetected = !isManual &&
+                    selectedCountry.code == HolidayManager.getSelectedCountry(requireContext())
+        )
+
+        holidayCountryDropdown.setText(displayText, false)
+
+        updateDateText()
+        updatePresetSelectionState()
+    }
+}
+
+fun HomeFragment.saveSettings(normalizedCycle: List<String>) {
+    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+    CycleManager.saveCycle(requireContext(), normalizedCycle)
+    CycleManager.saveStartDate(requireContext(), selectedDate)
+
+    val selectedFirstDay = sanitizeLabel(
+        firstCycleDayDropdown.text?.toString().orEmpty(),
+        normalizedCycle.firstOrNull() ?: "A"
+    )
+
+    runWithoutChangeTracking {
+        firstCycleDayDropdown.setText(selectedFirstDay, false)
+        cycleDaysEdit.setText(normalizedCycle.joinToString(", "))
+        refreshFirstCycleDayDropdown(selectedFirstDay)
+    }
+
+    val selectedCountryCode = resolveSelectedCountryCodeFromUi()
 
     prefs.edit {
         putInt(AppPrefs.KEY_START_YEAR, selectedDate.year)
         putInt(AppPrefs.KEY_START_MONTH, selectedDate.monthValue)
         putInt(AppPrefs.KEY_START_DAY, selectedDate.dayOfMonth)
         putString(AppPrefs.KEY_FIRST_CYCLE_DAY, selectedFirstDay)
-        putString(AppPrefs.KEY_PREFIX_TEXT, prefixEdit.text.toString().trim())
         putBoolean(AppPrefs.KEY_SKIP_SATURDAYS, switchSaturdays.isChecked)
         putBoolean(AppPrefs.KEY_SKIP_SUNDAYS, switchSundays.isChecked)
         putBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, switchHolidays.isChecked)
@@ -306,48 +363,38 @@ fun HomeFragment.migrateLegacySettingsIfNeeded() {
 
 fun HomeFragment.setupChangeListeners() {
     switchSaturdays.setOnCheckedChangeListener { _, _ ->
+        if (isInitializing) return@setOnCheckedChangeListener
+
         clearDateCheckResult()
-        markUnsavedChanges()
+        updateUnsavedChangesState()
     }
 
     switchSundays.setOnCheckedChangeListener { _, _ ->
+        if (isInitializing) return@setOnCheckedChangeListener
+
         clearDateCheckResult()
-        markUnsavedChanges()
+        updateUnsavedChangesState()
     }
 
     switchHolidays.setOnCheckedChangeListener { _, _ ->
+        if (isInitializing) return@setOnCheckedChangeListener
+
         clearDateCheckResult()
-        markUnsavedChanges()
+        updateUnsavedChangesState()
     }
 
     switchOverrideSkippedDays.setOnCheckedChangeListener { _, isChecked ->
+        if (isInitializing) return@setOnCheckedChangeListener
+
         skippedDayLabelEdit.isEnabled = isChecked
         skippedDayLabelEdit.alpha = if (isChecked) 1f else 0.5f
         clearDateCheckResult()
-        markUnsavedChanges()
-    }
-
-    firstCycleDayDropdown.setOnItemClickListener { _, _, _, _ ->
-        clearDateCheckResult()
-        markUnsavedChanges()
-        updateTodayStatus()
-        updateCyclePreview()
-    }
-
-    holidayCountryDropdown.setOnItemClickListener { _, _, _, _ ->
-        clearDateCheckResult()
-        markUnsavedChanges()
-    }
-
-    themeClassic.setOnClickListener { markUnsavedChanges() }
-    themePastel.setOnClickListener { markUnsavedChanges() }
-    themeDark.setOnClickListener { markUnsavedChanges() }
-
-    prefixEdit.addTextChangedListener {
-        markUnsavedChanges()
+        updateUnsavedChangesState()
     }
 
     cycleDaysEdit.addTextChangedListener {
+        if (isInitializing) return@addTextChangedListener
+
         clearDateCheckResult()
         refreshFirstCycleDayDropdown()
         validateCycleInput()
@@ -357,8 +404,10 @@ fun HomeFragment.setupChangeListeners() {
     }
 
     skippedDayLabelEdit.addTextChangedListener {
+        if (isInitializing) return@addTextChangedListener
+
         clearDateCheckResult()
-        markUnsavedChanges()
+        updateUnsavedChangesState()
     }
 }
 

@@ -28,68 +28,12 @@
                 android:id="@+id/screenSubtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
                 android:alpha="0.75"
-                android:text="@string/settings_subtitle"
+                android:text="@string/home_next_7_days_subtitle"
                 android:textSize="14sp" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/statusCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:minHeight="180dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="6dp"
-                app:cardUseCompatPadding="true">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:id="@+id/statusTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.85"
-                        android:text="@string/status_section"
-                        android:textColor="@color/statusTextOnCard"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/todayStatusText"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:textColor="@color/statusTextOnCard"
-                        android:textSize="44sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tomorrowStatusText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textColor="@color/statusTextOnCard"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <TextView
-                android:id="@+id/previewTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/preview_title"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
+            <com.dante.abworkdaywidget.ui.ClickableRecyclerView
                 android:id="@+id/previewRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -123,7 +67,6 @@
 
             <include layout="@layout/include_cycle_section" />
             <include layout="@layout/include_rules_section" />
-            <include layout="@layout/include_display_section" />
 
             <TextView
                 android:id="@+id/versionText"

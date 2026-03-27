@@ -1,6 +1,7 @@
 package com.dante.abworkdaywidget
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -13,7 +14,8 @@ class CyclePreviewAdapter :
     data class PreviewItem(
         val title: String,
         val dateText: String,
-        val cycleLabel: String
+        val cycleLabel: String,
+        val helperText: String? = null
     )
 
     private var cycleLabels: List<String> = emptyList()
@@ -44,6 +46,10 @@ class CyclePreviewAdapter :
             binding.dayDateText.text = item.dateText
             binding.dayCycleText.text = item.cycleLabel
 
+            binding.dayHelperText.text = item.helperText.orEmpty()
+            binding.dayHelperText.visibility =
+                if (item.helperText.isNullOrBlank()) View.GONE else View.VISIBLE
+
             val bgColor = CycleColorHelper.getBackgroundColor(
                 context = context,
                 label = item.cycleLabel,
@@ -56,6 +62,7 @@ class CyclePreviewAdapter :
             binding.dayTitleText.setTextColor(textColor)
             binding.dayDateText.setTextColor(textColor)
             binding.dayCycleText.setTextColor(textColor)
+            binding.dayHelperText.setTextColor(textColor)
         }
     }
 

@@ -2,7 +2,6 @@ package com.dante.abworkdaywidget
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Filter
@@ -107,13 +106,6 @@ private fun HomeFragment.configureAsSelectBox(dropdown: MaterialAutoCompleteText
         if (hasFocus) {
             dropdown.showDropdownIfPossible()
         }
-    }
-
-    dropdown.setOnTouchListener { _, event ->
-        if (event.action == MotionEvent.ACTION_UP) {
-            dropdown.showDropdownIfPossible()
-        }
-        false
     }
 }
 
@@ -357,7 +349,7 @@ fun HomeFragment.updatePresetSelectionState(markAsChanged: Boolean = false) {
     }
 
     if (markAsChanged) {
-        markUnsavedChanges()
+        updateUnsavedChangesState()
     }
 }
 
@@ -377,6 +369,6 @@ fun HomeFragment.setupHolidayCountryDropdown() {
 
     holidayCountryDropdown.setOnItemClickListener { _, _, _, _ ->
         clearDateCheckResult()
-        markUnsavedChanges()
+        updateUnsavedChangesState()
     }
 }

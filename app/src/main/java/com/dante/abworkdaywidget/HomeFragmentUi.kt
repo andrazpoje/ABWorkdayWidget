@@ -1,14 +1,11 @@
 package com.dante.abworkdaywidget
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
 import android.app.DatePickerDialog
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dante.abworkdaywidget.util.parseCycleInput
 import com.dante.abworkdaywidget.util.sanitizeLabel
@@ -24,30 +21,7 @@ fun HomeFragment.setupPreviewRecyclerView() {
     previewRecyclerView.isNestedScrollingEnabled = false
 }
 
-fun HomeFragment.updateTodayStatus() {
-    val today = LocalDate.now()
-    val tomorrow = today.plusDays(1)
-
-    todayStatusText.text = formatDayLabel(today)
-
-    tomorrowStatusText.text = getString(
-        R.string.tomorrow_status,
-        formatDayLabel(tomorrow)
-    )
-
-    val cycle = getPreviewCycle()
-    val todayLabel = getPreviewCycleDayForDate(today)
-
-    val cardColor = CycleColorHelper.getBackgroundColor(
-        context = requireContext(),
-        label = todayLabel,
-        cycle = cycle
-    )
-
-    animateStatusCardColor(cardColor)
-    todayStatusText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-    tomorrowStatusText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-}
+fun HomeFragment.updateTodayStatus() = Unit
 
 fun HomeFragment.revertToSavedState() {
     val cycle = CycleManager.loadCycle(requireContext())
@@ -86,36 +60,25 @@ fun HomeFragment.revertToSavedState() {
     Toast.makeText(requireContext(), getString(R.string.reverted), Toast.LENGTH_SHORT).show()
 }
 
-private fun HomeFragment.formatDayLabel(date: LocalDate): String {
-    val locale = Locale.getDefault()
-
-    val dayName = date.dayOfWeek
-        .getDisplayName(java.time.format.TextStyle.SHORT, locale)
-        .replaceFirstChar { it.titlecase(locale) }
-
-    val cycleLabel = getPreviewCycleDayForDate(date)
-        .trim()
-        .ifBlank { "?" }
-
-    return "$dayName $cycleLabel"
-}
-
 fun HomeFragment.updateCyclePreview() {
     val today = LocalDate.now()
     val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
     val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
         .withLocale(Locale.getDefault())
 
-    val items = (2..6).map { offset ->
+    val items = (0..6).map { offset ->
         val date = today.plusDays(offset.toLong())
         val title = date.format(dayFormatter).replaceFirstChar {
             if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
         }
 
+        val isNonWorkingDay = isPreviewSkippedOverrideActiveForDate(date)
+
         CyclePreviewAdapter.PreviewItem(
             title = title,
             dateText = date.format(dateFormatter),
-            cycleLabel = getPreviewCycleDayForDate(date)
+            cycleLabel = getPreviewCycleDayForDate(date),
+            helperText = if (isNonWorkingDay) getString(R.string.non_working_day_label) else null
         )
     }
 
@@ -177,19 +140,6 @@ fun HomeFragment.updateDateText() {
     )
 }
 
-fun HomeFragment.animateStatusCardColor(toColor: Int) {
-    val fromColor = statusCard.cardBackgroundColor.defaultColor
-
-    ValueAnimator.ofObject(ArgbEvaluator(), fromColor, toColor).apply {
-        duration = 220
-        addUpdateListener { animator ->
-            val animatedColor = animator.animatedValue as Int
-            statusCard.setCardBackgroundColor(animatedColor)
-        }
-        start()
-    }
-}
-
 fun HomeFragment.animateSaveButtonActivated() {
     saveButton.scaleX = 0.96f
     saveButton.scaleY = 0.96f
@@ -214,7 +164,6 @@ fun HomeFragment.updateSaveButtonVisualState() {
 
         revertButton.visibility = View.VISIBLE
         revertButton.alpha = 1f
-
     } else {
         saveButton.isEnabled = false
         saveButton.alpha = 0.6f

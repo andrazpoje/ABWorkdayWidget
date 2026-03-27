@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.abs
+import android.annotation.SuppressLint
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
@@ -105,6 +106,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupMonthSwipe() {
         gestureDetector = GestureDetector(
             requireContext(),
@@ -143,8 +145,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             }
         )
 
-        recycler.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
+        recycler.setOnTouchListener { view, event ->
+            val handled = gestureDetector.onTouchEvent(event)
+
+            if (handled && event.actionMasked == MotionEvent.ACTION_UP) {
+                view.performClick()
+            }
+
             false
         }
     }
