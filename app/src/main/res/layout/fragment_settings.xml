@@ -139,17 +139,36 @@
                         android:text="@string/theme_classic" />
 
                     <RadioButton
-                        android:id="@+id/settingsThemePastel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/theme_pastel" />
-
-                    <RadioButton
                         android:id="@+id/settingsThemeDark"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/theme_dark" />
                 </RadioGroup>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="Custom colors"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <com.dante.abworkdaywidget.ui.views.ColorRowView
+                    android:id="@+id/colorShiftA"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.dante.abworkdaywidget.ui.views.ColorRowView
+                    android:id="@+id/colorShiftB"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.dante.abworkdaywidget.ui.views.ColorRowView
+                    android:id="@+id/colorBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

@@ -19,6 +19,11 @@ import com.dante.abworkdaywidget.notifications.MidnightAlarmScheduler
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
+import com.dante.abworkdaywidget.style.WidgetStyleManager
+import com.dante.abworkdaywidget.style.ThemePreset
+import com.dante.abworkdaywidget.widget.WidgetRefreshHelper
+import com.dante.abworkdaywidget.ui.views.ColorRowView
+import com.dante.abworkdaywidget.ui.dialogs.ColorPickerDialog
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
@@ -34,9 +39,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private lateinit var appThemeDark: RadioButton
 
     private lateinit var themeClassic: RadioButton
-    private lateinit var themePastel: RadioButton
     private lateinit var themeDark: RadioButton
     private lateinit var prefixEdit: TextInputEditText
+
+    private lateinit var colorShiftA: ColorRowView
+    private lateinit var colorShiftB: ColorRowView
+    private lateinit var colorBackground: ColorRowView
 
     private lateinit var widgetStyleClassic: RadioButton
     private lateinit var widgetStyleMinimal: RadioButton
@@ -72,9 +80,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         appThemeDark = root.findViewById(R.id.settingsAppThemeDark)
 
         themeClassic = root.findViewById(R.id.settingsThemeClassic)
-        themePastel = root.findViewById(R.id.settingsThemePastel)
         themeDark = root.findViewById(R.id.settingsThemeDark)
         prefixEdit = root.findViewById(R.id.settingsPrefixEdit)
+
+        colorShiftA = root.findViewById(R.id.colorShiftA)
+        colorShiftB = root.findViewById(R.id.colorShiftB)
+        colorBackground = root.findViewById(R.id.colorBackground)
 
         widgetStyleClassic = root.findViewById(R.id.settingsWidgetStyleClassic)
         widgetStyleMinimal = root.findViewById(R.id.settingsWidgetStyleMinimal)
@@ -100,10 +111,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 .getString(AppPrefs.KEY_PREFIX_TEXT, "") ?: ""
         )
 
-        when (CycleThemeManager.loadTheme(requireContext())) {
-            CycleThemeManager.THEME_PASTEL -> themePastel.isChecked = true
-            CycleThemeManager.THEME_DARK -> themeDark.isChecked = true
-            else -> themeClassic.isChecked = true
+        when (WidgetStyleManager.getCurrentPreset(requireContext())) {
+            ThemePreset.DARK -> themeDark.isChecked = true
+            ThemePreset.CLASSIC -> themeClassic.isChecked = true
+            ThemePreset.CUSTOM -> {
+                // optional: lahko pustiš neoznačeno ali označiš Classic
+                themeClassic.isChecked = false
+                themeDark.isChecked = false
+            }
         }
 
         val prefs = requireContext().getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
@@ -123,6 +138,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         switchSilentNotification.isEnabled = notificationsEnabled
 
         settingsVersion.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
+
+        val colors = WidgetStyleManager.getColors(requireContext())
+
+        colorShiftA.setLabel("Shift A")
+        colorShiftA.setColor(colors.shiftAColor)
+
+        colorShiftB.setLabel("Shift B")
+        colorShiftB.setColor(colors.shiftBColor)
+
+        colorBackground.setLabel("Background")
+        colorBackground.setColor(colors.widgetBackgroundColor)
+
     }
 
     private fun setupListeners() {
@@ -139,15 +166,41 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
         themeClassic.setOnClickListener {
-            if (!isInitializing) saveCycleTheme(CycleThemeManager.THEME_CLASSIC)
-        }
-
-        themePastel.setOnClickListener {
-            if (!isInitializing) saveCycleTheme(CycleThemeManager.THEME_PASTEL)
+            if (!isInitializing) {
+                WidgetStyleManager.applyPreset(requireContext(), ThemePreset.CLASSIC)
+                WidgetRefreshHelper.refresh(requireContext())
+            }
         }
 
         themeDark.setOnClickListener {
-            if (!isInitializing) saveCycleTheme(CycleThemeManager.THEME_DARK)
+            if (!isInitializing) {
+                WidgetStyleManager.applyPreset(requireContext(), ThemePreset.DARK)
+                WidgetRefreshHelper.refresh(requireContext())
+            }
+        }
+
+        colorShiftA.setOnRowClick {
+            ColorPickerDialog {
+                WidgetStyleManager.updateShiftAColor(requireContext(), it)
+                WidgetRefreshHelper.refresh(requireContext())
+                bindCurrentValues()
+            }.show(parentFragmentManager, "colorA")
+        }
+
+        colorShiftB.setOnRowClick {
+            ColorPickerDialog {
+                WidgetStyleManager.updateShiftBColor(requireContext(), it)
+                WidgetRefreshHelper.refresh(requireContext())
+                bindCurrentValues()
+            }.show(parentFragmentManager, "colorB")
+        }
+
+        colorBackground.setOnRowClick {
+            ColorPickerDialog {
+                WidgetStyleManager.updateWidgetBackgroundColor(requireContext(), it)
+                WidgetRefreshHelper.refresh(requireContext())
+                bindCurrentValues()
+            }.show(parentFragmentManager, "colorBg")
         }
 
         prefixEdit.doAfterTextChanged {
@@ -238,11 +291,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         prefs.edit {
             putString(AppPrefs.KEY_PREFIX_TEXT, prefix.trim())
         }
-        refreshWidget()
-    }
-
-    private fun saveCycleTheme(theme: String) {
-        CycleThemeManager.saveTheme(requireContext(), theme)
         refreshWidget()
     }
 

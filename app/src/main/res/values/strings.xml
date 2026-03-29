@@ -228,5 +228,7 @@
     <string name="non_working_day_label">Non-working day</string>
 
     <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the AB Workday Widget.</string>
+    <string name="select_color">Select color</string>
+
 
 </resources>

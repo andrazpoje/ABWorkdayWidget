@@ -17,8 +17,8 @@ android {
         applicationId "com.dante.abworkdaywidget"
         minSdk 26
         targetSdk 36
-        versionCode 12
-        versionName "1.8"
+        versionCode 14
+        versionName "2.0"
     }
 
     buildFeatures {

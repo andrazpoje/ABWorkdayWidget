@@ -230,4 +230,6 @@
 
     <string name="widget_add_manual_hint">Na domačem zaslonu naredi dolg pritisk, odpri Pripomočki in dodaj AB Workday Widget.</string>
 
+    <string name="select_color">Izberi barvo</string>
+
 </resources>
