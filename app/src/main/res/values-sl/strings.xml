@@ -228,7 +228,7 @@
     <string name="home_next_7_days_subtitle">Pregled naslednjih 7 dni</string>
     <string name="non_working_day_label">Dela prosti dan</string>
 
-    <string name="widget_add_manual_hint">Na domačem zaslonu naredi dolg pritisk, odpri Pripomočki in dodaj AB Workday Widget.</string>
+    <string name="widget_add_manual_hint">Na domačem zaslonu naredi dolg pritisk, odpri Pripomočki in dodaj Delovni cikel Widget.</string>
 
     <string name="select_color">Izberi barvo</string>
 

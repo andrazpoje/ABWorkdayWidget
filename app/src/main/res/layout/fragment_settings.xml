@@ -155,17 +155,17 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <com.dante.abworkdaywidget.ui.views.ColorRowView
+                <com.dante.workcycle.ui.views.ColorRowView
                     android:id="@+id/colorShiftA"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <com.dante.abworkdaywidget.ui.views.ColorRowView
+                <com.dante.workcycle.ui.views.ColorRowView
                     android:id="@+id/colorShiftB"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <com.dante.abworkdaywidget.ui.views.ColorRowView
+                <com.dante.workcycle.ui.views.ColorRowView
                     android:id="@+id/colorBackground"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

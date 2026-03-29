@@ -10,11 +10,11 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace 'com.dante.abworkdaywidget'
+    namespace 'com.dante.workcycle'
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.dante.abworkdaywidget"
+        applicationId "com.dante.workcycle"
         minSdk 26
         targetSdk 36
         versionCode 14

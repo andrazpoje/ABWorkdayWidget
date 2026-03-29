@@ -69,7 +69,7 @@
     <string name="reverted">Changes reverted</string>
 
     <!-- APP -->
-    <string name="app_name">Work Cycle</string>
+    <string name="app_name">WorkCycle</string>
     <string name="app_header_title">Work Cycle</string>
     <string name="app_version">Version %1$s</string>
     <string name="settings_subtitle">Set your cycle, rules and widget appearance.</string>
@@ -227,7 +227,7 @@
     <string name="home_next_7_days_subtitle">Next 7 days overview</string>
     <string name="non_working_day_label">Non-working day</string>
 
-    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the AB Workday Widget.</string>
+    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Workday Widget.</string>
     <string name="select_color">Select color</string>
 
 

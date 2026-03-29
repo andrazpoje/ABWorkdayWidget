@@ -10,7 +10,7 @@ Android widget za prikaz izmen A/B.
 
 ## Namestitev
 Aplikacija je na Google Play:
-https://play.google.com/store/apps/details?id=com.dante.abworkdaywidget
+https://play.google.com/store/apps/details?id=com.dante.workcycle
 
 ## Razvoj
 Projekt je narejen v:

@@ -73,7 +73,7 @@
             android:layout_marginBottom="4dp"
             android:orientation="horizontal" />
 
-        <com.dante.abworkdaywidget.ui.ClickableRecyclerView
+        <com.dante.workcycle.ui.ClickableRecyclerView
             android:id="@+id/calendarRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

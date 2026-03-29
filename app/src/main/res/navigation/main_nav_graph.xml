@@ -6,17 +6,17 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.dante.abworkdaywidget.HomeFragment"
+        android:name="com.dante.workcycle.ui.fragments.HomeFragment"
         android:label="@string/nav_home" />
 
     <fragment
         android:id="@+id/calendarFragment"
-        android:name="com.dante.abworkdaywidget.CalendarFragment"
+        android:name="com.dante.workcycle.ui.fragments.CalendarFragment"
         android:label="@string/nav_calendar" />
 
     <fragment
         android:id="@+id/moreFragment"
-        android:name="com.dante.abworkdaywidget.MoreFragment"
+        android:name="com.dante.workcycle.ui.fragments.MoreFragment"
         android:label="@string/nav_more">
 
         <action
@@ -30,17 +30,17 @@
 
     <fragment
         android:id="@+id/statisticsFragment"
-        android:name="com.dante.abworkdaywidget.StatisticsFragment"
+        android:name="com.dante.workcycle.ui.fragments.StatisticsFragment"
         android:label="@string/statistics_title" />
 
     <fragment
         android:id="@+id/whatsNewFragment"
-        android:name="com.dante.abworkdaywidget.WhatsNewFragment"
+        android:name="com.dante.workcycle.ui.fragments.WhatsNewFragment"
         android:label="@string/whats_new_title" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.dante.abworkdaywidget.SettingsFragment"
+        android:name="com.dante.workcycle.ui.fragments.SettingsFragment"
         android:label="@string/settings_title">
 
         <action
@@ -50,6 +50,6 @@
 
     <fragment
         android:id="@+id/helpFragment"
-        android:name="com.dante.abworkdaywidget.HelpFragment"
+        android:name="com.dante.workcycle.ui.fragments.HelpFragment"
         android:label="@string/help_title" />
 </navigation>

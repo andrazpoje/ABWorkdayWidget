@@ -1,0 +1,51 @@
+package com.dante.workcycle
+
+import android.content.Context
+
+object CyclePresetProvider {
+
+    fun getPresets(): List<CyclePreset> = listOf(
+
+        CyclePreset(
+            id = "ab",
+            nameRes = R.string.preset_ab,
+            cycleDaysProvider = { _ -> listOf("A", "B") },
+            defaultFirstDayProvider = { _ -> "A" }
+        ),
+
+        CyclePreset(
+            id = "two_shift",
+            nameRes = R.string.preset_two_shift,
+            cycleDaysProvider = { context ->
+                listOf(
+                    context.getString(R.string.label_morning),
+                    context.getString(R.string.label_afternoon)
+                )
+            },
+            defaultFirstDayProvider = { context ->
+                context.getString(R.string.label_morning)
+            }
+        ),
+
+        CyclePreset(
+            id = "three_shift",
+            nameRes = R.string.preset_three_shift,
+            cycleDaysProvider = { context ->
+                listOf(
+                    context.getString(R.string.label_morning),
+                    context.getString(R.string.label_afternoon),
+                    context.getString(R.string.label_night)
+                )
+            },
+            defaultFirstDayProvider = { context ->
+                context.getString(R.string.label_morning)
+            }
+        )
+    )
+
+    fun findByDisplayName(context: Context, displayName: String): CyclePreset? {
+        return getPresets().firstOrNull {
+            context.getString(it.nameRes) == displayName
+        }
+    }
+}
