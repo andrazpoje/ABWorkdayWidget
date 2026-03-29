@@ -3,7 +3,7 @@ package com.dante.workcycle.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.dante.workcycle.CycleManager
+import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.R
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.notifications.NotificationHelper

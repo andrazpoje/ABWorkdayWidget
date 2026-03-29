@@ -1,4 +1,4 @@
-package com.dante.workcycle.util
+package com.dante.workcycle.domain.schedule
 
 private val whitespaceRegex = Regex("\\s+")
 

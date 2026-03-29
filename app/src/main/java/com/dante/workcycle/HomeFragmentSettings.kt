@@ -4,9 +4,11 @@ import android.content.Context
 import android.widget.Toast
 import androidx.core.content.edit
 import androidx.core.widget.addTextChangedListener
+import com.dante.workcycle.domain.holiday.HolidayManager
+import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.ui.fragments.HomeFragment
-import com.dante.workcycle.util.parseCycleInput
-import com.dante.workcycle.util.sanitizeLabel
+import com.dante.workcycle.domain.schedule.parseCycleInput
+import com.dante.workcycle.domain.schedule.sanitizeLabel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 fun HomeFragment.showUnsavedChangesDialog(

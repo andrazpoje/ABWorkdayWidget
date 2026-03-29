@@ -1,4 +1,4 @@
-package com.dante.workcycle
+package com.dante.workcycle.widget
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -10,6 +10,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
+import com.dante.workcycle.AppPrefs
+import com.dante.workcycle.CycleColorHelper
+import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.R
 import com.dante.workcycle.data.Prefs
 import com.dante.workcycle.ui.activity.MainActivity
 import java.time.LocalDate

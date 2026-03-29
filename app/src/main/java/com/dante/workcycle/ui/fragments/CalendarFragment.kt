@@ -28,8 +28,8 @@ import android.view.Gravity
 import com.dante.workcycle.ui.adapter.CalendarAdapter
 import com.dante.workcycle.CalendarDayItem
 import com.dante.workcycle.CycleColorHelper
-import com.dante.workcycle.CycleManager
-import com.dante.workcycle.HolidayManager
+import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.R
 import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding

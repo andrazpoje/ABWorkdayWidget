@@ -18,7 +18,7 @@ import com.dante.workcycle.AppPrefs
 import com.dante.workcycle.AppThemeManager
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
-import com.dante.workcycle.WorkCycleWidgetProvider
+import com.dante.workcycle.widget.WorkCycleWidgetProvider
 import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.data.Prefs

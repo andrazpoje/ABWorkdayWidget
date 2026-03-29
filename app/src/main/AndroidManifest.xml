@@ -27,7 +27,7 @@
 		</activity>
 
 		<receiver
-			android:name=".WorkCycleWidgetProvider"
+			android:name=".widget.WorkCycleWidgetProvider"
 			android:exported="false">
 
 			<intent-filter>

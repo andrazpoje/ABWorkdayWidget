@@ -9,8 +9,11 @@ import android.widget.Filterable
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import com.dante.workcycle.domain.holiday.HolidayManager
+import com.dante.workcycle.domain.schedule.CyclePreset
+import com.dante.workcycle.domain.schedule.CyclePresetProvider
 import com.dante.workcycle.ui.fragments.HomeFragment
-import com.dante.workcycle.util.sanitizeLabel
+import com.dante.workcycle.domain.schedule.sanitizeLabel
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import java.util.Locale

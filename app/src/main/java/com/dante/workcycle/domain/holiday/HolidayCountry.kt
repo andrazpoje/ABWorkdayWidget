@@ -1,4 +1,4 @@
-package com.dante.workcycle
+package com.dante.workcycle.domain.holiday
 
 data class HolidayCountry(
     val code: String,

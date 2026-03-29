@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.dante.workcycle.R
-import com.dante.workcycle.StatisticsCalculator
+import com.dante.workcycle.domain.statistics.StatisticsCalculator
 import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding
 

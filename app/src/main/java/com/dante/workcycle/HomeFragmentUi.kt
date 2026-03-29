@@ -7,10 +7,13 @@ import android.content.Context
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dante.workcycle.domain.holiday.HolidayManager
+import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
 import com.dante.workcycle.ui.fragments.HomeFragment
-import com.dante.workcycle.util.parseCycleInput
-import com.dante.workcycle.util.sanitizeLabel
+import com.dante.workcycle.domain.schedule.parseCycleInput
+import com.dante.workcycle.domain.schedule.sanitizeLabel
+import com.dante.workcycle.widget.WorkCycleWidgetProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle

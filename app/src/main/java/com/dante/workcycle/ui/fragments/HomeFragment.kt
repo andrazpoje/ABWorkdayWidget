@@ -21,9 +21,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.AppPrefs
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
-import com.dante.workcycle.HolidayCountry
+import com.dante.workcycle.domain.holiday.HolidayCountry
 import com.dante.workcycle.R
-import com.dante.workcycle.WorkCycleWidgetProvider
+import com.dante.workcycle.widget.WorkCycleWidgetProvider
 import com.dante.workcycle.applyImeInsetAsPadding
 import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding

@@ -1,8 +1,9 @@
-package com.dante.workcycle
+package com.dante.workcycle.domain.schedule
 
 import android.content.Context
 import androidx.core.content.edit
-import com.dante.workcycle.util.sanitizeLabel
+import com.dante.workcycle.AppPrefs
+import com.dante.workcycle.domain.holiday.HolidayManager
 import java.time.LocalDate
 
 object CycleManager {

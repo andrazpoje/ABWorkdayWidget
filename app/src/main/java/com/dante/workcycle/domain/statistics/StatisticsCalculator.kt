@@ -1,6 +1,8 @@
-package com.dante.workcycle
+package com.dante.workcycle.domain.statistics
 
 import android.content.Context
+import com.dante.workcycle.AppPrefs
+import com.dante.workcycle.domain.schedule.CycleManager
 import java.time.LocalDate
 
 data class StatisticsSummary(
