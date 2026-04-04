@@ -3,7 +3,7 @@ package com.dante.workcycle.domain.holiday
 import android.content.Context
 import android.telephony.TelephonyManager
 import androidx.core.content.edit
-import com.dante.workcycle.AppPrefs
+import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.R
 import java.time.LocalDate
 import java.util.Locale

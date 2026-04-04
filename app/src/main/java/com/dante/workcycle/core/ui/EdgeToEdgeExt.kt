@@ -1,4 +1,4 @@
-package com.dante.workcycle
+package com.dante.workcycle.core.ui
 
 import android.content.res.Configuration
 import android.view.View

@@ -1,278 +1,292 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_widget_classic"
+    android:gravity="top"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:paddingStart="8dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="8dp">
 
     <LinearLayout
         android:id="@+id/leftColorBar"
         android:layout_width="4dp"
         android:layout_height="match_parent"
-        android:layout_marginEnd="10dp"
-        android:background="#FFFFFF"
+        android:layout_marginEnd="8dp"
         android:orientation="vertical" />
 
     <LinearLayout
+        android:id="@+id/mainContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:gravity="top"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/prefixText"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@null"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:visibility="gone"
-            tools:text="Shift" />
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/todayLabelText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@null"
-            android:textColor="#CCFFFFFF"
-            android:textSize="12sp"
-            android:visibility="gone"
-            tools:text="Today"
-            tools:visibility="visible" />
+            android:layout_marginTop="1dp"
+            android:textColor="#CCCCCC"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/abText"
+        <LinearLayout
+            android:id="@+id/mainLabelContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@null"
-            android:textColor="#FFFFFF"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            tools:text="A" />
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/primaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/secondaryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textColor="#CCCCCC"
+                android:visibility="gone" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/extraDaysContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- DAY 1 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <ImageView
                     android:id="@+id/day1Dot"
                     android:layout_width="6dp"
                     android:layout_height="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#FFFFFF"
-                    android:orientation="vertical" />
+                    android:layout_marginEnd="6dp"
+                    android:src="@android:color/transparent" />
 
                 <TextView
                     android:id="@+id/day1Title"
-                    android:layout_width="72dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="13sp"
-                    tools:text="Wed" />
-
-                <TextView
-                    android:id="@+id/day1Value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="A" />
+                    android:textColor="#CCCCCC" />
+
+                <TextView
+                    android:id="@+id/day1Cycle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/day1Assignment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- DAY 2 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <ImageView
                     android:id="@+id/day2Dot"
                     android:layout_width="6dp"
                     android:layout_height="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#FFFFFF"
-                    android:orientation="vertical" />
+                    android:layout_marginEnd="6dp"
+                    android:src="@android:color/transparent" />
 
                 <TextView
                     android:id="@+id/day2Title"
-                    android:layout_width="72dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="13sp"
-                    tools:text="Thu" />
-
-                <TextView
-                    android:id="@+id/day2Value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="B" />
+                    android:textColor="#CCCCCC" />
+
+                <TextView
+                    android:id="@+id/day2Cycle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/day2Assignment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- DAY 3 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <ImageView
                     android:id="@+id/day3Dot"
                     android:layout_width="6dp"
                     android:layout_height="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#FFFFFF"
-                    android:orientation="vertical" />
+                    android:layout_marginEnd="6dp"
+                    android:src="@android:color/transparent" />
 
                 <TextView
                     android:id="@+id/day3Title"
-                    android:layout_width="72dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="13sp"
-                    tools:text="Fri" />
-
-                <TextView
-                    android:id="@+id/day3Value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="A" />
+                    android:textColor="#CCCCCC" />
+
+                <TextView
+                    android:id="@+id/day3Cycle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/day3Assignment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- DAY 4 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <ImageView
                     android:id="@+id/day4Dot"
                     android:layout_width="6dp"
                     android:layout_height="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#FFFFFF"
-                    android:orientation="vertical" />
+                    android:layout_marginEnd="6dp"
+                    android:src="@android:color/transparent" />
 
                 <TextView
                     android:id="@+id/day4Title"
-                    android:layout_width="72dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="13sp"
-                    tools:text="Sat" />
-
-                <TextView
-                    android:id="@+id/day4Value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="X" />
+                    android:textColor="#CCCCCC" />
+
+                <TextView
+                    android:id="@+id/day4Cycle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/day4Assignment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- DAY 5 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <ImageView
                     android:id="@+id/day5Dot"
                     android:layout_width="6dp"
                     android:layout_height="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#FFFFFF"
-                    android:orientation="vertical" />
+                    android:layout_marginEnd="6dp"
+                    android:src="@android:color/transparent" />
 
                 <TextView
                     android:id="@+id/day5Title"
-                    android:layout_width="72dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="13sp"
-                    tools:text="Sun" />
-
-                <TextView
-                    android:id="@+id/day5Value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="A" />
+                    android:textColor="#CCCCCC" />
+
+                <TextView
+                    android:id="@+id/day5Cycle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/day5Assignment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:visibility="gone" />
             </LinearLayout>
 
-            <!-- DAY 6 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <ImageView
                     android:id="@+id/day6Dot"
                     android:layout_width="6dp"
                     android:layout_height="6dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="#FFFFFF"
-                    android:orientation="vertical" />
+                    android:layout_marginEnd="6dp"
+                    android:src="@android:color/transparent" />
 
                 <TextView
                     android:id="@+id/day6Title"
-                    android:layout_width="72dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="13sp"
-                    tools:text="Mon" />
-
-                <TextView
-                    android:id="@+id/day6Value"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="B" />
+                    android:textColor="#CCCCCC" />
+
+                <TextView
+                    android:id="@+id/day6Cycle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/day6Assignment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:visibility="gone" />
             </LinearLayout>
 
         </LinearLayout>

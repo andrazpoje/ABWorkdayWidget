@@ -24,7 +24,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Label"
+            android:text="@string/color_row_default_label"
             android:textColor="?attr/colorOnSurface"
             android:textSize="14sp" />
 

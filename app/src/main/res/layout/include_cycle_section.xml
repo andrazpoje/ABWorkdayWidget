@@ -60,6 +60,40 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/activeTemplateCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:id="@+id/activeTemplateTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/template_active_title"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/activeTemplateDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <TextView
                     android:id="@+id/presetLabel"
                     android:layout_width="match_parent"
@@ -71,23 +105,31 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/presetInputLayout"
+                    style="@style/AppExposedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="@string/preset_hint"
-                    style="@style/AppExposedDropdown">
+                    android:layout_marginBottom="8dp"
+                    android:hint="@string/preset_hint">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/presetDropdown"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="60dp"
                         android:clickable="true"
                         android:focusable="false"
                         android:inputType="none"
-                        android:maxLines="1" />
+                        android:maxLines="1"
+                        android:minHeight="60dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <TextView
+                    android:id="@+id/templateLockedMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/template_locked_message"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/dateText"
@@ -156,29 +198,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    app:singleSelection="true"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="8dp"
                     app:selectionRequired="true"
                     app:singleLine="false"
-                    app:chipSpacingHorizontal="8dp"
-                    app:chipSpacingVertical="8dp" />
+                    app:singleSelection="true" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/firstCycleDayInputLayout"
+                    style="@style/AppExposedDropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:hint="@string/first_cycle_day_label"
-                    style="@style/AppExposedDropdown">
+                    android:visibility="gone">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/firstCycleDayDropdown"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="60dp"
                         android:clickable="true"
                         android:focusable="false"
                         android:inputType="none"
-                        android:maxLines="1" />
+                        android:maxLines="1"
+                        android:minHeight="60dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
@@ -193,9 +235,9 @@
                     android:id="@+id/dateResultText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

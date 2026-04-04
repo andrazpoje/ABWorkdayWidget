@@ -2,15 +2,18 @@ package com.dante.workcycle.domain.schedule
 
 import android.content.Context
 import androidx.core.content.edit
-import com.dante.workcycle.AppPrefs
+import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import java.time.LocalDate
+import com.dante.workcycle.R
 
 object CycleManager {
 
     const val PREFS_NAME = "ab_cycle_prefs"
     const val KEY_CYCLE_DAYS = "cycle_days"
     const val KEY_CYCLE_START_DATE = "cycle_start_date"
+
+    private val DEFAULT_START_DATE: LocalDate = LocalDate.of(2026, 1, 1)
 
     fun saveCycle(context: Context, cycle: List<String>) {
         val cleaned = cycle
@@ -49,18 +52,17 @@ object CycleManager {
             .getString(KEY_CYCLE_START_DATE, null)
 
         return try {
-            if (stored.isNullOrBlank()) LocalDate.now() else LocalDate.parse(stored)
+            if (stored.isNullOrBlank()) {
+                DEFAULT_START_DATE
+            } else {
+                LocalDate.parse(stored)
+            }
         } catch (_: Exception) {
-            LocalDate.now()
+            DEFAULT_START_DATE
         }
     }
 
     fun getCycleDayForDate(context: Context, date: LocalDate): String {
-        val overrideLabel = getSkippedDayOverrideLabelOrNull(context, date)
-        if (overrideLabel != null) {
-            return overrideLabel
-        }
-
         val cycle = loadCycle(context)
         if (cycle.isEmpty()) return "A"
 
@@ -100,19 +102,22 @@ object CycleManager {
     private fun loadFirstCycleDayIndex(context: Context, cycle: List<String>): Int {
         val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
+        val fallback = cycle.firstOrNull() ?: "A"
+
         val savedFirstDayRaw = prefs.getString(
             AppPrefs.KEY_FIRST_CYCLE_DAY,
-            cycle.firstOrNull() ?: "A"
-        ) ?: (cycle.firstOrNull() ?: "A")
+            fallback
+        ) ?: fallback
 
-        val savedFirstDay = sanitizeLabel(
-            savedFirstDayRaw,
-            cycle.firstOrNull() ?: "A"
-        )
-
+        val savedFirstDay = sanitizeLabel(savedFirstDayRaw, fallback)
         val index = cycle.indexOfFirst { it.equals(savedFirstDay, ignoreCase = true) }
 
         return if (index >= 0) index else 0
+    }
+
+    private fun sanitizeLabel(raw: String?, fallback: String): String {
+        val normalized = raw?.trim().orEmpty()
+        return if (normalized.isBlank()) fallback else normalized
     }
 
     fun getSkippedDayOverrideLabelOrNull(context: Context, date: LocalDate): String? {
@@ -135,12 +140,7 @@ object CycleManager {
 
         if (!isSkipped) return null
 
-        val label = prefs.getString(AppPrefs.KEY_SKIPPED_LABEL, AppPrefs.DEFAULT_SKIPPED_LABEL)
-            ?.trim()
-            .orEmpty()
-            .ifBlank { AppPrefs.DEFAULT_SKIPPED_LABEL }
-
-        return label
+        return context.getString(R.string.off_day_label)
     }
 
     private fun countIncludedDaysForward(

@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.dante.workcycle.ui.fragments.HomeFragment"
+        android:name="com.dante.workcycle.ui.home.HomeFragment"
         android:label="@string/nav_home" />
 
     <fragment
@@ -46,7 +46,16 @@
         <action
             android:id="@+id/action_settingsFragment_to_whatsNewFragment"
             app:destination="@id/whatsNewFragment" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_secondaryLabelsFragment"
+            app:destination="@id/secondaryLabelsFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/secondaryLabelsFragment"
+        android:name="com.dante.workcycle.ui.settings.AssignmentLabelsFragment"
+        android:label="Secondary labels" />
 
     <fragment
         android:id="@+id/helpFragment"

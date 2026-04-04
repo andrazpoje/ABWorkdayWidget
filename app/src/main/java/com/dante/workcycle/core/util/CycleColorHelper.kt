@@ -1,8 +1,11 @@
-package com.dante.workcycle
+package com.dante.workcycle.core.util
 
 import android.content.Context
+import android.graphics.Color
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
+import com.dante.workcycle.core.theme.CycleThemeManager
+import com.dante.workcycle.data.prefs.AppPrefs
 
 object CycleColorHelper {
 
@@ -26,14 +29,13 @@ object CycleColorHelper {
         val normalizedLabel = label.trim()
         val index = cleanedCycle.indexOfFirst { it.equals(normalizedLabel, ignoreCase = true) }
 
-        if (index == -1) {
-            return getSkippedDayColor(context)
-        }
+// fallback na prvi element cikla namesto sive
+        val safeIndex = if (index == -1) 0 else index
 
         return when (CycleThemeManager.loadTheme(context)) {
-            CycleThemeManager.THEME_PASTEL -> getPastelColor(index)
-            CycleThemeManager.THEME_DARK -> getDarkColor(index)
-            else -> getClassicColor(index)
+            CycleThemeManager.THEME_PASTEL -> getPastelColor(safeIndex)
+            CycleThemeManager.THEME_DARK -> getDarkColor(safeIndex)
+            else -> getClassicColor(safeIndex)
         }
     }
 
@@ -103,9 +105,9 @@ object CycleColorHelper {
     fun getTextColorForBackground(backgroundColor: Int): Int {
         val luminance = ColorUtils.calculateLuminance(backgroundColor)
         return if (luminance > 0.5) {
-            android.graphics.Color.BLACK
+            Color.BLACK
         } else {
-            android.graphics.Color.WHITE
+            Color.WHITE
         }
     }
 }

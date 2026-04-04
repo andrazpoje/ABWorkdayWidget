@@ -12,8 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
-import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
-import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.google.android.material.card.MaterialCardView
 
 class MoreFragment : Fragment(R.layout.fragment_more) {
@@ -21,10 +21,9 @@ class MoreFragment : Fragment(R.layout.fragment_more) {
     companion object {
         private const val AUTHOR_EMAIL = "danteprodukcija@gmail.com"
         private const val DONATE_URL = "https://buymeacoffee.com/poje"
-        private const val GITHUB_URL = "https://github.com/andrazpoje/WorkCycle"
+        private const val GITHUB_URL = "https://github.com/andrazpoje/ABWorkdayWidget"
     }
 
-    private lateinit var moreRoot: View
     private lateinit var moreContentContainer: View
     private lateinit var moreVersion: TextView
 
@@ -68,7 +67,6 @@ class MoreFragment : Fragment(R.layout.fragment_more) {
     }
 
     private fun bindViews(root: View) {
-        moreRoot = root
         moreContentContainer = root.findViewById(R.id.moreContentContainer)
         moreVersion = root.findViewById(R.id.moreVersion)
     }

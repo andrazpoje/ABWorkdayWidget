@@ -1,4 +1,4 @@
-package com.dante.workcycle.style
+package com.dante.workcycle.core.theme
 
 enum class ThemePreset(val storageValue: String) {
     CLASSIC("classic"),

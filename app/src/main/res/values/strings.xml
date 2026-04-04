@@ -1,63 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- WHAT'S NEW -->
-    <string name="whats_new_content">
-- New Settings, Help and Statistics screens
-- First cycle day selection with chips UI
-- Support for Italy and Hungary
-- Improved notification reliability (fallback for some devices)
-- Fixed Save/Revert button behavior
-- General improvements and bug fixes
-</string>
-    <string name="whats_new_view_full_changelog">View full changelog</string>
-
-    <string name="label_day">Day</string>
-    <string name="label_off">Off</string>
-    <string name="label_recovery">Recovery</string>
-
-    <string name="whats_new_title">What’s New</string>
-    <string name="whats_new_version_format">Version %1$s</string>
-
-    <!-- STATISTICS -->
-    <string name="statistics_title">Statistics</string>
-    <string name="statistics_this_month">This month</string>
-    <string name="statistics_this_year">This year</string>
-    <string name="statistics_total_days">Total days: %1$d</string>
-    <string name="more_statistics_title">Statistics</string>
-    <string name="more_statistics_subtitle">View cycle counts for this month and year</string>
-
-    <!-- SETTINGS -->
-    <string name="settings_title">Settings</string>
-    <string name="settings_appearance_title">App Appearance</string>
-    <string name="settings_widget_title">Widget</string>
-    <string name="settings_about_title">About</string>
-    <string name="settings_notifications_title">Notifications</string>
-    <string name="settings_widget_style_title">Widget appearance</string>
-    <string name="settings_widget_style_description">Choose the widget style.</string>
-    <string name="settings_widget_style_classic">Classic</string>
-    <string name="settings_widget_style_minimal">Minimal</string>
-    <string name="settings_notifications_enabled">Cycle change notifications</string>
-    <string name="settings_silent_notification">Silent notifications (no sound)</string>
-
-    <!-- compatibility keys if any old XML still references them -->
-    <string name="widget_style_classic">Classic</string>
-    <string name="widget_style_minimal">Minimal</string>
-    <string name="notifications_enabled">Enable notifications</string>
-    <string name="silent_notification">Silent notifications</string>
-
-    <!-- HELP -->
-    <string name="help_title">Help &amp; guide</string>
-    <string name="help_getting_started_title">Getting started</string>
-    <string name="help_getting_started_content">1. Set the start date.\n2. Choose the first cycle day.\n3. Configure skip rules and labels.\n4. Save your changes.\n5. Add the widget to your home screen.</string>
-    <string name="help_calculation_title">How cycle calculation works</string>
-    <string name="help_calculation_content">The selected start date is the reference point for the cycle. The first cycle day is the label assigned to that date. The cycle advances only on included days. Skipped weekends and holidays do not move the cycle forward.</string>
-    <string name="help_presets_title">Presets</string>
-    <string name="help_presets_content">Presets fill the cycle fields with ready-made values. If you later edit the cycle manually, the preset changes to Custom.</string>
-    <string name="help_widget_title">Widget</string>
-    <string name="help_widget_content">You can add the widget from your launcher’s widget picker. The widget updates automatically and uses the saved app settings. Widget style affects appearance only.</string>
-    <string name="help_faq_title">FAQ</string>
-    <string name="help_faq_content">Why does the cycle not change on some days?\nBecause weekends or holidays may be skipped.\n\nWhy is the widget different from the app?\nCheck saved settings and widget style.\n\nWhy are notifications not working?\nMake sure notifications are enabled and permission is granted.</string>
+    <!-- APP -->
+    <string name="app_name">WorkCycle</string>
+    <string name="app_version">Version %1$s</string>
 
     <!-- COMMON -->
     <string name="ok">OK</string>
@@ -65,23 +11,17 @@
     <string name="save">Save</string>
     <string name="discard">Discard</string>
     <string name="close">Close</string>
+    <string name="remove">Remove</string>
     <string name="revert">Revert</string>
     <string name="reverted">Changes reverted</string>
+    <string name="none_label">None</string>
+    <string name="preview_label">Preview</string>
 
-    <!-- APP -->
-    <string name="app_name">WorkCycle</string>
-    <string name="app_header_title">Work Cycle</string>
-    <string name="app_version">Version %1$s</string>
-    <string name="settings_subtitle">Set your cycle, rules and widget appearance.</string>
-
-    <!-- STATUS -->
-    <string name="status_section">Today</string>
+    <!-- HOME -->
     <string name="today_label">Today</string>
     <string name="tomorrow_label">Tomorrow</string>
-    <string name="tomorrow_status">Tomorrow: %1$s</string>
-
-    <!-- PREVIEW -->
-    <string name="preview_title">Upcoming days</string>
+    <string name="home_next_7_days_subtitle">Next 7 days overview</string>
+    <string name="non_working_day_label">Non-working day</string>
 
     <!-- CYCLE -->
     <string name="cycle_section">Cycle</string>
@@ -96,27 +36,14 @@
     <!-- PRESETS -->
     <string name="preset_label">Preset</string>
     <string name="preset_hint">Choose preset</string>
-    <string name="apply_preset_title">Apply preset</string>
-    <string name="apply_preset">Apply preset</string>
-    <string name="apply_preset_message">This will replace the current cycle settings with preset "%1$s".</string>
-    <string name="preset_already_applied">This preset is already applied</string>
     <string name="preset_custom">Custom</string>
     <string name="preset_applied">Preset applied: %1$s</string>
     <string name="preset_ab">A / B</string>
     <string name="preset_two_shift">2-shift</string>
     <string name="preset_three_shift">3-shift</string>
 
-    <!-- THEMES -->
-    <string name="app_theme">App theme</string>
-    <string name="theme_system">Follow system</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_dark_mode">Dark</string>
-    <string name="color_theme">Color theme</string>
-    <string name="theme_classic">Classic</string>
-    <string name="theme_pastel">Pastel</string>
-    <string name="theme_dark">Dark</string>
-
     <!-- LABELS -->
+    <string name="label_off">Off</string>
     <string name="label_morning">Morning</string>
     <string name="label_afternoon">Afternoon</string>
     <string name="label_night">Night</string>
@@ -129,17 +56,88 @@
     <string name="rules_info_text">Choose whether the cycle should skip Saturdays, Sundays and non-working days.</string>
     <string name="holiday_country_label">Country for non-working days</string>
     <string name="holiday_country_hint">Select country</string>
-    <string name="override_skipped_days">Show custom label on skipped days</string>
-    <string name="skipped_day_label">Skipped day label</string>
+    <string name="off_day_label">Off</string>
+
 
     <!-- DISPLAY -->
     <string name="display_section">Display</string>
-    <string name="prefix_text">Text before cycle label</string>
-    <string name="display_info_text">The widget shows exactly the labels entered in the cycle.</string>
+    <string name="show_assignment_icons_calendar">Show assignment indicators in calendar</string>
+    <string name="show_assignment_icons_weekly">Show assignment indicators in weekly preview</string>
+    <string name="show_assignment_icons_helper">Show or hide assignment icons and indicators in the calendar and the next 7 days preview.</string>
+
+    <!-- THEMES -->
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="color_theme">Color theme</string>
+    <string name="theme_classic">Classic</string>
+    <string name="theme_pastel">Pastel</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- SETTINGS -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance_title">App Appearance</string>
+    <string name="settings_widget_title">Widget</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_widget_style_classic">Classic</string>
+    <string name="settings_widget_style_minimal">Minimal</string>
+    <string name="settings_notifications_enabled">Cycle change notifications</string>
+    <string name="settings_silent_notification">Silent notifications (no sound)</string>
+
+
+    <!-- ASSIGNMENTS -->
+    <string name="assignment_section_title">Assignments</string>
+    <string name="assignment_enable">Enable assignments</string>
+    <string name="assignment_enable_first_message">Enable assignments first.</string>
+    <string name="assignment_mode_helper">Choose how assignments are resolved for each day.</string>
+    <string name="assignment_mode_cyclic_overrides">Cyclic + overrides</string>
+    <string name="assignment_mode_manual_only">Manual only</string>
+    <string name="assignment_mode_cyclic_helper">Uses the assignment cycle as the default value. You can override individual days.</string>
+    <string name="assignment_mode_manual_helper">Assignments are set manually day by day.</string>
+    <string name="assignment_labels_button">Manage assignment labels</string>
+    <string name="assignment_override_label">Manual assignment override</string>
+    <string name="assignment_advance_mode_title">Assignment cycle advance</string>
+    <string name="assignment_advance_mode_label">Advance mode</string>
+    <string name="assignment_advance_mode_helper">Choose whether the assignment cycle advances every day or only on working days.</string>
+    <string name="assignment_advance_mode_all_days">Every day</string>
+    <string name="assignment_advance_mode_working_days_only">Working days only</string>
+
+
+    <!-- CALENDAR -->
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_day_cycle">Cycle day</string>
+    <string name="calendar_day_holiday">Day status</string>
+    <string name="calendar_month_year">%1$s %2$d</string>
+
+    <string-array name="week_days_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+
+    <!-- BOTTOM SHEET -->
+    <string name="select_assignment">Select assignment</string>
+    <string name="bottom_sheet_cycle_info">Cycle: %1$s</string>
+    <string name="bottom_sheet_assignment_info">Assignment: %1$s</string>
+
+    <!-- STATISTICS -->
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_this_month">This month</string>
+    <string name="statistics_this_year">This year</string>
+    <string name="statistics_total_days">Total days: %1$d</string>
+    <string name="more_statistics_title">Statistics</string>
+    <string name="more_statistics_subtitle">View cycle counts for this month and year</string>
 
     <!-- WIDGET -->
     <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
+    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Workday Widget.</string>
     <string name="open_widgets">Open widgets</string>
+    <string name="select_color">Select color</string>
 
     <!-- SAVE / DIALOG -->
     <string name="settings_saved">Settings saved</string>
@@ -161,15 +159,12 @@
     <string name="fix_errors">Please fix input errors</string>
 
     <!-- NOTIFICATIONS -->
-    <string name="settings_notification_title">Notifications</string>
     <string name="notification_channel_normal_name">AB day notifications</string>
     <string name="notification_channel_normal_desc">Notifications when the workday cycle changes</string>
     <string name="notification_channel_silent_name">AB day notifications (silent)</string>
     <string name="notification_channel_silent_desc">Silent notifications when the workday cycle changes</string>
     <string name="notification_day_changed_title">Cycle changed</string>
-    <string name="notification_generic_message">The work cycle has been updated.</string>
     <string name="notification_today_tomorrow">Today: %1$s\nTomorrow: %2$s</string>
-    <string name="notification_day_off_short">not a workday</string>
     <string name="notification_permission_denied">Notification permission was not granted.</string>
 
     <!-- MORE / NAVIGATION -->
@@ -177,8 +172,6 @@
     <string name="more_whats_new_subtitle">See what changed in the latest version</string>
     <string name="more_check_updates_title">Check for updates</string>
     <string name="more_check_updates_subtitle">Open Google Play to check for a newer version</string>
-    <string name="more_calendar_title">Cycle calendar</string>
-    <string name="more_calendar_subtitle">View the cycle across the month</string>
     <string name="more_contact_title">Contact author</string>
     <string name="more_contact_subtitle">Send feedback or questions</string>
     <string name="more_github_title">GitHub</string>
@@ -191,22 +184,27 @@
     <string name="nav_calendar">Calendar</string>
     <string name="nav_more">More</string>
 
-    <!-- CALENDAR -->
-    <string name="calendar_previous_month">Previous month</string>
-    <string name="calendar_next_month">Next month</string>
-    <string name="calendar_day_cycle">Cycle day</string>
-    <string name="calendar_day_holiday">Day status</string>
-    <string name="calendar_month_year">%1$s %2$d</string>
 
-    <string-array name="week_days_short">
-        <item>Mon</item>
-        <item>Tue</item>
-        <item>Wed</item>
-        <item>Thu</item>
-        <item>Fri</item>
-        <item>Sat</item>
-        <item>Sun</item>
-    </string-array>
+    <!-- HELP -->
+    <string name="help_getting_started_content">• Set the start date of your cycle.\n• Define cycle labels (e.g. A, B or Morning, Afternoon, Night).\n• Select which label applies to the start date.\n• Configure rules (skip weekends or holidays if needed).\n• Save your settings.\n• Optionally add a widget to your home screen.</string>
+
+    <string name="help_cycle_logic_content">• The start date is the reference point of the cycle.\n• The selected label applies to that date.\n• Each valid day advances the cycle.\n• Skipped weekends or holidays do not affect the cycle.</string>
+
+    <string name="help_assignments_content">• Assignments add extra labels (e.g. O1, vacation, sick leave).\n• Edit a day in the 7-day preview or calendar.\n• Assignments can override or complement the cycle.\n• You can toggle assignment visibility in settings.</string>
+
+    <string name="help_preview_content">• Shows the next 7 days based on current settings.\n• Tap a day to edit its assignment.\n• Changes appear after saving.\n• Reflects both cycle rules and assignments.</string>
+
+    <string name="help_calendar_content">• Displays a monthly overview of the cycle.\n• Each day shows a short label (A, B, O1).\n• Tap a day to see details.\n• Combines cycle and assignment data.</string>
+
+    <string name="help_widget_content">• The widget shows your current cycle.\n• It updates automatically every day.\n• You can customize its appearance in settings.\n• Uses the same data as the app.</string>
+
+    <string name="help_tips_content">• Use short labels for better readability.\n• Keep the cycle simple (A/B or 2–3 shifts).\n• Use assignments for exceptions.\n• If something looks wrong, check start date and rules.</string>
+
+    <!-- WHAT'S NEW -->
+    <string name="whats_new_title">What’s New</string>
+    <string name="whats_new_version_format">Version %1$s</string>
+    <string name="whats_new_view_full_changelog">View full changelog</string>
+    <string name="whats_new_content">✨ New\n• Templates (presets) – e.g. Pošta Slovenije A/B\n• 7-day preview with editable assignments\n• Calendar with improved day labels and details\n• Support for additional countries: Italy and Hungary\n\n🎨 Improvements\n• Redesigned Settings, Help and Statistics screens\n• Start day selection with chips UI\n• Better cycle and assignment display\n• Improved Help screen with expandable sections\n• Cleaner settings layout and display options\n\n⚙️ Fixes and stability\n• Improved notification reliability on some devices\n• Fixed Save / Revert button behavior\n• General bug fixes and performance improvements</string>
 
     <!-- EMAIL / LINKS -->
     <string name="email_subject_contact">%1$s - Feedback</string>
@@ -224,11 +222,126 @@
     <string name="country_italy">Italy</string>
     <string name="country_hungary">Hungary</string>
 
-    <string name="home_next_7_days_subtitle">Next 7 days overview</string>
-    <string name="non_working_day_label">Non-working day</string>
+    <string name="edit_day">Edit day</string>
+    <string name="set_manual_assignment">Set manual assignment</string>
+    <string name="date_format_hint">Date (yyyy-MM-dd)</string>
+    <string name="secondary_label_hint">Secondary label (e.g. O1)</string>
+    <string name="label">Label</string>
+    <string name="color">Color</string>
+    <string name="pick_color">Pick color</string>
+    <string name="add_label">Add label</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="custom_colors">Custom colors</string>
+    <string name="schedule">Schedule</string>
+    <string name="start_date_hint">Start date (yyyy-MM-dd)</string>
 
-    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Workday Widget.</string>
-    <string name="select_color">Select color</string>
+    <string name="help_title">Help &amp; Guide</string>
+    <string name="help_cycle_logic_title">How the cycle works</string>
+    <string name="help_calculation_content">@string/help_cycle_logic_content</string>
+    <string name="help_preview_title">7-day preview</string>
+    <string name="help_presets_content">@string/help_preview_content</string>
+    <string name="help_faq_content">@string/help_tips_content</string>
+
+    <string name="help_getting_started_title">Getting started</string>
+    <string name="help_assignments_title">Assignments (secondary labels)</string>
+    <string name="help_calendar_title">Calendar</string>
+    <string name="help_widget_title">Widget</string>
+    <string name="help_tips_title">Tips</string>
+
+    <string name="select_cycle_override">Select cycle override</string>
+    <string name="clear_cycle_override">Clear cycle override</string>
+    <string name="clear_assignment">Clear assignment</string>
+    <string name="bottom_sheet_cycle_info_base_only">Cycle: %1$s</string>
+    <string name="bottom_sheet_cycle_info_with_override">Cycle: %1$s → %2$s</string>
+
+    <string name="assignment_labels_title">Assignment labels</string>
+    <string name="assignment_labels_description">System labels stay fixed and can only be enabled or disabled. Manual labels can be added, edited, deleted, and are sorted by usage.</string>
+    <string name="assignment_label_type_system">System label</string>
+    <string name="assignment_label_type_manual_usage">Manual label • used %1$d×</string>
+    <string name="edit_label">Edit label</string>
+    <string name="delete_label">Delete label</string>
+    <string name="delete_label_message">Delete "%1$s"?</string>
+
+    <string name="assignment_labels_system_section">System labels</string>
+    <string name="assignment_labels_manual_section">My labels</string>
+    <string name="my_labels_helper">Add your own labels (e.g. location, project or task).</string>
+    <string name="edit_system_label">Edit system label</string>
+
+    <string name="day_editor_cycle_helper">Base cycle is calculated automatically. Override only if this specific day should be different.</string>
+    <string name="day_editor_assignment_helper">Assignments add extra meaning to the day. System labels stay fixed; manual labels are sorted by usage.</string>
+
+    <string name="cycle_override_label">Cycle override</string>
+
+    <string name="template_none">No template</string>
+    <string name="template_active_title">Active template</string>
+    <string name="template_locked_message">Some settings are locked because a template is active.</string>
+    <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
+    <string name="template_posta_slovenije_description">Fixed A/B cycle for postal workers. Cycle, rules, and start date are locked. Assignments are enabled in manual-only mode.</string>
+    <string name="template_locked_cycle_edit">Cycle editing is locked because a template is active.</string>
+    <string name="template_locked_rules_edit">Rules are locked because a template is active.</string>
+
+    <string name="template_apply_confirm_message">This will apply a fixed cycle and lock cycle and rules settings.</string>
+    <string name="apply">Apply</string>
+    <string name="template_removed_message">Template removed. Manual editing is enabled again.</string>
+    <string name="template_locked_click_message">This setting is locked because an active template controls it.</string>
+
+    <string name="template_cycle_override_locked_message">Cycle is controlled by the active template and cannot be changed here.</string>
+    <string name="assignment_mode_locked_by_template">
+Assignment mode is controlled by the active template.
+</string>
+
+    <string name="template_reference_date_format">Reference date: %1$s = %2$s</string>
+    <string name="template_locked_summary_format">Locked by template: %1$s</string>
+    <string name="template_locked_item_cycle">cycle</string>
+    <string name="template_locked_item_rules">rules</string>
+    <string name="template_locked_item_start_date">start date</string>
+    <string name="template_locked_item_assignment_mode">assignment mode</string>
+
+    <string name="template_clear_dialog_title">Disable template?</string>
+    <string name="template_clear_dialog_message">The template will be disabled. Manual editing of cycle, rules, and assignment mode will be re-enabled.</string>
+    <string name="template_clear_dialog_confirm">Disable</string>
+
+    <string name="theme_custom">Custom</string>
+    <string name="custom_colors_title">Custom colors</string>
+    <string name="custom_colors_helper">These colors are used only when the Custom theme is selected.</string>
+
+    <string name="color_shift_a">Cycle A</string>
+    <string name="color_shift_b">Cycle B</string>
+    <string name="color_background">Background</string>
+
+    <string name="color_picker_title">Choose color</string>
+    <string name="color_picker_palette_label">Color palette</string>
+    <string name="color_picker_apply">Apply</string>
+    <string name="color_picker_title_cycle_a">Choose color for Cycle A</string>
+    <string name="color_picker_title_cycle_b">Choose color for Cycle B</string>
+    <string name="color_picker_title_background">Choose background color</string>
+
+    <string name="assignment_label_name">Label</string>
+    <string name="assignment_label_color">Color</string>
+    <string name="assignment_label_pick_color">Pick color</string>
+
+    <string name="color_row_default_label">Label</string>
+
+    <string name="calendar_day_label_placeholder">A</string>
+    <string name="calendar_secondary_label_placeholder">Vac.</string>
+
+    <string name="assignment_system_label_sick">Sick leave</string>
+    <string name="assignment_system_label_vacation">Vacation</string>
+    <string name="assignment_system_label_standby">Standby</string>
+    <string name="assignment_system_label_field">Field work</string>
+
+    <string name="assignment_system_label_sick_short">Sick</string>
+    <string name="assignment_system_label_vacation_short">Vac.</string>
+    <string name="assignment_system_label_standby_short">Stand.</string>
+    <string name="assignment_system_label_field_short">Field</string>
+
+    <string name="cycle_day_fallback">Day %1$d</string>
+    <string name="settings_schedule_title">Schedule</string>
+
+    <string name="assignment_start_date_hint">Start date (yyyy-MM-dd)</string>
+    <string name="assignment_cycle_hint">Labels (e.g. A,B,C or Route1,Route2)</string>
+
 
 
 </resources>

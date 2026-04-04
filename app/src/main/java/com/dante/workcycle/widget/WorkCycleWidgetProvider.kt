@@ -8,19 +8,26 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
-import com.dante.workcycle.AppPrefs
-import com.dante.workcycle.CycleColorHelper
-import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.R
-import com.dante.workcycle.data.Prefs
+import com.dante.workcycle.core.util.CycleColorHelper
+import com.dante.workcycle.data.prefs.Prefs
+import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
+import com.dante.workcycle.style.WidgetStyleManager
 import com.dante.workcycle.ui.activity.MainActivity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
+import com.dante.workcycle.core.util.DateProvider
 
 class WorkCycleWidgetProvider : AppWidgetProvider() {
 
@@ -55,22 +62,23 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         widgetId: Int
     ) {
         val cycle = CycleManager.loadCycle(context)
-        val today = LocalDate.now()
-        val todayCycle = CycleManager.getCycleDayForDate(context, today)
+        val today = DateProvider.today()
+        val resolver = DefaultScheduleResolver(context)
+        val resolvedToday = resolver.resolve(today)
 
-        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-        val prefix = prefs.getString(AppPrefs.KEY_PREFIX_TEXT, "") ?: ""
+        val todayPrimary = resolvedToday.effectiveCycleLabel.trim()
+        val todayBase = resolvedToday.baseCycleLabel.trim()
+        val todaySecondary = resolvedToday.assignmentLabel?.trim()
 
-        val todayColor = CycleColorHelper.getBackgroundColor(
+        val widgetColors = WidgetStyleManager.getColors(context)
+
+        val todayColor = resolveWidgetCycleColor(
             context = context,
-            label = todayCycle,
+            label = todayBase,
             cycle = cycle
         )
 
-        val views = RemoteViews(
-            context.packageName,
-            R.layout.widget_layout
-        )
+        val views = RemoteViews(context.packageName, R.layout.widget_layout)
 
         val options = appWidgetManager.getAppWidgetOptions(widgetId)
         val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
@@ -78,39 +86,64 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
 
         val mode = resolveWidgetMode(minWidth, minHeight)
         val isVeryNarrow = minWidth < 170
-        val isSingleCellLike = minWidth < 110
-        val canShowFullMainLabel = minWidth >= 140
+        val isSingleCellLike = minWidth < 110 || minHeight < 80
+        val canShowSecondaryLabel = !isSingleCellLike && minWidth >= 140 && minHeight >= 70
 
-        val showPrefix = prefix.isNotBlank() && mode != WidgetMode.SMALL && !isVeryNarrow
-        val showTodayLabel = mode != WidgetMode.SMALL && !isVeryNarrow
+        val showTodayLabel = mode != WidgetMode.SMALL && !isVeryNarrow && !isSingleCellLike
 
-        val rowsToShow = resolveExtraRows(minWidth, minHeight)
+        val rowsToShow = if (isSingleCellLike) 0 else resolveExtraRows(minWidth, minHeight)
+        val typography = resolveTypography(mode, minWidth, minHeight)
 
         val skippedOverride = CycleManager.getSkippedDayOverrideLabelOrNull(context, today)
 
-        val displayTodayCycle = when {
-            skippedOverride != null && isSingleCellLike -> "X"
-            canShowFullMainLabel -> todayCycle
-            skippedOverride != null -> "X"
-            else -> formatCompactWidgetLabel(todayCycle)
+        val displayPrimary = when {
+            isSingleCellLike -> resolveWidgetPrimaryDisplayLabel(
+                context = context,
+                rawLabel = todayPrimary,
+                short = true
+            )
+            else -> resolveWidgetPrimaryDisplayLabel(
+                context = context,
+                rawLabel = todayPrimary,
+                short = false
+            )
         }
 
-        views.setTextViewText(R.id.abText, displayTodayCycle)
-        views.setTextColor(R.id.abText, todayColor)
+        val displaySecondary = when {
+            skippedOverride != null -> null
+            isSingleCellLike -> null
+            canShowSecondaryLabel && !todaySecondary.isNullOrBlank() -> {
+                resolveWidgetAssignmentDisplayLabel(
+                    context = context,
+                    rawLabel = todaySecondary,
+                    short = false
+                )
+            }
+            else -> null
+        }
+
+        applyAdaptiveTypography(views, typography)
+
+        views.setTextViewText(R.id.primaryText, displayPrimary)
+        views.setTextColor(R.id.primaryText, todayColor)
         views.setInt(R.id.leftColorBar, "setBackgroundColor", todayColor)
+
+        if (displaySecondary.isNullOrBlank()) {
+            views.setViewVisibility(R.id.secondaryText, View.GONE)
+        } else {
+            views.setViewVisibility(R.id.secondaryText, View.VISIBLE)
+            views.setTextViewText(R.id.secondaryText, displaySecondary)
+            views.setTextColor(R.id.secondaryText, widgetColors.secondaryTextColor)
+        }
 
         applyWidgetStyle(context, views)
 
-        if (showPrefix) {
-            views.setViewVisibility(R.id.prefixText, View.VISIBLE)
-            views.setTextViewText(R.id.prefixText, prefix)
-        } else {
-            views.setViewVisibility(R.id.prefixText, View.GONE)
-        }
+        views.setViewVisibility(R.id.prefixText, View.GONE)
 
         if (showTodayLabel) {
             views.setViewVisibility(R.id.todayLabelText, View.VISIBLE)
             views.setTextViewText(R.id.todayLabelText, context.getString(R.string.today_label))
+            views.setTextColor(R.id.todayLabelText, widgetColors.secondaryTextColor)
         } else {
             views.setViewVisibility(R.id.todayLabelText, View.GONE)
         }
@@ -120,63 +153,50 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
 
             bindExtraDayRow(
                 context = context,
+                resolver = resolver,
                 views = views,
                 cycle = cycle,
                 date = today.plusDays(1),
                 titleViewId = R.id.day1Title,
-                valueViewId = R.id.day1Value,
+                cycleViewId = R.id.day1Cycle,
+                assignmentViewId = R.id.day1Assignment,
                 dotViewId = R.id.day1Dot,
                 isTomorrow = true
             )
 
             if (rowsToShow >= 2) {
-                showRow(views, R.id.day2Dot, R.id.day2Title, R.id.day2Value)
-                bindExtraDayRow(
-                    context, views, cycle, today.plusDays(2),
-                    R.id.day2Title, R.id.day2Value, R.id.day2Dot, false
-                )
+                showRow(views, R.id.day2Dot, R.id.day2Title, R.id.day2Cycle, R.id.day2Assignment)
+                bindExtraDayRow(context, resolver, views, cycle, today.plusDays(2), R.id.day2Title, R.id.day2Cycle, R.id.day2Assignment, R.id.day2Dot, false)
             } else {
-                hideRow(views, R.id.day2Dot, R.id.day2Title, R.id.day2Value)
+                hideRow(views, R.id.day2Dot, R.id.day2Title, R.id.day2Cycle, R.id.day2Assignment)
             }
 
             if (rowsToShow >= 3) {
-                showRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Value)
-                bindExtraDayRow(
-                    context, views, cycle, today.plusDays(3),
-                    R.id.day3Title, R.id.day3Value, R.id.day3Dot, false
-                )
+                showRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Cycle, R.id.day3Assignment)
+                bindExtraDayRow(context, resolver, views, cycle, today.plusDays(3), R.id.day3Title, R.id.day3Cycle, R.id.day3Assignment, R.id.day3Dot, false)
             } else {
-                hideRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Value)
+                hideRow(views, R.id.day3Dot, R.id.day3Title, R.id.day3Cycle, R.id.day3Assignment)
             }
 
             if (rowsToShow >= 4) {
-                showRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Value)
-                bindExtraDayRow(
-                    context, views, cycle, today.plusDays(4),
-                    R.id.day4Title, R.id.day4Value, R.id.day4Dot, false
-                )
+                showRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Cycle, R.id.day4Assignment)
+                bindExtraDayRow(context, resolver, views, cycle, today.plusDays(4), R.id.day4Title, R.id.day4Cycle, R.id.day4Assignment, R.id.day4Dot, false)
             } else {
-                hideRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Value)
+                hideRow(views, R.id.day4Dot, R.id.day4Title, R.id.day4Cycle, R.id.day4Assignment)
             }
 
             if (rowsToShow >= 5) {
-                showRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Value)
-                bindExtraDayRow(
-                    context, views, cycle, today.plusDays(5),
-                    R.id.day5Title, R.id.day5Value, R.id.day5Dot, false
-                )
+                showRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Cycle, R.id.day5Assignment)
+                bindExtraDayRow(context, resolver, views, cycle, today.plusDays(5), R.id.day5Title, R.id.day5Cycle, R.id.day5Assignment, R.id.day5Dot, false)
             } else {
-                hideRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Value)
+                hideRow(views, R.id.day5Dot, R.id.day5Title, R.id.day5Cycle, R.id.day5Assignment)
             }
 
             if (rowsToShow >= 6) {
-                showRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Value)
-                bindExtraDayRow(
-                    context, views, cycle, today.plusDays(6),
-                    R.id.day6Title, R.id.day6Value, R.id.day6Dot, false
-                )
+                showRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Cycle, R.id.day6Assignment)
+                bindExtraDayRow(context, resolver, views, cycle, today.plusDays(6), R.id.day6Title, R.id.day6Cycle, R.id.day6Assignment, R.id.day6Dot, false)
             } else {
-                hideRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Value)
+                hideRow(views, R.id.day6Dot, R.id.day6Title, R.id.day6Cycle, R.id.day6Assignment)
             }
         } else {
             views.setViewVisibility(R.id.extraDaysContainer, View.GONE)
@@ -194,12 +214,30 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         )
 
         views.setOnClickPendingIntent(R.id.rootLayout, pendingIntent)
-
         appWidgetManager.updateAppWidget(widgetId, views)
     }
 
+    private fun resolveWidgetCycleColor(
+        context: Context,
+        label: String,
+        cycle: List<String>
+    ): Int {
+        val colors = WidgetStyleManager.getColors(context)
+        val normalizedLabel = label.trim()
+
+        val index = cycle.indexOfFirst {
+            it.trim().equals(normalizedLabel, ignoreCase = true)
+        }
+
+        return when (index) {
+            0 -> colors.shiftAColor
+            1 -> colors.shiftBColor
+            else -> colors.offDayColor
+        }
+    }
     private fun applyWidgetStyle(context: Context, views: RemoteViews) {
         val prefs = context.getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
+        val colors = WidgetStyleManager.getColors(context)
 
         val style = prefs.getString(
             Prefs.KEY_WIDGET_STYLE,
@@ -207,25 +245,39 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         ) ?: Prefs.WIDGET_STYLE_CLASSIC
 
         if (style == Prefs.WIDGET_STYLE_MINIMAL) {
-            views.setInt(R.id.rootLayout, "setBackgroundResource", R.drawable.bg_widget_minimal)
             views.setViewVisibility(R.id.leftColorBar, View.GONE)
+            views.setInt(R.id.rootLayout, "setBackgroundColor", android.graphics.Color.TRANSPARENT)
         } else {
-            views.setInt(R.id.rootLayout, "setBackgroundResource", R.drawable.bg_widget_classic)
             views.setViewVisibility(R.id.leftColorBar, View.VISIBLE)
+            views.setInt(R.id.rootLayout, "setBackgroundColor", colors.widgetBackgroundColor)
         }
     }
 
     private fun bindExtraDayRow(
         context: Context,
+        resolver: DefaultScheduleResolver,
         views: RemoteViews,
         cycle: List<String>,
         date: LocalDate,
         titleViewId: Int,
-        valueViewId: Int,
+        cycleViewId: Int,
+        assignmentViewId: Int,
         dotViewId: Int,
         isTomorrow: Boolean
     ) {
-        val label = CycleManager.getCycleDayForDate(context, date)
+        val resolved = resolver.resolve(date)
+        val primary = resolveWidgetPrimaryDisplayLabel(
+            context = context,
+            rawLabel = resolved.effectiveCycleLabel.trim(),
+            short = true
+        )
+
+        val secondary = resolveWidgetAssignmentDisplayLabel(
+            context = context,
+            rawLabel = resolved.assignmentLabel,
+            short = true
+        )
+        val widgetColors = WidgetStyleManager.getColors(context)
 
         val title = if (isTomorrow) {
             context.getString(R.string.tomorrow_label)
@@ -236,41 +288,72 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
                 }
         }
 
-        val color = CycleColorHelper.getBackgroundColor(
+        val color = resolveWidgetCycleColor(
             context = context,
-            label = label,
+            label = resolved.baseCycleLabel.trim(),
             cycle = cycle
         )
 
         views.setTextViewText(titleViewId, title)
-        views.setTextViewText(valueViewId, label)
+        views.setTextViewText(cycleViewId, primary)
+        views.setTextColor(titleViewId, widgetColors.secondaryTextColor)
+        views.setTextColor(cycleViewId, widgetColors.primaryTextColor)
 
-        views.setTextColor(titleViewId, 0xCCFFFFFF.toInt())
-        views.setTextColor(valueViewId, 0xFFFFFFFF.toInt())
-        views.setInt(dotViewId, "setBackgroundColor", color)
+        if (secondary.isBlank()) {
+            views.setViewVisibility(assignmentViewId, View.GONE)
+            views.setTextViewText(assignmentViewId, "")
+        } else {
+            views.setViewVisibility(assignmentViewId, View.VISIBLE)
+            views.setTextViewText(assignmentViewId, secondary)
+            views.setTextColor(assignmentViewId, widgetColors.secondaryTextColor)
+        }
+
+        views.setImageViewBitmap(dotViewId, createDotBitmap(context, color))
     }
 
-    private fun hideRow(views: RemoteViews, dotId: Int, titleId: Int, valueId: Int) {
+    private fun hideRow(
+        views: RemoteViews,
+        dotId: Int,
+        titleId: Int,
+        cycleId: Int,
+        assignmentId: Int
+    ) {
         views.setViewVisibility(dotId, View.GONE)
         views.setViewVisibility(titleId, View.GONE)
-        views.setViewVisibility(valueId, View.GONE)
+        views.setViewVisibility(cycleId, View.GONE)
+        views.setViewVisibility(assignmentId, View.GONE)
     }
 
-    private fun showRow(views: RemoteViews, dotId: Int, titleId: Int, valueId: Int) {
+    private fun showRow(
+        views: RemoteViews,
+        dotId: Int,
+        titleId: Int,
+        cycleId: Int,
+        assignmentId: Int
+    ) {
         views.setViewVisibility(dotId, View.VISIBLE)
         views.setViewVisibility(titleId, View.VISIBLE)
-        views.setViewVisibility(valueId, View.VISIBLE)
+        views.setViewVisibility(cycleId, View.VISIBLE)
+        views.setViewVisibility(assignmentId, View.VISIBLE)
     }
 
-    private fun formatCompactWidgetLabel(label: String): String {
-        val trimmed = label.trim()
-
+    private fun formatCompactWidgetLabel(primary: String, mode: WidgetMode, minWidth: Int): String {
+        val trimmed = primary.trim()
         if (trimmed.isBlank()) return "X"
 
         return when {
-            trimmed.length <= 2 -> trimmed
-            else -> trimmed.take(1).uppercase(Locale.getDefault())
+            mode == WidgetMode.SMALL && minWidth < 100 -> trimmed.take(1).uppercase(Locale.getDefault())
+            else -> trimmed
         }
+    }
+
+    private fun compactCycleLabel(label: String): String {
+        return if (label.length <= 7) label else label.take(7)
+    }
+
+    private fun compactAssignmentLabel(label: String): String {
+        if (label.isBlank()) return ""
+        return if (label.length <= 6) label else label.take(6)
     }
 
     private fun resolveWidgetMode(minWidth: Int, minHeight: Int): WidgetMode {
@@ -281,21 +364,102 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    /**
-     * How many upcoming rows to show:
-     * 0 = only main label
-     * 1 = tomorrow only
-     * 2..6 = more days ahead
-     */
     private fun resolveExtraRows(minWidth: Int, minHeight: Int): Int {
-        if (minWidth < 110 || minHeight < 70) return 0
+        if (minWidth < 110 || minHeight < 75) return 0
 
         return when {
-            minHeight < 110 -> 1
-            minHeight < 180 -> 2
-            minHeight < 250 -> 4
+            minHeight < 110 -> 0
+            minHeight < 145 -> 1
+            minHeight < 185 -> 2
+            minHeight < 230 -> 4
             else -> 6
         }
+    }
+
+    private fun resolveTypography(
+        mode: WidgetMode,
+        minWidth: Int,
+        minHeight: Int
+    ): WidgetTypography {
+        return when (mode) {
+            WidgetMode.SMALL -> {
+                if (minWidth < 100 || minHeight < 80) {
+                    WidgetTypography(
+                        prefixSp = 11f,
+                        todayLabelSp = 10f,
+                        primarySp = 34f,
+                        secondarySp = 13f,
+                        rowTitleSp = 12f,
+                        rowCycleSp = 13f,
+                        rowAssignmentSp = 12f
+                    )
+                } else {
+                    WidgetTypography(
+                        prefixSp = 12f,
+                        todayLabelSp = 11f,
+                        primarySp = 34f,
+                        secondarySp = 13f,
+                        rowTitleSp = 12f,
+                        rowCycleSp = 13f,
+                        rowAssignmentSp = 12f
+                    )
+                }
+            }
+
+            WidgetMode.MEDIUM -> WidgetTypography(
+                prefixSp = 12f,
+                todayLabelSp = 12f,
+                primarySp = 36f,
+                secondarySp = 14f,
+                rowTitleSp = 13f,
+                rowCycleSp = 14f,
+                rowAssignmentSp = 12f
+            )
+
+            WidgetMode.LARGE -> WidgetTypography(
+                prefixSp = 13f,
+                todayLabelSp = 13f,
+                primarySp = 38f,
+                secondarySp = 15f,
+                rowTitleSp = 13f,
+                rowCycleSp = 14f,
+                rowAssignmentSp = 12f
+            )
+        }
+    }
+
+    private fun applyAdaptiveTypography(
+        views: RemoteViews,
+        typography: WidgetTypography
+    ) {
+        views.setTextViewTextSize(R.id.prefixText, TypedValue.COMPLEX_UNIT_SP, typography.prefixSp)
+        views.setTextViewTextSize(R.id.todayLabelText, TypedValue.COMPLEX_UNIT_SP, typography.todayLabelSp)
+        views.setTextViewTextSize(R.id.primaryText, TypedValue.COMPLEX_UNIT_SP, typography.primarySp)
+        views.setTextViewTextSize(R.id.secondaryText, TypedValue.COMPLEX_UNIT_SP, typography.secondarySp)
+
+        views.setTextViewTextSize(R.id.day1Title, TypedValue.COMPLEX_UNIT_SP, typography.rowTitleSp)
+        views.setTextViewTextSize(R.id.day1Cycle, TypedValue.COMPLEX_UNIT_SP, typography.rowCycleSp)
+        views.setTextViewTextSize(R.id.day1Assignment, TypedValue.COMPLEX_UNIT_SP, typography.rowAssignmentSp)
+
+        views.setTextViewTextSize(R.id.day2Title, TypedValue.COMPLEX_UNIT_SP, typography.rowTitleSp)
+        views.setTextViewTextSize(R.id.day2Cycle, TypedValue.COMPLEX_UNIT_SP, typography.rowCycleSp)
+        views.setTextViewTextSize(R.id.day2Assignment, TypedValue.COMPLEX_UNIT_SP, typography.rowAssignmentSp)
+
+        views.setTextViewTextSize(R.id.day3Title, TypedValue.COMPLEX_UNIT_SP, typography.rowTitleSp)
+        views.setTextViewTextSize(R.id.day3Cycle, TypedValue.COMPLEX_UNIT_SP, typography.rowCycleSp)
+        views.setTextViewTextSize(R.id.day3Assignment, TypedValue.COMPLEX_UNIT_SP, typography.rowAssignmentSp)
+
+        views.setTextViewTextSize(R.id.day4Title, TypedValue.COMPLEX_UNIT_SP, typography.rowTitleSp)
+        views.setTextViewTextSize(R.id.day4Cycle, TypedValue.COMPLEX_UNIT_SP, typography.rowCycleSp)
+        views.setTextViewTextSize(R.id.day4Assignment, TypedValue.COMPLEX_UNIT_SP, typography.rowAssignmentSp)
+
+        views.setTextViewTextSize(R.id.day5Title, TypedValue.COMPLEX_UNIT_SP, typography.rowTitleSp)
+        views.setTextViewTextSize(R.id.day5Cycle, TypedValue.COMPLEX_UNIT_SP, typography.rowCycleSp)
+        views.setTextViewTextSize(R.id.day5Assignment, TypedValue.COMPLEX_UNIT_SP, typography.rowAssignmentSp)
+
+        views.setTextViewTextSize(R.id.day6Title, TypedValue.COMPLEX_UNIT_SP, typography.rowTitleSp)
+        views.setTextViewTextSize(R.id.day6Cycle, TypedValue.COMPLEX_UNIT_SP, typography.rowCycleSp)
+        views.setTextViewTextSize(R.id.day6Assignment, TypedValue.COMPLEX_UNIT_SP, typography.rowAssignmentSp)
     }
 
     private fun scheduleNextUpdate(context: Context) {
@@ -322,11 +486,7 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
             .toInstant()
             .toEpochMilli()
 
-        alarmManager.set(
-            AlarmManager.RTC_WAKEUP,
-            triggerTime,
-            pendingIntent
-        )
+        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -350,9 +510,89 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    private data class WidgetTypography(
+        val prefixSp: Float,
+        val todayLabelSp: Float,
+        val primarySp: Float,
+        val secondarySp: Float,
+        val rowTitleSp: Float,
+        val rowCycleSp: Float,
+        val rowAssignmentSp: Float
+    )
+
     private enum class WidgetMode {
         SMALL,
         MEDIUM,
         LARGE
+    }
+
+
+    private fun dpToPx(context: Context, dp: Float): Int {
+        return (dp * context.resources.displayMetrics.density).toInt().coerceAtLeast(1)
+    }
+
+    private fun createDotBitmap(
+        context: Context,
+        color: Int,
+        sizeDp: Float = 6f
+    ): Bitmap {
+        val sizePx = dpToPx(context, sizeDp)
+        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = color
+            style = Paint.Style.FILL
+        }
+
+        val radius = sizePx / 2f
+        canvas.drawCircle(radius, radius, radius, paint)
+
+        return bitmap
+    }
+
+    private fun getLocalizedOffDayLabel(
+        context: Context,
+        short: Boolean
+    ): String {
+        val full = context.getString(R.string.off_day_label)
+        return if (short) compactCycleLabel(full) else full
+    }
+
+    private fun resolveWidgetAssignmentDisplayLabel(
+        context: Context,
+        rawLabel: String?,
+        short: Boolean
+    ): String {
+        val clean = rawLabel?.trim().orEmpty()
+        if (clean.isBlank()) return ""
+
+        val prefs = AssignmentLabelsPrefs(context)
+        val label = prefs.getLabelByName(clean) ?: return clean
+
+        val display = prefs.getDisplayName(label)
+
+        return if (short) {
+            compactAssignmentLabel(display)
+        } else {
+            display
+        }
+    }
+    private fun resolveWidgetPrimaryDisplayLabel(
+        context: Context,
+        rawLabel: String,
+        short: Boolean
+    ): String {
+        val clean = rawLabel.trim()
+        if (clean.isBlank()) return "X"
+
+        val cycle = CycleManager.loadCycle(context)
+        val isCycleLabel = cycle.any { it.trim().equals(clean, ignoreCase = true) }
+
+        if (!isCycleLabel) {
+            return getLocalizedOffDayLabel(context, short)
+        }
+
+        return if (short) compactCycleLabel(clean) else clean
     }
 }

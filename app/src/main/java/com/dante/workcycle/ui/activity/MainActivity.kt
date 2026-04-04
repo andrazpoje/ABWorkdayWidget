@@ -8,23 +8,25 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.dante.workcycle.AppLanguageManager
-import com.dante.workcycle.AppThemeManager
-import com.dante.workcycle.ui.fragments.HomeFragment
 import com.dante.workcycle.R
-import com.dante.workcycle.applyBottomNavInsetAsPadding
-import com.dante.workcycle.applyTopStatusBarInsetAsMargin
+import com.dante.workcycle.core.theme.AppThemeManager
+import com.dante.workcycle.core.ui.applyBottomNavInsetAsPadding
+import com.dante.workcycle.core.ui.applyTopStatusBarInsetAsMargin
+import com.dante.workcycle.core.ui.setupDefaultEdgeToEdge
+import com.dante.workcycle.core.ui.updateSystemBarIconContrast
 import com.dante.workcycle.databinding.ActivityMainBinding
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.notifications.NotificationHelper
-import com.dante.workcycle.setupDefaultEdgeToEdge
-import com.dante.workcycle.updateSystemBarIconContrast
+import com.dante.workcycle.ui.home.HomeFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,13 +34,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
 
     private var pendingNotificationPermissionResult: ((Boolean) -> Unit)? = null
+    private var isNotificationPermissionRequestInFlight = false
 
     private val notificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            isNotificationPermissionRequestInFlight = false
+
             pendingNotificationPermissionResult?.invoke(granted)
             pendingNotificationPermissionResult = null
 
-            if (!granted) {
+            if (!granted && ::navHostFragment.isInitialized) {
                 val currentFragment = navHostFragment.childFragmentManager.primaryNavigationFragment
                 if (currentFragment is HomeFragment) {
                     currentFragment.onNotificationPermissionDenied()
@@ -62,8 +67,13 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+        val host = supportFragmentManager.findFragmentById(R.id.navHostFragment)
+        if (host !is NavHostFragment) {
+            finish()
+            return
+        }
+        navHostFragment = host
+
         val navController = navHostFragment.navController
 
         val appBarConfiguration = AppBarConfiguration(
@@ -100,8 +110,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             val showBottomNav = destination.id == R.id.homeFragment ||
-                destination.id == R.id.calendarFragment ||
-                destination.id == R.id.moreFragment
+                    destination.id == R.id.calendarFragment ||
+                    destination.id == R.id.moreFragment
 
             binding.bottomNavigation.visibility = if (showBottomNav) View.VISIBLE else View.GONE
 
@@ -119,10 +129,10 @@ class MainActivity : AppCompatActivity() {
 
     fun isNotificationPermissionGranted(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
     }
 
     fun requestNotificationPermissionIfNeeded(onResult: (Boolean) -> Unit) {
@@ -131,7 +141,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        if (isNotificationPermissionRequestInFlight) {
+            return
+        }
+
         pendingNotificationPermissionResult = onResult
+        isNotificationPermissionRequestInFlight = true
         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
@@ -144,8 +159,8 @@ class MainActivity : AppCompatActivity() {
         val destinationId = navHostFragment.navController.currentDestination?.id
 
         val showActions = destinationId == R.id.homeFragment ||
-            destinationId == R.id.calendarFragment ||
-            destinationId == R.id.moreFragment
+                destinationId == R.id.calendarFragment ||
+                destinationId == R.id.moreFragment
 
         menu.findItem(R.id.action_settings)?.isVisible = showActions
         menu.findItem(R.id.action_help)?.isVisible = showActions
@@ -156,16 +171,26 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                navHostFragment.navController.navigate(R.id.settingsFragment)
+                safeNavigate(R.id.settingsFragment)
                 true
             }
 
             R.id.action_help -> {
-                navHostFragment.navController.navigate(R.id.helpFragment)
+                safeNavigate(R.id.helpFragment)
                 true
             }
 
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun safeNavigate(@IdRes destinationId: Int) {
+        val navController = navHostFragment.navController
+        val currentId = navController.currentDestination?.id
+        if (currentId == destinationId) return
+
+        runCatching {
+            navController.navigate(destinationId)
         }
     }
 

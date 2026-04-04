@@ -2,6 +2,7 @@ package com.dante.workcycle.style
 
 import android.content.Context
 import android.graphics.Color
+import com.dante.workcycle.core.theme.ThemePreset
 
 object WidgetStyleManager {
 

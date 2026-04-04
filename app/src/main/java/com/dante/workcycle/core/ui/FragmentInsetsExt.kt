@@ -1,4 +1,4 @@
-package com.dante.workcycle
+package com.dante.workcycle.core.ui
 
 import android.view.View
 import androidx.core.graphics.Insets

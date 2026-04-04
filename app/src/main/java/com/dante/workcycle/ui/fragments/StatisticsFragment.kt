@@ -6,8 +6,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.dante.workcycle.R
 import com.dante.workcycle.domain.statistics.StatisticsCalculator
-import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
-import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 
 class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
 

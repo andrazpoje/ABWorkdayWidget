@@ -1,4 +1,4 @@
-package com.dante.workcycle
+package com.dante.workcycle.data.prefs
 
 object AppPrefs {
 
@@ -27,10 +27,9 @@ object AppPrefs {
     const val KEY_SKIP_HOLIDAYS = "skipHolidays"
 
     // labels / display
-    const val KEY_PREFIX_TEXT = "prefixText"
     const val KEY_OVERRIDE_SKIPPED = "overrideSkippedDays"
     const val KEY_SKIPPED_LABEL = "skippedDayLabel"
-    const val DEFAULT_SKIPPED_LABEL = "Prosto"
+    const val DEFAULT_SKIPPED_LABEL = ""
 
     // themes
     const val KEY_CYCLE_THEME = "cycle_theme"

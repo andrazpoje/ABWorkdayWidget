@@ -1,59 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- WHAT'S NEW -->
-    <string name="whats_new_version_format">Verzija %1$s</string>
-    <string name="whats_new_title">Kaj je novega</string>
-    <string name="whats_new_content">
-- Nov zaslon Nastavitve, Pomoč in Statistika
-- Izbira prvega dne cikla z chips UI
-- Podpora za Italijo in Madžarsko
-- Izboljšana stabilnost obvestil (fallback za nekatere naprave)
-- Popravljen prikaz gumbov Shrani/Povrni
-- Splošne izboljšave in popravki
-</string>
-    <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
-
-
-    <!-- STATISTICS -->
-    <string name="statistics_title">Statistika</string>
-    <string name="statistics_this_month">Ta mesec</string>
-    <string name="statistics_this_year">To leto</string>
-    <string name="statistics_total_days">Skupaj dni: %1$d</string>
-    <string name="more_statistics_title">Statistika</string>
-    <string name="more_statistics_subtitle">Poglej število dni cikla za mesec in leto</string>
-
-    <!-- SETTINGS -->
-    <string name="settings_title">Nastavitve</string>
-    <string name="settings_appearance_title">Videz aplikacije</string>
-    <string name="settings_widget_title">Widget</string>
-    <string name="settings_about_title">O aplikaciji</string>
-    <string name="settings_notifications_title">Obvestila</string>
-    <string name="settings_widget_style_title">Videz widgeta</string>
-    <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
-    <string name="settings_widget_style_classic">Klasičen</string>
-    <string name="settings_widget_style_minimal">Minimalističen</string>
-    <string name="settings_notifications_enabled">Obvestila o spremembi cikla</string>
-    <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
-
-    <!-- compatibility keys if any old XML still references them -->
-    <string name="widget_style_classic">Klasičen</string>
-    <string name="widget_style_minimal">Minimalističen</string>
-    <string name="notifications_enabled">Omogoči obvestila</string>
-    <string name="silent_notification">Tiha obvestila</string>
-
-    <!-- HELP -->
-    <string name="help_title">Pomoč in navodila</string>
-    <string name="help_getting_started_title">Kako začeti</string>
-    <string name="help_getting_started_content">1. Nastavi začetni datum.\n2. Izberi prvi dan cikla.\n3. Nastavi pravila preskakovanja in oznake.\n4. Shrani spremembe.\n5. Dodaj widget na domači zaslon.</string>
-    <string name="help_calculation_title">Kako deluje izračun cikla</string>
-    <string name="help_calculation_content">Izbrani začetni datum je referenčna točka cikla. Prvi dan cikla je oznaka, dodeljena temu datumu. Cikel napreduje samo na vključenih dnevih. Preskočeni vikendi in prazniki cikla ne premaknejo naprej.</string>
-    <string name="help_presets_title">Predloge</string>
-    <string name="help_presets_content">Predloge samodejno izpolnijo polja cikla z vnaprej določenimi vrednostmi. Če cikel nato ročno spremeniš, se predloga spremeni v Po meri.</string>
-    <string name="help_widget_title">Widget</string>
-    <string name="help_widget_content">Widget lahko dodaš prek izbire widgetov na domačem zaslonu. Widget se samodejno posodablja in uporablja shranjene nastavitve aplikacije. Slog widgeta vpliva samo na videz.</string>
-    <string name="help_faq_title">Pogosta vprašanja</string>
-    <string name="help_faq_content">Zakaj se cikel na nekatere dni ne spremeni?\nKer so lahko vikendi ali prazniki preskočeni.\n\nZakaj je widget drugačen kot aplikacija?\nPreveri shranjene nastavitve in slog widgeta.\n\nZakaj obvestila ne delujejo?\nPreveri, ali so obvestila omogočena in ali je dovoljenje odobreno.</string>
+    <!-- APP -->
+    <string name="app_name">Delovni cikel</string>
+    <string name="app_header_title">Delovni cikel</string>
+    <string name="app_version">v%1$s</string>
 
     <!-- COMMON -->
     <string name="ok">V redu</string>
@@ -61,23 +12,20 @@
     <string name="save">Shrani</string>
     <string name="discard">Zavrzi</string>
     <string name="close">Zapri</string>
+    <string name="remove">Odstrani</string>
     <string name="revert">Povrni</string>
     <string name="reverted">Spremembe povrnjene</string>
+    <string name="none_label">Brez</string>
+    <string name="preview_label">Predogled</string>
 
-    <!-- APP -->
-    <string name="app_name">Delovni cikel</string>
-    <string name="app_header_title">Delovni cikel</string>
-    <string name="app_version">v%1$s</string>
-    <string name="settings_subtitle">Nastavi cikel, pravila in izgled widgeta.</string>
-
-    <!-- STATUS -->
+    <!-- HOME -->
     <string name="status_section">Danes</string>
     <string name="today_label">Danes</string>
     <string name="tomorrow_label">Jutri</string>
     <string name="tomorrow_status">Jutri: %1$s</string>
-
-    <!-- PREVIEW -->
     <string name="preview_title">Naslednji dnevi</string>
+    <string name="home_next_7_days_subtitle">Pregled naslednjih 7 dni</string>
+    <string name="non_working_day_label">Dela prosti dan</string>
 
     <!-- CYCLE -->
     <string name="cycle_section">Cikel</string>
@@ -102,6 +50,30 @@
     <string name="preset_two_shift">2-izmensko</string>
     <string name="preset_three_shift">3-izmensko</string>
 
+    <!-- LABELS -->
+    <string name="label_day">Dan</string>
+    <string name="label_off">Prosto</string>
+    <string name="label_recovery">Počitek</string>
+    <string name="label_morning">Jutranja</string>
+    <string name="label_afternoon">Popoldanska</string>
+    <string name="label_night">Nočna</string>
+
+    <!-- RULES -->
+    <string name="rules_section">Pravila</string>
+    <string name="skip_saturdays">Preskoči sobote</string>
+    <string name="skip_sundays">Preskoči nedelje</string>
+    <string name="skip_holidays">Preskoči dela proste dneve</string>
+    <string name="rules_info_text">Določi, ali naj cikel preskoči sobote, nedelje in dela proste dneve.</string>
+    <string name="holiday_country_label">Država za praznike in dela proste dni</string>
+    <string name="holiday_country_hint">Izberi državo</string>
+    <string name="off_day_label">Prosto</string>
+
+    <!-- DISPLAY -->
+    <string name="display_section">Prikaz</string>
+    <string name="show_assignment_icons_calendar">Prikaži oznake assignmentov v koledarju</string>
+    <string name="show_assignment_icons_weekly">Prikaži oznake assignmentov v tedenskem pregledu</string>
+    <string name="show_assignment_icons_helper">Prikaže ali skrije ikone in oznake assignmentov v koledarju ter v pregledu naslednjih 7 dni.</string>
+
     <!-- THEMES -->
     <string name="app_theme">Tema aplikacije</string>
     <string name="theme_system">Po sistemu</string>
@@ -112,33 +84,85 @@
     <string name="theme_pastel">Pastelna</string>
     <string name="theme_dark">Temna</string>
 
-    <!-- LABELS -->
-    <string name="label_morning">Jutranja</string>
-    <string name="label_afternoon">Popoldanska</string>
-    <string name="label_night">Nočna</string>
-    <string name="label_off">Prosto</string>
-    <string name="label_day">Dan</string>
-    <string name="label_recovery">Počitek</string>
+    <!-- SETTINGS -->
+    <string name="settings_title">Nastavitve</string>
+    <string name="settings_subtitle">Nastavi cikel, pravila in izgled widgeta.</string>
+    <string name="settings_appearance_title">Videz aplikacije</string>
+    <string name="settings_widget_title">Widget</string>
+    <string name="settings_about_title">O aplikaciji</string>
+    <string name="settings_notifications_title">Obvestila</string>
+    <string name="settings_widget_style_title">Videz widgeta</string>
+    <string name="settings_widget_style_description">Izberi videz domačega widgeta.</string>
+    <string name="settings_widget_style_classic">Klasičen</string>
+    <string name="settings_widget_style_minimal">Minimalističen</string>
+    <string name="settings_notifications_enabled">Obvestila o spremembi cikla</string>
+    <string name="settings_silent_notification">Tiha obvestila (brez zvoka)</string>
+    <string name="settings_notification_title">Obvestila</string>
 
-    <!-- RULES -->
-    <string name="rules_section">Pravila</string>
-    <string name="skip_saturdays">Preskoči sobote</string>
-    <string name="skip_sundays">Preskoči nedelje</string>
-    <string name="skip_holidays">Preskoči dela proste dneve</string>
-    <string name="rules_info_text">Določi, ali naj cikel preskoči sobote, nedelje in dela proste dneve.</string>
-    <string name="holiday_country_label">Država za praznike in dela proste dni</string>
-    <string name="holiday_country_hint">Izberi državo</string>
-    <string name="override_skipped_days">Prikaži posebno oznako za preskočene dni</string>
-    <string name="skipped_day_label">Oznaka za preskočen dan</string>
+    <!-- compatibility keys if any old XML still references them -->
+    <string name="widget_style_classic">Klasičen</string>
+    <string name="widget_style_minimal">Minimalističen</string>
+    <string name="notifications_enabled">Omogoči obvestila</string>
+    <string name="silent_notification">Tiha obvestila</string>
 
-    <!-- DISPLAY -->
-    <string name="display_section">Prikaz</string>
-    <string name="prefix_text">Besedilo pred oznako cikla</string>
-    <string name="display_info_text">Widget prikaže točno oznake, ki jih vneseš v cikel.</string>
+    <!-- ASSIGNMENTS -->
+    <string name="assignment_cycle_title">Cikel assignmentov</string>
+    <string name="assignment_section_title">Assignmenti</string>
+    <string name="assignment_enable">Omogoči assignmente</string>
+    <string name="assignment_enable_first_message">Najprej vklopi assignmente.</string>
+    <string name="assignment_mode_helper">Izberi, kako se assignmenti določijo za posamezen dan.</string>
+    <string name="assignment_mode_cyclic_overrides">Ciklično + overridei</string>
+    <string name="assignment_mode_manual_only">Samo ročno</string>
+    <string name="assignment_mode_cyclic_helper">Uporabi assignment cikel kot privzeto vrednost. Posamezne dneve lahko ročno prepišeš.</string>
+    <string name="assignment_mode_manual_helper">Assignmenti se nastavljajo ročno za vsak dan posebej.</string>
+    <string name="assignment_labels_button">Upravljaj oznake assignmentov</string>
+    <string name="assignment_day_title">Uredi assignment za dan</string>
+    <string name="assignment_day_helper">Nastavi ročno assignment oznako za določen datum.</string>
+    <string name="assignment_label_hint">Oznaka assignmenta (npr. O1)</string>
+    <string name="assignment_override_label">Ročni assignment override</string>
+    <string name="assignment_advance_mode_title">Napredovanje assignment cikla</string>
+    <string name="assignment_advance_mode_label">Način napredovanja</string>
+    <string name="assignment_advance_mode_helper">Izberi, ali assignment cikel napreduje vsak dan ali samo na delovne dni.</string>
+    <string name="assignment_advance_mode_all_days">Vsak dan</string>
+    <string name="assignment_advance_mode_working_days_only">Samo delovne dni</string>
+    <string name="assignment_manual_only_message">Urejanje dneva je na voljo samo v ročnem načinu assignmentov.</string>
+
+
+    <!-- CALENDAR -->
+    <string name="calendar_previous_month">Prejšnji mesec</string>
+    <string name="calendar_next_month">Naslednji mesec</string>
+    <string name="calendar_day_cycle">Dan cikla</string>
+    <string name="calendar_day_holiday">Status dneva</string>
+    <string name="calendar_month_year">%1$s %2$d</string>
+
+    <string-array name="week_days_short">
+        <item>Pon</item>
+        <item>Tor</item>
+        <item>Sre</item>
+        <item>Čet</item>
+        <item>Pet</item>
+        <item>Sob</item>
+        <item>Ned</item>
+    </string-array>
+
+    <!-- BOTTOM SHEET -->
+    <string name="select_assignment">Izberi assignment</string>
+    <string name="bottom_sheet_cycle_info">Cikel: %1$s</string>
+    <string name="bottom_sheet_assignment_info">Assignment: %1$s</string>
+
+    <!-- STATISTICS -->
+    <string name="statistics_title">Statistika</string>
+    <string name="statistics_this_month">Ta mesec</string>
+    <string name="statistics_this_year">To leto</string>
+    <string name="statistics_total_days">Skupaj dni: %1$d</string>
+    <string name="more_statistics_title">Statistika</string>
+    <string name="more_statistics_subtitle">Poglej število dni cikla za mesec in leto</string>
 
     <!-- WIDGET -->
     <string name="widget_not_added_short">Widget še ni dodan na domači zaslon.</string>
+    <string name="widget_add_manual_hint">Na domačem zaslonu naredi dolg pritisk, odpri Pripomočke in dodaj gradnik Delovni cikel.</string>
     <string name="open_widgets">Odpri widgete</string>
+    <string name="select_color">Izberi barvo</string>
 
     <!-- SAVE / DIALOG -->
     <string name="settings_saved">Nastavitve shranjene</string>
@@ -162,15 +186,14 @@
     <string name="fix_errors">Popravi napake v vnosu</string>
 
     <!-- NOTIFICATIONS -->
-    <string name="settings_notification_title">Obvestila</string>
-    <string name="notification_channel_normal_name">AB delovni cikel obvestila</string>
+    <string name="notification_channel_normal_name">Obvestila o AB delovnem ciklu</string>
     <string name="notification_channel_normal_desc">Obvestila ob spremembi delovnega cikla</string>
-    <string name="notification_channel_silent_name">AB delovni cikel obvestila brez zvoka</string>
+    <string name="notification_channel_silent_name">Tiha obvestila o AB delovnem ciklu</string>
     <string name="notification_channel_silent_desc">Tiha obvestila ob spremembi delovnega cikla</string>
     <string name="notification_day_changed_title">Cikel se je spremenil</string>
-    <string name="notification_generic_message">Delovni cikel se je posodobil.</string>
+
     <string name="notification_today_tomorrow">Danes: %1$s\nJutri: %2$s</string>
-    <string name="notification_day_off_short">prost dan</string>
+
     <string name="notification_permission_denied">Dovoljenje za obvestila ni bilo odobreno.</string>
 
     <!-- MORE / NAVIGATION -->
@@ -178,8 +201,7 @@
     <string name="more_whats_new_subtitle">Poglej novosti v zadnji verziji</string>
     <string name="more_check_updates_title">Preveri posodobitve</string>
     <string name="more_check_updates_subtitle">Odpri Google Play in preveri novejšo verzijo</string>
-    <string name="more_calendar_title">Koledar cikla</string>
-    <string name="more_calendar_subtitle">Pregled cikla skozi mesec</string>
+
     <string name="more_contact_title">Kontaktiraj avtorja</string>
     <string name="more_contact_subtitle">Pošlji vprašanje ali povratno informacijo</string>
     <string name="more_github_title">GitHub</string>
@@ -192,23 +214,26 @@
     <string name="nav_calendar">Koledar</string>
     <string name="nav_more">Več</string>
 
-    <!-- CALENDAR -->
-    <string name="calendar_previous_month">Prejšnji mesec</string>
-    <string name="calendar_next_month">Naslednji mesec</string>
-    <string name="calendar_day_cycle">Dan cikla</string>
-    <string name="calendar_day_holiday">Status dneva</string>
-    <string name="calendar_month_year">%1$s %2$d</string>
+    <!-- HELP -->
+    <string name="help_getting_started_content">• Nastavi začetni datum cikla.\n• Določi oznake cikla (npr. A, B ali Jutranja, Popoldanska, Nočna).\n• Izberi, katera oznaka velja na začetni datum.\n• Nastavi pravila (preskok vikendov ali praznikov po potrebi).\n• Shrani nastavitve.\n• Po želji dodaj widget na domači zaslon.</string>
 
-    <string-array name="week_days_short">
-        <item>Pon</item>
-        <item>Tor</item>
-        <item>Sre</item>
-        <item>Čet</item>
-        <item>Pet</item>
-        <item>Sob</item>
-        <item>Ned</item>
-    </string-array>
+    <string name="help_cycle_logic_content">• Začetni datum je referenčna točka cikla.\n• Izbrana oznaka velja za ta datum.\n• Vsak naslednji veljaven dan premakne cikel naprej.\n• Preskočeni vikendi ali prazniki ne vplivajo na napredovanje cikla.</string>
 
+    <string name="help_assignments_content">• Assignmenti omogočajo dodatne oznake (npr. O1, dopust, bolniška).\n• Dan lahko urediš v 7-dnevnem pregledu ali koledarju.\n• Assignment lahko prepiše ali dopolni oznako cikla.\n• Prikaz assignmentov lahko vklopiš ali izklopiš v nastavitvah.</string>
+
+    <string name="help_preview_content">• Prikazuje naslednjih 7 dni glede na trenutne nastavitve.\n• Klikni na dan za urejanje assignmenta.\n• Spremembe se prikažejo po shranjevanju.\n• Upošteva pravila cikla in assignmente.</string>
+
+    <string name="help_calendar_content">• Prikazuje mesečni pregled cikla.\n• Vsak dan ima skrajšano oznako (A, B, O1).\n• Klik na dan prikaže podrobnosti.\n• Prikaže kombinacijo cikla in assignmenta.</string>
+
+    <string name="help_widget_content">• Widget prikazuje trenutni cikel na domačem zaslonu.\n• Samodejno se posodablja vsak dan.\n• Videz widgeta lahko prilagodiš v nastavitvah.\n• Uporablja iste podatke kot aplikacija.</string>
+
+    <string name="help_tips_content">• Uporabljaj kratke oznake (bolj pregledno v koledarju).\n• Naj bo cikel enostaven (A/B ali 2–3 izmene).\n• Assignmente uporabi za izjeme (dopust, bolniška).\n• Če kaj ne štima, preveri začetni datum in pravila.</string>
+
+    <!-- WHAT'S NEW -->
+    <string name="whats_new_title">Kaj je novega</string>
+    <string name="whats_new_version_format">Verzija %1$s</string>
+    <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
+    <string name="whats_new_content">✨ Novo\n• Prednastavitve (template) – npr. Pošta Slovenije A/B\n• 7-dnevni pregled z možnostjo urejanja assignmentov\n• Koledar z izboljšanimi oznakami dni in podrobnostmi\n• Podpora za dodatne države: Italija in Madžarska\n\n🎨 Izboljšave\n• Prenovljeni zasloni Nastavitve, Pomoč in Statistika\n• Izbira začetnega dne s chips UI\n• Boljši prikaz cikla in assignmentov\n• Izboljšan zaslon Pomoč z razširljivimi sekcijami\n• Čistejši izgled nastavitev in prikaza\n\n⚙️ Popravki in stabilnost\n• Izboljšana zanesljivost obvestil na nekaterih napravah\n• Popravljeno delovanje gumbov Shrani / Povrni\n• Splošni popravki napak in izboljšave delovanja</string>
     <!-- EMAIL / LINKS -->
     <string name="email_subject_contact">%1$s - Povratne informacije</string>
     <string name="email_subject_bug_report">%1$s - Prijava napake</string>
@@ -225,11 +250,120 @@
     <string name="country_italy">Italija</string>
     <string name="country_hungary">Madžarska</string>
 
-    <string name="home_next_7_days_subtitle">Pregled naslednjih 7 dni</string>
-    <string name="non_working_day_label">Dela prosti dan</string>
 
-    <string name="widget_add_manual_hint">Na domačem zaslonu naredi dolg pritisk, odpri Pripomočki in dodaj Delovni cikel Widget.</string>
+    <string name="edit_day">Uredi dan</string>
+    <string name="set_manual_assignment">Nastavi ročni assignment</string>
+    <string name="date_format_hint">Datum (yyyy-MM-dd)</string>
+    <string name="secondary_label_hint">Oznaka (npr. O1)</string>
+    <string name="label">Oznaka</string>
+    <string name="color">Barva</string>
+    <string name="pick_color">Izberi barvo</string>
+    <string name="add_label">Dodaj oznako</string>
+    <string name="edit">Uredi</string>
+    <string name="delete">Izbriši</string>
+    <string name="custom_colors">Lastne barve</string>
+    <string name="schedule">Urnik</string>
+    <string name="start_date_hint">Začetni datum (yyyy-MM-dd)</string>
 
-    <string name="select_color">Izberi barvo</string>
+    <string name="help_getting_started_title">Kako začeti</string>
+    <string name="help_assignments_title">Assignmenti (sekundarne oznake)</string>
+    <string name="help_calendar_title">Koledar</string>
+    <string name="help_widget_title">Widget</string>
+    <string name="help_tips_title">Nasveti</string>
+
+
+    <string name="select_cycle_override">Izberi cycle override</string>
+    <string name="clear_cycle_override">Odstrani cycle override</string>
+    <string name="clear_assignment">Odstrani assignment</string>
+    <string name="bottom_sheet_cycle_info_base_only">Cikel: %1$s</string>
+    <string name="bottom_sheet_cycle_info_with_override">Cikel: %1$s → %2$s</string>
+
+    <string name="assignment_labels_title">Oznake assignmentov</string>
+    <string name="assignment_labels_description">Sistemske oznake ostanejo fiksne in jih lahko samo omogočiš ali onemogočiš. Ročne oznake lahko dodajaš, urejaš, brišeš in se razvrščajo po uporabi.</string>
+    <string name="assignment_label_type_system">Sistemska oznaka</string>
+    <string name="assignment_label_type_manual_usage">Ročna oznaka • uporabljena %1$d×</string>
+    <string name="edit_label">Uredi oznako</string>
+    <string name="delete_label">Izbriši oznako</string>
+    <string name="delete_label_message">Izbrišem "%1$s"?</string>
+
+    <string name="assignment_labels_system_section">Sistemske oznake</string>
+    <string name="assignment_labels_manual_section">Moje oznake</string>
+    <string name="my_labels_helper">Dodaj svoje oznake (npr. lokacija, projekt ali naloga).</string>
+    <string name="edit_system_label">Uredi sistemsko oznako</string>
+
+    <string name="day_editor_cycle_helper">Osnovni cikel se izračuna samodejno. Override uporabi samo, če mora biti ta dan drugačen.</string>
+    <string name="day_editor_assignment_helper">Assignmenti dodajo dnevu dodatni pomen. Sistemske oznake ostanejo fiksne, ročne pa so razvrščene po uporabi.</string>
+
+    <string name="cycle_override_label">Ročni cikel override</string>
+
+    <string name="template_none">Brez template-a</string>
+    <string name="template_active_title">Aktiven template</string>
+    <string name="template_locked_message">Nekatere nastavitve so zaklenjene, ker je aktiven template.</string>
+    <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
+    <string name="template_posta_slovenije_description">Fiksen A/B cikel za pismonoše. Cikel, pravila in začetni datum so zaklenjeni. Rajoni so omogočeni v načinu samo ročno.</string>
+    <string name="template_locked_cycle_edit">Urejanje cikla je zaklenjeno, ker je aktiven template.</string>
+    <string name="template_locked_rules_edit">Pravila so zaklenjena, ker je aktiven template.</string>
+
+    <string name="template_apply_confirm_message">To bo nastavilo fiksen cikel in zaklenilo nastavitve cikla ter pravil.</string>
+    <string name="apply">Uporabi</string>
+    <string name="template_removed_message">Template je odstranjen. Ročno urejanje je ponovno omogočeno.</string>
+    <string name="template_locked_click_message">Ta nastavitev je zaklenjena, ker jo določa aktivni template.</string>
+
+    <string name="template_cycle_override_locked_message">Cikel določa aktivni template in ga tukaj ni mogoče spreminjati.</string>
+    <string name="assignment_mode_locked_by_template">
+Način assignmentov določa aktivni template.
+</string>
+
+    <string name="template_reference_date_format">Referenčni datum: %1$s = %2$s</string>
+    <string name="template_locked_summary_format">Zaklenjeno zaradi template-a: %1$s</string>
+    <string name="template_locked_item_cycle">cikel</string>
+    <string name="template_locked_item_rules">pravila</string>
+    <string name="template_locked_item_start_date">začetni datum</string>
+    <string name="template_locked_item_assignment_mode">način assignmentov</string>
+
+    <string name="template_clear_dialog_title">Izklopim template?</string>
+    <string name="template_clear_dialog_message">Template se bo izklopil. Ročno urejanje cikla, pravil in assignmentov bo ponovno omogočeno.</string>
+    <string name="template_clear_dialog_confirm">Izklopi</string>
+
+    <string name="theme_custom">Po meri</string>
+    <string name="custom_colors_title">Barve po meri</string>
+    <string name="custom_colors_helper">Te barve se uporabijo samo, ko je izbrana tema Po meri.</string>
+
+    <string name="color_shift_a">Cikel A</string>
+    <string name="color_shift_b">Cikel B</string>
+    <string name="color_background">Ozadje</string>
+
+    <string name="color_picker_title">Izberi barvo</string>
+    <string name="color_picker_palette_label">Barvna paleta</string>
+    <string name="color_picker_apply">Uporabi</string>
+    <string name="color_picker_title_cycle_a">Izberi barvo za Cikel A</string>
+    <string name="color_picker_title_cycle_b">Izberi barvo za Cikel B</string>
+    <string name="color_picker_title_background">Izberi barvo ozadja</string>
+
+    <string name="assignment_label_name">Oznaka</string>
+    <string name="assignment_label_color">Barva</string>
+    <string name="assignment_label_pick_color">Izberi barvo</string>
+
+    <string name="color_row_default_label">Oznaka</string>
+
+    <string name="calendar_day_label_placeholder">A</string>
+    <string name="calendar_secondary_label_placeholder">Dop.</string>
+
+    <string name="assignment_system_label_sick">Bolniška</string>
+    <string name="assignment_system_label_vacation">Dopust</string>
+    <string name="assignment_system_label_standby">Dežurstvo</string>
+    <string name="assignment_system_label_field">Teren</string>
+
+    <string name="assignment_system_label_sick_short">Boln.</string>
+    <string name="assignment_system_label_vacation_short">Dop.</string>
+    <string name="assignment_system_label_standby_short">Dež.</string>
+    <string name="assignment_system_label_field_short">Ter.</string>
+
+    <string name="cycle_day_fallback">Dan %1$d</string>
+    <string name="settings_schedule_title">Razpored</string>
+
+    <string name="assignment_start_date_hint">Začetni datum (yyyy-MM-dd)</string>
+    <string name="assignment_cycle_hint">Oznake (npr. A,B,C ali Rajon1,Rajon2)</string>
+
 
 </resources>

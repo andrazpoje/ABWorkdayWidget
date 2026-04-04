@@ -10,8 +10,8 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
-import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
-import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.google.android.material.button.MaterialButton
 
 class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {

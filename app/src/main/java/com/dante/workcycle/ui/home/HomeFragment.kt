@@ -1,4 +1,4 @@
-package com.dante.workcycle.ui.fragments
+package com.dante.workcycle.ui.home
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -18,33 +18,17 @@ import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.dante.workcycle.AppPrefs
 import com.dante.workcycle.BuildConfig
-import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
-import com.dante.workcycle.domain.holiday.HolidayCountry
 import com.dante.workcycle.R
-import com.dante.workcycle.widget.WorkCycleWidgetProvider
-import com.dante.workcycle.applyImeInsetAsPadding
-import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
-import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding
-import com.dante.workcycle.clearUnsavedChanges
+import com.dante.workcycle.core.ui.applyImeInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.databinding.FragmentHomeBinding
-import com.dante.workcycle.loadSettings
-import com.dante.workcycle.migrateLegacySettingsIfNeeded
-import com.dante.workcycle.revertToSavedState
-import com.dante.workcycle.saveChangesAndRefresh
-import com.dante.workcycle.setupChangeListeners
-import com.dante.workcycle.setupFirstCycleDayDropdown
-import com.dante.workcycle.setupHolidayCountryDropdown
-import com.dante.workcycle.setupPresetDropdown
-import com.dante.workcycle.setupPreviewRecyclerView
-import com.dante.workcycle.showDatePicker
-import com.dante.workcycle.showUnsavedChangesDialog
-import com.dante.workcycle.updateCyclePreview
-import com.dante.workcycle.updateTodayStatus
-import com.dante.workcycle.updateUnsavedChangesState
-import com.dante.workcycle.updateWidgetHint
-import com.dante.workcycle.validateCycleInput
+import com.dante.workcycle.domain.holiday.HolidayCountry
+import com.dante.workcycle.domain.template.TemplateManager
+import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
+import com.dante.workcycle.widget.WorkCycleWidgetProvider
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -66,6 +50,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     var hasUnsavedChanges = false
     var isInitializing = false
 
+    var previewAssignmentDraftDate: LocalDate? = null
+    var previewAssignmentDraftLabel: String? = null
     lateinit var activityRoot: View
     lateinit var saveBarContainer: View
 
@@ -92,6 +78,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var presetDropdown: MaterialAutoCompleteTextView
 
+    lateinit var activeTemplateCard: View
+    lateinit var activeTemplateTitle: TextView
+    lateinit var activeTemplateDescription: TextView
+    lateinit var templateLockedMessage: TextView
+
     lateinit var cycleDaysEdit: EditText
     lateinit var firstCycleDayChipGroup: ChipGroup
     lateinit var firstCycleDayDropdown: MaterialAutoCompleteTextView
@@ -102,7 +93,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var switchSaturdays: SwitchMaterial
     lateinit var switchSundays: SwitchMaterial
     lateinit var switchHolidays: SwitchMaterial
-    lateinit var switchOverrideSkippedDays: SwitchMaterial
 
     lateinit var holidayCountryDropdown: MaterialAutoCompleteTextView
 
@@ -110,7 +100,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var openWidgetsButton: MaterialButton
 
     lateinit var widgetHint: TextView
-    lateinit var skippedDayLabelEdit: EditText
 
     var selectedDate: LocalDate = LocalDate.now()
     lateinit var supportedCountries: List<HolidayCountry>
@@ -133,6 +122,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupHolidayCountryDropdown()
         migrateLegacySettingsIfNeeded()
         loadSettings()
+        updateTemplateUiState()
         setupChangeListeners()
         updateTodayStatus()
         updateCyclePreview()
@@ -175,6 +165,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
 
             saveChangesAndRefresh()
+        }
+
+        cycleDaysInputLayout.setOnClickListener {
+            if (TemplateManager.isCycleEditingLocked(requireContext())) {
+                showTemplateLockedMessage()
+            }
+        }
+
+        holidayCountryDropdown.setOnClickListener {
+            if (TemplateManager.isCycleEditingLocked(requireContext())) {
+                showTemplateLockedMessage()
+            }
         }
 
         githubLinkText.setOnClickListener {
@@ -302,6 +304,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         presetDropdown = root.findViewById(R.id.presetDropdown)
 
+        activeTemplateCard = root.findViewById(R.id.activeTemplateCard)
+        activeTemplateTitle = root.findViewById(R.id.activeTemplateTitle)
+        activeTemplateDescription = root.findViewById(R.id.activeTemplateDescription)
+        templateLockedMessage = root.findViewById(R.id.templateLockedMessage)
+
         cycleDaysInputLayout = root.findViewById(R.id.cycleDaysInputLayout)
         cycleDaysEdit = root.findViewById(R.id.cycleDaysEdit)
         firstCycleDayChipGroup = root.findViewById(R.id.firstCycleDayChipGroup)
@@ -310,14 +317,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         switchSaturdays = root.findViewById(R.id.switchSaturdays)
         switchSundays = root.findViewById(R.id.switchSundays)
         switchHolidays = root.findViewById(R.id.switchHolidays)
-        switchOverrideSkippedDays = root.findViewById(R.id.switchOverrideSkippedDays)
 
         holidayCountryDropdown = root.findViewById(R.id.holidayCountryDropdown)
 
         saveButton = root.findViewById(R.id.saveButton)
         revertButton = root.findViewById(R.id.revertButton)
         openWidgetsButton = root.findViewById(R.id.openWidgetsButton)
-        skippedDayLabelEdit = root.findViewById(R.id.skippedDayLabelEdit)
 
         previewRecyclerView = root.findViewById(R.id.previewRecyclerView)
     }
@@ -336,6 +341,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         Toast.makeText(
             requireContext(),
             getString(R.string.notification_permission_denied),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun HomeFragment.showTemplateLockedMessage() {
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.template_locked_click_message),
             Toast.LENGTH_SHORT
         ).show()
     }

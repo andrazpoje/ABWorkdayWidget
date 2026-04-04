@@ -1,9 +1,10 @@
 package com.dante.workcycle.domain.statistics
 
 import android.content.Context
-import com.dante.workcycle.AppPrefs
+import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.domain.schedule.CycleManager
 import java.time.LocalDate
+import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 
 data class StatisticsSummary(
     val counts: LinkedHashMap<String, Int>,
@@ -57,11 +58,11 @@ object StatisticsCalculator {
         var current = startDate
         var total = 0
 
+        val resolver = DefaultScheduleResolver(context)
+
         while (!current.isAfter(endDate)) {
-            // Future-proof note:
-            // Statistics intentionally uses generic cycle labels instead of hardcoded A/B logic,
-            // so this can later support custom weekly cycles and more than two cycle entries.
-            val label = CycleManager.getCycleDayForDate(context, current)
+
+            val label = resolver.resolve(current).effectiveCycleLabel
 
             if (!counts.containsKey(label)) {
                 counts[label] = 0

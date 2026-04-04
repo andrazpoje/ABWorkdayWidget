@@ -3,6 +3,7 @@ package com.dante.workcycle
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.dante.workcycle.data.prefs.AppPrefs
 
 object AppLanguageManager {
 

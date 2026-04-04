@@ -1,4 +1,4 @@
-package com.dante.workcycle
+package com.dante.workcycle.ui.home
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -7,16 +7,25 @@ import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import com.dante.workcycle.R
+import com.dante.workcycle.core.util.CycleColorHelper
+import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
-import com.dante.workcycle.domain.schedule.CyclePreset
 import com.dante.workcycle.domain.schedule.CyclePresetProvider
-import com.dante.workcycle.ui.fragments.HomeFragment
 import com.dante.workcycle.domain.schedule.sanitizeLabel
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import java.util.Locale
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.core.view.children
+import androidx.core.view.isVisible
+import com.dante.workcycle.data.prefs.TemplatePrefs
+import com.dante.workcycle.domain.schedule.CyclePreset
+import com.dante.workcycle.domain.template.TemplateManager
+import com.dante.workcycle.domain.template.ScheduleTemplateProvider
 
 fun HomeFragment.validateCycleInput(): Boolean {
     val raw = cycleDaysEdit.text?.toString().orEmpty().trim()
@@ -89,7 +98,39 @@ private fun HomeFragment.createNoFilterAdapter(items: List<String>): ArrayAdapte
         }
     }
 }
+private fun HomeFragment.showClearTemplateDialog() {
+    MaterialAlertDialogBuilder(requireContext())
+        .setTitle(R.string.template_clear_dialog_title)
+        .setMessage(R.string.template_clear_dialog_message)
+        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+            val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
+            val selectedText = activeTemplate?.let { getString(it.titleRes) }
+                ?: getString(R.string.template_none)
 
+            presetDropdown.setText(selectedText, false)
+            dialog.dismiss()
+        }
+        .setPositiveButton(R.string.template_clear_dialog_confirm) { dialog, _ ->
+            TemplateManager.clearTemplate(requireContext())
+
+            runWithoutChangeTracking {
+                loadSettings()
+                updateTemplateUiState()
+                clearUnsavedChanges()
+            }
+
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.template_removed_message),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            updateTodayStatus()
+            updateCyclePreview()
+            dialog.dismiss()
+        }
+        .show()
+}
 private fun MaterialAutoCompleteTextView.showDropdownIfPossible() {
     val adapterCount = adapter?.count ?: 0
     if (adapterCount > 0) {
@@ -126,22 +167,36 @@ fun HomeFragment.buildCountryDisplayList(
     }
 }
 
-fun parseCycleLabels(raw: String): List<String> {
+fun parseCycleLabels(
+    raw: String,
+    fallbackLabelProvider: (Int) -> String = { index -> "Day $index" }
+): List<String> {
     return raw.split(",")
         .map { it.trim() }
         .filter { it.isNotEmpty() }
         .mapIndexed { index, label ->
-            sanitizeLabel(label, "Day ${index + 1}").take(HomeFragment.MAX_LABEL_LENGTH)
+            sanitizeLabel(
+                label,
+                fallbackLabelProvider(index + 1)
+            ).take(HomeFragment.MAX_LABEL_LENGTH)
         }
         .take(HomeFragment.MAX_CYCLE_ITEMS)
 }
 
 fun HomeFragment.getCurrentCycleLabelsFromInput(): List<String> {
-    return parseCycleLabels(cycleDaysEdit.text?.toString().orEmpty())
+    return parseCycleLabels(
+        cycleDaysEdit.text?.toString().orEmpty()
+    ) { dayNumber ->
+        getString(R.string.cycle_day_fallback, dayNumber)
+    }
 }
 
 fun HomeFragment.getCurrentCycleInputState(): Pair<List<String>, String> {
-    val currentCycle = parseCycleLabels(cycleDaysEdit.text?.toString().orEmpty())
+    val currentCycle = parseCycleLabels(
+        cycleDaysEdit.text?.toString().orEmpty()
+    ) { dayNumber ->
+        getString(R.string.cycle_day_fallback, dayNumber)
+    }
     val currentFirstDay = firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
     return currentCycle to currentFirstDay
 }
@@ -304,38 +359,53 @@ fun HomeFragment.setupFirstCycleDayDropdown() {
         val selected = firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
         refreshFirstCycleDayDropdown(selected)
         clearDateCheckResult()
-        updatePresetSelectionState(markAsChanged = true)
+        updateUnsavedChangesState()
         updateTodayStatus()
         updateCyclePreview()
     }
 }
 
 fun HomeFragment.setupPresetDropdown() {
-    val presets = CyclePresetProvider.getPresets()
-    val names = presets.map { getString(it.nameRes) } + getString(R.string.preset_custom)
+    val templateItems = buildList {
+        add(getString(R.string.template_none))
+        addAll(
+            ScheduleTemplateProvider.getAll().map { template ->
+                getString(template.titleRes)
+            }
+        )
+    }
 
-    val adapter = createNoFilterAdapter(names)
+    val adapter = createNoFilterAdapter(templateItems)
 
     presetDropdown.setAdapter(adapter)
     configureAsSelectBox(presetDropdown)
 
-    presetDropdown.setOnItemClickListener { _, _, _, _ ->
-        val selectedName = presetDropdown.text?.toString()?.trim().orEmpty()
+    val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
+    val selectedText = activeTemplate?.let { getString(it.titleRes) }
+        ?: getString(R.string.template_none)
 
-        if (selectedName == getString(R.string.preset_custom)) {
-            updatePresetSelectionState(markAsChanged = true)
-            return@setOnItemClickListener
+    presetDropdown.setText(selectedText, false)
+
+    presetDropdown.setOnItemClickListener { _, _, position, _ ->
+        val selectedTextFromList = templateItems[position]
+
+        if (selectedTextFromList == getString(R.string.template_none)) {
+            if (TemplateManager.isTemplateActive(requireContext())) {
+                showClearTemplateDialog()
+            } else {
+                presetDropdown.setText(getString(R.string.template_none), false)
+            }
+        } else {
+            val selectedTemplate = ScheduleTemplateProvider.getAll().firstOrNull {
+                getString(it.titleRes) == selectedTextFromList
+            } ?: return@setOnItemClickListener
+
+            showApplyTemplateDialog(
+                templateId = selectedTemplate.id,
+                templateTitle = getString(selectedTemplate.titleRes),
+                templateDescription = getString(selectedTemplate.descriptionRes)
+            )
         }
-
-        val preset = CyclePresetProvider.findByDisplayName(requireContext(), selectedName)
-            ?: return@setOnItemClickListener
-
-        if (!wouldPresetChangeCurrentState(preset)) {
-            updatePresetSelectionState()
-            return@setOnItemClickListener
-        }
-
-        applyPreset(preset)
     }
 }
 
@@ -375,4 +445,127 @@ fun HomeFragment.setupHolidayCountryDropdown() {
         clearDateCheckResult()
         updateUnsavedChangesState()
     }
+}
+
+private fun View.setEnabledWithAlpha(enabled: Boolean) {
+    isEnabled = enabled
+    alpha = if (enabled) 1f else 0.5f
+}
+
+private fun HomeFragment.setChipGroupEnabled(enabled: Boolean) {
+    firstCycleDayChipGroup.isEnabled = enabled
+    firstCycleDayChipGroup.alpha = if (enabled) 1f else 0.5f
+
+    firstCycleDayChipGroup.children.forEach { chip ->
+        chip.isEnabled = enabled
+        chip.alpha = if (enabled) 1f else 0.6f
+    }
+}
+
+private fun HomeFragment.buildTemplateDescriptionText(
+    template: com.dante.workcycle.domain.template.ScheduleTemplate
+): String {
+    val dateFormatter = java.time.format.DateTimeFormatter.ofLocalizedDate(
+        java.time.format.FormatStyle.MEDIUM
+    ).withLocale(java.util.Locale.getDefault())
+
+    val lockedItems = mutableListOf<String>()
+
+    if (template.locksCycleEditing) {
+        lockedItems += getString(R.string.template_locked_item_cycle)
+    }
+
+    if (template.locksRulesEditing) {
+        lockedItems += getString(R.string.template_locked_item_rules)
+    }
+
+    if (!template.allowsStartDateEditing) {
+        lockedItems += getString(R.string.template_locked_item_start_date)
+    }
+
+    if (TemplateManager.isAssignmentModeEditingLocked(requireContext())) {
+        lockedItems += getString(R.string.template_locked_item_assignment_mode)
+    }
+
+    val lockedSummary = if (lockedItems.isNotEmpty()) {
+        getString(
+            R.string.template_locked_summary_format,
+            lockedItems.joinToString(", ")
+        )
+    } else {
+        ""
+    }
+
+    val parts = listOfNotNull(
+        getString(template.descriptionRes),
+        getString(
+            R.string.template_reference_date_format,
+            template.fixedStartDate.format(dateFormatter),
+            template.fixedFirstCycleDay
+        ),
+        lockedSummary.takeIf { it.isNotBlank() }
+    )
+
+    return parts.joinToString("\n\n")
+}
+fun HomeFragment.updateTemplateUiState() {
+    val template = TemplateManager.getActiveTemplate(requireContext())
+    val hasTemplate = template != null
+
+    activeTemplateCard.isVisible = hasTemplate
+    templateLockedMessage.isVisible = hasTemplate
+
+    if (template != null) {
+        activeTemplateTitle.text =
+            getString(R.string.template_active_title) + ": " + getString(template.titleRes)
+
+        activeTemplateDescription.text = buildTemplateDescriptionText(template)
+        presetDropdown.setText(getString(template.titleRes), false)
+    } else {
+        activeTemplateTitle.text = getString(R.string.template_active_title)
+        activeTemplateDescription.text = ""
+        presetDropdown.setText(getString(R.string.template_none), false)
+    }
+
+    val cycleLocked = TemplateManager.isCycleEditingLocked(requireContext())
+    val rulesLocked = TemplateManager.isRulesEditingLocked(requireContext())
+    val canEditStartDate = TemplateManager.canEditStartDate(requireContext())
+
+    cycleDaysEdit.setEnabledWithAlpha(!cycleLocked)
+    firstCycleDayDropdown.setEnabledWithAlpha(!cycleLocked)
+    setChipGroupEnabled(!cycleLocked)
+
+    pickDateButton.setEnabledWithAlpha(canEditStartDate)
+
+    switchSaturdays.setEnabledWithAlpha(!rulesLocked)
+    switchSundays.setEnabledWithAlpha(!rulesLocked)
+    switchHolidays.setEnabledWithAlpha(!rulesLocked)
+    holidayCountryDropdown.setEnabledWithAlpha(!rulesLocked)
+}
+
+private fun HomeFragment.showApplyTemplateDialog(
+    templateId: String,
+    templateTitle: String,
+    templateDescription: String
+) {
+    MaterialAlertDialogBuilder(requireContext())
+        .setTitle(templateTitle)
+        .setMessage(
+            templateDescription + "\n\n" +
+                    getString(R.string.template_apply_confirm_message)
+        )
+        .setNegativeButton(android.R.string.cancel, null)
+        .setPositiveButton(R.string.apply) { _, _ ->
+            TemplateManager.applyTemplate(requireContext(), templateId)
+
+            runWithoutChangeTracking {
+                loadSettings()
+                updateTemplateUiState()
+                clearUnsavedChanges()
+            }
+
+            updateTodayStatus()
+            updateCyclePreview()
+        }
+        .show()
 }

@@ -1,7 +1,10 @@
 package com.dante.workcycle.ui.fragments
 
+import android.annotation.SuppressLint
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.GestureDetector
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -9,10 +12,24 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.dante.workcycle.CalendarDayItem
+import com.dante.workcycle.R
+import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
+import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.core.util.CycleColorHelper
+import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
+import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
+import com.dante.workcycle.domain.holiday.HolidayManager
+import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
+import com.dante.workcycle.ui.adapter.CalendarAdapter
+import com.dante.workcycle.ui.dialogs.EditAssignmentDayBottomSheet
+import com.dante.workcycle.widget.WidgetRefreshHelper
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -22,17 +39,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.abs
-import android.annotation.SuppressLint
-import android.graphics.Typeface
-import android.view.Gravity
-import com.dante.workcycle.ui.adapter.CalendarAdapter
-import com.dante.workcycle.CalendarDayItem
-import com.dante.workcycle.CycleColorHelper
-import com.dante.workcycle.domain.schedule.CycleManager
-import com.dante.workcycle.domain.holiday.HolidayManager
-import com.dante.workcycle.R
-import com.dante.workcycle.applySystemBarsBottomInsetAsPadding
-import com.dante.workcycle.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.core.util.DateProvider
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
@@ -48,6 +55,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private lateinit var displayedMonth: LocalDate
     private lateinit var gestureDetector: GestureDetector
+
+    private var selectedDate: LocalDate? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -187,49 +196,128 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             monthDate.year
         )
 
-        val items = buildMonth(monthDate)
+        val items = buildMonthItems(monthDate)
 
         recycler.adapter = CalendarAdapter(
             items = items,
-            getLabel = { date ->
-                CycleManager.getCycleDayForDate(requireContext(), date)
-            },
-            getBackgroundColor = { _, label ->
-                val cycle = CycleManager.loadCycle(requireContext())
-                CycleColorHelper.getBackgroundColor(
-                    context = requireContext(),
-                    label = label,
-                    cycle = cycle
-                )
-            },
-            onDayClick = { date ->
-                showDayDetails(date)
+            onDayClick = { item ->
+                val date = item.date ?: return@CalendarAdapter
+
+                val assignmentPrefs = AssignmentCyclePrefs(requireContext())
+                if (!assignmentPrefs.isEnabled()) {
+                    showDayDetails(date)
+                    return@CalendarAdapter
+                }
+
+                if (!isAdded || parentFragmentManager.isStateSaved) return@CalendarAdapter
+
+                selectedDate = date
+                renderMonth(displayedMonth)
+
+                EditAssignmentDayBottomSheet(
+                    date = date,
+                    onSaved = {
+                        if (!isAdded) return@EditAssignmentDayBottomSheet
+                        renderMonth(displayedMonth)
+                        WidgetRefreshHelper.refresh(requireContext())
+                    }
+                ).show(parentFragmentManager, "editDay")
             }
         )
     }
 
-    private fun buildMonth(date: LocalDate): List<CalendarDayItem> {
-        val start = date.withDayOfMonth(1)
-        val end = date.withDayOfMonth(date.lengthOfMonth())
+    private fun buildMonthItems(monthDate: LocalDate): List<CalendarDayItem> {
+        val ctx = context ?: return emptyList()
+
+        val start = monthDate.withDayOfMonth(1)
+        val end = monthDate.withDayOfMonth(monthDate.lengthOfMonth())
+
+        val resolver = DefaultScheduleResolver(ctx)
+        val labelsPrefs = AssignmentLabelsPrefs(ctx)
+        val cycle = CycleManager.loadCycle(ctx)
+        val today = com.dante.workcycle.core.util.DateProvider.today()
 
         val result = mutableListOf<CalendarDayItem>()
 
         val leadingEmptyDays = start.dayOfWeek.toMondayBasedIndex()
         repeat(leadingEmptyDays) {
-            result.add(CalendarDayItem(null))
+            result.add(
+                CalendarDayItem(
+                    date = null,
+                    isCurrentMonth = false,
+                    isEmpty = true
+                )
+            )
         }
 
         var current = start
         while (!current.isAfter(end)) {
-            result.add(CalendarDayItem(current))
+            val resolved = resolver.resolve(current)
+
+            val effectiveCycleLabel = resolved.effectiveCycleLabel
+            val baseCycleLabel = resolved.baseCycleLabel
+
+            val cycleColor = CycleColorHelper.getBackgroundColor(
+                context = ctx,
+                label = baseCycleLabel,
+                cycle = cycle
+            )
+
+            val rawAssignmentLabel = resolved.assignmentLabel
+            val displayAssignmentLabel = rawAssignmentLabel?.let {
+                if (resolved.isAssignmentOverridden) "$it*" else it
+            }
+
+            val assignmentColor = rawAssignmentLabel
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
+                ?.let { labelsPrefs.getLabelByName(it)?.color }
+
+            val skippedOverrideLabel = CycleManager.getSkippedDayOverrideLabelOrNull(ctx, current)
+
+            result.add(
+                CalendarDayItem(
+                    date = current,
+                    dayNumber = current.dayOfMonth.toString(),
+                    effectiveCycleLabel = shortenCalendarLabel(effectiveCycleLabel),
+                    assignmentLabel = displayAssignmentLabel?.let { shortenCalendarLabel(it) },
+                    cycleColor = cycleColor,
+                    assignmentColor = assignmentColor,
+                    isOffDay = skippedOverrideLabel != null,
+                    isToday = current == today,
+                    isCurrentMonth = true,
+                    isEmpty = false,
+                    isSelected = current == selectedDate
+                )
+            )
+
             current = current.plusDays(1)
         }
 
         while (result.size % 7 != 0) {
-            result.add(CalendarDayItem(null))
+            result.add(
+                CalendarDayItem(
+                    date = null,
+                    isCurrentMonth = false,
+                    isEmpty = true
+                )
+            )
         }
 
         return result
+    }
+
+    private fun shortenCalendarLabel(label: String): String {
+        val normalized = label.trim()
+
+        val labelsPrefs = AssignmentLabelsPrefs(requireContext())
+        val matchedLabel = labelsPrefs.getLabelByName(normalized)
+
+        return if (matchedLabel != null && matchedLabel.isSystem) {
+            labelsPrefs.getShortDisplayName(matchedLabel)
+        } else {
+            if (normalized.length <= 5) normalized else normalized.take(5)
+        }
     }
 
     private fun DayOfWeek.toMondayBasedIndex(): Int {
@@ -245,7 +333,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     }
 
     private fun showDayDetails(date: LocalDate) {
-        val label = CycleManager.getCycleDayForDate(requireContext(), date)
+        val resolver = DefaultScheduleResolver(requireContext())
+        val label = shortenCalendarLabel(resolver.resolve(date).effectiveCycleLabel)
 
         val dateText = date.format(
             DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.getDefault())

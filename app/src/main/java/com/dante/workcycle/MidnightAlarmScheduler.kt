@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.dante.workcycle.receivers.DayChangeReceiver
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,11 +21,52 @@ object MidnightAlarmScheduler {
         val pendingIntent = pendingIntent(context)
 
         alarmManager.cancel(pendingIntent)
-        alarmManager.setAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            nextTriggerMillis(),
-            pendingIntent
-        )
+
+        val triggerAt = nextTriggerMillis()
+
+        try {
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                        alarmManager.canScheduleExactAlarms() -> {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerAt,
+                        pendingIntent
+                    )
+                }
+
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerAt,
+                        pendingIntent
+                    )
+                }
+
+                else -> {
+                    alarmManager.set(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerAt,
+                        pendingIntent
+                    )
+                }
+            }
+        } catch (_: SecurityException) {
+            // fallback brez exact alarma
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.set(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                )
+            }
+        }
     }
 
     fun cancel(context: Context) {

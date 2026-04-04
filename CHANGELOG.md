@@ -4,6 +4,63 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.0
+
+## ✨ Added
+
+- Assignment system (manual day overrides)
+- Assignment labels (Sick, Vacation, Standby, Field + custom labels)
+- Assignment icons and color indicators
+- Click on day → edit assignment (bottom sheet)
+- Assignment support in 7-day preview
+- Assignment support in Calendar
+- Template system (foundation)
+- Pošta Slovenije preset (fixed A/B schedule)
+- Template-based restrictions (locked cycle/rules)
+- Template-specific assignment labels (O1, Š1)
+- Automatic cleanup of template-specific data
+- Assignment usage tracking (usageCount, lastUsedAt)
+
+## 🎨 Improved
+
+- Redesigned 7-day preview layout (3-zone layout: date / assignment / cycle)
+- Better visual hierarchy (assignment now clearly visible)
+- Icons added to assignments for faster recognition
+- Reduced visual dominance of cycle when assignment is present
+- Improved card balance and spacing (Material 3 style)
+- Cleaner and more consistent UI across screens
+- Improved label sorting (by usage + recency)
+- Better handling of empty states (no assignment)
+
+## 🐞 Fixed
+
+- Fixed assignment labels not updating correctly after template change
+- Fixed leftover template labels (O1, Š1) after switching template
+- Fixed stale assignment data still showing in preview/calendar
+- Fixed multiple UI inconsistencies in preview list
+- Fixed icon/dot rendering conflicts
+- Fixed edge cases with empty/invalid labels
+- Fixed crashes related to missing label references
+
+## ⚙️ Technical
+
+- Introduced TemplateManager system
+- Added template-aware configuration layer
+- Implemented assignment label persistence (JSON-based)
+- Added cleanup logic for template-specific data
+- Improved ManualScheduleRepository (bulk cleanup support)
+- Refactored CyclePreviewAdapter for new layout
+- Simplified assignment rendering logic (single source of truth)
+- Improved separation between cycle and assignment logic
+- Prepared architecture for combined schedule (cycle + manual)
+- Codebase cleanup and consistency improvements
+
+---
+
+🚀 Version 2.0 is a major update introducing assignment tracking, templates, and a redesigned UI.
+
+---
+
 ## v1.9
 
 ## ✨ Added

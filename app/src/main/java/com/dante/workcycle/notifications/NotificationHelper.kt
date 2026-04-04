@@ -8,7 +8,11 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.dante.workcycle.ui.activity.MainActivity
 import com.dante.workcycle.R
-import com.dante.workcycle.data.Prefs
+import com.dante.workcycle.data.prefs.Prefs
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 
 object NotificationHelper {
 
@@ -32,6 +36,16 @@ object NotificationHelper {
         message: String
     ) {
         if (!areNotificationsEnabled(context)) return
+
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
 
         val manager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

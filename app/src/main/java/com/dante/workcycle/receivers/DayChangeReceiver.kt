@@ -3,12 +3,12 @@ package com.dante.workcycle.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.R
+import com.dante.workcycle.core.util.DateProvider
+import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.notifications.NotificationHelper
 import com.dante.workcycle.widget.WidgetUpdater
-import java.time.LocalDate
 
 class DayChangeReceiver : BroadcastReceiver() {
 
@@ -23,11 +23,12 @@ class DayChangeReceiver : BroadcastReceiver() {
                     return
                 }
 
-                val today = LocalDate.now()
+                val today = DateProvider.today()
                 val tomorrow = today.plusDays(1)
+                val resolver = DefaultScheduleResolver(context)
 
-                val todayLabel = CycleManager.getCycleDayForDate(context, today)
-                val tomorrowLabel = CycleManager.getCycleDayForDate(context, tomorrow)
+                val todayLabel = resolver.resolve(today).effectiveCycleLabel
+                val tomorrowLabel = resolver.resolve(tomorrow).effectiveCycleLabel
 
                 val message = context.getString(
                     R.string.notification_today_tomorrow,

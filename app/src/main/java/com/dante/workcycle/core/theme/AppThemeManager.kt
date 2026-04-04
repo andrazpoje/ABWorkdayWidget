@@ -1,8 +1,9 @@
-package com.dante.workcycle
+package com.dante.workcycle.core.theme
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
+import com.dante.workcycle.data.prefs.AppPrefs
 
 object AppThemeManager {
 

@@ -1,4 +1,4 @@
-package com.dante.workcycle
+package com.dante.workcycle.ui.home
 
 import android.app.DatePickerDialog
 import android.appwidget.AppWidgetManager
@@ -7,23 +7,58 @@ import android.content.Context
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dante.workcycle.R
+import com.dante.workcycle.data.prefs.AppPrefs
+import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
-import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
-import com.dante.workcycle.ui.fragments.HomeFragment
+import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.domain.schedule.parseCycleInput
 import com.dante.workcycle.domain.schedule.sanitizeLabel
+import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
+import com.dante.workcycle.ui.dialogs.EditAssignmentDayBottomSheet
+import com.dante.workcycle.widget.WidgetRefreshHelper
 import com.dante.workcycle.widget.WorkCycleWidgetProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
+import com.dante.workcycle.core.util.DateProvider
 
 fun HomeFragment.setupPreviewRecyclerView() {
     previewAdapter = CyclePreviewAdapter()
+
     previewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     previewRecyclerView.adapter = previewAdapter
     previewRecyclerView.isNestedScrollingEnabled = false
+
+    previewAdapter.onItemClick = { item ->
+
+        if (isAdded && !parentFragmentManager.isStateSaved) {
+
+            val ctx = context
+            if (ctx != null) {
+
+                val assignmentPrefs = AssignmentCyclePrefs(ctx)
+
+                if (assignmentPrefs.isEnabled()) {
+                    EditAssignmentDayBottomSheet(
+                        date = item.date,
+                        onSaved = {
+                            updateCyclePreview()
+                            WidgetRefreshHelper.refresh(ctx)
+                        }
+                    ).show(parentFragmentManager, "editDay")
+                } else {
+                    Toast.makeText(
+                        ctx,
+                        getString(R.string.assignment_enable_first_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
 }
 
 fun HomeFragment.updateTodayStatus() = Unit
@@ -39,10 +74,6 @@ fun HomeFragment.revertToSavedState() {
         cycle.firstOrNull() ?: "A"
     ) ?: (cycle.firstOrNull() ?: "A")
 
-    val skippedLabel = prefs.getString(
-        AppPrefs.KEY_SKIPPED_LABEL,
-        AppPrefs.DEFAULT_SKIPPED_LABEL
-    ) ?: AppPrefs.DEFAULT_SKIPPED_LABEL
 
     cycleDaysEdit.setText(cycle.joinToString(", "))
     selectedDate = startDate
@@ -50,12 +81,10 @@ fun HomeFragment.revertToSavedState() {
 
     refreshFirstCycleDayDropdown(firstDay)
 
-    skippedDayLabelEdit.setText(skippedLabel)
 
     switchSaturdays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
     switchSundays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
     switchHolidays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
-    switchOverrideSkippedDays.isChecked = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
 
     updateTodayStatus()
     updateCyclePreview()
@@ -66,30 +95,57 @@ fun HomeFragment.revertToSavedState() {
 }
 
 fun HomeFragment.updateCyclePreview() {
-    val today = LocalDate.now()
+
+    if (!isAdded) return
+
+    val ctx = context ?: return
+
+    val today = DateProvider.today()
+
     val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
     val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
         .withLocale(Locale.getDefault())
 
-    val items = (0..6).map { offset ->
+    val resolver = DefaultScheduleResolver(ctx)
+
+    val list = mutableListOf<CyclePreviewAdapter.PreviewItem>()
+
+    for (offset in 0..6) {
+
         val date = today.plusDays(offset.toLong())
-        val title = date.format(dayFormatter).replaceFirstChar {
-            if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+
+        val resolved = try {
+            resolver.resolve(date)
+        } catch (e: Exception) {
+            null
+        } ?: continue
+
+        val title = try {
+            date.format(dayFormatter).replaceFirstChar { char ->
+                if (char.isLowerCase()) char.titlecase(Locale.getDefault()) else char.toString()
+            }
+        } catch (e: Exception) {
+            ""
         }
 
-        val isNonWorkingDay = isPreviewSkippedOverrideActiveForDate(date)
+        val offDayLabel = ctx.getString(R.string.off_day_label)
+        val isOffDay = resolved.effectiveCycleLabel.equals(offDayLabel, ignoreCase = true)
 
-        CyclePreviewAdapter.PreviewItem(
-            title = title,
-            dateText = date.format(dateFormatter),
-            cycleLabel = getPreviewCycleDayForDate(date),
-            helperText = if (isNonWorkingDay) getString(R.string.non_working_day_label) else null
+        list.add(
+            CyclePreviewAdapter.PreviewItem(
+                date = date,
+                title = title,
+                dateText = date.format(dateFormatter),
+                cycleLabel = resolved.effectiveCycleLabel.ifEmpty { "-" },
+                colorLabel = resolved.baseCycleLabel,
+                helperText = resolved.assignmentLabel,
+                isOffDay = isOffDay
+            )
         )
     }
-
-    previewAdapter.submitList(items, getPreviewCycle())
+    val cycle = CycleManager.loadCycle(ctx)
+    previewAdapter.submitPreviewItems(list, cycle)
 }
-
 fun HomeFragment.updateWidgetHint() {
     val manager = AppWidgetManager.getInstance(requireContext())
     val ids = manager.getAppWidgetIds(
@@ -216,13 +272,6 @@ private fun HomeFragment.getPreviewFirstCycleDay(cycle: List<String>): String {
     )
 }
 
-private fun HomeFragment.getPreviewSkippedLabel(): String {
-    return sanitizeLabel(
-        skippedDayLabelEdit.text?.toString().orEmpty(),
-        AppPrefs.DEFAULT_SKIPPED_LABEL
-    )
-}
-
 private fun HomeFragment.getPreviewCycleDayForDate(date: LocalDate): String {
     val cycle = getPreviewCycle()
     if (cycle.isEmpty()) return "?"
@@ -232,7 +281,7 @@ private fun HomeFragment.getPreviewCycleDayForDate(date: LocalDate): String {
         .takeIf { it >= 0 } ?: 0
 
     if (isPreviewSkippedOverrideActiveForDate(date)) {
-        return getPreviewSkippedLabel()
+        return getString(R.string.off_day_label)
     }
 
     val startDate = selectedDate
@@ -255,7 +304,6 @@ private fun HomeFragment.getPreviewCycleDayForDate(date: LocalDate): String {
 }
 
 private fun HomeFragment.isPreviewSkippedOverrideActiveForDate(date: LocalDate): Boolean {
-    if (!switchOverrideSkippedDays.isChecked) return false
     return isPreviewSkippedDay(date)
 }
 
