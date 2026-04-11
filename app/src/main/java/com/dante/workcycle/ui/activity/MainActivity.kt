@@ -27,6 +27,11 @@ import com.dante.workcycle.databinding.ActivityMainBinding
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.notifications.NotificationHelper
 import com.dante.workcycle.ui.home.HomeFragment
+import androidx.core.os.bundleOf
+import com.dante.workcycle.data.prefs.LaunchPrefs
+import android.widget.ImageView
+import androidx.core.view.children
+import androidx.appcompat.widget.Toolbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,6 +72,30 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
+        binding.toolbar.post {
+            val size = (38 * resources.displayMetrics.density).toInt()
+            val marginEnd = (10 * resources.displayMetrics.density).toInt()
+
+            binding.toolbar.children.forEach { child ->
+                if (child is ImageView && child.drawable != null) {
+                    val params = child.layoutParams as? Toolbar.LayoutParams
+                    if (params != null) {
+                        params.width = size
+                        params.height = size
+                        params.marginEnd = marginEnd
+                        child.layoutParams = params
+                    } else {
+                        child.layoutParams.width = size
+                        child.layoutParams.height = size
+                    }
+
+                    child.adjustViewBounds = true
+                    child.scaleType = ImageView.ScaleType.FIT_CENTER
+                    child.requestLayout()
+                }
+            }
+        }
+
         val host = supportFragmentManager.findFragmentById(R.id.navHostFragment)
         if (host !is NavHostFragment) {
             finish()
@@ -86,6 +115,7 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.bottomNavigation.setupWithNavController(navController)
+        handleLaunchDestination(navController, savedInstanceState)
 
         ensureNotificationFallbackScheduled()
 
@@ -106,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             binding.toolbar.title = if (suffix.isEmpty()) {
                 appName
             } else {
-                "$appName - $suffix"
+                suffix
             }
 
             val showBottomNav = destination.id == R.id.homeFragment ||
@@ -183,7 +213,33 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+    private fun handleLaunchDestination(
+        navController: NavController,
+        savedInstanceState: Bundle?
+    ) {
+        if (savedInstanceState != null) return
 
+        val launchPrefs = LaunchPrefs(this)
+
+        binding.root.post {
+            when {
+                !launchPrefs.isOnboardingCompleted() -> {
+                    runCatching {
+                        navController.navigate(
+                            R.id.helpFragment,
+                            bundleOf("isOnboarding" to true)
+                        )
+                    }
+                }
+
+                launchPrefs.shouldShowWhatsNew() -> {
+                    runCatching {
+                        navController.navigate(R.id.whatsNewFragment)
+                    }
+                }
+            }
+        }
+    }
     private fun safeNavigate(@IdRes destinationId: Int) {
         val navController = navHostFragment.navController
         val currentId = navController.currentDestination?.id

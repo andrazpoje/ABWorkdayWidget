@@ -38,4 +38,6 @@ object AppPrefs {
     // holiday country
     const val KEY_HOLIDAY_COUNTRY = "holidayCountry"
     const val KEY_COUNTRY_MANUAL = "holidayCountryManual"
+
+    const val KEY_FIRST_CYCLE_DAY_INDEX = "first_cycle_day_index"
 }

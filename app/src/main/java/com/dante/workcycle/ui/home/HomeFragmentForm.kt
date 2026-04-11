@@ -7,25 +7,27 @@ import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.children
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
 import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
+import com.dante.workcycle.domain.schedule.CyclePreset
 import com.dante.workcycle.domain.schedule.CyclePresetProvider
 import com.dante.workcycle.domain.schedule.sanitizeLabel
+import com.dante.workcycle.domain.template.ScheduleTemplate
+import com.dante.workcycle.domain.template.ScheduleTemplateProvider
+import com.dante.workcycle.domain.template.TemplateManager
+import com.dante.workcycle.ui.template.TemplateDropdownAdapter
+import com.dante.workcycle.ui.template.TemplateDropdownItem
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import java.util.Locale
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import androidx.core.view.children
-import androidx.core.view.isVisible
-import com.dante.workcycle.data.prefs.TemplatePrefs
-import com.dante.workcycle.domain.schedule.CyclePreset
-import com.dante.workcycle.domain.template.TemplateManager
-import com.dante.workcycle.domain.template.ScheduleTemplateProvider
 
 fun HomeFragment.validateCycleInput(): Boolean {
     val raw = cycleDaysEdit.text?.toString().orEmpty().trim()
@@ -59,10 +61,14 @@ fun HomeFragment.validateCycleInput(): Boolean {
         return false
     }
 
-    val distinct = parts.map { it.lowercase(Locale.getDefault()) }.toSet()
-    if (distinct.size != parts.size) {
-        cycleDaysInputLayout.error = getString(R.string.error_cycle_duplicates)
-        return false
+    val duplicatesAllowed = TemplateManager.isTemplateActive(requireContext())
+
+    if (!duplicatesAllowed) {
+        val distinct = parts.map { it.lowercase(Locale.getDefault()) }.toSet()
+        if (distinct.size != parts.size) {
+            cycleDaysInputLayout.error = getString(R.string.error_cycle_duplicates)
+            return false
+        }
     }
 
     cycleDaysInputLayout.error = null
@@ -98,16 +104,52 @@ private fun HomeFragment.createNoFilterAdapter(items: List<String>): ArrayAdapte
         }
     }
 }
+
+private fun HomeFragment.buildTemplateDropdownItems(): List<TemplateDropdownItem> {
+    val generalTemplates = listOfNotNull(
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_AB),
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_TWO_SHIFT),
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_THREE_SHIFT),
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_4_ON_4_OFF),
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_PANAMA_223)
+    )
+
+    val professionalTemplates = listOfNotNull(
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_POSTA_SLOVENIJE_AB)
+    )
+
+    return buildList {
+        add(TemplateDropdownItem.Header(getString(R.string.template_group_general)))
+        generalTemplates.forEach { template ->
+            add(
+                TemplateDropdownItem.Option(
+                    templateId = template.id,
+                    title = getString(template.titleRes)
+                )
+            )
+        }
+
+        add(TemplateDropdownItem.Header(getString(R.string.template_group_special)))
+        professionalTemplates.forEach { template ->
+            add(
+                TemplateDropdownItem.Option(
+                    templateId = template.id,
+                    title = getString(template.titleRes)
+                )
+            )
+        }
+    }
+}
+
 private fun HomeFragment.showClearTemplateDialog() {
     MaterialAlertDialogBuilder(requireContext())
         .setTitle(R.string.template_clear_dialog_title)
         .setMessage(R.string.template_clear_dialog_message)
         .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-            val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
-            val selectedText = activeTemplate?.let { getString(it.titleRes) }
-                ?: getString(R.string.template_none)
-
-            presetDropdown.setText(selectedText, false)
+            presetDropdown.setText(
+                TemplateManager.getCurrentTemplateDisplayName(requireContext()),
+                false
+            )
             dialog.dismiss()
         }
         .setPositiveButton(R.string.template_clear_dialog_confirm) { dialog, _ ->
@@ -118,6 +160,11 @@ private fun HomeFragment.showClearTemplateDialog() {
                 updateTemplateUiState()
                 clearUnsavedChanges()
             }
+
+            presetDropdown.setText(
+                TemplateManager.getCurrentTemplateDisplayName(requireContext()),
+                false
+            )
 
             Toast.makeText(
                 requireContext(),
@@ -131,6 +178,7 @@ private fun HomeFragment.showClearTemplateDialog() {
         }
         .show()
 }
+
 private fun MaterialAutoCompleteTextView.showDropdownIfPossible() {
     val adapterCount = adapter?.count ?: 0
     if (adapterCount > 0) {
@@ -223,7 +271,6 @@ fun HomeFragment.applyPreset(preset: CyclePreset) {
     cycleDaysEdit.setText(labels.joinToString(", "))
     refreshFirstCycleDayDropdown(firstDay)
     clearDateCheckResult()
-    validateCycleInput()
     updatePresetSelectionState(markAsChanged = true)
     updateTodayStatus()
     updateCyclePreview()
@@ -259,7 +306,30 @@ private fun HomeFragment.renderFirstCycleDayChips(
 
     firstCycleDayChipGroup.visibility = View.VISIBLE
 
-    cycleLabels.forEach { label ->
+    val isTemplateActive = TemplateManager.isTemplateActive(requireContext())
+    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+    val savedIndex = if (isTemplateActive) {
+        prefs.getInt(AppPrefs.KEY_FIRST_CYCLE_DAY_INDEX, -1)
+    } else {
+        -1
+    }
+
+    val selectedIndex = draftFirstCycleDayIndex ?: savedIndex
+
+    val counters = mutableMapOf<String, Int>()
+    val totals = cycleLabels.groupingBy { it }.eachCount()
+
+    cycleLabels.forEachIndexed { index, label ->
+        val displayText = if (isTemplateActive) {
+            val count = (counters[label] ?: 0) + 1
+            counters[label] = count
+            val total = totals[label] ?: 1
+            "$label $count/$total"
+        } else {
+            label
+        }
+
         val fillColor = getChipColorForLabel(label, cycleLabels)
         val textColor = CycleColorHelper.getTextColorForBackground(fillColor)
         val unselectedBackground = ColorUtils.setAlphaComponent(fillColor, 40)
@@ -298,14 +368,20 @@ private fun HomeFragment.renderFirstCycleDayChips(
             )
         )
 
+        val isSelected = if (isTemplateActive && selectedIndex in cycleLabels.indices) {
+            index == selectedIndex
+        } else {
+            label == selectedValue
+        }
+
         val chip = Chip(requireContext()).apply {
             id = View.generateViewId()
-            text = label
+            text = displayText
             isCheckable = true
             isClickable = true
             isCheckedIconVisible = false
             setEnsureMinTouchTargetSize(false)
-            isChecked = label == selectedValue
+            isChecked = isSelected
 
             chipBackgroundColor = backgroundStates
             setTextColor(textStates)
@@ -313,11 +389,14 @@ private fun HomeFragment.renderFirstCycleDayChips(
             chipStrokeWidth = resources.displayMetrics.density * 1f
 
             setOnClickListener {
+                draftFirstCycleDayIndex = index
                 firstCycleDayDropdown.setText(label, false)
+                cycleDaysInputLayout.error = null
                 clearDateCheckResult()
-                updatePresetSelectionState(markAsChanged = true)
+                updateUnsavedChangesState()
                 updateTodayStatus()
                 updateCyclePreview()
+                renderFirstCycleDayChips(cycleLabels, label)
             }
         }
 
@@ -366,57 +445,43 @@ fun HomeFragment.setupFirstCycleDayDropdown() {
 }
 
 fun HomeFragment.setupPresetDropdown() {
-    val templateItems = buildList {
-        add(getString(R.string.template_none))
-        addAll(
-            ScheduleTemplateProvider.getAll().map { template ->
-                getString(template.titleRes)
-            }
-        )
-    }
-
-    val adapter = createNoFilterAdapter(templateItems)
+    val items = buildTemplateDropdownItems()
+    val adapter = TemplateDropdownAdapter(requireContext(), items)
 
     presetDropdown.setAdapter(adapter)
     configureAsSelectBox(presetDropdown)
 
-    val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
-    val selectedText = activeTemplate?.let { getString(it.titleRes) }
-        ?: getString(R.string.template_none)
-
-    presetDropdown.setText(selectedText, false)
+    presetDropdown.setText(
+        TemplateManager.getCurrentTemplateDisplayName(requireContext()),
+        false
+    )
 
     presetDropdown.setOnItemClickListener { _, _, position, _ ->
-        val selectedTextFromList = templateItems[position]
+        when (val selected = adapter.getItem(position)) {
+            is TemplateDropdownItem.Option -> {
+                val selectedTemplate = ScheduleTemplateProvider.getById(selected.templateId)
+                    ?: return@setOnItemClickListener
 
-        if (selectedTextFromList == getString(R.string.template_none)) {
-            if (TemplateManager.isTemplateActive(requireContext())) {
-                showClearTemplateDialog()
-            } else {
-                presetDropdown.setText(getString(R.string.template_none), false)
+                showApplyTemplateDialog(
+                    templateId = selectedTemplate.id,
+                    templateTitle = getString(selectedTemplate.titleRes),
+                    templateDescription = getString(selectedTemplate.descriptionRes)
+                )
             }
-        } else {
-            val selectedTemplate = ScheduleTemplateProvider.getAll().firstOrNull {
-                getString(it.titleRes) == selectedTextFromList
-            } ?: return@setOnItemClickListener
 
-            showApplyTemplateDialog(
-                templateId = selectedTemplate.id,
-                templateTitle = getString(selectedTemplate.titleRes),
-                templateDescription = getString(selectedTemplate.descriptionRes)
-            )
+            is TemplateDropdownItem.Header -> Unit
         }
     }
 }
 
 fun HomeFragment.updatePresetSelectionState(markAsChanged: Boolean = false) {
-    val matchedPreset = CyclePresetProvider.getPresets().firstOrNull { preset ->
-        !wouldPresetChangeCurrentState(preset)
-    }
+    val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
 
-    val presetText = matchedPreset
-        ?.let { getString(it.nameRes) }
-        ?: getString(R.string.preset_custom)
+    val presetText = if (activeTemplate != null) {
+        getString(activeTemplate.titleRes)
+    } else {
+        getString(R.string.template_none)
+    }
 
     if (presetDropdown.text?.toString() != presetText) {
         presetDropdown.setText(presetText, false)
@@ -463,7 +528,7 @@ private fun HomeFragment.setChipGroupEnabled(enabled: Boolean) {
 }
 
 private fun HomeFragment.buildTemplateDescriptionText(
-    template: com.dante.workcycle.domain.template.ScheduleTemplate
+    template: ScheduleTemplate
 ): String {
     val dateFormatter = java.time.format.DateTimeFormatter.ofLocalizedDate(
         java.time.format.FormatStyle.MEDIUM
@@ -496,8 +561,21 @@ private fun HomeFragment.buildTemplateDescriptionText(
         ""
     }
 
+    val isContinuousShift = when (template.id) {
+        ScheduleTemplateProvider.TEMPLATE_PANAMA_223,
+        ScheduleTemplateProvider.TEMPLATE_4_ON_4_OFF -> true
+        else -> false
+    }
+
+    val continuousText = if (isContinuousShift) {
+        getString(R.string.template_continuous_shift)
+    } else {
+        null
+    }
+
     val parts = listOfNotNull(
         getString(template.descriptionRes),
+        continuousText,
         getString(
             R.string.template_reference_date_format,
             template.fixedStartDate.format(dateFormatter),
@@ -508,6 +586,7 @@ private fun HomeFragment.buildTemplateDescriptionText(
 
     return parts.joinToString("\n\n")
 }
+
 fun HomeFragment.updateTemplateUiState() {
     val template = TemplateManager.getActiveTemplate(requireContext())
     val hasTemplate = template != null
@@ -554,7 +633,13 @@ private fun HomeFragment.showApplyTemplateDialog(
             templateDescription + "\n\n" +
                     getString(R.string.template_apply_confirm_message)
         )
-        .setNegativeButton(android.R.string.cancel, null)
+        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+            presetDropdown.setText(
+                TemplateManager.getCurrentTemplateDisplayName(requireContext()),
+                false
+            )
+            dialog.dismiss()
+        }
         .setPositiveButton(R.string.apply) { _, _ ->
             TemplateManager.applyTemplate(requireContext(), templateId)
 

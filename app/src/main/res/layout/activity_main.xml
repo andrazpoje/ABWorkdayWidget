@@ -14,7 +14,8 @@
 		android:background="?attr/colorSurface"
 		android:elevation="4dp"
 		android:minHeight="?attr/actionBarSize"
-		app:titleCentered="true"
+		app:logo="@drawable/ic_app_toolbar"
+		app:titleCentered="false"
 		app:titleTextColor="?attr/colorOnSurface" />
 
 	<androidx.fragment.app.FragmentContainerView

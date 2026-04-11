@@ -2,6 +2,7 @@ package com.dante.workcycle.domain.template
 
 import android.content.Context
 import androidx.core.content.edit
+import com.dante.workcycle.R
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
@@ -20,8 +21,34 @@ object TemplateManager {
         return ScheduleTemplateProvider.getById(id)
     }
 
+    fun getCurrentTemplateDisplayName(context: Context): String {
+        val template = getActiveTemplate(context)
+        return if (template != null) {
+            context.getString(template.titleRes)
+        } else {
+            context.getString(R.string.template_none)
+        }
+    }
+
     fun isTemplateActive(context: Context): Boolean {
         return getActiveTemplate(context) != null
+    }
+
+    fun isGeneralTemplate(context: Context): Boolean {
+        return when (getActiveTemplate(context)?.id) {
+            ScheduleTemplateProvider.TEMPLATE_AB,
+            ScheduleTemplateProvider.TEMPLATE_TWO_SHIFT,
+            ScheduleTemplateProvider.TEMPLATE_THREE_SHIFT -> true
+
+            else -> false
+        }
+    }
+
+    fun isProfessionalTemplate(context: Context): Boolean {
+        return when (getActiveTemplate(context)?.id) {
+            ScheduleTemplateProvider.TEMPLATE_POSTA_SLOVENIJE_AB -> true
+            else -> false
+        }
     }
 
     fun isCycleEditingLocked(context: Context): Boolean {

@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.data.prefs.LaunchPrefs
 import com.google.android.material.button.MaterialButton
 
 class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {
@@ -24,6 +26,8 @@ class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {
     private lateinit var whatsNewContentContainer: View
     private lateinit var whatsNewVersion: TextView
     private lateinit var buttonFullChangelog: MaterialButton
+    private lateinit var buttonContinue: MaterialButton
+    private lateinit var whatsNewBottomBar: View
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,6 +36,7 @@ class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {
 
         view.findViewById<View>(R.id.whatsNewScrollView).applySystemBarsBottomInsetAsPadding()
         whatsNewContentContainer.applySystemBarsHorizontalInsetAsPadding()
+        whatsNewBottomBar.applySystemBarsBottomInsetAsPadding()
 
         whatsNewVersion.text =
             getString(R.string.whats_new_version_format, BuildConfig.VERSION_NAME)
@@ -40,12 +45,34 @@ class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {
             openChangelog()
         }
 
+        buttonContinue.setOnClickListener {
+            closeWhatsNew()
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    closeWhatsNew()
+                }
+            }
+        )
     }
 
     private fun bindViews(root: View) {
         whatsNewContentContainer = root.findViewById(R.id.whatsNewContentContainer)
         whatsNewVersion = root.findViewById(R.id.whatsNewVersion)
         buttonFullChangelog = root.findViewById(R.id.buttonFullChangelog)
+        buttonContinue = root.findViewById(R.id.buttonContinue)
+        whatsNewBottomBar = root.findViewById(R.id.whatsNewBottomBar)
+    }
+
+    private fun closeWhatsNew() {
+        LaunchPrefs(requireContext()).markWhatsNewSeen()
+        val popped = parentFragmentManager.popBackStackImmediate()
+        if (!popped) {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun openChangelog() {

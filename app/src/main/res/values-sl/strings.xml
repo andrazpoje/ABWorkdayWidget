@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="template_4on4off_title">4 dni delo / 4 dni prosto</string>
+    <string name="template_4on4off_description">4 dni dela, nato 4 dni prosto. Pogost urnik v izmenskem delu.</string>
+    <string name="template_panama_223_title">Panama 2-2-3</string>
+    <string name="template_panama_223_description">14-dnevni cikel: 2 dni delo, 2 dni prosto, 3 dni delo, 2 dni prosto, 2 dni delo, 3 dni prosto.</string>
+    <string name="template_continuous_shift">Kontinuiran turnus (vikendi vključeni)</string>
+
+
     <!-- APP -->
     <string name="app_name">Delovni cikel</string>
     <string name="app_header_title">Delovni cikel</string>
@@ -38,17 +45,16 @@
     <string name="first_cycle_day_hint">Izberi oznako iz cikla, ki velja na izbrani začetni datum.</string>
 
     <!-- PRESETS -->
-    <string name="preset_label">Predloga</string>
-    <string name="preset_hint">Izberi predlogo</string>
-    <string name="apply_preset_title">Uporabi predlogo</string>
-    <string name="apply_preset">Uporabi predlogo</string>
+    <string name="preset_label">Predloga cikla</string>
+    <string name="preset_hint">Izberi predlogo cikla</string>
+    <string name="preset_custom">Lastno določena</string>
+    <string name="preset_applied">Predloga cikla uporabljena: %1$s</string>
     <string name="apply_preset_message">To bo prepisalo trenutne nastavitve cikla s predlogo »%1$s«.</string>
     <string name="preset_already_applied">Ta predloga je že izbrana</string>
-    <string name="preset_custom">Po meri</string>
-    <string name="preset_applied">Predloga uporabljena: %1$s</string>
     <string name="preset_ab">A / B</string>
     <string name="preset_two_shift">2-izmensko</string>
     <string name="preset_three_shift">3-izmensko</string>
+    <string name="preset_hint_description">Predlogo cikla lahko izbereš tukaj. Če ročno spremeniš cikel ali pravila, se stanje nastavi na Lastno določena.</string>
 
     <!-- LABELS -->
     <string name="label_day">Dan</string>
@@ -215,7 +221,7 @@
     <string name="nav_more">Več</string>
 
     <!-- HELP -->
-    <string name="help_getting_started_content">• Nastavi začetni datum cikla.\n• Določi oznake cikla (npr. A, B ali Jutranja, Popoldanska, Nočna).\n• Izberi, katera oznaka velja na začetni datum.\n• Nastavi pravila (preskok vikendov ali praznikov po potrebi).\n• Shrani nastavitve.\n• Po želji dodaj widget na domači zaslon.</string>
+    <string name="help_getting_started_content">• Najprej preveri Predloge (Templates) – mogoče že obstaja razpored, ki ti ustreza.\n• Če ne, nastavi začetni datum cikla.\n• Določi oznake cikla (npr. A, B ali Jutranja, Popoldanska, Nočna).\n• Izberi, katera oznaka velja na začetni datum.\n• Nastavi pravila (preskok vikendov ali praznikov po potrebi).\n• Shrani nastavitve.\n• Po želji dodaj widget na domači zaslon.</string>
 
     <string name="help_cycle_logic_content">• Začetni datum je referenčna točka cikla.\n• Izbrana oznaka velja za ta datum.\n• Vsak naslednji veljaven dan premakne cikel naprej.\n• Preskočeni vikendi ali prazniki ne vplivajo na napredovanje cikla.</string>
 
@@ -233,8 +239,7 @@
     <string name="whats_new_title">Kaj je novega</string>
     <string name="whats_new_version_format">Verzija %1$s</string>
     <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
-    <string name="whats_new_content">✨ Novo\n• Prednastavitve (template) – npr. Pošta Slovenije A/B\n• 7-dnevni pregled z možnostjo urejanja assignmentov\n• Koledar z izboljšanimi oznakami dni in podrobnostmi\n• Podpora za dodatne države: Italija in Madžarska\n\n🎨 Izboljšave\n• Prenovljeni zasloni Nastavitve, Pomoč in Statistika\n• Izbira začetnega dne s chips UI\n• Boljši prikaz cikla in assignmentov\n• Izboljšan zaslon Pomoč z razširljivimi sekcijami\n• Čistejši izgled nastavitev in prikaza\n\n⚙️ Popravki in stabilnost\n• Izboljšana zanesljivost obvestil na nekaterih napravah\n• Popravljeno delovanje gumbov Shrani / Povrni\n• Splošni popravki napak in izboljšave delovanja</string>
-    <!-- EMAIL / LINKS -->
+    <string name="whats_new_content">✨ Novo\n• Novi predlogi (templates): 4 dni delo / 4 dni prosto, Panama 2-2-3\n• Podpora za kontinuiran turnus (brez preskoka vikendov/praznikov)\n• Prikaz sklopa cikla v 7-dnevnem pregledu (npr. Delo 3/7, Prosto 2/7)\n• Izboljšani chipi z oznako položaja v ciklu (npr. Delo 1/7)\n• Nova minimalna velikost widgeta (1x1)\n• Ikona aplikacije v zgornji vrstici (prilagojena temi)\n\n🎨 Izboljšave\n• Naslov v zgornji vrstici poravnan levo (boljša berljivost)\n• Bolj jasen prikaz cikla v 7-dnevnem pregledu\n• Boljša usklajenost med chipi in prikazom cikla\n• Natančnejši prikaz turnusov (Panama, 4/4)\n• Čistejši in bolj konsistenten UI\n\n⚙️ Popravki in stabilnost\n• Popravljen napačen prikaz sklopa cikla (Delo/Prosto)\n• Popravki pri uporabi predlog z ponavljajočimi oznakami\n• Popravljen izbor dneva cikla (chipi)\n• Popravljen prikaz gumba Shrani\n• Popravljene napake v dropdown seznamih\n• Splošni popravki in izboljšave stabilnosti</string>    <!-- EMAIL / LINKS -->
     <string name="email_subject_contact">%1$s - Povratne informacije</string>
     <string name="email_subject_bug_report">%1$s - Prijava napake</string>
     <string name="email_body_bug_report">Opiši težavo:\n\n---\nVerzija aplikacije: %1$s\nNaprava: %2$s\nAndroid: %3$s\n</string>
@@ -296,7 +301,21 @@
 
     <string name="cycle_override_label">Ročni cikel override</string>
 
-    <string name="template_none">Brez template-a</string>
+    <string name="template_none">Lastno določena</string>
+
+    <string name="templates_hint_text">Predloge najdeš na zaslonu Domov v sekciji Cikel. Tam lahko hitro izbereš že pripravljen razpored. Če si cikel nastaviš sam, bo prikazano Lastno določena.</string>
+
+    <string name="template_group_general">Splošni template-i</string>
+    <string name="template_group_special">Posebni template-i</string>
+
+    <string name="template_ab_title">A / B</string>
+    <string name="template_ab_description">Preprost dvodnevni cikel z oznakama A in B.</string>
+
+    <string name="template_two_shift_title">2-izmensko</string>
+    <string name="template_two_shift_description">Preprost dvoizmenski cikel: Dopoldan in Popoldan.</string>
+
+    <string name="template_three_shift_title">3-izmensko</string>
+    <string name="template_three_shift_description">Standardni triizmenski cikel: Dopoldan, Popoldan in Nočna.</string>
     <string name="template_active_title">Aktiven template</string>
     <string name="template_locked_message">Nekatere nastavitve so zaklenjene, ker je aktiven template.</string>
     <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
@@ -364,6 +383,12 @@ Način assignmentov določa aktivni template.
 
     <string name="assignment_start_date_hint">Začetni datum (yyyy-MM-dd)</string>
     <string name="assignment_cycle_hint">Oznake (npr. A,B,C ali Rajon1,Rajon2)</string>
+
+    <string name="continue_label">Nadaljuj</string>
+    <string name="welcome_title">Dobrodošel v Delovnem ciklu</string>
+    <string name="welcome_subtitle">Kratek vodič za prvi začetek. Tukaj hitro nastaviš svoj cikel, razumeš koledar in začneš uporabljati widget.</string>
+    <string name="help_title">Pomoč in navodila</string>
+    <string name="help_cycle_logic_title">Kako deluje cikel</string>
 
 
 </resources>

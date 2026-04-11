@@ -52,6 +52,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     var previewAssignmentDraftDate: LocalDate? = null
     var previewAssignmentDraftLabel: String? = null
+    var draftFirstCycleDayIndex: Int? = null
     lateinit var activityRoot: View
     lateinit var saveBarContainer: View
 
@@ -252,6 +253,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             AppPrefs.NAME,
             Context.MODE_PRIVATE
         )
+
+        val isFirstLaunch = prefs.getBoolean("first_launch", true)
+
+        // ❗ če je prvi zagon → samo označi in NE pokaži WhatsNew
+        if (isFirstLaunch) {
+            prefs.edit {
+                putBoolean("first_launch", false)
+                putString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, BuildConfig.VERSION_NAME)
+            }
+            return
+        }
+
         val currentVersion = BuildConfig.VERSION_NAME
         val lastSeenVersion = prefs.getString(AppPrefs.KEY_LAST_SEEN_WHATS_NEW_VERSION, null)
 

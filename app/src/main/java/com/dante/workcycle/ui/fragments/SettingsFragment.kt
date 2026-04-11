@@ -18,6 +18,7 @@ import com.dante.workcycle.core.theme.ThemePreset
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
+import com.dante.workcycle.data.prefs.LaunchPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.databinding.FragmentSettingsBinding
 import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
@@ -72,6 +73,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         updateSecondaryUi()
         updateCustomColorsUi()
         updateActiveTemplateInfoCard()
+        setupTemplatesHint()
         setupListeners()
         isInitializing = false
     }
@@ -157,6 +159,23 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                             template.fixedStartDate.format(dateFormatter),
                             template.fixedFirstCycleDay
                         )
+        }
+    }
+
+    private fun setupTemplatesHint() {
+        val launchPrefs = LaunchPrefs(requireContext())
+
+        binding.templatesHintCard.visibility =
+            if (launchPrefs.shouldShowTemplatesHint()) View.VISIBLE else View.GONE
+
+        binding.buttonCloseTemplatesHint.setOnClickListener {
+            binding.templatesHintCard.visibility = View.GONE
+            launchPrefs.markTemplatesHintShown()
+        }
+
+        binding.templatesHintCard.setOnClickListener {
+            binding.templatesHintCard.visibility = View.GONE
+            launchPrefs.markTemplatesHintShown()
         }
     }
 

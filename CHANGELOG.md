@@ -4,6 +4,47 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.1
+
+### ✨ Added
+- New cycle templates (4 days work / 4 days off)
+- New cycle templates (Panama 2-2-3 shift schedule)
+- Continuous shift support for templates (no weekend/holiday skipping)
+- Visual indicator for continuous shifts in template description
+- Cycle block indicators (e.g. Work 3/7, Off 2/7) in 7-day preview
+- Improved chip labels with position indicators (e.g. Work 1/7)
+- App logo displayed in toolbar (adaptive to light/dark theme)
+
+### 🎨 Improved
+- Toolbar redesigned with left-aligned title (better for long text)
+- App logo added for stronger branding
+- Better readability of cycle blocks in preview
+- Improved consistency between cycle chips and preview indicators
+- More accurate visual representation of shift-based schedules
+- Cleaner spacing and alignment in top app bar
+
+### 🐞 Fixed
+- Fixed incorrect cycle block labels (mismatch between Work and Off)
+- Fixed preview inconsistencies when using skip rules with templates
+- Fixed duplicate validation errors when using templates with repeated labels
+- Fixed chip selection issues (wrong index being saved)
+- Fixed "Save" button flickering or not appearing correctly
+- Fixed incorrect reset of selected cycle day after saving
+- Fixed dropdown rendering issues for template sections
+- Fixed resource compilation issues in layouts (missing namespace)
+
+### ⚙️ Technical
+- Improved cycle index calculation for preview (template-aware logic)
+- Added support for duplicate labels in template mode
+- Introduced block-position calculation (e.g. 3/7 logic)
+- Refactored toolbar handling (logo + title behavior)
+- Improved template configuration (continuous vs non-continuous)
+- Better separation between base cycle and resolved cycle
+- UI stability improvements across fragments
+- Minor code cleanup and consistency improvements
+
+🚀 Version 2.1 expands template support, improves accuracy of cycle visualization, and refines the overall UI experience.
+
 ## v2.0
 
 ## ✨ Added

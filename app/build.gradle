@@ -14,11 +14,11 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.dante.workcycle"
+        applicationId "com.dante.abworkdaywidget"
         minSdk 26
         targetSdk 36
-        versionCode 14
-        versionName "2.0"
+        versionCode 15
+        versionName "2.1"
     }
 
     buildFeatures {

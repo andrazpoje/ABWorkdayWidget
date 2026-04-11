@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="template_4on4off_title">4-on / 4-off</string>
+    <string name="template_4on4off_description">4 days of work followed by 4 days off. Common in shift-based jobs.</string>
+    <string name="template_panama_223_title">Panama 2-2-3</string>
+    <string name="template_panama_223_description">14-day shift cycle: 2 work, 2 off, 3 work, 2 off, 2 work, 3 off.</string>
+    <string name="template_continuous_shift">Continuous shift (weekends included)</string>
+
+
+<string name="preset_hint_description">Select a cycle template here. If you manually change the cycle or rules, it will switch to Custom.</string>
+
+    <string name="continue_label">Continue</string>
+    <string name="welcome_title">Welcome to WorkCycle</string>
+    <string name="welcome_subtitle">A quick guide to help you set up your cycle, understand the calendar, and start using the widget.</string>
+
     <!-- APP -->
     <string name="app_name">WorkCycle</string>
     <string name="app_version">Version %1$s</string>
@@ -34,10 +47,10 @@
     <string name="first_cycle_day_hint">Select a label from the cycle that applies to the selected start date.</string>
 
     <!-- PRESETS -->
-    <string name="preset_label">Preset</string>
-    <string name="preset_hint">Choose preset</string>
+    <string name="preset_label">Cycle template</string>
+    <string name="preset_hint">Choose cycle template</string>
     <string name="preset_custom">Custom</string>
-    <string name="preset_applied">Preset applied: %1$s</string>
+    <string name="preset_applied">Cycle template applied: %1$s</string>
     <string name="preset_ab">A / B</string>
     <string name="preset_two_shift">2-shift</string>
     <string name="preset_three_shift">3-shift</string>
@@ -185,9 +198,9 @@
     <string name="nav_more">More</string>
 
 
-    <!-- HELP -->
-    <string name="help_getting_started_content">• Set the start date of your cycle.\n• Define cycle labels (e.g. A, B or Morning, Afternoon, Night).\n• Select which label applies to the start date.\n• Configure rules (skip weekends or holidays if needed).\n• Save your settings.\n• Optionally add a widget to your home screen.</string>
 
+    <!-- HELP -->
+    <string name="help_getting_started_content">• First check Templates – there might already be a schedule that fits your needs.\n• If not, set the cycle start date.\n• Define cycle labels (e.g. A, B or Morning, Afternoon, Night).\n• Select which label applies on the start date.\n• Configure rules (skip weekends or holidays if needed).\n• Save your settings.\n• Optionally add the widget to your home screen.</string>
     <string name="help_cycle_logic_content">• The start date is the reference point of the cycle.\n• The selected label applies to that date.\n• Each valid day advances the cycle.\n• Skipped weekends or holidays do not affect the cycle.</string>
 
     <string name="help_assignments_content">• Assignments add extra labels (e.g. O1, vacation, sick leave).\n• Edit a day in the 7-day preview or calendar.\n• Assignments can override or complement the cycle.\n• You can toggle assignment visibility in settings.</string>
@@ -204,8 +217,7 @@
     <string name="whats_new_title">What’s New</string>
     <string name="whats_new_version_format">Version %1$s</string>
     <string name="whats_new_view_full_changelog">View full changelog</string>
-    <string name="whats_new_content">✨ New\n• Templates (presets) – e.g. Pošta Slovenije A/B\n• 7-day preview with editable assignments\n• Calendar with improved day labels and details\n• Support for additional countries: Italy and Hungary\n\n🎨 Improvements\n• Redesigned Settings, Help and Statistics screens\n• Start day selection with chips UI\n• Better cycle and assignment display\n• Improved Help screen with expandable sections\n• Cleaner settings layout and display options\n\n⚙️ Fixes and stability\n• Improved notification reliability on some devices\n• Fixed Save / Revert button behavior\n• General bug fixes and performance improvements</string>
-
+    <string name="whats_new_content">✨ New\n• New templates: 4 days work / 4 days off, Panama 2-2-3\n• Continuous shift support (no weekend/holiday skipping)\n• Cycle block indicators in 7-day preview (e.g. Work 3/7, Off 2/7)\n• Improved chips with cycle position indicators (e.g. Work 1/7)\n• New minimum widget size (1x1)\n• App logo in top bar (theme-aware)\n\n🎨 Improvements\n• Left-aligned toolbar title (better readability)\n• Improved cycle visibility in 7-day preview\n• Better consistency between chips and cycle display\n• More accurate shift schedule representation\n• Cleaner and more consistent UI\n\n⚙️ Fixes and stability\n• Fixed incorrect cycle block labels (Work/Off mismatch)\n• Fixed issues with templates using repeated labels\n• Fixed chip selection behavior\n• Fixed Save button visibility issues\n• Fixed dropdown rendering issues\n• General bug fixes and performance improvements</string>
     <!-- EMAIL / LINKS -->
     <string name="email_subject_contact">%1$s - Feedback</string>
     <string name="email_subject_bug_report">%1$s - Bug report</string>
@@ -273,7 +285,21 @@
 
     <string name="cycle_override_label">Cycle override</string>
 
-    <string name="template_none">No template</string>
+    <string name="template_none">Custom</string>
+
+    <string name="templates_hint_text">You can find templates on the Home screen in the Cycle section. There you can quickly choose a predefined schedule. If you configure the cycle manually, it will be shown as Custom.</string>
+
+    <string name="template_group_general">General templates</string>
+    <string name="template_group_special">Special templates</string>
+
+    <string name="template_ab_title">A / B</string>
+    <string name="template_ab_description">Simple two-day cycle with labels A and B.</string>
+
+    <string name="template_two_shift_title">2-shift</string>
+    <string name="template_two_shift_description">A simple two-shift cycle: Morning and Afternoon.</string>
+
+    <string name="template_three_shift_title">3-shift</string>
+    <string name="template_three_shift_description">A standard three-shift cycle: Morning, Afternoon and Night.</string>
     <string name="template_active_title">Active template</string>
     <string name="template_locked_message">Some settings are locked because a template is active.</string>
     <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>

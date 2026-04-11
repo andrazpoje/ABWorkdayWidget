@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 import com.dante.workcycle.core.util.DateProvider
+import com.dante.workcycle.domain.template.TemplateManager
 
 fun HomeFragment.setupPreviewRecyclerView() {
     previewAdapter = CyclePreviewAdapter()
@@ -90,6 +91,7 @@ fun HomeFragment.revertToSavedState() {
     updateCyclePreview()
 
     clearUnsavedChanges()
+    draftFirstCycleDayIndex = null
 
     Toast.makeText(requireContext(), getString(R.string.reverted), Toast.LENGTH_SHORT).show()
 }
@@ -131,6 +133,18 @@ fun HomeFragment.updateCyclePreview() {
         val offDayLabel = ctx.getString(R.string.off_day_label)
         val isOffDay = resolved.effectiveCycleLabel.equals(offDayLabel, ignoreCase = true)
 
+        val blockLabel = buildPreviewBlockLabel(
+            date,
+            resolved.baseCycleLabel
+        )
+
+        val helperParts = listOfNotNull(
+            blockLabel,
+            resolved.assignmentLabel?.takeIf { it.isNotBlank() }
+        )
+
+        val helperText = helperParts.joinToString(" • ").ifBlank { null }
+
         list.add(
             CyclePreviewAdapter.PreviewItem(
                 date = date,
@@ -138,7 +152,7 @@ fun HomeFragment.updateCyclePreview() {
                 dateText = date.format(dateFormatter),
                 cycleLabel = resolved.effectiveCycleLabel.ifEmpty { "-" },
                 colorLabel = resolved.baseCycleLabel,
-                helperText = resolved.assignmentLabel,
+                helperText = helperText,
                 isOffDay = isOffDay
             )
         )
@@ -146,6 +160,73 @@ fun HomeFragment.updateCyclePreview() {
     val cycle = CycleManager.loadCycle(ctx)
     previewAdapter.submitPreviewItems(list, cycle)
 }
+private fun HomeFragment.buildPreviewBlockLabel(
+    date: LocalDate,
+    baseLabel: String
+): String? {
+    if (!TemplateManager.isTemplateActive(requireContext())) return null
+
+    val cycle = getPreviewCycle()
+    if (cycle.isEmpty()) return null
+
+    val cycleIndex = getPreviewCycleIndexForDate(date) ?: return null
+
+    val label = cycle.getOrNull(cycleIndex) ?: return null
+
+// 🔥 FIX: če se ne ujema z base labelom, ignoriraj
+    if (!label.equals(baseLabel, ignoreCase = true)) return null
+
+    val total = cycle.count { it.equals(label, ignoreCase = true) }
+    if (total <= 1) return null
+
+    var occurrence = 0
+    for (i in 0..cycleIndex) {
+        if (cycle[i].equals(label, ignoreCase = true)) {
+            occurrence++
+        }
+    }
+
+    return "$label $occurrence/$total"
+}
+
+private fun HomeFragment.getPreviewCycleIndexForDate(date: LocalDate): Int? {
+    val cycle = getPreviewCycle()
+    if (cycle.isEmpty()) return null
+
+    if (isPreviewSkippedOverrideActiveForDate(date)) return null
+
+    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+    val fallbackFirstDay = getPreviewFirstCycleDay(cycle)
+    val fallbackIndex = cycle.indexOfFirst { it.equals(fallbackFirstDay, ignoreCase = true) }
+        .takeIf { it >= 0 } ?: 0
+
+    val startIndex = if (TemplateManager.isTemplateActive(requireContext())) {
+        prefs.getInt(AppPrefs.KEY_FIRST_CYCLE_DAY_INDEX, fallbackIndex)
+            .takeIf { it in cycle.indices } ?: fallbackIndex
+    } else {
+        fallbackIndex
+    }
+
+    val startDate = selectedDate
+
+    return if (date == startDate) {
+        startIndex
+    } else if (date.isAfter(startDate)) {
+        val stepsForward = countPreviewIncludedDaysForward(
+            fromExclusive = startDate,
+            toInclusive = date
+        )
+        positiveModulo(startIndex + stepsForward, cycle.size)
+    } else {
+        val stepsBack = countPreviewIncludedDaysBackward(
+            fromInclusive = date,
+            toExclusive = startDate
+        )
+        positiveModulo(startIndex - stepsBack, cycle.size)
+    }
+}
+
 fun HomeFragment.updateWidgetHint() {
     val manager = AppWidgetManager.getInstance(requireContext())
     val ids = manager.getAppWidgetIds(
