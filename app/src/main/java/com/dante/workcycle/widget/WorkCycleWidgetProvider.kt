@@ -104,10 +104,21 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         val mode = resolveWidgetMode(minWidth, minHeight)
         val isVeryNarrow = minWidth < 140
         val isSingleCellLike = isMinimal
-        val canShowSecondaryLabel = !isSingleCellLike && minWidth >= 140 && minHeight >= 90
+        val rowsToShow = if (isSingleCellLike) 0 else resolveExtraRows(minWidth, minHeight)
+
+// 2x1 compact: secondary je dovoljen
+        val isCompactLike = isCompact
+
+// 3x1 in širši 1-row widget: secondary za danes mora biti dovoljen
+        val isWideSingleRow = !isSingleCellLike && !isCompactLike && rowsToShow == 0 && minWidth >= 180
+
+        val canShowSecondaryLabel = !isSingleCellLike && (
+                isCompactLike ||
+                        minWidth >= 140 ||
+                        isWideSingleRow
+                )
 
         val showTodayLabel = mode != WidgetMode.SMALL && !isVeryNarrow && !isSingleCellLike
-        val rowsToShow = if (isSingleCellLike) 0 else resolveExtraRows(minWidth, minHeight)
         val typography = resolveTypography(mode, minWidth, minHeight)
 
         val skippedOverride = CycleManager.getSkippedDayOverrideLabelOrNull(context, today)
@@ -128,7 +139,8 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         val displaySecondary = when {
             skippedOverride != null -> null
             isSingleCellLike -> null
-            canShowSecondaryLabel && !todaySecondary.isNullOrBlank() -> {
+            todaySecondary.isNullOrBlank() -> null
+            canShowSecondaryLabel -> {
                 resolveWidgetAssignmentDisplayLabel(
                     context = context,
                     rawLabel = todaySecondary,
@@ -177,7 +189,7 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.secondaryTextCompact, displaySecondaryCompact)
                 views.setTextColor(R.id.secondaryTextCompact, widgetColors.secondaryTextColor)
             } else {
-                views.setViewVisibility(R.id.secondaryTextCompact, View.VISIBLE)
+                views.setViewVisibility(R.id.secondaryTextCompact, View.GONE)
                 views.setTextViewText(R.id.secondaryTextCompact, "")
             }
 
@@ -706,11 +718,26 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         val cycle = CycleManager.loadCycle(context)
         val isCycleLabel = cycle.any { it.trim().equals(clean, ignoreCase = true) }
 
+        // 🔴 OFF / PROST DAN
         if (!isCycleLabel) {
-            return getLocalizedOffDayLabel(context, short)
+            return if (short) "X" else getLocalizedOffDayLabel(context, false)
         }
 
-        return if (short) compactCycleLabel(clean) else clean
+        // 🔵 NORMALNI CIKEL
+        return if (short) {
+            compactCycleLabelUltra(clean)
+        } else {
+            clean
+        }
+    }
+
+    private fun compactCycleLabelUltra(label: String): String {
+        val trimmed = label.trim()
+
+        if (trimmed.length <= 2) return trimmed
+
+        // fallback → prva črka
+        return trimmed.take(1).uppercase()
     }
 
     private fun compactCycleLabel(label: String): String {
@@ -718,7 +745,15 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
     }
 
     private fun compactAssignmentLabel(label: String): String {
-        if (label.isBlank()) return ""
-        return if (label.length <= 6) label else label.take(6)
+        val trimmed = label.trim()
+        if (trimmed.isBlank()) return ""
+
+        return when (trimmed.lowercase()) {
+            "dopust" -> "Dop."
+            "bolniška", "bolniska" -> "Bol."
+            "dežurstvo", "dezurstvo" -> "Dež."
+            "teren" -> "Ter."
+            else -> if (trimmed.length <= 5) trimmed else trimmed.take(5)
+        }
     }
 }

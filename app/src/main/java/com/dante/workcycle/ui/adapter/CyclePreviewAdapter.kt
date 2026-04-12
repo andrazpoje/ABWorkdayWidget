@@ -82,19 +82,21 @@ class CyclePreviewAdapter :
             binding.dayDateText.setTextColor(textColor)
             binding.dayCycleText.setTextColor(textColor)
 
-            val displayLabel = item.helperText ?: item.secondaryLabel
-
             bindSecondaryIndicator(
                 context = context,
-                secondaryName = displayLabel,
+                secondaryName = item.secondaryLabel,
                 textColor = textColor
             )
 
-            binding.dayCycleText.alpha = if (!displayLabel.isNullOrBlank()) 0.7f else 1f
+            binding.dayCycleText.alpha = 1f
+
+            binding.root.alpha = if (!item.helperText.isNullOrBlank()) 0.96f else 1f
 
             binding.root.setOnClickListener {
                 onClick?.invoke(item)
             }
+            binding.daySecondaryText.alpha =
+                if (item.secondaryLabel?.contains("*") == true) 1f else 0.75f
         }
 
         private fun getCycleBackgroundColor(

@@ -32,6 +32,8 @@ import com.dante.workcycle.data.prefs.LaunchPrefs
 import android.widget.ImageView
 import androidx.core.view.children
 import androidx.appcompat.widget.Toolbar
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,16 +61,17 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AppLanguageManager.applySavedLanguage(this)
         AppThemeManager.applyFromPreferences(this)
+
         super.onCreate(savedInstanceState)
+
+        setupDefaultEdgeToEdge()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupDefaultEdgeToEdge()
-
         binding.toolbar.applyTopStatusBarInsetAsMargin()
         binding.bottomNavigation.applyBottomNavInsetAsPadding()
-        updateSystemBarIconContrast(binding.root)
+        updateSystemBarIconContrast(binding.toolbar)
 
         setSupportActionBar(binding.toolbar)
 

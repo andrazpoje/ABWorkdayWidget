@@ -66,6 +66,18 @@ class CycleOverrideRepository(
         return result
     }
 
+    fun hasOverrides(): Boolean {
+        val raw = prefs.getString(KEY_OVERRIDES_JSON, null)
+        return !raw.isNullOrBlank() && raw != "{}"
+    }
+
+    fun clearAllOverrides() {
+        prefs.edit()
+            .remove(KEY_OVERRIDES_JSON)
+            .apply()
+    }
+
+
     companion object {
         private const val PREFS_NAME = "cycle_override_prefs"
         private const val KEY_OVERRIDES_JSON = "cycle_overrides_json"

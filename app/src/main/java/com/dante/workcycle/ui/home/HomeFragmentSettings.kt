@@ -13,6 +13,7 @@ import com.dante.workcycle.domain.schedule.sanitizeLabel
 import com.dante.workcycle.domain.template.TemplateManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.time.LocalDate
+import com.dante.workcycle.domain.schedule.CyclePresetProvider
 
 fun HomeFragment.showUnsavedChangesDialog(
     onSave: () -> Unit,
@@ -388,7 +389,20 @@ fun HomeFragment.migrateLegacySettingsIfNeeded() {
     val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
     if (!hasCycle || !hasStartDate) {
-        val defaultCycle = listOf("Dopoldan", "Popoldan", "Nočna")
+        val threeShiftPreset = CyclePresetProvider.getPresets().firstOrNull {
+            it.id == "three_shift"
+        }
+
+        val defaultCycle = threeShiftPreset?.cycleDaysProvider?.invoke(context)
+            ?: listOf(
+                context.getString(R.string.label_morning),
+                context.getString(R.string.label_afternoon),
+                context.getString(R.string.label_night)
+            )
+
+        val defaultFirstDay = threeShiftPreset?.defaultFirstDayProvider?.invoke(context)
+            ?: defaultCycle.first()
+
         val defaultStartDate = LocalDate.now()
 
         CycleManager.saveCycle(context, defaultCycle)
@@ -398,7 +412,8 @@ fun HomeFragment.migrateLegacySettingsIfNeeded() {
             putInt(AppPrefs.KEY_START_YEAR, defaultStartDate.year)
             putInt(AppPrefs.KEY_START_MONTH, defaultStartDate.monthValue)
             putInt(AppPrefs.KEY_START_DAY, defaultStartDate.dayOfMonth)
-            putString(AppPrefs.KEY_FIRST_CYCLE_DAY, defaultCycle.first())
+            putString(AppPrefs.KEY_FIRST_CYCLE_DAY, defaultFirstDay)
+            remove(AppPrefs.KEY_FIRST_CYCLE_DAY_INDEX)
         }
 
         TemplateManager.clearTemplate(context)

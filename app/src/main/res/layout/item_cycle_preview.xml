@@ -23,7 +23,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.2"
+            android:layout_weight="1.4"
             android:orientation="vertical">
 
             <TextView
@@ -43,56 +43,64 @@
                 tools:text="7. apr. 2026" />
         </LinearLayout>
 
-        <!-- SREDINA: ASSIGNMENT -->
+        <!-- DESNO: PRIMARY + SECONDARY (STACKED) -->
         <LinearLayout
-            android:id="@+id/assignmentContainer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/viewSecondaryIcon"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginEnd="6dp"
-                android:visibility="gone"
-                tools:src="@drawable/ic_assignment_vacation_24"
-                tools:visibility="visible" />
-
-            <View
-                android:id="@+id/viewSecondaryDot"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginEnd="6dp"
-                android:background="@drawable/bg_label_color_circle"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <TextView
-                android:id="@+id/daySecondaryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                tools:text="Dopust"
-                tools:visibility="visible" />
-        </LinearLayout>
-
-        <!-- DESNO: CIKEL -->
-        <TextView
-            android:id="@+id/dayCycleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            tools:text="A" />
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <!-- PRIMARY (A/B) -->
+            <TextView
+                android:id="@+id/dayCycleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                tools:text="A" />
+
+            <!-- SECONDARY -->
+            <LinearLayout
+                android:id="@+id/assignmentContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/viewSecondaryIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="4dp"
+                    android:visibility="gone"
+                    tools:src="@drawable/ic_assignment_vacation_24"
+                    tools:visibility="visible" />
+
+                <View
+                    android:id="@+id/viewSecondaryDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_label_color_circle"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/daySecondaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="Dopust"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

@@ -4,6 +4,66 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.2
+
+### Added
+- Added persistent secondary schedule layer groundwork for combined schedule support  
+- Added improved 7-day preview layout with clearer primary and secondary label hierarchy  
+- Added improved calendar day cells with layered primary and secondary information  
+- Added richer day editor summary and state cards for primary and secondary layers  
+- Added color-coded cycle override chips in day editor  
+- Added improved visual styling for active cycle and secondary state cards  
+- Added support groundwork for cleaner 1x1 widget behavior with compact labels  
+- Added full-height bottom sheet behavior for the day editor  
+- Added fixed bottom action bar in the day editor so Save and Cancel remain visible  
+- Added safer bottom sheet background and inset handling for better rendering across devices  
+- Added global edge-to-edge handling with proper status bar and navigation bar insets  
+- Added dynamic calendar label shortening (min. 3 characters) for better multi-language support  
+
+### Improved
+- Improved terminology across the app from assignment-focused wording toward secondary label terminology  
+- Improved day editor UX by clearly separating primary cycle editing from secondary label editing  
+- Improved disabled-state behavior so cycle override editing still works even when secondary labels are disabled  
+- Improved summary text and helper text for secondary labels  
+- Improved dark mode rendering for cycle and secondary state cards  
+- Improved light mode card tint balance and spacing  
+- Improved calendar compactness and readability for secondary labels  
+- Improved preview presentation so secondary information feels like a real second schedule layer  
+- Improved chip styling for cycle override selection  
+- Improved widget sizing logic for compact and minimal layouts  
+- Improved widget layout adaptability across 1x1, 2x1 and larger sizes  
+- Improved system bar icon contrast handling based on theme  
+- Improved overall layout consistency across different devices (Pixel, gesture navigation, etc.)  
+
+### Fixed
+- Fixed issue where day editor could not be opened when secondary labels were disabled  
+- Fixed issue where cycle override editing was blocked by disabled secondary-label settings  
+- Fixed bottom sheet rendering glitches caused by transparent or unstable backgrounds  
+- Fixed bottom sheet height behavior causing clipped content and hidden actions  
+- Fixed navigation-bar / gesture-area overlap in the day editor  
+- Fixed spacing inconsistencies between cards, dividers, and action areas  
+- Fixed multiple UI issues affecting dark/light mode consistency  
+- Fixed 1x1 widget text overflow issue for long labels like off-day labels  
+- Fixed several compact widget display edge cases for small sizes  
+- Fixed calendar and preview presentation inconsistencies for layered schedule data  
+- Fixed widget not updating when changing cycle template  
+- Fixed system bar overlap issues on devices with display cutouts (e.g. Pixel 6)  
+
+### Changed
+- Changed secondary label handling from simple override-only behavior toward a persistent layered schedule model  
+- Changed `DefaultScheduleResolver` flow to better support primary and secondary combined schedule resolution  
+- Changed day editor wording and UX to better match the future combined schedule direction  
+- Changed 1x1 widget direction toward compact symbolic display instead of full translated words  
+- Changed behavior so cycle overrides are reset when switching cycle templates (with confirmation dialog when needed)  
+- Changed template switching logic to behave more predictably and safely  
+
+### Notes
+- This release continues the transition from the original A/B-focused model toward a more flexible multi-layer WorkCycle system  
+- Combined schedule architecture is now much better prepared for future additions such as route/work-type layers, richer day editing, and advanced schedule presets  
+- UI and widget behavior are now significantly more consistent across different screen sizes, languages, and devices  
+
+---
+
 ## v2.1
 
 ### ✨ Added
@@ -44,6 +104,8 @@ All notable changes to this project will be documented in this file.
 - Minor code cleanup and consistency improvements
 
 🚀 Version 2.1 expands template support, improves accuracy of cycle visualization, and refines the overall UI experience.
+
+---
 
 ## v2.0
 

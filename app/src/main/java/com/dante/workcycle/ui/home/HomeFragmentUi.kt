@@ -40,23 +40,13 @@ fun HomeFragment.setupPreviewRecyclerView() {
             val ctx = context
             if (ctx != null) {
 
-                val assignmentPrefs = AssignmentCyclePrefs(ctx)
-
-                if (assignmentPrefs.isEnabled()) {
-                    EditAssignmentDayBottomSheet(
-                        date = item.date,
-                        onSaved = {
-                            updateCyclePreview()
-                            WidgetRefreshHelper.refresh(ctx)
-                        }
-                    ).show(parentFragmentManager, "editDay")
-                } else {
-                    Toast.makeText(
-                        ctx,
-                        getString(R.string.assignment_enable_first_message),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                EditAssignmentDayBottomSheet(
+                    date = item.date,
+                    onSaved = {
+                        updateCyclePreview()
+                        WidgetRefreshHelper.refresh(ctx)
+                    }
+                ).show(parentFragmentManager, "editDay")
             }
         }
     }
@@ -113,7 +103,6 @@ fun HomeFragment.updateCyclePreview() {
     val list = mutableListOf<CyclePreviewAdapter.PreviewItem>()
 
     for (offset in 0..6) {
-
         val date = today.plusDays(offset.toLong())
 
         val resolved = try {
@@ -134,16 +123,16 @@ fun HomeFragment.updateCyclePreview() {
         val isOffDay = resolved.effectiveCycleLabel.equals(offDayLabel, ignoreCase = true)
 
         val blockLabel = buildPreviewBlockLabel(
-            date,
-            resolved.baseCycleLabel
+            date = date,
+            baseLabel = resolved.baseCycleLabel
         )
 
-        val helperParts = listOfNotNull(
-            blockLabel,
-            resolved.assignmentLabel?.takeIf { it.isNotBlank() }
-        )
-
-        val helperText = helperParts.joinToString(" • ").ifBlank { null }
+        val assignmentLabel = resolved.assignmentLabel
+            ?.trim()
+            ?.ifBlank { null }
+            ?.let { assignment ->
+                if (resolved.isAssignmentOverridden) "$assignment*" else assignment
+            }
 
         list.add(
             CyclePreviewAdapter.PreviewItem(
@@ -152,11 +141,13 @@ fun HomeFragment.updateCyclePreview() {
                 dateText = date.format(dateFormatter),
                 cycleLabel = resolved.effectiveCycleLabel.ifEmpty { "-" },
                 colorLabel = resolved.baseCycleLabel,
-                helperText = helperText,
+                secondaryLabel = assignmentLabel,
+                helperText = blockLabel,
                 isOffDay = isOffDay
             )
         )
     }
+
     val cycle = CycleManager.loadCycle(ctx)
     previewAdapter.submitPreviewItems(list, cycle)
 }

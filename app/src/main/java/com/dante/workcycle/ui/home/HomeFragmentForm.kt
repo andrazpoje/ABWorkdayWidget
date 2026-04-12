@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import com.dante.workcycle.widget.WidgetRefreshHelper
 import com.dante.workcycle.R
 import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AppPrefs
@@ -28,6 +28,8 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import java.util.Locale
+import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.domain.schedule.CycleOverrideRepository
 
 fun HomeFragment.validateCycleInput(): Boolean {
     val raw = cycleDaysEdit.text?.toString().orEmpty().trim()
@@ -174,6 +176,7 @@ private fun HomeFragment.showClearTemplateDialog() {
 
             updateTodayStatus()
             updateCyclePreview()
+            WidgetRefreshHelper.refresh(requireContext())
             dialog.dismiss()
         }
         .show()
@@ -264,9 +267,38 @@ fun HomeFragment.wouldPresetChangeCurrentState(preset: CyclePreset): Boolean {
     return currentCycle != normalizedPresetCycle || currentFirstDay != normalizedPresetFirstDay
 }
 
+private fun HomeFragment.applyPresetWithOverrideCheck(preset: CyclePreset) {
+    val repository = CycleOverrideRepository(requireContext())
+
+    if (!repository.hasOverrides()) {
+        applyPresetInternal(preset, clearOverrides = false)
+        return
+    }
+
+    MaterialAlertDialogBuilder(requireContext())
+        .setTitle(R.string.cycle_override_reset_dialog_title)
+        .setMessage(R.string.cycle_override_reset_dialog_message)
+        .setNegativeButton(android.R.string.cancel, null)
+        .setPositiveButton(R.string.apply) { _, _ ->
+            applyPresetInternal(preset, clearOverrides = true)
+        }
+        .show()
+}
+
 fun HomeFragment.applyPreset(preset: CyclePreset) {
+    applyPresetWithOverrideCheck(preset)
+}
+
+private fun HomeFragment.applyPresetInternal(
+    preset: CyclePreset,
+    clearOverrides: Boolean
+) {
     val labels = preset.cycleDaysProvider(requireContext())
     val firstDay = preset.defaultFirstDayProvider(requireContext())
+
+    if (clearOverrides) {
+        CycleOverrideRepository(requireContext()).clearAllOverrides()
+    }
 
     cycleDaysEdit.setText(labels.joinToString(", "))
     refreshFirstCycleDayDropdown(firstDay)
@@ -274,6 +306,7 @@ fun HomeFragment.applyPreset(preset: CyclePreset) {
     updatePresetSelectionState(markAsChanged = true)
     updateTodayStatus()
     updateCyclePreview()
+    WidgetRefreshHelper.refresh(requireContext())
 
     Toast.makeText(
         requireContext(),
@@ -282,375 +315,441 @@ fun HomeFragment.applyPreset(preset: CyclePreset) {
     ).show()
 }
 
-private fun HomeFragment.getChipColorForLabel(
-    label: String,
-    cycleLabels: List<String>
-): Int {
-    return try {
-        CycleColorHelper.getBackgroundColor(requireContext(), label, cycleLabels)
-    } catch (_: Exception) {
-        ContextCompat.getColor(requireContext(), android.R.color.darker_gray)
-    }
-}
-
-private fun HomeFragment.renderFirstCycleDayChips(
-    cycleLabels: List<String>,
-    selectedValue: String
-) {
-    firstCycleDayChipGroup.removeAllViews()
-
-    if (cycleLabels.isEmpty()) {
-        firstCycleDayChipGroup.visibility = View.GONE
-        return
+    private fun HomeFragment.getChipColorForLabel(
+        label: String,
+        cycleLabels: List<String>
+    ): Int {
+        return try {
+            CycleColorHelper.getBackgroundColor(requireContext(), label, cycleLabels)
+        } catch (_: Exception) {
+            ContextCompat.getColor(requireContext(), android.R.color.darker_gray)
+        }
     }
 
-    firstCycleDayChipGroup.visibility = View.VISIBLE
+    private fun HomeFragment.renderFirstCycleDayChips(
+        cycleLabels: List<String>,
+        selectedValue: String
+    ) {
+        firstCycleDayChipGroup.removeAllViews()
 
-    val isTemplateActive = TemplateManager.isTemplateActive(requireContext())
-    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-
-    val savedIndex = if (isTemplateActive) {
-        prefs.getInt(AppPrefs.KEY_FIRST_CYCLE_DAY_INDEX, -1)
-    } else {
-        -1
-    }
-
-    val selectedIndex = draftFirstCycleDayIndex ?: savedIndex
-
-    val counters = mutableMapOf<String, Int>()
-    val totals = cycleLabels.groupingBy { it }.eachCount()
-
-    cycleLabels.forEachIndexed { index, label ->
-        val displayText = if (isTemplateActive) {
-            val count = (counters[label] ?: 0) + 1
-            counters[label] = count
-            val total = totals[label] ?: 1
-            "$label $count/$total"
-        } else {
-            label
+        if (cycleLabels.isEmpty()) {
+            firstCycleDayChipGroup.visibility = View.GONE
+            return
         }
 
-        val fillColor = getChipColorForLabel(label, cycleLabels)
-        val textColor = CycleColorHelper.getTextColorForBackground(fillColor)
-        val unselectedBackground = ColorUtils.setAlphaComponent(fillColor, 40)
-        val unselectedStroke = ColorUtils.setAlphaComponent(fillColor, 120)
+        firstCycleDayChipGroup.visibility = View.VISIBLE
 
-        val backgroundStates = ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_checked),
-                intArrayOf()
-            ),
-            intArrayOf(
-                fillColor,
-                unselectedBackground
-            )
-        )
+        val isTemplateActive = TemplateManager.isTemplateActive(requireContext())
+        val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
-        val textStates = ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_checked),
-                intArrayOf()
-            ),
-            intArrayOf(
-                textColor,
-                fillColor
-            )
-        )
-
-        val strokeStates = ColorStateList(
-            arrayOf(
-                intArrayOf(android.R.attr.state_checked),
-                intArrayOf()
-            ),
-            intArrayOf(
-                fillColor,
-                unselectedStroke
-            )
-        )
-
-        val isSelected = if (isTemplateActive && selectedIndex in cycleLabels.indices) {
-            index == selectedIndex
+        val savedIndex = if (isTemplateActive) {
+            prefs.getInt(AppPrefs.KEY_FIRST_CYCLE_DAY_INDEX, -1)
         } else {
-            label == selectedValue
+            -1
         }
 
-        val chip = Chip(requireContext()).apply {
-            id = View.generateViewId()
-            text = displayText
-            isCheckable = true
-            isClickable = true
-            isCheckedIconVisible = false
-            setEnsureMinTouchTargetSize(false)
-            isChecked = isSelected
+        val selectedIndex = draftFirstCycleDayIndex ?: savedIndex
 
-            chipBackgroundColor = backgroundStates
-            setTextColor(textStates)
-            chipStrokeColor = strokeStates
-            chipStrokeWidth = resources.displayMetrics.density * 1f
+        val counters = mutableMapOf<String, Int>()
+        val totals = cycleLabels.groupingBy { it }.eachCount()
 
-            setOnClickListener {
-                draftFirstCycleDayIndex = index
-                firstCycleDayDropdown.setText(label, false)
-                cycleDaysInputLayout.error = null
-                clearDateCheckResult()
-                updateUnsavedChangesState()
-                updateTodayStatus()
-                updateCyclePreview()
-                renderFirstCycleDayChips(cycleLabels, label)
+        cycleLabels.forEachIndexed { index, label ->
+            val displayText = if (isTemplateActive) {
+                val count = (counters[label] ?: 0) + 1
+                counters[label] = count
+                val total = totals[label] ?: 1
+                "$label $count/$total"
+            } else {
+                label
             }
-        }
 
-        firstCycleDayChipGroup.addView(chip)
-    }
-}
+            val fillColor = getChipColorForLabel(label, cycleLabels)
+            val textColor = CycleColorHelper.getTextColorForBackground(fillColor)
+            val unselectedBackground = ColorUtils.setAlphaComponent(fillColor, 40)
+            val unselectedStroke = ColorUtils.setAlphaComponent(fillColor, 120)
 
-fun HomeFragment.refreshFirstCycleDayDropdown(preferredValue: String? = null) {
-    val cycleLabels = getCurrentCycleLabelsFromInput()
-
-    val adapter = createNoFilterAdapter(cycleLabels)
-    firstCycleDayDropdown.setAdapter(adapter)
-
-    if (cycleLabels.isEmpty()) {
-        firstCycleDayDropdown.setText("", false)
-        firstCycleDayDropdown.isEnabled = false
-        renderFirstCycleDayChips(emptyList(), "")
-        return
-    }
-
-    firstCycleDayDropdown.isEnabled = true
-
-    val currentValue = preferredValue
-        ?: firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
-
-    val finalValue = when {
-        currentValue in cycleLabels -> currentValue
-        else -> cycleLabels.first()
-    }
-
-    firstCycleDayDropdown.setText(finalValue, false)
-    renderFirstCycleDayChips(cycleLabels, finalValue)
-}
-
-fun HomeFragment.setupFirstCycleDayDropdown() {
-    configureAsSelectBox(firstCycleDayDropdown)
-
-    firstCycleDayDropdown.setOnItemClickListener { _, _, _, _ ->
-        val selected = firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
-        refreshFirstCycleDayDropdown(selected)
-        clearDateCheckResult()
-        updateUnsavedChangesState()
-        updateTodayStatus()
-        updateCyclePreview()
-    }
-}
-
-fun HomeFragment.setupPresetDropdown() {
-    val items = buildTemplateDropdownItems()
-    val adapter = TemplateDropdownAdapter(requireContext(), items)
-
-    presetDropdown.setAdapter(adapter)
-    configureAsSelectBox(presetDropdown)
-
-    presetDropdown.setText(
-        TemplateManager.getCurrentTemplateDisplayName(requireContext()),
-        false
-    )
-
-    presetDropdown.setOnItemClickListener { _, _, position, _ ->
-        when (val selected = adapter.getItem(position)) {
-            is TemplateDropdownItem.Option -> {
-                val selectedTemplate = ScheduleTemplateProvider.getById(selected.templateId)
-                    ?: return@setOnItemClickListener
-
-                showApplyTemplateDialog(
-                    templateId = selectedTemplate.id,
-                    templateTitle = getString(selectedTemplate.titleRes),
-                    templateDescription = getString(selectedTemplate.descriptionRes)
+            val backgroundStates = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf()
+                ),
+                intArrayOf(
+                    fillColor,
+                    unselectedBackground
                 )
-            }
-
-            is TemplateDropdownItem.Header -> Unit
-        }
-    }
-}
-
-fun HomeFragment.updatePresetSelectionState(markAsChanged: Boolean = false) {
-    val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
-
-    val presetText = if (activeTemplate != null) {
-        getString(activeTemplate.titleRes)
-    } else {
-        getString(R.string.template_none)
-    }
-
-    if (presetDropdown.text?.toString() != presetText) {
-        presetDropdown.setText(presetText, false)
-    }
-
-    if (markAsChanged) {
-        updateUnsavedChangesState()
-    }
-}
-
-fun HomeFragment.setupHolidayCountryDropdown() {
-    supportedCountries = HolidayManager.supportedCountries
-
-    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-    val detectedCode = HolidayManager.getSelectedCountry(requireContext())
-    val isManual = prefs.getBoolean(AppPrefs.KEY_COUNTRY_MANUAL, false)
-
-    val displayItems = buildCountryDisplayList(detectedCode, isManual)
-
-    val adapter = createNoFilterAdapter(displayItems)
-
-    holidayCountryDropdown.setAdapter(adapter)
-    configureAsSelectBox(holidayCountryDropdown)
-
-    holidayCountryDropdown.setOnItemClickListener { _, _, _, _ ->
-        clearDateCheckResult()
-        updateUnsavedChangesState()
-    }
-}
-
-private fun View.setEnabledWithAlpha(enabled: Boolean) {
-    isEnabled = enabled
-    alpha = if (enabled) 1f else 0.5f
-}
-
-private fun HomeFragment.setChipGroupEnabled(enabled: Boolean) {
-    firstCycleDayChipGroup.isEnabled = enabled
-    firstCycleDayChipGroup.alpha = if (enabled) 1f else 0.5f
-
-    firstCycleDayChipGroup.children.forEach { chip ->
-        chip.isEnabled = enabled
-        chip.alpha = if (enabled) 1f else 0.6f
-    }
-}
-
-private fun HomeFragment.buildTemplateDescriptionText(
-    template: ScheduleTemplate
-): String {
-    val dateFormatter = java.time.format.DateTimeFormatter.ofLocalizedDate(
-        java.time.format.FormatStyle.MEDIUM
-    ).withLocale(java.util.Locale.getDefault())
-
-    val lockedItems = mutableListOf<String>()
-
-    if (template.locksCycleEditing) {
-        lockedItems += getString(R.string.template_locked_item_cycle)
-    }
-
-    if (template.locksRulesEditing) {
-        lockedItems += getString(R.string.template_locked_item_rules)
-    }
-
-    if (!template.allowsStartDateEditing) {
-        lockedItems += getString(R.string.template_locked_item_start_date)
-    }
-
-    if (TemplateManager.isAssignmentModeEditingLocked(requireContext())) {
-        lockedItems += getString(R.string.template_locked_item_assignment_mode)
-    }
-
-    val lockedSummary = if (lockedItems.isNotEmpty()) {
-        getString(
-            R.string.template_locked_summary_format,
-            lockedItems.joinToString(", ")
-        )
-    } else {
-        ""
-    }
-
-    val isContinuousShift = when (template.id) {
-        ScheduleTemplateProvider.TEMPLATE_PANAMA_223,
-        ScheduleTemplateProvider.TEMPLATE_4_ON_4_OFF -> true
-        else -> false
-    }
-
-    val continuousText = if (isContinuousShift) {
-        getString(R.string.template_continuous_shift)
-    } else {
-        null
-    }
-
-    val parts = listOfNotNull(
-        getString(template.descriptionRes),
-        continuousText,
-        getString(
-            R.string.template_reference_date_format,
-            template.fixedStartDate.format(dateFormatter),
-            template.fixedFirstCycleDay
-        ),
-        lockedSummary.takeIf { it.isNotBlank() }
-    )
-
-    return parts.joinToString("\n\n")
-}
-
-fun HomeFragment.updateTemplateUiState() {
-    val template = TemplateManager.getActiveTemplate(requireContext())
-    val hasTemplate = template != null
-
-    activeTemplateCard.isVisible = hasTemplate
-    templateLockedMessage.isVisible = hasTemplate
-
-    if (template != null) {
-        activeTemplateTitle.text =
-            getString(R.string.template_active_title) + ": " + getString(template.titleRes)
-
-        activeTemplateDescription.text = buildTemplateDescriptionText(template)
-        presetDropdown.setText(getString(template.titleRes), false)
-    } else {
-        activeTemplateTitle.text = getString(R.string.template_active_title)
-        activeTemplateDescription.text = ""
-        presetDropdown.setText(getString(R.string.template_none), false)
-    }
-
-    val cycleLocked = TemplateManager.isCycleEditingLocked(requireContext())
-    val rulesLocked = TemplateManager.isRulesEditingLocked(requireContext())
-    val canEditStartDate = TemplateManager.canEditStartDate(requireContext())
-
-    cycleDaysEdit.setEnabledWithAlpha(!cycleLocked)
-    firstCycleDayDropdown.setEnabledWithAlpha(!cycleLocked)
-    setChipGroupEnabled(!cycleLocked)
-
-    pickDateButton.setEnabledWithAlpha(canEditStartDate)
-
-    switchSaturdays.setEnabledWithAlpha(!rulesLocked)
-    switchSundays.setEnabledWithAlpha(!rulesLocked)
-    switchHolidays.setEnabledWithAlpha(!rulesLocked)
-    holidayCountryDropdown.setEnabledWithAlpha(!rulesLocked)
-}
-
-private fun HomeFragment.showApplyTemplateDialog(
-    templateId: String,
-    templateTitle: String,
-    templateDescription: String
-) {
-    MaterialAlertDialogBuilder(requireContext())
-        .setTitle(templateTitle)
-        .setMessage(
-            templateDescription + "\n\n" +
-                    getString(R.string.template_apply_confirm_message)
-        )
-        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-            presetDropdown.setText(
-                TemplateManager.getCurrentTemplateDisplayName(requireContext()),
-                false
             )
-            dialog.dismiss()
-        }
-        .setPositiveButton(R.string.apply) { _, _ ->
-            TemplateManager.applyTemplate(requireContext(), templateId)
 
-            runWithoutChangeTracking {
-                loadSettings()
-                updateTemplateUiState()
-                clearUnsavedChanges()
+            val textStates = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf()
+                ),
+                intArrayOf(
+                    textColor,
+                    fillColor
+                )
+            )
+
+            val strokeStates = ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf()
+                ),
+                intArrayOf(
+                    fillColor,
+                    unselectedStroke
+                )
+            )
+
+            val isSelected = if (isTemplateActive && selectedIndex in cycleLabels.indices) {
+                index == selectedIndex
+            } else {
+                label == selectedValue
             }
 
+            val chip = Chip(requireContext()).apply {
+                id = View.generateViewId()
+                text = displayText
+                isCheckable = true
+                isClickable = true
+                isCheckedIconVisible = false
+                setEnsureMinTouchTargetSize(false)
+                isChecked = isSelected
+
+                chipBackgroundColor = backgroundStates
+                setTextColor(textStates)
+                chipStrokeColor = strokeStates
+                chipStrokeWidth = resources.displayMetrics.density * 1f
+
+                setOnClickListener {
+                    draftFirstCycleDayIndex = index
+                    firstCycleDayDropdown.setText(label, false)
+                    cycleDaysInputLayout.error = null
+                    clearDateCheckResult()
+                    updateUnsavedChangesState()
+                    updateTodayStatus()
+                    updateCyclePreview()
+                    renderFirstCycleDayChips(cycleLabels, label)
+                }
+            }
+
+            firstCycleDayChipGroup.addView(chip)
+        }
+    }
+
+    fun HomeFragment.refreshFirstCycleDayDropdown(preferredValue: String? = null) {
+        val cycleLabels = getCurrentCycleLabelsFromInput()
+
+        val adapter = createNoFilterAdapter(cycleLabels)
+        firstCycleDayDropdown.setAdapter(adapter)
+
+        if (cycleLabels.isEmpty()) {
+            firstCycleDayDropdown.setText("", false)
+            firstCycleDayDropdown.isEnabled = false
+            renderFirstCycleDayChips(emptyList(), "")
+            return
+        }
+
+        firstCycleDayDropdown.isEnabled = true
+
+        val currentValue = preferredValue
+            ?: firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
+
+        val finalValue = when {
+            currentValue in cycleLabels -> currentValue
+            else -> cycleLabels.first()
+        }
+
+        firstCycleDayDropdown.setText(finalValue, false)
+        renderFirstCycleDayChips(cycleLabels, finalValue)
+    }
+
+    fun HomeFragment.setupFirstCycleDayDropdown() {
+        configureAsSelectBox(firstCycleDayDropdown)
+
+        firstCycleDayDropdown.setOnItemClickListener { _, _, _, _ ->
+            val selected = firstCycleDayDropdown.text?.toString()?.trim().orEmpty()
+            refreshFirstCycleDayDropdown(selected)
+            clearDateCheckResult()
+            updateUnsavedChangesState()
             updateTodayStatus()
             updateCyclePreview()
         }
+    }
+
+    fun HomeFragment.setupPresetDropdown() {
+        val items = buildTemplateDropdownItems()
+        val adapter = TemplateDropdownAdapter(requireContext(), items)
+
+        presetDropdown.setAdapter(adapter)
+        configureAsSelectBox(presetDropdown)
+
+        presetDropdown.setText(
+            resolvePresetDisplayNameForCurrentState(),
+            false
+        )
+
+        presetDropdown.setOnItemClickListener { _, _, position, _ ->
+            when (val selected = adapter.getItem(position)) {
+                is TemplateDropdownItem.Option -> {
+                    val selectedTemplate = ScheduleTemplateProvider.getById(selected.templateId)
+                        ?: return@setOnItemClickListener
+
+                    showApplyTemplateDialog(
+                        templateId = selectedTemplate.id,
+                        templateTitle = getString(selectedTemplate.titleRes),
+                        templateDescription = getString(selectedTemplate.descriptionRes)
+                    )
+                }
+
+                is TemplateDropdownItem.Header -> Unit
+            }
+        }
+    }
+
+    private fun HomeFragment.resolvePresetDisplayNameForCurrentState(): String {
+        val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
+        if (activeTemplate != null) {
+            return getString(activeTemplate.titleRes)
+        }
+
+        val matchedPreset = findMatchingCyclePresetForSavedState()
+        return if (matchedPreset != null) {
+            getString(matchedPreset.nameRes)
+        } else {
+            getString(R.string.template_none)
+        }
+    }
+
+    private fun HomeFragment.findMatchingCyclePresetForSavedState(): CyclePreset? {
+        val context = requireContext()
+        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+
+        val currentCycle = CycleManager.loadCycle(context).map {
+            sanitizeLabel(it, "").take(HomeFragment.MAX_LABEL_LENGTH)
+        }
+
+        val savedFirstDayRaw = prefs.getString(
+            AppPrefs.KEY_FIRST_CYCLE_DAY,
+            currentCycle.firstOrNull() ?: ""
+        ).orEmpty()
+
+        val currentFirstDay = sanitizeLabel(
+            savedFirstDayRaw,
+            currentCycle.firstOrNull() ?: ""
+        ).take(HomeFragment.MAX_LABEL_LENGTH)
+
+        return CyclePresetProvider.getPresets().firstOrNull { preset ->
+            val presetCycle = preset.cycleDaysProvider(context).map {
+                sanitizeLabel(it, "").take(HomeFragment.MAX_LABEL_LENGTH)
+            }
+
+            val presetFirstDay = sanitizeLabel(
+                preset.defaultFirstDayProvider(context),
+                presetCycle.firstOrNull() ?: ""
+            ).take(HomeFragment.MAX_LABEL_LENGTH)
+
+            currentCycle == presetCycle &&
+                    currentFirstDay.equals(presetFirstDay, ignoreCase = true)
+        }
+    }
+
+    fun HomeFragment.updatePresetSelectionState(markAsChanged: Boolean = false) {
+        val presetText = resolvePresetDisplayNameForCurrentState()
+
+        if (presetDropdown.text?.toString() != presetText) {
+            presetDropdown.setText(presetText, false)
+        }
+
+        if (markAsChanged) {
+            updateUnsavedChangesState()
+        }
+    }
+
+    fun HomeFragment.setupHolidayCountryDropdown() {
+        supportedCountries = HolidayManager.supportedCountries
+
+        val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+        val detectedCode = HolidayManager.getSelectedCountry(requireContext())
+        val isManual = prefs.getBoolean(AppPrefs.KEY_COUNTRY_MANUAL, false)
+
+        val displayItems = buildCountryDisplayList(detectedCode, isManual)
+
+        val adapter = createNoFilterAdapter(displayItems)
+
+        holidayCountryDropdown.setAdapter(adapter)
+        configureAsSelectBox(holidayCountryDropdown)
+
+        holidayCountryDropdown.setOnItemClickListener { _, _, _, _ ->
+            clearDateCheckResult()
+            updateUnsavedChangesState()
+        }
+    }
+
+    private fun View.setEnabledWithAlpha(enabled: Boolean) {
+        isEnabled = enabled
+        alpha = if (enabled) 1f else 0.5f
+    }
+
+    private fun HomeFragment.setChipGroupEnabled(enabled: Boolean) {
+        firstCycleDayChipGroup.isEnabled = enabled
+        firstCycleDayChipGroup.alpha = if (enabled) 1f else 0.5f
+
+        firstCycleDayChipGroup.children.forEach { chip ->
+            chip.isEnabled = enabled
+            chip.alpha = if (enabled) 1f else 0.6f
+        }
+    }
+
+    private fun HomeFragment.buildTemplateDescriptionText(
+        template: ScheduleTemplate
+    ): String {
+        val dateFormatter = java.time.format.DateTimeFormatter.ofLocalizedDate(
+            java.time.format.FormatStyle.MEDIUM
+        ).withLocale(java.util.Locale.getDefault())
+
+        val lockedItems = mutableListOf<String>()
+
+        if (template.locksCycleEditing) {
+            lockedItems += getString(R.string.template_locked_item_cycle)
+        }
+
+        if (template.locksRulesEditing) {
+            lockedItems += getString(R.string.template_locked_item_rules)
+        }
+
+        if (!template.allowsStartDateEditing) {
+            lockedItems += getString(R.string.template_locked_item_start_date)
+        }
+
+        if (TemplateManager.isAssignmentModeEditingLocked(requireContext())) {
+            lockedItems += getString(R.string.template_locked_item_assignment_mode)
+        }
+
+        val lockedSummary = if (lockedItems.isNotEmpty()) {
+            getString(
+                R.string.template_locked_summary_format,
+                lockedItems.joinToString(", ")
+            )
+        } else {
+            ""
+        }
+
+        val isContinuousShift = when (template.id) {
+            ScheduleTemplateProvider.TEMPLATE_PANAMA_223,
+            ScheduleTemplateProvider.TEMPLATE_4_ON_4_OFF -> true
+
+            else -> false
+        }
+
+        val continuousText = if (isContinuousShift) {
+            getString(R.string.template_continuous_shift)
+        } else {
+            null
+        }
+
+        val parts = listOfNotNull(
+            getString(template.descriptionRes),
+            continuousText,
+            getString(
+                R.string.template_reference_date_format,
+                template.fixedStartDate.format(dateFormatter),
+                template.fixedFirstCycleDay
+            ),
+            lockedSummary.takeIf { it.isNotBlank() }
+        )
+
+        return parts.joinToString("\n\n")
+    }
+
+    fun HomeFragment.updateTemplateUiState() {
+        val template = TemplateManager.getActiveTemplate(requireContext())
+        val hasTemplate = template != null
+
+        activeTemplateCard.isVisible = hasTemplate
+        templateLockedMessage.isVisible = hasTemplate
+
+        if (template != null) {
+            activeTemplateTitle.text =
+                getString(R.string.template_active_title) + ": " + getString(template.titleRes)
+
+            activeTemplateDescription.text = buildTemplateDescriptionText(template)
+            presetDropdown.setText(getString(template.titleRes), false)
+        } else {
+            activeTemplateTitle.text = getString(R.string.template_active_title)
+            activeTemplateDescription.text = ""
+            presetDropdown.setText(resolvePresetDisplayNameForCurrentState(), false)
+        }
+
+        val cycleLocked = TemplateManager.isCycleEditingLocked(requireContext())
+        val rulesLocked = TemplateManager.isRulesEditingLocked(requireContext())
+        val canEditStartDate = TemplateManager.canEditStartDate(requireContext())
+
+        cycleDaysEdit.setEnabledWithAlpha(!cycleLocked)
+        firstCycleDayDropdown.setEnabledWithAlpha(!cycleLocked)
+        setChipGroupEnabled(!cycleLocked)
+
+        pickDateButton.setEnabledWithAlpha(canEditStartDate)
+
+        switchSaturdays.setEnabledWithAlpha(!rulesLocked)
+        switchSundays.setEnabledWithAlpha(!rulesLocked)
+        switchHolidays.setEnabledWithAlpha(!rulesLocked)
+        holidayCountryDropdown.setEnabledWithAlpha(!rulesLocked)
+    }
+private fun HomeFragment.applyTemplateWithOverrideCheck(templateId: String) {
+    val repository = CycleOverrideRepository(requireContext())
+
+    val applyTemplateNow = {
+        TemplateManager.applyTemplate(requireContext(), templateId)
+        repository.clearAllOverrides()
+
+        runWithoutChangeTracking {
+            loadSettings()
+            updateTemplateUiState()
+            clearUnsavedChanges()
+        }
+
+        updateTodayStatus()
+        updateCyclePreview()
+        WidgetRefreshHelper.refresh(requireContext())
+    }
+
+    if (!repository.hasOverrides()) {
+        applyTemplateNow()
+        return
+    }
+
+    MaterialAlertDialogBuilder(requireContext())
+        .setTitle(R.string.cycle_override_reset_dialog_title)
+        .setMessage(R.string.cycle_override_reset_dialog_message)
+        .setNegativeButton(android.R.string.cancel, null)
+        .setPositiveButton(R.string.apply) { _, _ ->
+            applyTemplateNow()
+        }
         .show()
 }
+
+
+    private fun HomeFragment.showApplyTemplateDialog(
+        templateId: String,
+        templateTitle: String,
+        templateDescription: String
+    ) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(templateTitle)
+            .setMessage(
+                templateDescription + "\n\n" +
+                        getString(R.string.template_apply_confirm_message)
+            )
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                presetDropdown.setText(
+                    TemplateManager.getCurrentTemplateDisplayName(requireContext()),
+                    false
+                )
+                dialog.dismiss()
+            }
+            .setPositiveButton(R.string.apply) { _, _ ->
+                applyTemplateWithOverrideCheck(templateId)
+            }
+            .show()
+    }

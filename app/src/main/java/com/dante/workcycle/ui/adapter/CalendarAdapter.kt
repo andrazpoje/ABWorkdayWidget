@@ -58,6 +58,9 @@ class CalendarAdapter(
     private fun bindEmptyCell(holder: VH) {
         holder.dayNumber.text = ""
         holder.dayLabel.text = ""
+        holder.dayLabel.alpha = 1f
+
+        holder.secondaryLabel.alpha = 1f
         holder.secondaryLabel.text = ""
 
         holder.dayCard.setCardBackgroundColor(Color.TRANSPARENT)
@@ -104,7 +107,7 @@ class CalendarAdapter(
         holder.dayLabel.alpha = 1f
 
         holder.dayNumber.text = item.dayNumber
-        holder.dayLabel.text = item.effectiveCycleLabel
+        holder.dayLabel.text = getShortCycleLabel(item.effectiveCycleLabel)
 
         val backgroundColor = if (item.isOffDay) {
             Color.parseColor("#9E9E9E")
@@ -180,7 +183,8 @@ class CalendarAdapter(
 
         holder.secondaryContainer.isVisible = true
         holder.secondaryLabel.text = trimmedLabel
-        holder.secondaryLabel.setTextColor(fallbackTextColor)
+        val secondaryTextColor = ColorUtils.setAlphaComponent(fallbackTextColor, 180)
+        holder.secondaryLabel.setTextColor(secondaryTextColor)
         holder.secondaryLabel.isVisible = true
 
         val labelsPrefs = AssignmentLabelsPrefs(context)
@@ -209,6 +213,16 @@ class CalendarAdapter(
         } else {
             holder.secondaryDot.setBackgroundColor(finalColor)
         }
+        val shortLabel = when {
+            trimmedLabel.startsWith("Dopust", true) -> "Dop."
+            trimmedLabel.startsWith("Bolniška", true) -> "Boln."
+            trimmedLabel.startsWith("Dežurstvo", true) -> "Dež."
+            trimmedLabel.startsWith("Teren", true) -> "Ter."
+            else -> trimmedLabel.take(3)
+        }
+
+        holder.secondaryLabel.text = shortLabel
+
     }
 
     private fun getIconRes(iconKey: String?): Int? {
@@ -262,4 +276,22 @@ class CalendarAdapter(
     private fun darkenColor(color: Int): Int {
         return ColorUtils.blendARGB(color, Color.BLACK, 0.22f)
     }
+    private fun getShortCycleLabel(label: String): String {
+        val normalized = label.trim()
+
+        return when (normalized.lowercase()) {
+            "dopoldan" -> "Dop"
+            "popoldan" -> "Pop"
+            "nočna", "nocna" -> "Noč"
+            "prosto" -> "Pro"
+            else -> {
+                if (normalized.length <= 3) {
+                    normalized
+                } else {
+                    normalized.take(3)
+                }
+            }
+        }
+    }
+
 }

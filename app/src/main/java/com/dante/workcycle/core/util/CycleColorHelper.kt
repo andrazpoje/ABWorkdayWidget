@@ -110,4 +110,13 @@ object CycleColorHelper {
             Color.WHITE
         }
     }
+
+    fun getSoftTint(color: Int): Int {
+        return ColorUtils.blendARGB(color, Color.WHITE, 0.84f)
+    }
+
+    fun getSoftStroke(color: Int): Int {
+        return ColorUtils.blendARGB(color, Color.BLACK, 0.18f)
+    }
+
 }

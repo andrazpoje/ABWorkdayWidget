@@ -203,12 +203,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             onDayClick = { item ->
                 val date = item.date ?: return@CalendarAdapter
 
-                val assignmentPrefs = AssignmentCyclePrefs(requireContext())
-                if (!assignmentPrefs.isEnabled()) {
-                    showDayDetails(date)
-                    return@CalendarAdapter
-                }
-
                 if (!isAdded || parentFragmentManager.isStateSaved) return@CalendarAdapter
 
                 selectedDate = date
@@ -264,13 +258,15 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             )
 
             val rawAssignmentLabel = resolved.assignmentLabel
+                ?.trim()
+                ?.ifBlank { null }
+
             val displayAssignmentLabel = rawAssignmentLabel?.let {
-                if (resolved.isAssignmentOverridden) "$it*" else it
+                val value = shortenSecondaryLabel(it)
+                if (resolved.isAssignmentOverridden) "$value*" else value
             }
 
             val assignmentColor = rawAssignmentLabel
-                ?.trim()
-                ?.takeIf { it.isNotBlank() }
                 ?.let { labelsPrefs.getLabelByName(it)?.color }
 
             val skippedOverrideLabel = CycleManager.getSkippedDayOverrideLabelOrNull(ctx, current)
@@ -279,8 +275,8 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 CalendarDayItem(
                     date = current,
                     dayNumber = current.dayOfMonth.toString(),
-                    effectiveCycleLabel = shortenCalendarLabel(effectiveCycleLabel),
-                    assignmentLabel = displayAssignmentLabel?.let { shortenCalendarLabel(it) },
+                    effectiveCycleLabel = shortenPrimaryCycleLabel(effectiveCycleLabel),
+                    assignmentLabel = displayAssignmentLabel,
                     cycleColor = cycleColor,
                     assignmentColor = assignmentColor,
                     isOffDay = skippedOverrideLabel != null,
@@ -307,8 +303,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         return result
     }
 
-    private fun shortenCalendarLabel(label: String): String {
+    private fun shortenPrimaryCycleLabel(label: String): String {
         val normalized = label.trim()
+        return if (normalized.length <= 5) normalized else normalized.take(5)
+    }
+
+    private fun shortenSecondaryLabel(label: String): String {
+        val normalized = label.trim().removeSuffix("*").trim()
 
         val labelsPrefs = AssignmentLabelsPrefs(requireContext())
         val matchedLabel = labelsPrefs.getLabelByName(normalized)
@@ -334,7 +335,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
     private fun showDayDetails(date: LocalDate) {
         val resolver = DefaultScheduleResolver(requireContext())
-        val label = shortenCalendarLabel(resolver.resolve(date).effectiveCycleLabel)
+        val label = shortenPrimaryCycleLabel(resolver.resolve(date).effectiveCycleLabel)
 
         val dateText = date.format(
             DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.getDefault())
