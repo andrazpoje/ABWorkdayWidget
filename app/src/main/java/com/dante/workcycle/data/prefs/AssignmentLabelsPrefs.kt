@@ -12,27 +12,6 @@ class AssignmentLabelsPrefs(private val context: Context) {
 
     private val defaultSystemLabels = listOf(
         AssignmentLabel(
-            name = "Bolniška",
-            color = Color.parseColor("#E53935"),
-            isSystem = true,
-            isEnabled = true,
-            iconKey = "sick"
-        ),
-        AssignmentLabel(
-            name = "Dopust",
-            color = Color.parseColor("#F9A825"),
-            isSystem = true,
-            isEnabled = true,
-            iconKey = "vacation"
-        ),
-        AssignmentLabel(
-            name = "Dežurstvo",
-            color = Color.parseColor("#8E24AA"),
-            isSystem = true,
-            isEnabled = true,
-            iconKey = "standby"
-        ),
-        AssignmentLabel(
             name = "Teren",
             color = Color.parseColor("#00897B"),
             isSystem = true,

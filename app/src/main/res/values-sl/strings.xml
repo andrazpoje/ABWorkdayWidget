@@ -1,8 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+<string name="cycle_locked_by_template">
+Način določa aktivni template
+</string>
+
+    <string name="secondary_labels_description">Sekundarne oznake lahko prosto urejaš. Uporabljajo se za dodatne informacije (npr. lokacija ali naloga).</string>
+
+    <string name="status_helper_text">Status preglasi sekundarne oznake in cikel.</string>
+
+    <string name="status_labels_description">Status oznake so ločene od sekundarnih oznak. Lahko jih omogočiš ali onemogočiš ter prilagodiš njihove barve.</string>
+    <string name="status_labels_system_section">Status oznake</string>
+    <string name="edit_status_label">Uredi status oznako</string>
+
+    <string name="secondary_labels_button">Uredi sekundarne oznake</string>
+    <string name="status_labels_button">Uredi status oznake</string>
+
+    <string name="day_summary_status_value">Status: %1$s</string>
+    <string name="assignment_first_day_hint">Prvi dan na začetni datum</string>
+
     <string name="cycle_override_reset_dialog_title">Ponastavi override-e cikla?</string>
     <string name="cycle_override_reset_dialog_message">Menjava predloge cikla bo izbrisala obstoječe ročne override-e cikla. Sekundarne oznake bodo ostale.</string>
+
+    <string name="secondary_label_title">Sekundarni</string>
+    <string name="secondary_override_title">Sekundarna oznaka</string>
+    <string name="secondary_clear">Počisti sekundarni</string>
+
+    <string name="secondary_mode_manual_helper">Ročno nastavi oznake za posamezne dni</string>
+
+    <string name="secondary_mode_cycle">Ciklično + ročni prepisi</string>
+    <string name="secondary_labels_title">Sekundarne oznake</string>
+
 
     <string name="day_editor_base">Osnova</string>
     <string name="day_editor_override">Override</string>
@@ -136,7 +164,7 @@
 
     <!-- ASSIGNMENTS -->
     <string name="assignment_cycle_title">Cikel assignmentov</string>
-    <string name="assignment_section_title">Sekundarne oznake</string>
+    <string name="assignment_section_title">Oznake</string>
     <string name="assignment_enable">Omogoči sekundarne oznake</string>
     <string name="assignment_enable_first_message">Najprej omogoči sekundarne oznake.</string>
     <string name="assignment_mode_helper">Izberi, kako se sekundarne oznake določijo za posamezen dan.</string>
@@ -262,8 +290,7 @@
     <string name="whats_new_title">Kaj je novega</string>
     <string name="whats_new_version_format">Verzija %1$s</string>
     <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
-    <string name="whats_new_content">✨ Novo\n• Novi predlogi (templates): 4 dni delo / 4 dni prosto, Panama 2-2-3\n• Podpora za kontinuiran turnus (brez preskoka vikendov/praznikov)\n• Prikaz sklopa cikla v 7-dnevnem pregledu (npr. Delo 3/7, Prosto 2/7)\n• Izboljšani chipi z oznako položaja v ciklu (npr. Delo 1/7)\n• Nova minimalna velikost widgeta (1x1)\n• Ikona aplikacije v zgornji vrstici (prilagojena temi)\n\n🎨 Izboljšave\n• Naslov v zgornji vrstici poravnan levo (boljša berljivost)\n• Bolj jasen prikaz cikla v 7-dnevnem pregledu\n• Boljša usklajenost med chipi in prikazom cikla\n• Natančnejši prikaz turnusov (Panama, 4/4)\n• Čistejši in bolj konsistenten UI\n\n⚙️ Popravki in stabilnost\n• Popravljen napačen prikaz sklopa cikla (Delo/Prosto)\n• Popravki pri uporabi predlog z ponavljajočimi oznakami\n• Popravljen izbor dneva cikla (chipi)\n• Popravljen prikaz gumba Shrani\n• Popravljene napake v dropdown seznamih\n• Splošni popravki in izboljšave stabilnosti</string>    <!-- EMAIL / LINKS -->
-    <string name="email_subject_contact">%1$s - Povratne informacije</string>
+    <string name="whats_new_content">• Dodane statusne oznake (bolniška, dopust, dežurstvo)\n• Ločene sekundarne in statusne oznake v nastavitvah\n• Izboljšan urejevalnik dneva\n• Popravljen prikaz naslovov v orodni vrstici\n• Izboljšan izgled v temnem načinu\n• Manjši popravki in izboljšave stabilnosti</string>    <string name="email_subject_contact">%1$s - Povratne informacije</string>
     <string name="email_subject_bug_report">%1$s - Prijava napake</string>
     <string name="email_body_bug_report">Opiši težavo:\n\n---\nVerzija aplikacije: %1$s\nNaprava: %2$s\nAndroid: %3$s\n</string>
     <string name="no_email_app_found">Aplikacija za e-pošto ni bila najdena</string>
@@ -299,9 +326,12 @@
     <string name="help_widget_title">Widget</string>
     <string name="help_tips_title">Nasveti</string>
 
+    <string name="status_labels_title">Statusne oznake</string>
+    <string name="clear_cycle_override">Počisti override cikla</string>
+    <string name="select_cycle_override_title">Izberi override cikla</string>
 
     <string name="select_cycle_override">Izberi cycle override</string>
-    <string name="clear_cycle_override">Odstrani cycle override</string>
+
     <string name="clear_assignment">Počisti sekundarno oznako</string>
     <string name="bottom_sheet_cycle_info_base_only">Cikel: %1$s</string>
     <string name="bottom_sheet_cycle_info_with_override">Cikel: %1$s → %2$s</string>

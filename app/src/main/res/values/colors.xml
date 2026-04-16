@@ -16,4 +16,6 @@
 
     <color name="statusTextOnCard">#FFFFFFFF</color>
 
+    <color name="scroll_fade_color">#FFFFFFFF</color>
+
 </resources>

@@ -1,41 +1,48 @@
 package com.dante.workcycle.domain.schedule
 
 import android.content.Context
-import android.graphics.Color
 import com.dante.workcycle.data.prefs.AppPrefs
-
-import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
+import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
-
+import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
 import com.dante.workcycle.domain.model.CycleMode
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
-import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
 
 class SecondaryScheduleResolver(
     private val context: Context
 ) {
 
-    private val cyclePrefs = AssignmentCyclePrefs(context)
-    private val labelsPrefs = AssignmentLabelsPrefs(context)
+    private val cyclePrefs = SecondaryCyclePrefs(context)
     private val appPrefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
 
     data class SecondaryResolvedDay(
-        val label: String?,
-        val color: Int?,
-        val index: Int?,
-        val isEnabled: Boolean
+        val baseLabel: String?,
+        val cycleIndex: Int?,
+        val isEnabled: Boolean,
+        val mode: CycleMode
     )
 
     fun resolve(date: LocalDate): SecondaryResolvedDay {
+        val mode = cyclePrefs.getMode()
+
         if (!cyclePrefs.isEnabled()) {
-            return SecondaryResolvedDay(null, null, null, false)
+            return SecondaryResolvedDay(
+                baseLabel = null,
+                cycleIndex = null,
+                isEnabled = false,
+                mode = mode
+            )
         }
 
-        if (cyclePrefs.getMode() != CycleMode.CYCLIC) {
-            return SecondaryResolvedDay(null, null, null, true)
+        if (mode != CycleMode.CYCLIC) {
+            return SecondaryResolvedDay(
+                baseLabel = null,
+                cycleIndex = null,
+                isEnabled = true,
+                mode = mode
+            )
         }
 
         val cycleLabels = cyclePrefs.getCycle()
@@ -43,35 +50,41 @@ class SecondaryScheduleResolver(
             .filter { it.isNotBlank() }
 
         if (cycleLabels.isEmpty()) {
-            return SecondaryResolvedDay(null, null, null, true)
+            return SecondaryResolvedDay(
+                baseLabel = null,
+                cycleIndex = null,
+                isEnabled = true,
+                mode = mode
+            )
         }
 
         val startDate = cyclePrefs.getStartDate()
+        val firstCycleDay = cyclePrefs.getFirstCycleDay().trim()
         val advanceMode = cyclePrefs.getAdvanceMode()
 
-        val resolvedIndex = when (advanceMode) {
+        val firstDayIndex = cycleLabels.indexOf(firstCycleDay)
+            .takeIf { it >= 0 }
+            ?: 0
+
+        val stepOffset = when (advanceMode) {
             AssignmentCycleAdvanceMode.ALL_DAYS -> {
-                val dayOffset = ChronoUnit.DAYS.between(startDate, date).toInt()
-                Math.floorMod(dayOffset, cycleLabels.size)
+                ChronoUnit.DAYS.between(startDate, date).toInt()
             }
 
             AssignmentCycleAdvanceMode.WORKING_DAYS_ONLY -> {
-                val workingOffset = countWorkingCycleSteps(startDate, date)
-                Math.floorMod(workingOffset, cycleLabels.size)
+                countWorkingCycleSteps(startDate, date)
             }
         }
 
-        val resolvedLabel = cycleLabels[resolvedIndex]
-        val labelConfig = labelsPrefs.getLabelByName(resolvedLabel)
+        val resolvedIndex = Math.floorMod(firstDayIndex + stepOffset, cycleLabels.size)
 
         return SecondaryResolvedDay(
-            label = resolvedLabel,
-            color = labelConfig?.color ?: Color.WHITE,
-            index = resolvedIndex,
-            isEnabled = true
+            baseLabel = cycleLabels[resolvedIndex],
+            cycleIndex = resolvedIndex,
+            isEnabled = true,
+            mode = mode
         )
     }
-
 
     private fun countWorkingCycleSteps(startDate: LocalDate, targetDate: LocalDate): Int {
         if (targetDate == startDate) return 0

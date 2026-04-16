@@ -43,15 +43,15 @@
                 tools:text="7. apr. 2026" />
         </LinearLayout>
 
-        <!-- DESNO: PRIMARY + SECONDARY (STACKED) -->
+        <!-- DESNO: PRIMARY + SECONDARY + STATUS -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:orientation="vertical"
-            android:gravity="end">
+            android:gravity="end"
+            android:orientation="vertical">
 
-            <!-- PRIMARY (A/B) -->
+            <!-- PRIMARY -->
             <TextView
                 android:id="@+id/dayCycleText"
                 android:layout_width="wrap_content"
@@ -66,8 +66,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:orientation="horizontal"
                 android:gravity="end"
+                android:orientation="horizontal"
                 android:visibility="gone">
 
                 <ImageView
@@ -92,12 +92,24 @@
                     android:id="@+id/daySecondaryText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:maxLines="1"
                     android:ellipsize="end"
-                    tools:text="Dopust"
+                    android:maxLines="1"
+                    android:textSize="12sp"
+                    tools:text="O2"
                     tools:visibility="visible" />
             </LinearLayout>
+
+            <!-- STATUS -->
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="Dopust"
+                tools:visibility="visible" />
 
         </LinearLayout>
 

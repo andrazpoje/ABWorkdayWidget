@@ -31,6 +31,9 @@ class AssignmentLabelsFragment : Fragment(R.layout.fragment_secondary_labels) {
         _binding = FragmentSecondaryLabelsBinding.bind(view)
         prefs = AssignmentLabelsPrefs(requireContext())
 
+        binding.textDescription.text =
+            getString(R.string.secondary_labels_description)
+
         setupToolbar()
         setupLists()
 

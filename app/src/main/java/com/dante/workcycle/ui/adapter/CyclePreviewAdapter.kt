@@ -27,6 +27,7 @@ class CyclePreviewAdapter :
         val cycleLabel: String,
         val colorLabel: String,
         val secondaryLabel: String? = null,
+        val statusLabel: String? = null,
         val helperText: String? = null,
         val isOffDay: Boolean = false
     )
@@ -62,6 +63,9 @@ class CyclePreviewAdapter :
             binding.dayDateText.text = item.dateText
             binding.dayCycleText.text = item.cycleLabel
 
+            binding.dayCycleText.setTypeface(null, android.graphics.Typeface.BOLD)
+            binding.daySecondaryText.setTypeface(null, android.graphics.Typeface.NORMAL)
+
             val bgColor = if (item.isOffDay) {
                 Color.parseColor("#9E9E9E")
             } else {
@@ -78,6 +82,9 @@ class CyclePreviewAdapter :
             }
 
             binding.root.setCardBackgroundColor(bgColor)
+            binding.daySecondaryText.setTextColor(
+                ColorUtils.setAlphaComponent(textColor, 180)
+            )
             binding.dayTitleText.setTextColor(textColor)
             binding.dayDateText.setTextColor(textColor)
             binding.dayCycleText.setTextColor(textColor)
@@ -88,15 +95,25 @@ class CyclePreviewAdapter :
                 textColor = textColor
             )
 
-            binding.dayCycleText.alpha = 1f
+            bindStatusIndicator(
+                status = item.statusLabel,
+                textColor = textColor
+            )
 
+            val hasStatus = !item.statusLabel.isNullOrBlank()
+
+            binding.dayCycleText.alpha = 1f
             binding.root.alpha = if (!item.helperText.isNullOrBlank()) 0.96f else 1f
 
             binding.root.setOnClickListener {
                 onClick?.invoke(item)
             }
-            binding.daySecondaryText.alpha =
-                if (item.secondaryLabel?.contains("*") == true) 1f else 0.75f
+
+            binding.daySecondaryText.alpha = when {
+                hasStatus -> 0.48f
+                item.secondaryLabel?.contains("*") == true -> 1f
+                else -> 0.65f
+            }
         }
 
         private fun getCycleBackgroundColor(
@@ -166,9 +183,9 @@ class CyclePreviewAdapter :
             val iconRes = getIconRes(secondary?.iconKey)
 
             container.visibility = View.VISIBLE
-            text.text = trimmedName
-            text.setTextColor(textColor)
+            text.text = "• $trimmedName"
             text.visibility = View.VISIBLE
+            text.setTextColor(ColorUtils.setAlphaComponent(textColor, 180))
 
             when {
                 iconRes != null -> {
@@ -188,6 +205,39 @@ class CyclePreviewAdapter :
                     dot.visibility = View.GONE
                     icon.visibility = View.GONE
                 }
+            }
+        }
+
+        private fun bindStatusIndicator(
+            status: String?,
+            textColor: Int
+        ) {
+            val text = binding.statusText
+            val trimmed = status?.trim().orEmpty()
+
+            if (trimmed.isBlank()) {
+                text.visibility = View.GONE
+                text.text = ""
+                return
+            }
+
+            text.visibility = View.VISIBLE
+            text.text = trimmed
+
+            val statusColor = getStatusColor(trimmed)
+            text.setTextColor(statusColor ?: ColorUtils.setAlphaComponent(textColor, 220))
+            text.alpha = 1f
+        }
+
+        private fun getStatusColor(status: String): Int? {
+            return when (status.trim()) {
+                "Bolniška" -> Color.parseColor("#E53935")
+                "Dopust" -> Color.parseColor("#F9A825")
+                "Dežurstvo" -> Color.parseColor("#8E24AA")
+                "Sick leave" -> Color.parseColor("#E53935")
+                "Vacation" -> Color.parseColor("#F9A825")
+                "Standby" -> Color.parseColor("#8E24AA")
+                else -> null
             }
         }
 

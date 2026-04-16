@@ -133,6 +133,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.whatsNewFragment -> getString(R.string.whats_new_title)
                 R.id.settingsFragment -> getString(R.string.settings_title)
                 R.id.helpFragment -> getString(R.string.help_title)
+                R.id.secondaryLabelsFragment -> getString(R.string.secondary_labels_title)
+                R.id.statusLabelsFragment -> getString(R.string.status_labels_title)
                 else -> ""
             }
 

@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.3
+
+### ✨ Added
+- Added full Status layer (Bolniška, Dopust, Dežurstvo) separated from secondary schedule
+- Added dedicated Status labels screen for managing system status labels
+- Added clear separation between Secondary labels and Status labels in Settings
+- Added improved toolbar titles for Secondary and Status screens
+- Added scroll hint (fade overlay) for better navigation on long screens
+
+### 🎨 Improved
+- Improved Settings structure by separating Secondary and Status label management
+- Improved day editor by simplifying layout and removing redundant actions
+- Improved UI spacing and layout consistency across settings screens
+- Improved dark theme visuals (fixed incorrect fade overlay color)
+- Improved toolbar title handling for better context awareness
+
+### 🛠 Fixed
+- Fixed incorrect toolbar title showing "Delovni cikel" on label screens
+- Fixed excessive top spacing on label management screens
+- Fixed duplicate UI elements in Settings layout
+- Fixed incorrect resource usage in settings layouts
+
+---
+
 ## v2.2
 
 ### Added

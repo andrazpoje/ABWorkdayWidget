@@ -17,7 +17,12 @@ import com.dante.workcycle.core.theme.AppThemeManager
 import com.dante.workcycle.core.theme.ThemePreset
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
-import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
+import android.app.DatePickerDialog
+import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 import com.dante.workcycle.data.prefs.LaunchPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.databinding.FragmentSettingsBinding
@@ -29,6 +34,11 @@ import com.dante.workcycle.style.WidgetStyleManager
 import com.dante.workcycle.ui.activity.MainActivity
 import com.dante.workcycle.ui.dialogs.ColorPickerDialog
 import com.dante.workcycle.widget.WidgetRefreshHelper
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.chip.Chip
+import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
 
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
@@ -57,13 +67,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.settingsScrollView.applySystemBarsBottomInsetAsPadding()
         binding.settingsContentContainer.applySystemBarsHorizontalInsetAsPadding()
 
-        val assignmentPrefs = AssignmentCyclePrefs(requireContext())
+        val secondaryPrefs = SecondaryCyclePrefs(requireContext())
 
         isInitializing = true
         bindCurrentValues()
 
-        binding.switchSecondaryEnabled.isChecked = assignmentPrefs.isEnabled()
-        when (assignmentPrefs.getMode()) {
+        binding.switchSecondaryEnabled.isChecked = secondaryPrefs.isEnabled()
+        when (secondaryPrefs.getMode()) {
             CycleMode.MANUAL -> binding.radioManual.isChecked = true
             CycleMode.CYCLIC -> binding.radioCyclic.isChecked = true
         }
@@ -75,6 +85,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         updateActiveTemplateInfoCard()
         setupTemplatesHint()
         setupListeners()
+        setupScrollHint()
         isInitializing = false
     }
 
@@ -97,7 +108,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupAssignmentAdvanceModeDropdown() {
-        val assignmentPrefs = AssignmentCyclePrefs(requireContext())
+        val secondaryPrefs = SecondaryCyclePrefs(requireContext())
         val items = getAssignmentAdvanceModeItems()
 
         val adapter = ArrayAdapter(
@@ -108,7 +119,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         binding.secondaryAdvanceModeDropdown.setAdapter(adapter)
 
-        val currentMode = assignmentPrefs.getAdvanceMode()
+        val currentMode = secondaryPrefs.getAdvanceMode()
         val selectedItem = items.firstOrNull { it.mode == currentMode } ?: items.first()
 
         binding.secondaryAdvanceModeDropdown.setText(selectedItem.title, false)
@@ -120,7 +131,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
 
             val chosen = items[position]
-            assignmentPrefs.setAdvanceMode(chosen.mode)
+            secondaryPrefs.setAdvanceMode(chosen.mode)
             WidgetRefreshHelper.refresh(requireContext())
         }
     }
@@ -128,11 +139,11 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private fun enforceTemplateAssignmentModeIfNeeded() {
         if (!TemplateManager.isAssignmentModeEditingLocked(requireContext())) return
 
-        val assignmentPrefs = AssignmentCyclePrefs(requireContext())
+        val secondaryPrefs = SecondaryCyclePrefs(requireContext())
 
-        assignmentPrefs.setEnabled(true)
-        assignmentPrefs.setMode(CycleMode.MANUAL)
-        assignmentPrefs.setAdvanceMode(AssignmentCycleAdvanceMode.WORKING_DAYS_ONLY)
+        secondaryPrefs.setEnabled(true)
+        secondaryPrefs.setMode(CycleMode.MANUAL)
+        secondaryPrefs.setAdvanceMode(AssignmentCycleAdvanceMode.WORKING_DAYS_ONLY)
 
         binding.switchSecondaryEnabled.isChecked = true
         binding.radioManual.isChecked = true
@@ -205,6 +216,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.btnSecondaryLabels.alpha =
             if (enabled && isManual) 1f else 0.4f
 
+        binding.btnStatusLabels.visibility = View.VISIBLE
+        binding.btnStatusLabels.alpha = 1f
+
         val alpha = if (enabled && !isLockedByTemplate) 1f else 0.4f
         binding.radioCyclic.alpha = alpha
         binding.radioManual.alpha = alpha
@@ -215,10 +229,20 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (isLockedByTemplate) {
                 getString(R.string.assignment_mode_locked_by_template)
             } else if (binding.radioManual.isChecked) {
-                getString(R.string.assignment_mode_manual_helper)
+                getString(R.string.secondary_mode_manual_helper)
             } else {
-                getString(R.string.assignment_mode_cyclic_helper)
+                getString(R.string.secondary_mode_cyclic_helper)
             }
+
+        val canEditCyclicFields = enabled && !isManual && !isLockedByTemplate
+
+        binding.editStartDate.isEnabled = canEditCyclicFields
+        binding.editStartDateLayout.isEnabled = canEditCyclicFields
+        binding.secondaryCycleChipGroup.isEnabled = canEditCyclicFields
+        binding.btnAddCycleLabel.isEnabled = canEditCyclicFields
+        binding.secondaryFirstDayLayout.isEnabled = canEditCyclicFields
+        binding.secondaryFirstDayDropdown.isEnabled = canEditCyclicFields
+        binding.secondaryAdvanceModeDropdown.isEnabled = canEditCyclicFields
     }
 
     private fun updateCustomColorsUi() {
@@ -274,8 +298,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             Prefs.DEFAULT_SHOW_ASSIGNMENT_ICONS_WEEKLY
         )
 
-        binding.settingsVersionButton.text =
-            getString(R.string.app_version, BuildConfig.VERSION_NAME)
+        binding.settingsVersionText.text = "v${BuildConfig.VERSION_NAME}"
 
         val colors = WidgetStyleManager.getColors(requireContext())
         binding.colorShiftA.setLabel(getString(R.string.color_shift_a))
@@ -286,10 +309,110 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.colorBackground.setColor(colors.widgetBackgroundColor)
 
         updateCustomColorsUi()
+
+        val secondaryPrefs = SecondaryCyclePrefs(requireContext())
+        updateSecondaryStartDateText(secondaryPrefs.getStartDate())
+        renderSecondaryCycleChips()
+        refreshSecondaryFirstDayDropdown()
     }
 
+    private fun updateSecondaryStartDateText(date: LocalDate) {
+        val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+            .withLocale(Locale.getDefault())
+
+        binding.editStartDate.setText(date.format(formatter))
+    }
+
+    private fun showSecondaryStartDatePicker() {
+        val secondaryPrefs = SecondaryCyclePrefs(requireContext())
+        val selectedDate = secondaryPrefs.getStartDate()
+
+        val dialog = DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                val newDate = LocalDate.of(year, month + 1, dayOfMonth)
+                secondaryPrefs.setStartDate(newDate)
+                updateSecondaryStartDateText(newDate)
+                WidgetRefreshHelper.refresh(requireContext())
+            },
+            selectedDate.year,
+            selectedDate.monthValue - 1,
+            selectedDate.dayOfMonth
+        )
+
+        dialog.show()
+    }
+
+    private fun getSecondaryCycleLabels(): List<String> {
+        return SecondaryCyclePrefs(requireContext()).getCycle()
+    }
+
+    private fun refreshSecondaryFirstDayDropdown() {
+        val secondaryPrefs = SecondaryCyclePrefs(requireContext())
+        val labels = getSecondaryCycleLabels().ifEmpty { secondaryPrefs.getCycle() }
+
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            labels
+        )
+
+        binding.secondaryFirstDayDropdown.setAdapter(adapter)
+
+        val savedFirstDay = secondaryPrefs.getFirstCycleDay().trim()
+        val selected = labels.firstOrNull { it == savedFirstDay }
+            ?: labels.firstOrNull()
+            ?: ""
+
+        if (selected.isNotBlank()) {
+            if (selected != savedFirstDay) {
+                secondaryPrefs.setFirstCycleDay(selected)
+            }
+            binding.secondaryFirstDayDropdown.setText(selected, false)
+        } else {
+            binding.secondaryFirstDayDropdown.setText("", false)
+        }
+    }
+
+    private fun setupScrollHint() {
+        val scrollView = binding.settingsScrollView
+        val hint = binding.viewBottomScrollHint
+
+        scrollView.viewTreeObserver.addOnScrollChangedListener {
+            val child = scrollView.getChildAt(0)
+            if (child != null) {
+                val diff = child.bottom - (scrollView.height + scrollView.scrollY)
+                hint.visibility = if (diff > 24) View.VISIBLE else View.GONE
+            } else {
+                hint.visibility = View.GONE
+            }
+        }
+
+        scrollView.post {
+            val child = scrollView.getChildAt(0)
+            if (child != null) {
+                val diff = child.bottom - (scrollView.height + scrollView.scrollY)
+                hint.visibility = if (diff > 24) View.VISIBLE else View.GONE
+            } else {
+                hint.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun updateScrollHint(
+        scrollView: NestedScrollView,
+        currentScrollY: Int = scrollView.scrollY
+    ) {
+        val child = scrollView.getChildAt(0) ?: run {
+            binding.viewBottomScrollHint.isVisible = false
+            return
+        }
+
+        val remaining = child.bottom - (scrollView.height + currentScrollY)
+        binding.viewBottomScrollHint.isVisible = remaining > 24
+    }
     private fun setupListeners() {
-        val assignmentPrefs = AssignmentCyclePrefs(requireContext())
+        val secondaryPrefs = SecondaryCyclePrefs(requireContext())
 
         binding.switchSecondaryEnabled.setOnCheckedChangeListener { _, isChecked ->
             if (isInitializing) return@setOnCheckedChangeListener
@@ -302,10 +425,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 return@setOnCheckedChangeListener
             }
 
-            assignmentPrefs.setEnabled(isChecked)
+            secondaryPrefs.setEnabled(isChecked)
             updateSecondaryUi()
             WidgetRefreshHelper.refresh(requireContext())
         }
+
+        binding.btnAddCycleLabel.setOnClickListener {
+            showAddCycleLabelDialog()
+        }
+
 
         binding.radioGroupMode.setOnCheckedChangeListener { _, checkedId ->
             if (isInitializing) return@setOnCheckedChangeListener
@@ -324,9 +452,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 CycleMode.CYCLIC
             }
 
-            assignmentPrefs.setMode(mode)
+            secondaryPrefs.setMode(mode)
             updateSecondaryUi()
             WidgetRefreshHelper.refresh(requireContext())
+            refreshSecondaryFirstDayDropdown()
         }
 
         binding.settingsThemeCustom.setOnClickListener {
@@ -340,6 +469,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.btnSecondaryLabels.setOnClickListener {
             findNavController().navigate(
                 R.id.action_settingsFragment_to_secondaryLabelsFragment
+            )
+        }
+
+        binding.btnStatusLabels.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_settingsFragment_to_statusLabelsFragment
             )
         }
 
@@ -511,6 +646,31 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.buttonSettingsFullChangelog.setOnClickListener {
             openChangelog()
         }
+        binding.editStartDate.setOnClickListener {
+            if (TemplateManager.isAssignmentModeEditingLocked(requireContext())) return@setOnClickListener
+            showSecondaryStartDatePicker()
+        }
+
+        binding.editStartDateLayout.setOnClickListener {
+            if (TemplateManager.isAssignmentModeEditingLocked(requireContext())) return@setOnClickListener
+            showSecondaryStartDatePicker()
+        }
+
+        binding.secondaryFirstDayDropdown.setOnItemClickListener { _, _, position, _ ->
+            if (isInitializing) return@setOnItemClickListener
+            if (TemplateManager.isAssignmentModeEditingLocked(requireContext())) return@setOnItemClickListener
+
+            val labels = getSecondaryCycleLabels().ifEmpty {
+                secondaryPrefs.getCycle()
+            }
+
+            val selected = labels.getOrNull(position) ?: return@setOnItemClickListener
+
+            secondaryPrefs.setFirstCycleDay(selected)
+            WidgetRefreshHelper.refresh(requireContext())
+        }
+
+
     }
 
     private fun saveAppTheme(theme: String) {
@@ -536,6 +696,59 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private fun refreshWidget() {
         WidgetRefreshHelper.refresh(requireContext())
+    }
+
+    private fun showAddCycleLabelDialog() {
+        val input = EditText(requireContext())
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Add label")
+            .setView(input)
+            .setPositiveButton("Add") { _, _ ->
+                val value = input.text.toString().trim()
+                if (value.isNotBlank()) {
+                    val prefs = SecondaryCyclePrefs(requireContext())
+                    val updated = prefs.getCycle().toMutableList()
+                    updated.add(value)
+                    prefs.setCycle(updated)
+
+                    renderSecondaryCycleChips()
+                    refreshSecondaryFirstDayDropdown()
+                    WidgetRefreshHelper.refresh(requireContext())
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun renderSecondaryCycleChips() {
+        val prefs = SecondaryCyclePrefs(requireContext())
+        val labels = prefs.getCycle()
+
+        binding.secondaryCycleChipGroup.removeAllViews()
+
+        labels.forEach { label ->
+            val chip = Chip(requireContext()).apply {
+                text = label
+                isCloseIconVisible = true
+
+                setOnCloseIconClickListener {
+                    val updated = labels.toMutableList()
+                    updated.remove(label)
+                    prefs.setCycle(updated)
+
+                    if (prefs.getFirstCycleDay() == label) {
+                        prefs.setFirstCycleDay(updated.firstOrNull() ?: "")
+                    }
+
+                    renderSecondaryCycleChips()
+                    refreshSecondaryFirstDayDropdown()
+                    WidgetRefreshHelper.refresh(requireContext())
+                }
+            }
+
+            binding.secondaryCycleChipGroup.addView(chip)
+        }
     }
 
     private fun openChangelog() {

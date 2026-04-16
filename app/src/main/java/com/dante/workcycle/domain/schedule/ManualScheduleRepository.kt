@@ -13,6 +13,7 @@ class ManualScheduleRepository(context: Context) {
     fun getSecondaryManualLabel(date: LocalDate): String? {
         return prefs.getString(buildSecondaryKey(date), null)
             ?.trim()
+            ?.removeSuffix("*")   // 🔥 FIX
             ?.takeIf { it.isNotBlank() }
     }
 
@@ -22,7 +23,7 @@ class ManualScheduleRepository(context: Context) {
             if (label.isNullOrBlank()) {
                 remove(key)
             } else {
-                putString(key, label.trim())
+                putString(key, label.trim().removeSuffix("*"))
             }
         }.apply()
     }

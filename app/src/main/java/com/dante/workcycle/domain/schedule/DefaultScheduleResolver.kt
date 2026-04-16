@@ -1,8 +1,8 @@
 package com.dante.workcycle.domain.schedule
 
 import android.content.Context
-import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
 import com.dante.workcycle.domain.model.CycleLayer
+import com.dante.workcycle.domain.model.CycleMode
 import com.dante.workcycle.domain.model.CycleResult
 import com.dante.workcycle.domain.model.DaySchedule
 import com.dante.workcycle.domain.model.ResolvedDay
@@ -12,17 +12,12 @@ class DefaultScheduleResolver(
     private val context: Context
 ) {
 
-    private val assignmentPrefs = AssignmentCyclePrefs(context)
     private val manualScheduleRepository = ManualScheduleRepository(context)
-
     private val secondaryResolver = SecondaryScheduleResolver(context)
     private val cycleOverrideRepository = CycleOverrideRepository(context)
+    private val statusRepository = StatusRepository(context)
 
     fun resolve(date: LocalDate): ResolvedDay {
-
-        // -------------------------
-        // PRIMARY LAYER
-        // -------------------------
 
         val baseCycleLabel = CycleManager.getCycleDayForDate(context, date)
 
@@ -43,81 +38,62 @@ class DefaultScheduleResolver(
         val primaryResult = CycleResult(
             layer = CycleLayer.PRIMARY,
             label = effectiveCycleLabel,
-            source = if (cycleOverrideLabel != null) "primary_override" else "primary_base",
+            source = when {
+                cycleOverrideLabel != null -> "primary_override"
+                skippedOverrideLabel != null -> "primary_skipped_override"
+                else -> "primary_base"
+            },
             isOverride = cycleOverrideLabel != null
         )
 
-        // -------------------------
-        // SECONDARY DISABLED
-        // -------------------------
-
-        if (!assignmentPrefs.isEnabled()) {
-
-            val daySchedule = DaySchedule(
-                date = date,
-                cycles = listOf(primaryResult),
-                hasManualOverride = cycleOverrideLabel != null
-            )
-
-            return ResolvedDay(
-                baseCycleLabel = baseCycleLabel,
-                cycleOverrideLabel = cycleOverrideLabel,
-                effectiveCycleLabel = effectiveCycleLabel,
-                secondaryBaseLabel = null,
-                secondaryOverrideLabel = null,
-                secondaryEffectiveLabel = null,
-                daySchedule = daySchedule,
-                isAssignmentFeatureEnabled = false
-            )
-        }
-
-        // -------------------------
-        // SECONDARY BASE (CYCLE)
-        // -------------------------
-
         val secondaryResolved = secondaryResolver.resolve(date)
 
-        val secondaryBaseLabel = secondaryResolved.label
+        val secondaryBaseLabel = secondaryResolved.baseLabel
             ?.trim()
             ?.ifBlank { null }
 
-        // -------------------------
-        // SECONDARY OVERRIDE
-        // -------------------------
-
-        val secondaryOverrideLabel = manualScheduleRepository
+        val rawManualLabel = manualScheduleRepository
             .getSecondaryManualLabel(date)
             ?.trim()
             ?.ifBlank { null }
 
-        val secondaryEffectiveLabel = secondaryOverrideLabel ?: secondaryBaseLabel
+        val isManualMode = secondaryResolved.mode != CycleMode.CYCLIC
+
+        val secondaryOverrideLabel = if (isManualMode) {
+            null
+        } else {
+            rawManualLabel
+        }
+
+        val secondaryEffectiveLabel = if (isManualMode) {
+            rawManualLabel
+        } else {
+            secondaryOverrideLabel ?: secondaryBaseLabel
+        }
 
         val secondaryResult = secondaryEffectiveLabel?.let { label ->
             CycleResult(
                 layer = CycleLayer.SECONDARY,
                 label = label,
-                source = if (secondaryOverrideLabel != null) {
-                    "secondary_override"
-                } else {
-                    "secondary_base"
+                source = when {
+                    secondaryOverrideLabel != null -> "secondary_override"
+                    secondaryBaseLabel != null -> "secondary_base"
+                    isManualMode && rawManualLabel != null -> "secondary_manual"
+                    else -> "secondary_manual_only"
                 },
                 isOverride = secondaryOverrideLabel != null
             )
         }
 
-        // -------------------------
-        // COMBINED DAY SCHEDULE
-        // -------------------------
+        val statusLabel = statusRepository.getStatusLabel(date)
+            ?.trim()
+            ?.ifBlank { null }
 
         val daySchedule = DaySchedule(
             date = date,
             cycles = listOfNotNull(primaryResult, secondaryResult),
             hasManualOverride = cycleOverrideLabel != null || secondaryOverrideLabel != null
         )
-
-        // -------------------------
-        // FINAL RESULT
-        // -------------------------
 
         return ResolvedDay(
             baseCycleLabel = baseCycleLabel,
@@ -126,8 +102,9 @@ class DefaultScheduleResolver(
             secondaryBaseLabel = secondaryBaseLabel,
             secondaryOverrideLabel = secondaryOverrideLabel,
             secondaryEffectiveLabel = secondaryEffectiveLabel,
+            statusLabel = statusLabel,
             daySchedule = daySchedule,
-            isAssignmentFeatureEnabled = true
+            isAssignmentFeatureEnabled = secondaryResolved.isEnabled
         )
     }
 }

@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+<string name="cycle_locked_by_template">
+Controlled by the active template
+</string>
+
+    <string name="secondary_labels_description">Secondary labels can be freely customized. They are used for additional information (e.g. location or task).</string>
+
+    <string name="status_labels_title">Status labels</string>
+    <string name="clear_cycle_override">Clear cycle override</string>
+    <string name="select_cycle_override_title">Select cycle override</string>
+
+
+    <string name="status_labels_description">Status labels are managed separately from secondary labels. You can enable or disable them and customize their colors.</string>
+    <string name="status_labels_system_section">Status labels</string>
+    <string name="edit_status_label">Edit status label</string>
+
+    <string name="secondary_labels_button">Edit secondary labels</string>
+    <string name="status_labels_button">Edit status labels</string>
+
+    <string name="day_summary_status_value">Status: %1$s</string>
+
+
+
+
+    <string name="secondary_label_title">Secondary</string>
+    <string name="secondary_override_title">Secondary label</string>
+    <string name="secondary_clear">Clear secondary</string>
+
+    <string name="secondary_schedule_title">Secondary schedule</string>
+    <string name="secondary_mode_manual">Manual schedule</string>
+    <string name="secondary_mode_cyclic">Cyclic schedule</string>
+    <string name="secondary_mode_manual_helper">Set values manually per day</string>
+    <string name="secondary_mode_cyclic_helper">Automatically cycles through values</string>
+
+    <string name="assignment_first_day_hint">First day on start date</string>
+
     <string name="cycle_override_reset_dialog_title">Reset cycle overrides?</string>
     <string name="cycle_override_reset_dialog_message">Changing the cycle template will remove existing manual cycle overrides. Secondary labels will remain.</string>
 
@@ -9,6 +44,10 @@
     <string name="day_editor_active">Active</string>
     <string name="bottom_sheet_assignment_info_with_override">Secondary label: %1$s → %2$s (active: %3$s)</string>
 
+    <string name="secondary_mode_cycle">Cyclic + manual overrides</string>
+
+
+    <string name="secondary_labels_title">Secondary Labels</string>
 
 
     <string name="assignment_disabled_for_day_editor">Secondary labels are disabled. You can still edit the main cycle override for this day.</string>
@@ -127,7 +166,7 @@
 
 
     <!-- ASSIGNMENTS -->
-    <string name="assignment_section_title">Secondary labels</string>
+    <string name="assignment_section_title">Labels</string>
     <string name="assignment_enable">Enable secondary labels</string>
     <string name="assignment_enable_first_message">Enable secondary labels first.</string>
     <string name="assignment_mode_helper">Choose how secondary labels are resolved for each day.</string>
@@ -247,7 +286,7 @@
     <string name="whats_new_title">What’s New</string>
     <string name="whats_new_version_format">Version %1$s</string>
     <string name="whats_new_view_full_changelog">View full changelog</string>
-    <string name="whats_new_content">✨ New\n• New templates: 4 days work / 4 days off, Panama 2-2-3\n• Continuous shift support (no weekend/holiday skipping)\n• Cycle block indicators in 7-day preview (e.g. Work 3/7, Off 2/7)\n• Improved chips with cycle position indicators (e.g. Work 1/7)\n• New minimum widget size (1x1)\n• App logo in top bar (theme-aware)\n\n🎨 Improvements\n• Left-aligned toolbar title (better readability)\n• Improved cycle visibility in 7-day preview\n• Better consistency between chips and cycle display\n• More accurate shift schedule representation\n• Cleaner and more consistent UI\n\n⚙️ Fixes and stability\n• Fixed incorrect cycle block labels (Work/Off mismatch)\n• Fixed issues with templates using repeated labels\n• Fixed chip selection behavior\n• Fixed Save button visibility issues\n• Fixed dropdown rendering issues\n• General bug fixes and performance improvements</string>
+    <string name="whats_new_content">• Dodane statusne oznake (bolniška, dopust, dežurstvo)\n• Ločene sekundarne in statusne oznake v nastavitvah\n• Izboljšan urejevalnik dneva\n• Popravljen prikaz naslovov v orodni vrstici\n• Izboljšan izgled v temnem načinu\n• Manjši popravki in izboljšave stabilnosti</string>
     <!-- EMAIL / LINKS -->
     <string name="email_subject_contact">%1$s - Feedback</string>
     <string name="email_subject_bug_report">%1$s - Bug report</string>
@@ -292,7 +331,7 @@
     <string name="help_tips_title">Tips</string>
 
     <string name="select_cycle_override">Select cycle override</string>
-    <string name="clear_cycle_override">Clear cycle override</string>
+
     <string name="clear_assignment">Clear secondary label</string>
     <string name="bottom_sheet_cycle_info_base_only">Cycle: %1$s</string>
     <string name="bottom_sheet_cycle_info_with_override">Cycle: %1$s → %2$s</string>

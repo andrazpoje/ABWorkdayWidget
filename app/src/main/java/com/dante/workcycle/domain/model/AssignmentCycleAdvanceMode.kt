@@ -6,7 +6,11 @@ enum class AssignmentCycleAdvanceMode {
 
     companion object {
         fun fromString(value: String?): AssignmentCycleAdvanceMode {
-            return entries.firstOrNull { it.name == value } ?: WORKING_DAYS_ONLY
+            return try {
+                valueOf(value ?: WORKING_DAYS_ONLY.name)
+            } catch (_: Exception) {
+                WORKING_DAYS_ONLY
+            }
         }
     }
 }

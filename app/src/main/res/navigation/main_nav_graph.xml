@@ -15,30 +15,6 @@
         android:label="@string/nav_calendar" />
 
     <fragment
-        android:id="@+id/moreFragment"
-        android:name="com.dante.workcycle.ui.fragments.MoreFragment"
-        android:label="@string/nav_more">
-
-        <action
-            android:id="@+id/action_moreFragment_to_statisticsFragment"
-            app:destination="@id/statisticsFragment" />
-
-        <action
-            android:id="@+id/action_moreFragment_to_whatsNewFragment"
-            app:destination="@id/whatsNewFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/statisticsFragment"
-        android:name="com.dante.workcycle.ui.fragments.StatisticsFragment"
-        android:label="@string/statistics_title" />
-
-    <fragment
-        android:id="@+id/whatsNewFragment"
-        android:name="com.dante.workcycle.ui.fragments.WhatsNewFragment"
-        android:label="@string/whats_new_title" />
-
-    <fragment
         android:id="@+id/settingsFragment"
         android:name="com.dante.workcycle.ui.fragments.SettingsFragment"
         android:label="@string/settings_title">
@@ -50,15 +26,53 @@
         <action
             android:id="@+id/action_settingsFragment_to_secondaryLabelsFragment"
             app:destination="@id/secondaryLabelsFragment" />
+
+        <action
+            android:id="@+id/action_settingsFragment_to_statusLabelsFragment"
+            app:destination="@id/statusLabelsFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/secondaryLabelsFragment"
-        android:name="com.dante.workcycle.ui.settings.AssignmentLabelsFragment"
-        android:label="Secondary labels" />
+        android:id="@+id/moreFragment"
+        android:name="com.dante.workcycle.ui.fragments.MoreFragment"
+        android:label="@string/nav_more">
+
+        <action
+            android:id="@+id/action_moreFragment_to_whatsNewFragment"
+            app:destination="@id/whatsNewFragment" />
+
+        <action
+            android:id="@+id/action_moreFragment_to_statisticsFragment"
+            app:destination="@id/statisticsFragment" />
+
+        <action
+            android:id="@+id/action_moreFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/whatsNewFragment"
+        android:name="com.dante.workcycle.ui.fragments.WhatsNewFragment"
+        android:label="@string/whats_new_title" />
+
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.dante.workcycle.ui.fragments.StatisticsFragment"
+        android:label="@string/statistics_title" />
 
     <fragment
         android:id="@+id/helpFragment"
         android:name="com.dante.workcycle.ui.fragments.HelpFragment"
         android:label="@string/help_title" />
+
+    <fragment
+        android:id="@+id/secondaryLabelsFragment"
+        android:name="com.dante.workcycle.ui.settings.AssignmentLabelsFragment"
+        android:label="@string/assignment_labels_title" />
+
+    <fragment
+        android:id="@+id/statusLabelsFragment"
+        android:name="com.dante.workcycle.ui.settings.StatusLabelsFragment"
+        android:label="@string/status_labels_title" />
+
 </navigation>

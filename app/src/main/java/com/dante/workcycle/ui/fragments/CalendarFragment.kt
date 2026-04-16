@@ -22,7 +22,6 @@ import com.dante.workcycle.R
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.core.util.CycleColorHelper
-import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
@@ -40,6 +39,8 @@ import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.abs
 import com.dante.workcycle.core.util.DateProvider
+import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
+import com.dante.workcycle.domain.model.CycleMode
 
 class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
@@ -257,16 +258,23 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 cycle = cycle
             )
 
-            val rawAssignmentLabel = resolved.assignmentLabel
+            val rawSecondaryLabel = resolved.secondaryLabel
                 ?.trim()
                 ?.ifBlank { null }
 
-            val displayAssignmentLabel = rawAssignmentLabel?.let {
+            val secondaryMode = SecondaryCyclePrefs(ctx).getMode()
+
+            val shouldShowSecondaryOverrideMarker =
+                secondaryMode == CycleMode.CYCLIC &&
+                        resolved.isSecondaryOverridden &&
+                        !resolved.secondaryBaseLabel.isNullOrBlank()
+
+            val displaySecondaryLabel = rawSecondaryLabel?.let {
                 val value = shortenSecondaryLabel(it)
-                if (resolved.isAssignmentOverridden) "$value*" else value
+                if (shouldShowSecondaryOverrideMarker) "$value*" else value
             }
 
-            val assignmentColor = rawAssignmentLabel
+            val assignmentColor = rawSecondaryLabel
                 ?.let { labelsPrefs.getLabelByName(it)?.color }
 
             val skippedOverrideLabel = CycleManager.getSkippedDayOverrideLabelOrNull(ctx, current)
@@ -276,7 +284,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                     date = current,
                     dayNumber = current.dayOfMonth.toString(),
                     effectiveCycleLabel = shortenPrimaryCycleLabel(effectiveCycleLabel),
-                    assignmentLabel = displayAssignmentLabel,
+                    assignmentLabel = displaySecondaryLabel,
                     cycleColor = cycleColor,
                     assignmentColor = assignmentColor,
                     isOffDay = skippedOverrideLabel != null,

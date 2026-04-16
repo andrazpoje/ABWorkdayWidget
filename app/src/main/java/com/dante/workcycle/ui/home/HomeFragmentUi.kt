@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dante.workcycle.R
 import com.dante.workcycle.data.prefs.AppPrefs
-import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
@@ -25,6 +24,8 @@ import java.time.format.FormatStyle
 import java.util.Locale
 import com.dante.workcycle.core.util.DateProvider
 import com.dante.workcycle.domain.template.TemplateManager
+import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
+import com.dante.workcycle.domain.model.CycleMode
 
 fun HomeFragment.setupPreviewRecyclerView() {
     previewAdapter = CyclePreviewAdapter()
@@ -127,12 +128,23 @@ fun HomeFragment.updateCyclePreview() {
             baseLabel = resolved.baseCycleLabel
         )
 
-        val assignmentLabel = resolved.assignmentLabel
+        val secondaryMode = SecondaryCyclePrefs(ctx).getMode()
+
+        val shouldShowSecondaryOverrideMarker =
+            secondaryMode == CycleMode.CYCLIC &&
+                    resolved.isSecondaryOverridden &&
+                    !resolved.secondaryBaseLabel.isNullOrBlank()
+
+        val secondaryLabel = resolved.secondaryLabel
             ?.trim()
             ?.ifBlank { null }
-            ?.let { assignment ->
-                if (resolved.isAssignmentOverridden) "$assignment*" else assignment
+            ?.let { secondary ->
+                if (shouldShowSecondaryOverrideMarker) "$secondary*" else secondary
             }
+
+        val statusLabel = resolved.statusLabel
+            ?.trim()
+            ?.ifBlank { null }
 
         list.add(
             CyclePreviewAdapter.PreviewItem(
@@ -141,7 +153,8 @@ fun HomeFragment.updateCyclePreview() {
                 dateText = date.format(dateFormatter),
                 cycleLabel = resolved.effectiveCycleLabel.ifEmpty { "-" },
                 colorLabel = resolved.baseCycleLabel,
-                secondaryLabel = assignmentLabel,
+                secondaryLabel = secondaryLabel,
+                statusLabel = statusLabel,
                 helperText = blockLabel,
                 isOffDay = isOffDay
             )

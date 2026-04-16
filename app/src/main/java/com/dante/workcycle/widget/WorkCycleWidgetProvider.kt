@@ -27,6 +27,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
+import com.dante.workcycle.domain.model.CycleMode
 
 class WorkCycleWidgetProvider : AppWidgetProvider() {
 
@@ -67,7 +69,18 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
 
         val todayPrimary = resolvedToday.effectiveCycleLabel.trim()
         val todayBase = resolvedToday.baseCycleLabel.trim()
-        val todaySecondary = resolvedToday.assignmentLabel?.trim()
+        val rawSecondary = resolvedToday.secondaryLabel?.trim()
+
+        val secondaryMode = SecondaryCyclePrefs(context).getMode()
+
+        val shouldShowSecondaryOverrideMarker =
+            secondaryMode == CycleMode.CYCLIC &&
+                    resolvedToday.isSecondaryOverridden &&
+                    !resolvedToday.secondaryBaseLabel.isNullOrBlank()
+
+        val todaySecondary = rawSecondary?.let {
+            if (shouldShowSecondaryOverrideMarker) "$it*" else it
+        }
 
         val widgetColors = WidgetStyleManager.getColors(context)
 
@@ -216,6 +229,7 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         } else {
             views.setViewVisibility(R.id.secondaryText, View.VISIBLE)
             views.setTextViewText(R.id.secondaryText, displaySecondary)
+            views.setTextViewText(R.id.secondaryText, "• $displaySecondary")
             views.setTextColor(R.id.secondaryText, widgetColors.secondaryTextColor)
         }
 
@@ -410,9 +424,22 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
             short = true
         )
 
+        val rawSecondary = resolved.secondaryLabel
+
+        val secondaryMode = SecondaryCyclePrefs(context).getMode()
+
+        val shouldShowSecondaryOverrideMarker =
+            secondaryMode == CycleMode.CYCLIC &&
+                    resolved.isSecondaryOverridden &&
+                    !resolved.secondaryBaseLabel.isNullOrBlank()
+
+        val secondaryWithMarker = rawSecondary?.let {
+            if (shouldShowSecondaryOverrideMarker) "$it*" else it
+        }
+
         val secondary = resolveWidgetAssignmentDisplayLabel(
             context = context,
-            rawLabel = resolved.assignmentLabel,
+            rawLabel = secondaryWithMarker,
             short = true
         )
         val widgetColors = WidgetStyleManager.getColors(context)

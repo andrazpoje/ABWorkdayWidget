@@ -108,6 +108,8 @@ class CalendarAdapter(
 
         holder.dayNumber.text = item.dayNumber
         holder.dayLabel.text = getShortCycleLabel(item.effectiveCycleLabel)
+        holder.dayLabel.setTypeface(null, android.graphics.Typeface.BOLD)
+        holder.secondaryLabel.setTypeface(null, android.graphics.Typeface.NORMAL)
 
         val backgroundColor = if (item.isOffDay) {
             Color.parseColor("#9E9E9E")
@@ -181,11 +183,13 @@ class CalendarAdapter(
             return
         }
 
+        val isOverride = trimmedLabel.contains("*")
+
         holder.secondaryContainer.isVisible = true
-        holder.secondaryLabel.text = trimmedLabel
         val secondaryTextColor = ColorUtils.setAlphaComponent(fallbackTextColor, 180)
         holder.secondaryLabel.setTextColor(secondaryTextColor)
         holder.secondaryLabel.isVisible = true
+        holder.secondaryLabel.alpha = if (isOverride) 1f else 0.7f
 
         val labelsPrefs = AssignmentLabelsPrefs(context)
         val cleanName = trimmedLabel.removeSuffix("*").trim()
@@ -196,33 +200,35 @@ class CalendarAdapter(
             holder.secondaryIcon.setImageResource(iconRes)
             holder.secondaryIcon.isVisible = true
             holder.secondaryDot.isVisible = false
-            return
-        }
-
-        holder.secondaryIcon.isVisible = false
-        holder.secondaryDot.isVisible = true
-
-        val baseColor = assignmentColor ?: fallbackTextColor
-        val finalColor = adjustDotColor(baseColor)
-
-        val dotDrawable = holder.secondaryDot.background?.mutate()
-        if (dotDrawable != null) {
-            val wrapped = DrawableCompat.wrap(dotDrawable)
-            DrawableCompat.setTint(wrapped, finalColor)
-            holder.secondaryDot.background = wrapped
         } else {
-            holder.secondaryDot.setBackgroundColor(finalColor)
+            holder.secondaryIcon.isVisible = false
+            holder.secondaryDot.isVisible = true
+
+            val baseColor = assignmentColor ?: fallbackTextColor
+            val finalColor = adjustDotColor(baseColor)
+
+            val dotDrawable = holder.secondaryDot.background?.mutate()
+            if (dotDrawable != null) {
+                val wrapped = DrawableCompat.wrap(dotDrawable)
+                DrawableCompat.setTint(wrapped, finalColor)
+                holder.secondaryDot.background = wrapped
+            } else {
+                holder.secondaryDot.setBackgroundColor(finalColor)
+            }
         }
+
+        val baseLabel = trimmedLabel.removeSuffix("*").trim()
+
         val shortLabel = when {
-            trimmedLabel.startsWith("Dopust", true) -> "Dop."
-            trimmedLabel.startsWith("Bolniška", true) -> "Boln."
-            trimmedLabel.startsWith("Dežurstvo", true) -> "Dež."
-            trimmedLabel.startsWith("Teren", true) -> "Ter."
-            else -> trimmedLabel.take(3)
+            baseLabel.startsWith("Dopust", true) -> "Dop."
+            baseLabel.startsWith("Bolniška", true) -> "Boln."
+            baseLabel.startsWith("Dežurstvo", true) -> "Dež."
+            baseLabel.startsWith("Teren", true) -> "Ter."
+            else -> baseLabel.take(3)
         }
 
-        holder.secondaryLabel.text = shortLabel
-
+        val finalLabel = if (isOverride) "$shortLabel*" else shortLabel
+        holder.secondaryLabel.text = "• $finalLabel"
     }
 
     private fun getIconRes(iconKey: String?): Int? {
