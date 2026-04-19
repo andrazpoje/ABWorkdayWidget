@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.DialogFragment
 import com.dante.workcycle.R
 import com.google.android.material.card.MaterialCardView
@@ -147,74 +148,74 @@ class ColorPickerDialog(
 
     companion object {
         private const val PALETTE_COLUMNS = 5
-        private val DEFAULT_COLOR = Color.parseColor("#6750A4")
+        private val DEFAULT_COLOR = "#6750A4".toColorInt()
 
         private val COLOR_PALETTE = listOf(
-            Color.parseColor("#0D47A1"),
-            Color.parseColor("#1565C0"),
-            Color.parseColor("#1976D2"),
-            Color.parseColor("#1E88E5"),
-            Color.parseColor("#42A5F5"),
+            "#0D47A1".toColorInt(),
+            "#1565C0".toColorInt(),
+            "#1976D2".toColorInt(),
+            "#1E88E5".toColorInt(),
+            "#42A5F5".toColorInt(),
 
-            Color.parseColor("#004D40"),
-            Color.parseColor("#00695C"),
-            Color.parseColor("#00796B"),
-            Color.parseColor("#00897B"),
-            Color.parseColor("#26A69A"),
+            "#004D40".toColorInt(),
+            "#00695C".toColorInt(),
+            "#00796B".toColorInt(),
+            "#00897B".toColorInt(),
+            "#26A69A".toColorInt(),
 
-            Color.parseColor("#1B5E20"),
-            Color.parseColor("#2E7D32"),
-            Color.parseColor("#388E3C"),
-            Color.parseColor("#43A047"),
-            Color.parseColor("#66BB6A"),
+            "#1B5E20".toColorInt(),
+            "#2E7D32".toColorInt(),
+            "#388E3C".toColorInt(),
+            "#43A047".toColorInt(),
+            "#66BB6A".toColorInt(),
 
-            Color.parseColor("#E65100"),
-            Color.parseColor("#EF6C00"),
-            Color.parseColor("#F57C00"),
-            Color.parseColor("#FB8C00"),
-            Color.parseColor("#FFA726"),
+            "#E65100".toColorInt(),
+            "#EF6C00".toColorInt(),
+            "#F57C00".toColorInt(),
+            "#FB8C00".toColorInt(),
+            "#FFA726".toColorInt(),
 
-            Color.parseColor("#BF360C"),
-            Color.parseColor("#D84315"),
-            Color.parseColor("#E64A19"),
-            Color.parseColor("#F4511E"),
-            Color.parseColor("#FF7043"),
+            "#BF360C".toColorInt(),
+            "#D84315".toColorInt(),
+            "#E64A19".toColorInt(),
+            "#F4511E".toColorInt(),
+            "#FF7043".toColorInt(),
 
-            Color.parseColor("#B71C1C"),
-            Color.parseColor("#C62828"),
-            Color.parseColor("#D32F2F"),
-            Color.parseColor("#E53935"),
-            Color.parseColor("#EF5350"),
+            "#B71C1C".toColorInt(),
+            "#C62828".toColorInt(),
+            "#D32F2F".toColorInt(),
+            "#E53935".toColorInt(),
+            "#EF5350".toColorInt(),
 
-            Color.parseColor("#4A148C"),
-            Color.parseColor("#6A1B9A"),
-            Color.parseColor("#7B1FA2"),
-            Color.parseColor("#8E24AA"),
-            Color.parseColor("#AB47BC"),
+            "#4A148C".toColorInt(),
+            "#6A1B9A".toColorInt(),
+            "#7B1FA2".toColorInt(),
+            "#8E24AA".toColorInt(),
+            "#AB47BC".toColorInt(),
 
-            Color.parseColor("#311B92"),
-            Color.parseColor("#4527A0"),
-            Color.parseColor("#512DA8"),
-            Color.parseColor("#5E35B1"),
-            Color.parseColor("#7E57C2"),
+            "#311B92".toColorInt(),
+            "#4527A0".toColorInt(),
+            "#512DA8".toColorInt(),
+            "#5E35B1".toColorInt(),
+            "#7E57C2".toColorInt(),
 
-            Color.parseColor("#263238"),
-            Color.parseColor("#37474F"),
-            Color.parseColor("#455A64"),
-            Color.parseColor("#607D8B"),
-            Color.parseColor("#90A4AE"),
+            "#263238".toColorInt(),
+            "#37474F".toColorInt(),
+            "#455A64".toColorInt(),
+            "#607D8B".toColorInt(),
+            "#90A4AE".toColorInt(),
 
-            Color.parseColor("#212121"),
-            Color.parseColor("#424242"),
-            Color.parseColor("#616161"),
-            Color.parseColor("#9E9E9E"),
-            Color.parseColor("#E0E0E0"),
+            "#212121".toColorInt(),
+            "#424242".toColorInt(),
+            "#616161".toColorInt(),
+            "#9E9E9E".toColorInt(),
+            "#E0E0E0".toColorInt(),
 
-            Color.parseColor("#FFFFFF"),
-            Color.parseColor("#F5F5F5"),
-            Color.parseColor("#EEEEEE"),
-            Color.parseColor("#DDDDDD"),
-            Color.parseColor("#000000")
+            "#FFFFFF".toColorInt(),
+            "#F5F5F5".toColorInt(),
+            "#EEEEEE".toColorInt(),
+            "#DDDDDD".toColorInt(),
+            "#000000".toColorInt()
         )
     }
 }

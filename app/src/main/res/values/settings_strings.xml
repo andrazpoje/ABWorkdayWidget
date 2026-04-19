@@ -101,6 +101,7 @@
     <string name="template_panama_223_description">14-day shift cycle: 2 work, 2 off, 3 work, 2 off, 2 work, 3 off.</string>
     <string name="template_continuous_shift">Continuous shift (weekends included)</string>
     <string name="template_active_title">Active template</string>
+    <string name="template_active_title_format">Active template: %1$s</string>
     <string name="template_locked_message">Some settings are locked because a template is active.</string>
     <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
     <string name="template_posta_slovenije_description">Fixed A/B cycle for postal workers. Cycle, rules, and start date are locked. Assignments are enabled in manual-only mode.</string>
@@ -109,6 +110,10 @@
     <string name="template_removed_message">Template removed. Manual editing is enabled again.</string>
     <string name="template_locked_click_message">This setting is locked because an active template controls it.</string>
     <string name="template_reference_date_format">Reference date: %1$s = %2$s</string>
+    <string name="template_description_with_reference_format">%1$s\n\n%2$s</string>
+    <string name="template_apply_message_format">%1$s\n\n%2$s</string>
+    <string name="template_dropdown_header_format">— %1$s</string>
+    <string name="template_dropdown_option_format">    %1$s</string>
     <string name="template_locked_summary_format">Locked by template: %1$s</string>
     <string name="template_locked_item_cycle">cycle</string>
     <string name="template_locked_item_rules">rules</string>

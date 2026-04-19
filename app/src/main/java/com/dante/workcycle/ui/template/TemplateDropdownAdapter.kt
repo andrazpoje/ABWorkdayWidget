@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
+import com.dante.workcycle.R
 
 class TemplateDropdownAdapter(
     context: Context,
@@ -59,7 +60,10 @@ class TemplateDropdownAdapter(
                     .inflate(android.R.layout.simple_list_item_1, parent, false)
 
                 val text = view.findViewById<TextView>(android.R.id.text1)
-                text.text = "— ${item.title.uppercase()}"
+                text.text = context.getString(
+                    R.string.template_dropdown_header_format,
+                    item.title.uppercase()
+                )
                 text.textSize = 13f
                 text.setTypeface(text.typeface, android.graphics.Typeface.BOLD)
                 text.alpha = 0.75f
@@ -74,7 +78,7 @@ class TemplateDropdownAdapter(
                     .inflate(android.R.layout.simple_list_item_1, parent, false)
 
                 val text = view.findViewById<TextView>(android.R.id.text1)
-                text.text = "    ${item.title}"
+                text.text = context.getString(R.string.template_dropdown_option_format, item.title)
                 text.textSize = 16f
                 text.setPadding(24, 16, 16, 16)
 

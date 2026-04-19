@@ -619,7 +619,7 @@ private fun HomeFragment.applyPresetInternal(
 
         if (template != null) {
             activeTemplateTitle.text =
-                getString(R.string.template_active_title) + ": " + getString(template.titleRes)
+                getString(R.string.template_active_title_format, getString(template.titleRes))
 
             activeTemplateDescription.text = buildTemplateDescriptionText(template)
             presetDropdown.setText(getString(template.titleRes), false)
@@ -686,8 +686,11 @@ private fun HomeFragment.applyTemplateWithOverrideCheck(templateId: String) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(templateTitle)
             .setMessage(
-                templateDescription + "\n\n" +
-                        getString(R.string.template_apply_confirm_message)
+                getString(
+                    R.string.template_apply_message_format,
+                    templateDescription,
+                    getString(R.string.template_apply_confirm_message)
+                )
             )
             .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                 presetDropdown.setText(

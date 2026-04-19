@@ -6,6 +6,8 @@
     <!-- ========================================================= -->
     <string name="app_name">Delovni cikel</string>
     <string name="app_version">v%1$s</string>
+    <string name="app_version_short">v%1$s</string>
+    <string name="bullet_label_format">• %1$s</string>
 
     <!-- ========================================================= -->
     <!-- CORE / COMMON ACTIONS -->

@@ -6,6 +6,9 @@
     <!-- ========================================================= -->
     <string name="work_log_target">Norma</string>
     <string name="work_log_balance">Saldo</string>
+    <string name="work_log_break_option_0" translatable="false">0</string>
+    <string name="work_log_break_option_30" translatable="false">30</string>
+    <string name="work_log_break_option_45" translatable="false">45</string>
 
     <string name="work_log_action_too_soon">Pred naslednjo akcijo počakaj vsaj 1 minuto</string>
     <string name="work_log_event_clock_out_with_total">Odhod (skupaj %1$s)</string>

@@ -37,7 +37,6 @@ import com.dante.workcycle.widget.WidgetRefreshHelper
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
-import androidx.core.view.isVisible
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     companion object {
@@ -159,15 +158,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             ).withLocale(java.util.Locale.getDefault())
 
             binding.activeTemplateSettingsTitle.text =
-                getString(R.string.template_active_title) + ": " + getString(template.titleRes)
+                getString(R.string.template_active_title_format, getString(template.titleRes))
 
             binding.activeTemplateSettingsDescription.text =
-                getString(template.descriptionRes) + "\n\n" +
-                        getString(
-                            R.string.template_reference_date_format,
-                            template.fixedStartDate.format(dateFormatter),
-                            template.fixedFirstCycleDay
-                        )
+                getString(
+                    R.string.template_description_with_reference_format,
+                    getString(template.descriptionRes),
+                    getString(
+                        R.string.template_reference_date_format,
+                        template.fixedStartDate.format(dateFormatter),
+                        template.fixedFirstCycleDay
+                    )
+                )
         }
     }
 
@@ -296,7 +298,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             Prefs.DEFAULT_SHOW_ASSIGNMENT_ICONS_WEEKLY
         )
 
-        binding.settingsVersionText.text = "v${BuildConfig.VERSION_NAME}"
+        binding.settingsVersionText.text =
+            getString(R.string.app_version_short, BuildConfig.VERSION_NAME)
 
         val colors = WidgetStyleManager.getColors(requireContext())
         binding.colorShiftA.setLabel(getString(R.string.color_shift_a))

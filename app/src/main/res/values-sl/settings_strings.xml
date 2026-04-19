@@ -101,6 +101,7 @@
     <string name="template_panama_223_description">14-dnevni cikel: 2 dni delo, 2 dni prosto, 3 dni delo, 2 dni prosto, 2 dni delo, 3 dni prosto.</string>
     <string name="template_continuous_shift">Kontinuiran turnus (vikendi vključeni)</string>
     <string name="template_active_title">Aktiven template</string>
+    <string name="template_active_title_format">Aktiven template: %1$s</string>
     <string name="template_locked_message">Nekatere nastavitve so zaklenjene, ker je aktiven template.</string>
     <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
     <string name="template_posta_slovenije_description">Fiksen A/B cikel za pismonoše. Cikel, pravila in začetni datum so zaklenjeni. Rajoni so omogočeni v načinu samo ročno.</string>
@@ -109,6 +110,10 @@
     <string name="template_removed_message">Template je odstranjen. Ročno urejanje je ponovno omogočeno.</string>
     <string name="template_locked_click_message">Ta nastavitev je zaklenjena, ker jo določa aktivni template.</string>
     <string name="template_reference_date_format">Referenčni datum: %1$s = %2$s</string>
+    <string name="template_description_with_reference_format">%1$s\n\n%2$s</string>
+    <string name="template_apply_message_format">%1$s\n\n%2$s</string>
+    <string name="template_dropdown_header_format">— %1$s</string>
+    <string name="template_dropdown_option_format">    %1$s</string>
     <string name="template_locked_summary_format">Zaklenjeno zaradi template-a: %1$s</string>
     <string name="template_locked_item_cycle">cikel</string>
     <string name="template_locked_item_rules">pravila</string>

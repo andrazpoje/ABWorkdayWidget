@@ -72,7 +72,7 @@ object MidnightAlarmScheduler {
         triggerAt: Long,
         pendingIntent: PendingIntent
     ) {
-        alarmManager.setExactAndAllowWhileIdle(
+        alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             triggerAt,
             pendingIntent

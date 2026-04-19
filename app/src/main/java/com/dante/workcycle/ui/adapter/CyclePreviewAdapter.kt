@@ -183,7 +183,7 @@ class CyclePreviewAdapter :
             val iconRes = getIconRes(secondary?.iconKey)
 
             container.visibility = View.VISIBLE
-            text.text = "• $trimmedName"
+            text.text = context.getString(R.string.bullet_label_format, trimmedName)
             text.visibility = View.VISIBLE
             text.setTextColor(ColorUtils.setAlphaComponent(textColor, 180))
 

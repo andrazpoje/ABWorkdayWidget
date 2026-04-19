@@ -97,17 +97,17 @@ class WorkLogDebugFragment : Fragment(R.layout.fragment_work_log_debug) {
         }
 
         chipBreak0.setOnClickListener {
-            editBreakMinutes.setText("0")
+            editBreakMinutes.setText(getString(R.string.work_log_break_option_0))
             viewModel.setBreakMinutes("0")
         }
 
         chipBreak30.setOnClickListener {
-            editBreakMinutes.setText("30")
+            editBreakMinutes.setText(getString(R.string.work_log_break_option_30))
             viewModel.setBreakMinutes("30")
         }
 
         chipBreak45.setOnClickListener {
-            editBreakMinutes.setText("45")
+            editBreakMinutes.setText(getString(R.string.work_log_break_option_45))
             viewModel.setBreakMinutes("45")
         }
 

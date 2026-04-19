@@ -226,7 +226,8 @@ class CalendarAdapter(
         }
 
         val finalLabel = if (isOverride) "$shortLabel*" else shortLabel
-        holder.secondaryLabel.text = "• $finalLabel"
+        holder.secondaryLabel.text =
+            holder.itemView.context.getString(R.string.bullet_label_format, finalLabel)
     }
 
     private fun getIconRes(iconKey: String?): Int? {
