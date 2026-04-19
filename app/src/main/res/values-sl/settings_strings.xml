@@ -42,7 +42,6 @@
     <string name="theme_system">Po sistemu</string>
     <string name="theme_light">Svetla</string>
     <string name="theme_classic">Klasična</string>
-    <string name="theme_pastel">Pastelna</string>
     <string name="theme_dark">Temna</string>
     <string name="theme_custom">Po meri</string>
     <string name="color_theme">Barvna tema</string>
@@ -107,7 +106,6 @@
     <string name="template_posta_slovenije_description">Fiksen A/B cikel za pismonoše. Cikel, pravila in začetni datum so zaklenjeni. Rajoni so omogočeni v načinu samo ročno.</string>
     <string name="template_apply_confirm_message">Ta predloga bo uporabila izbran cikel in povezane nastavitve.</string>
     <string name="apply">Uporabi</string>
-    <string name="template_removed_message">Template je odstranjen. Ročno urejanje je ponovno omogočeno.</string>
     <string name="template_locked_click_message">Ta nastavitev je zaklenjena, ker jo določa aktivni template.</string>
     <string name="template_reference_date_format">Referenčni datum: %1$s = %2$s</string>
     <string name="template_description_with_reference_format">%1$s\n\n%2$s</string>
@@ -119,9 +117,6 @@
     <string name="template_locked_item_rules">pravila</string>
     <string name="template_locked_item_start_date">začetni datum</string>
     <string name="template_locked_item_assignment_mode">način assignmentov</string>
-    <string name="template_clear_dialog_title">Izklopim template?</string>
-    <string name="template_clear_dialog_message">Template se bo izklopil. Ročno urejanje cikla, pravil in assignmentov bo ponovno omogočeno.</string>
-    <string name="template_clear_dialog_confirm">Izklopi</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / PRAVILA, KOLEDAR IN DOMOV -->
@@ -179,10 +174,10 @@
     <string name="assignment_labels_description">Sistemske oznake ostanejo fiksne in jih lahko samo omogočiš ali onemogočiš. Ročne sekundarne oznake lahko dodajaš, urejaš, brišeš in se razvrščajo po uporabi.</string>
     <string name="assignment_label_type_system">Sistemska oznaka</string>
     <plurals name="assignment_label_type_manual_usage">
-        <item quantity="one">Ro?na oznaka ? uporabljena %1$d-krat</item>
-        <item quantity="two">Ro?na oznaka ? uporabljena %1$d-krat</item>
-        <item quantity="few">Ro?na oznaka ? uporabljena %1$d-krat</item>
-        <item quantity="other">Ro?na oznaka ? uporabljena %1$d-krat</item>
+        <item quantity="one">Ročna oznaka uporabljena %1$d-krat</item>
+        <item quantity="two">Ročna oznaka uporabljena %1$d-krat</item>
+        <item quantity="few">Ročna oznaka uporabljena %1$d-krat</item>
+        <item quantity="other">Ročna oznaka uporabljena %1$d-krat</item>
     </plurals>
     <string name="assignment_labels_system_section">Sistemske oznake</string>
     <string name="assignment_labels_manual_section">Moje oznake</string>
@@ -199,6 +194,7 @@
     <string name="assignment_system_label_standby_short">Dež.</string>
     <string name="assignment_system_label_field_short">Ter.</string>
     <string name="clear_secondary_label">Počisti sekundarno oznako</string>
+    <string name="add">Dodaj</string>
     <string name="add_label">Dodaj oznako</string>
     <string name="edit_label">Uredi oznako</string>
     <string name="delete_label">Izbriši oznako</string>

@@ -8,5 +8,4 @@ data class DaySchedule(
     val isHoliday: Boolean = false,
     val isSkippedByRules: Boolean = false,
     val hasManualOverride: Boolean = false
-) {
-}
+)

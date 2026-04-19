@@ -554,7 +554,7 @@ private fun HomeFragment.applyPresetInternal(
     ): String {
         val dateFormatter = java.time.format.DateTimeFormatter.ofLocalizedDate(
             java.time.format.FormatStyle.MEDIUM
-        ).withLocale(java.util.Locale.getDefault())
+        ).withLocale(Locale.getDefault())
 
         val lockedItems = mutableListOf<String>()
 

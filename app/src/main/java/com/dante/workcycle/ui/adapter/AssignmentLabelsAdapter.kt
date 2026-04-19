@@ -18,7 +18,7 @@ class AssignmentLabelsAdapter(
     private val onToggleEnabled: (AssignmentLabel, Boolean) -> Unit
 ) : RecyclerView.Adapter<AssignmentLabelsAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: ItemLabelBinding) :
+    class ViewHolder(val binding: ItemLabelBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

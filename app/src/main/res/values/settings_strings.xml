@@ -42,7 +42,6 @@
     <string name="theme_system">Follow system</string>
     <string name="theme_light">Light</string>
     <string name="theme_classic">Classic</string>
-    <string name="theme_pastel">Pastel</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_custom">Custom</string>
     <string name="color_theme">Color theme</string>
@@ -107,7 +106,6 @@
     <string name="template_posta_slovenije_description">Fixed A/B cycle for postal workers. Cycle, rules, and start date are locked. Assignments are enabled in manual-only mode.</string>
     <string name="template_apply_confirm_message">This template will apply the selected cycle and related settings.</string>
     <string name="apply">Apply</string>
-    <string name="template_removed_message">Template removed. Manual editing is enabled again.</string>
     <string name="template_locked_click_message">This setting is locked because an active template controls it.</string>
     <string name="template_reference_date_format">Reference date: %1$s = %2$s</string>
     <string name="template_description_with_reference_format">%1$s\n\n%2$s</string>
@@ -119,9 +117,6 @@
     <string name="template_locked_item_rules">rules</string>
     <string name="template_locked_item_start_date">start date</string>
     <string name="template_locked_item_assignment_mode">assignment mode</string>
-    <string name="template_clear_dialog_title">Disable template?</string>
-    <string name="template_clear_dialog_message">The template will be disabled. Manual editing of cycle, rules, and assignment mode will be re-enabled.</string>
-    <string name="template_clear_dialog_confirm">Disable</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / RULES, CALENDAR & HOME -->
@@ -179,8 +174,8 @@
     <string name="assignment_labels_description">System labels stay fixed and can only be enabled or disabled. Manual labels can be added, edited, deleted, and are sorted by usage.</string>
     <string name="assignment_label_type_system">System label</string>
     <plurals name="assignment_label_type_manual_usage">
-        <item quantity="one">Manual label ? used %1$d time</item>
-        <item quantity="other">Manual label ? used %1$d times</item>
+        <item quantity="one">Manual label used %1$d time</item>
+        <item quantity="other">Manual label used %1$d times</item>
     </plurals>
     <string name="assignment_labels_system_section">System labels</string>
     <string name="assignment_labels_manual_section">My labels</string>
@@ -197,6 +192,7 @@
     <string name="assignment_system_label_standby_short">Stand.</string>
     <string name="assignment_system_label_field_short">Field</string>
     <string name="clear_secondary_label">Clear secondary label</string>
+    <string name="add">Add</string>
     <string name="add_label">Add label</string>
     <string name="edit_label">Edit label</string>
     <string name="delete_label">Delete label</string>

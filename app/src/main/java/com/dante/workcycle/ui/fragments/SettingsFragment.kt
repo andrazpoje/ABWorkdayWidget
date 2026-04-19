@@ -153,9 +153,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (template != null) View.VISIBLE else View.GONE
 
         if (template != null) {
-            val dateFormatter = java.time.format.DateTimeFormatter.ofLocalizedDate(
-                java.time.format.FormatStyle.MEDIUM
-            ).withLocale(java.util.Locale.getDefault())
+            val dateFormatter = DateTimeFormatter.ofLocalizedDate(
+                FormatStyle.MEDIUM
+            ).withLocale(Locale.getDefault())
 
             binding.activeTemplateSettingsTitle.text =
                 getString(R.string.template_active_title_format, getString(template.titleRes))
@@ -691,9 +691,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         val input = EditText(requireContext())
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Add label")
+            .setTitle(R.string.add_label)
             .setView(input)
-            .setPositiveButton("Add") { _, _ ->
+            .setPositiveButton(R.string.add) { _, _ ->
                 val value = input.text.toString().trim()
                 if (value.isNotBlank()) {
                     val prefs = SecondaryCyclePrefs(requireContext())
@@ -706,7 +706,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     WidgetRefreshHelper.refresh(requireContext())
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 

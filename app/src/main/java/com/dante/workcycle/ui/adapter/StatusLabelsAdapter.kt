@@ -18,7 +18,7 @@ class StatusLabelsAdapter(
     private val onToggleEnabled: (StatusLabel, Boolean) -> Unit
 ) : RecyclerView.Adapter<StatusLabelsAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: ItemLabelBinding) :
+    class ViewHolder(val binding: ItemLabelBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
