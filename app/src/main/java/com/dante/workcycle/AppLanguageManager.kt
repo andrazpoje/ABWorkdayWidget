@@ -21,19 +21,6 @@ object AppLanguageManager {
         ) ?: AppPrefs.APP_LANGUAGE_SYSTEM
     }
 
-    fun saveLanguage(context: Context, languageTag: String) {
-        val normalized = if (languageTag in supportedLanguageTags) {
-            languageTag
-        } else {
-            AppPrefs.APP_LANGUAGE_SYSTEM
-        }
-
-        val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString(AppPrefs.KEY_APP_LANGUAGE, normalized)
-            .apply()
-    }
-
     fun applySavedLanguage(context: Context) {
         applyLanguage(getSavedLanguage(context))
     }
@@ -50,7 +37,4 @@ object AppLanguageManager {
         }
     }
 
-    fun getDisplayLanguageTags(): List<String> {
-        return supportedLanguageTags
-    }
 }

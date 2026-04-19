@@ -14,8 +14,6 @@ data class ResolvedDay(
     val daySchedule: DaySchedule? = null,
     val isAssignmentFeatureEnabled: Boolean = false
 ) {
-    val hasCycleOverride: Boolean
-        get() = !cycleOverrideLabel.isNullOrBlank()
 
     val hasSecondaryBase: Boolean
         get() = !secondaryBaseLabel.isNullOrBlank()
@@ -23,23 +21,9 @@ data class ResolvedDay(
     val hasSecondaryOverride: Boolean
         get() = !secondaryOverrideLabel.isNullOrBlank()
 
-    val hasSecondaryEffective: Boolean
-        get() = !secondaryEffectiveLabel.isNullOrBlank()
-
-    val hasStatus: Boolean
-        get() = !statusLabel.isNullOrBlank()
-
     val secondaryLabel: String?
         get() = secondaryEffectiveLabel
 
     val isSecondaryOverridden: Boolean
-        get() = hasSecondaryOverride && hasSecondaryBase
-
-    @Deprecated("Use secondaryLabel")
-    val assignmentLabel: String?
-        get() = secondaryEffectiveLabel
-
-    @Deprecated("Use isSecondaryOverridden")
-    val isAssignmentOverridden: Boolean
         get() = hasSecondaryOverride && hasSecondaryBase
 }

@@ -117,7 +117,7 @@ object CycleManager {
 
     private fun sanitizeLabel(raw: String?, fallback: String): String {
         val normalized = raw?.trim().orEmpty()
-        return if (normalized.isBlank()) fallback else normalized
+        return normalized.ifBlank { fallback }
     }
 
     fun getSkippedDayOverrideLabelOrNull(context: Context, date: LocalDate): String? {

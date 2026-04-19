@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / GENERAL -->
+    <!-- ========================================================= -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance_title">App Appearance</string>
+    <string name="settings_widget_title">Widget</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_schedule_title">Schedule</string>
+    <string name="settings_saved">Settings saved</string>
+    <string name="unsaved_changes_title">Unsaved changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / NOTIFICATIONS -->
+    <!-- ========================================================= -->
+    <string name="settings_notifications_enabled">Cycle change notifications</string>
+    <string name="settings_silent_notification">Silent notifications (no sound)</string>
+    <string name="notification_channel_normal_name">AB day notifications</string>
+    <string name="notification_channel_normal_desc">Notifications when the workday cycle changes</string>
+    <string name="notification_channel_silent_name">AB day notifications (silent)</string>
+    <string name="notification_channel_silent_desc">Silent notifications when the workday cycle changes</string>
+    <string name="notification_day_changed_title">Cycle changed</string>
+    <string name="notification_today_tomorrow">Today: %1$s\nTomorrow: %2$s</string>
+    <string name="notification_permission_denied">Notification permission was not granted.</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / WIDGET -->
+    <!-- ========================================================= -->
+    <string name="settings_widget_style_classic">Classic</string>
+    <string name="settings_widget_style_minimal">Minimal</string>
+    <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
+    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Workday Widget.</string>
+    <string name="open_widgets">Open widgets</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / THEME & COLORS -->
+    <!-- ========================================================= -->
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_classic">Classic</string>
+    <string name="theme_pastel">Pastel</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_custom">Custom</string>
+    <string name="color_theme">Color theme</string>
+    <string name="custom_colors_title">Custom colors</string>
+    <string name="custom_colors_helper">These colors are used only when the Custom theme is selected.</string>
+    <string name="color_shift_a">Cycle A</string>
+    <string name="color_shift_b">Cycle B</string>
+    <string name="color_background">Background</string>
+    <string name="color_picker_title">Choose color</string>
+    <string name="color_picker_palette_label">Color palette</string>
+    <string name="color_picker_apply">Apply</string>
+    <string name="color_picker_title_cycle_a">Choose color for Cycle A</string>
+    <string name="color_picker_title_cycle_b">Choose color for Cycle B</string>
+    <string name="color_picker_title_background">Choose background color</string>
+    <string name="color_row_default_label">Label</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / CYCLE & PRESETS -->
+    <!-- ========================================================= -->
+    <string name="welcome_title">Welcome to WorkCycle</string>
+    <string name="welcome_subtitle">A quick guide to help you set up your cycle, understand the calendar, and start using the widget.</string>
+    <string name="continue_label">Continue</string>
+    <string name="cycle_locked_by_template">Controlled by the active template</string>
+    <string name="cycle_section">Cycle</string>
+    <string name="start_date">Start date: %1$s</string>
+    <string name="select_date">Select date</string>
+    <string name="cycle_days_label">Cycle days</string>
+    <string name="cycle_days_hint_placeholder">A, B, Morning, Afternoon, Night</string>
+    <string name="cycle_days_hint">Enter cycle labels separated by commas. Example: A, B or Morning, Afternoon, Night</string>
+    <string name="first_cycle_day_label">Cycle day on start date</string>
+    <string name="first_cycle_day_hint">Select a label from the cycle that applies to the selected start date.</string>
+    <string name="assignment_first_day_hint">First day on start date</string>
+    <string name="preset_label">Cycle template</string>
+    <string name="preset_hint">Choose cycle template</string>
+    <string name="preset_applied">Cycle template applied: %1$s</string>
+    <string name="preset_ab">A / B</string>
+    <string name="preset_two_shift">2-shift</string>
+    <string name="preset_three_shift">3-shift</string>
+    <string name="label_morning">Morning</string>
+    <string name="label_afternoon">Afternoon</string>
+    <string name="label_night">Night</string>
+    <string name="preset_hint_description">Select a cycle template here. If you manually change the cycle or rules, it will switch to Custom.</string>
+    <string name="template_none">Custom</string>
+    <string name="templates_hint_text">You can find templates on the Home screen in the Cycle section. There you can quickly choose a predefined schedule. If you configure the cycle manually, it will be shown as Custom.</string>
+    <string name="template_group_general">General templates</string>
+    <string name="template_group_special">Special templates</string>
+    <string name="template_ab_title">A / B</string>
+    <string name="template_ab_description">Simple two-day cycle with labels A and B.</string>
+    <string name="template_two_shift_title">2-shift</string>
+    <string name="template_two_shift_description">A simple two-shift cycle: Morning and Afternoon.</string>
+    <string name="template_three_shift_title">3-shift</string>
+    <string name="template_three_shift_description">A standard three-shift cycle: Morning, Afternoon and Night.</string>
+    <string name="template_4on4off_title">4-on / 4-off</string>
+    <string name="template_4on4off_description">4 days of work followed by 4 days off. Common in shift-based jobs.</string>
+    <string name="template_panama_223_title">Panama 2-2-3</string>
+    <string name="template_panama_223_description">14-day shift cycle: 2 work, 2 off, 3 work, 2 off, 2 work, 3 off.</string>
+    <string name="template_continuous_shift">Continuous shift (weekends included)</string>
+    <string name="template_active_title">Active template</string>
+    <string name="template_locked_message">Some settings are locked because a template is active.</string>
+    <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
+    <string name="template_posta_slovenije_description">Fixed A/B cycle for postal workers. Cycle, rules, and start date are locked. Assignments are enabled in manual-only mode.</string>
+    <string name="template_apply_confirm_message">This template will apply the selected cycle and related settings.</string>
+    <string name="apply">Apply</string>
+    <string name="template_removed_message">Template removed. Manual editing is enabled again.</string>
+    <string name="template_locked_click_message">This setting is locked because an active template controls it.</string>
+    <string name="template_reference_date_format">Reference date: %1$s = %2$s</string>
+    <string name="template_locked_summary_format">Locked by template: %1$s</string>
+    <string name="template_locked_item_cycle">cycle</string>
+    <string name="template_locked_item_rules">rules</string>
+    <string name="template_locked_item_start_date">start date</string>
+    <string name="template_locked_item_assignment_mode">assignment mode</string>
+    <string name="template_clear_dialog_title">Disable template?</string>
+    <string name="template_clear_dialog_message">The template will be disabled. Manual editing of cycle, rules, and assignment mode will be re-enabled.</string>
+    <string name="template_clear_dialog_confirm">Disable</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / RULES, CALENDAR & HOME -->
+    <!-- ========================================================= -->
+    <string name="today_label">Today</string>
+    <string name="tomorrow_label">Tomorrow</string>
+    <string name="home_next_7_days_subtitle">Next 7 days overview</string>
+    <string name="rules_section">Rules</string>
+    <string name="skip_saturdays">Skip Saturdays</string>
+    <string name="skip_sundays">Skip Sundays</string>
+    <string name="skip_holidays">Skip non-working days</string>
+    <string name="rules_info_text">Choose whether the cycle should skip Saturdays, Sundays and non-working days.</string>
+    <string name="holiday_country_label">Country for non-working days</string>
+    <string name="holiday_country_hint">Select country</string>
+    <string name="off_day_label">Off</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_month_year">%1$s %2$d</string>
+    <string-array name="week_days_short">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+    <string name="calendar_day_label_placeholder">A</string>
+    <string name="calendar_secondary_label_placeholder">Vac.</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / ASSIGNMENTS, LABELS & DAY EDITOR -->
+    <!-- ========================================================= -->
+    <string name="secondary_labels_title">Secondary Labels</string>
+    <string name="secondary_labels_description">Secondary labels can be freely customized. They are used for additional information (e.g. location or task).</string>
+    <string name="secondary_label_title">Secondary</string>
+    <string name="secondary_override_title">Secondary label</string>
+    <string name="secondary_clear">Clear secondary</string>
+    <string name="secondary_mode_manual_helper">Set values manually per day</string>
+    <string name="secondary_mode_cyclic_helper">Automatically cycles through values</string>
+    <string name="show_assignment_icons_calendar">Show secondary labels in calendar</string>
+    <string name="show_assignment_icons_weekly">Show secondary labels in weekly preview</string>
+    <string name="show_assignment_icons_helper">Show or hide secondary labels in the calendar and the next 7 days preview.</string>
+    <string name="assignment_section_title">Labels</string>
+    <string name="assignment_enable">Enable secondary labels</string>
+    <string name="assignment_mode_helper">Choose how secondary labels are resolved for each day.</string>
+    <string name="assignment_mode_cyclic_overrides">Cyclic + overrides</string>
+    <string name="assignment_mode_manual_only">Manual only</string>
+    <string name="assignment_advance_mode_title">Secondary label cycle advance</string>
+    <string name="assignment_advance_mode_helper">Choose whether the secondary label cycle advances every day or only on working days.</string>
+    <string name="assignment_advance_mode_all_days">Every day</string>
+    <string name="assignment_advance_mode_working_days_only">Working days only</string>
+    <string name="assignment_mode_locked_by_template">Assignment mode is controlled by the active template.</string>
+    <string name="assignment_labels_title">Secondary labels</string>
+    <string name="assignment_labels_description">System labels stay fixed and can only be enabled or disabled. Manual labels can be added, edited, deleted, and are sorted by usage.</string>
+    <string name="assignment_label_type_system">System label</string>
+    <plurals name="assignment_label_type_manual_usage">
+        <item quantity="one">Manual label ? used %1$d time</item>
+        <item quantity="other">Manual label ? used %1$d times</item>
+    </plurals>
+    <string name="assignment_labels_system_section">System labels</string>
+    <string name="assignment_labels_manual_section">My labels</string>
+    <string name="assignment_label_name">Label</string>
+    <string name="assignment_label_color">Color</string>
+    <string name="assignment_label_pick_color">Pick color</string>
+    <string name="my_labels_helper">Add your own labels (e.g. location, project or task).</string>
+    <string name="assignment_system_label_sick">Sick leave</string>
+    <string name="assignment_system_label_vacation">Vacation</string>
+    <string name="assignment_system_label_standby">Standby</string>
+    <string name="assignment_system_label_field">Field work</string>
+    <string name="assignment_system_label_sick_short">Sick</string>
+    <string name="assignment_system_label_vacation_short">Vac.</string>
+    <string name="assignment_system_label_standby_short">Stand.</string>
+    <string name="assignment_system_label_field_short">Field</string>
+    <string name="clear_secondary_label">Clear secondary label</string>
+    <string name="add_label">Add label</string>
+    <string name="edit_label">Edit label</string>
+    <string name="delete_label">Delete label</string>
+    <string name="delete_label_message">Delete "%1$s"?</string>
+    <string name="edit_system_label">Edit system label</string>
+    <string name="assignment_disabled_for_day_editor">Secondary labels are disabled. You can still edit the main cycle override for this day.</string>
+    <string name="clear_cycle_override">Clear cycle override</string>
+    <string name="select_cycle_override">Select cycle override</string>
+    <string name="cycle_override_reset_dialog_title">Reset cycle overrides?</string>
+    <string name="cycle_override_reset_dialog_message">Changing the cycle template will remove existing manual cycle overrides. Secondary labels will remain.</string>
+    <string name="day_summary_title">Active day summary</string>
+    <string name="day_summary_status_value">Status: %1$s</string>
+    <string name="day_summary_secondary_value">Secondary: %1$s</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / STATUS LABELS -->
+    <!-- ========================================================= -->
+    <string name="status_labels_title">Status labels</string>
+    <string name="status_labels_description">Status labels are managed separately from secondary labels. You can enable or disable them and customize their colors.</string>
+    <string name="status_labels_system_section">Status labels</string>
+    <string name="edit_status_label">Edit status label</string>
+    <string name="clear_status">Clear status</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / STATISTICS -->
+    <!-- ========================================================= -->
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_this_month">This month</string>
+    <string name="statistics_this_year">This year</string>
+    <string name="statistics_total_days">Total days: %1$d</string>
+    <string name="more_statistics_title">Statistics</string>
+    <string name="more_statistics_subtitle">View cycle counts for this month and year</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / VALIDATION -->
+    <!-- ========================================================= -->
+    <string name="error_cycle_empty">Enter at least one cycle day</string>
+    <string name="error_cycle_invalid_format_detailed">Invalid format: "%1$s". Use commas, e.g. A, B, C</string>
+    <string name="error_cycle_too_many">Too many items (%1$d). Maximum allowed is %2$d</string>
+    <string name="error_cycle_empty_item">Empty items are not allowed</string>
+    <string name="error_cycle_duplicates">Duplicate values are not allowed</string>
+    <plurals name="error_label_too_long">
+        <item quantity="one">Each cycle label can have up to %1$d character.</item>
+        <item quantity="other">Each cycle label can have up to %1$d characters.</item>
+    </plurals>
+    <string name="error_label_too_long_detailed">Label "%1$s" is too long (max %2$d characters)</string>
+    <string name="error_first_day_not_in_cycle">First day "%1$s" is not in cycle</string>
+    <string name="fix_errors">Please fix input errors</string>
+    <string name="assignment_start_date_hint">Start date (yyyy-MM-dd)</string>
+    <string name="assignment_cycle_hint">Labels (e.g. A,B,C or Route1,Route2)</string>
+    <string name="cycle_day_fallback">Day %1$d</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / NAVIGATION, LINKS & ABOUT -->
+    <!-- ========================================================= -->
+    <string name="display_section">Display</string>
+    <string name="help_title">Help &amp; Guide</string>
+    <string name="help_cycle_logic_title">How the cycle works</string>
+    <string name="help_preview_title">7-day preview</string>
+    <string name="help_getting_started_title">Getting started</string>
+    <string name="help_assignments_title">Secondary labels</string>
+    <string name="help_calendar_title">Calendar</string>
+    <string name="help_widget_title">Widget</string>
+    <string name="help_tips_title">Tips</string>
+    <string name="more_whats_new_title">What’s New</string>
+    <string name="more_whats_new_subtitle">See what changed in the latest version</string>
+    <string name="more_check_updates_title">Check for updates</string>
+    <string name="more_check_updates_subtitle">Open Google Play to check for a newer version</string>
+    <string name="more_contact_title">Contact author</string>
+    <string name="more_contact_subtitle">Send feedback or questions</string>
+    <string name="more_github_title">GitHub</string>
+    <string name="more_github_subtitle">Open project repository</string>
+    <string name="more_report_bug_title">Report a bug</string>
+    <string name="more_report_bug_subtitle">Send feedback or report an issue</string>
+    <string name="more_donate_title">Support development</string>
+    <string name="more_donate_subtitle">Help improve the app</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_more">More</string>
+    <string name="email_subject_contact">%1$s - Feedback</string>
+    <string name="email_subject_bug_report">%1$s - Bug report</string>
+    <string name="email_body_bug_report">Describe the issue:\n\n---\nApp version: %1$s\nDevice: %2$s\nAndroid version: %3$s\n</string>
+    <string name="no_email_app_found">No email app found</string>
+    <string name="unable_to_open_link">Unable to open link</string>
+    <string name="github">GitHub</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / COUNTRIES -->
+    <!-- ========================================================= -->
+    <string name="country_auto_detected_format">%1$s (auto-detected)</string>
+    <string name="country_slovenia">Slovenia</string>
+    <string name="country_austria">Austria</string>
+    <string name="country_croatia">Croatia</string>
+    <string name="country_italy">Italy</string>
+    <string name="country_hungary">Hungary</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / GENERIC UI LABELS -->
+    <!-- ========================================================= -->
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="add_symbol" translatable="false">+</string>
+    <string name="calendar_day_number_placeholder" translatable="false">12</string>
+    <string name="widget_primary_placeholder" translatable="false">A</string>
+    <string name="widget_secondary_placeholder" translatable="false">O1</string>
+    <string name="checkmark_symbol" translatable="false">✓</string>
+
+</resources>

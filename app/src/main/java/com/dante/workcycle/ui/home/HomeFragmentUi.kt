@@ -53,7 +53,7 @@ fun HomeFragment.setupPreviewRecyclerView() {
     }
 }
 
-fun HomeFragment.updateTodayStatus() = Unit
+fun updateTodayStatus() = Unit
 
 fun HomeFragment.revertToSavedState() {
     val cycle = CycleManager.loadCycle(requireContext())
@@ -357,36 +357,6 @@ private fun HomeFragment.getPreviewFirstCycleDay(cycle: List<String>): String {
     )
 }
 
-private fun HomeFragment.getPreviewCycleDayForDate(date: LocalDate): String {
-    val cycle = getPreviewCycle()
-    if (cycle.isEmpty()) return "?"
-
-    val firstDay = getPreviewFirstCycleDay(cycle)
-    val startIndex = cycle.indexOfFirst { it.equals(firstDay, ignoreCase = true) }
-        .takeIf { it >= 0 } ?: 0
-
-    if (isPreviewSkippedOverrideActiveForDate(date)) {
-        return getString(R.string.off_day_label)
-    }
-
-    val startDate = selectedDate
-
-    return if (date == startDate) {
-        cycle[startIndex]
-    } else if (date.isAfter(startDate)) {
-        val stepsForward = countPreviewIncludedDaysForward(
-            fromExclusive = startDate,
-            toInclusive = date
-        )
-        cycle[positiveModulo(startIndex + stepsForward, cycle.size)]
-    } else {
-        val stepsBack = countPreviewIncludedDaysBackward(
-            fromInclusive = date,
-            toExclusive = startDate
-        )
-        cycle[positiveModulo(startIndex - stepsBack, cycle.size)]
-    }
-}
 
 private fun HomeFragment.isPreviewSkippedOverrideActiveForDate(date: LocalDate): Boolean {
     return isPreviewSkippedDay(date)

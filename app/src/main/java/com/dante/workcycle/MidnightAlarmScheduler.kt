@@ -1,5 +1,6 @@
 package com.dante.workcycle.notifications
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -28,11 +29,7 @@ object MidnightAlarmScheduler {
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                         alarmManager.canScheduleExactAlarms() -> {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerAt,
-                        pendingIntent
-                    )
+                    setExactAlarm(alarmManager, triggerAt, pendingIntent)
                 }
 
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
@@ -67,6 +64,19 @@ object MidnightAlarmScheduler {
                 )
             }
         }
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    private fun setExactAlarm(
+        alarmManager: AlarmManager,
+        triggerAt: Long,
+        pendingIntent: PendingIntent
+    ) {
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerAt,
+            pendingIntent
+        )
     }
 
     fun cancel(context: Context) {

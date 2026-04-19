@@ -23,7 +23,7 @@ class HelpSectionAdapter(
             binding.helpArrow.rotation = if (item.isExpanded) 180f else 0f
 
             binding.helpHeader.setOnClickListener {
-                val position = adapterPosition
+                val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     item.isExpanded = !item.isExpanded
                     notifyItemChanged(position)

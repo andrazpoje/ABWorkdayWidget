@@ -10,8 +10,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import kotlin.math.max
-
 fun ComponentActivity.setupDefaultEdgeToEdge() {
     enableEdgeToEdge()
 }
@@ -60,30 +58,6 @@ fun View.applyBottomNavInsetAsPadding() {
             top = initialTop,
             right = initialRight,
             bottom = initialBottom + navigationBars.bottom
-        )
-
-        insets
-    }
-
-    ViewCompat.requestApplyInsets(this)
-}
-
-fun View.applyBottomSystemInsetWithImeAsPadding() {
-    val initialLeft = paddingLeft
-    val initialTop = paddingTop
-    val initialRight = paddingRight
-    val initialBottom = paddingBottom
-
-    ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
-        val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-        val bottomInset = max(navBars.bottom, imeInsets.bottom)
-
-        view.updatePadding(
-            left = initialLeft,
-            top = initialTop,
-            right = initialRight,
-            bottom = initialBottom + bottomInset
         )
 
         insets

@@ -32,40 +32,6 @@ class CycleOverrideRepository(
             .apply()
     }
 
-    fun removeOverride(date: LocalDate) {
-        val json = JSONObject(prefs.getString(KEY_OVERRIDES_JSON, "{}") ?: "{}")
-        json.remove(date.toString())
-
-        prefs.edit()
-            .putString(KEY_OVERRIDES_JSON, json.toString())
-            .apply()
-    }
-
-    fun hasOverride(date: LocalDate): Boolean {
-        return getOverrideLabel(date) != null
-    }
-
-    fun getAll(): Map<LocalDate, String> {
-        val json = JSONObject(prefs.getString(KEY_OVERRIDES_JSON, "{}") ?: "{}")
-        val result = linkedMapOf<LocalDate, String>()
-
-        val keys = json.keys()
-        while (keys.hasNext()) {
-            val key = keys.next()
-            val label = json.optString(key, "").trim()
-
-            if (label.isNotBlank()) {
-                runCatching { LocalDate.parse(key) }
-                    .getOrNull()
-                    ?.let { date ->
-                        result[date] = label
-                    }
-            }
-        }
-
-        return result
-    }
-
     fun hasOverrides(): Boolean {
         val raw = prefs.getString(KEY_OVERRIDES_JSON, null)
         return !raw.isNullOrBlank() && raw != "{}"

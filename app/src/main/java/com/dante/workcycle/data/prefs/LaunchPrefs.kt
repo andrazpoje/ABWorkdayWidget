@@ -1,6 +1,7 @@
 package com.dante.workcycle.data.prefs
 
 import android.content.Context
+import androidx.core.content.edit
 import com.dante.workcycle.BuildConfig
 
 class LaunchPrefs(context: Context) {
@@ -17,7 +18,9 @@ class LaunchPrefs(context: Context) {
     }
 
     fun setOnboardingCompleted(completed: Boolean) {
-        prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).apply()
+        prefs.edit {
+            putBoolean(KEY_ONBOARDING_COMPLETED, completed)
+        }
     }
 
     fun shouldShowWhatsNew(): Boolean {
@@ -26,9 +29,9 @@ class LaunchPrefs(context: Context) {
     }
 
     fun markWhatsNewSeen() {
-        prefs.edit()
-            .putString(KEY_LAST_SEEN_WHATS_NEW_VERSION, BuildConfig.VERSION_NAME)
-            .apply()
+        prefs.edit {
+            putString(KEY_LAST_SEEN_WHATS_NEW_VERSION, BuildConfig.VERSION_NAME)
+        }
     }
 
     fun shouldShowTemplatesHint(): Boolean {
@@ -36,14 +39,8 @@ class LaunchPrefs(context: Context) {
     }
 
     fun markTemplatesHintShown() {
-        prefs.edit().putBoolean("templates_hint_shown", true).apply()
-    }
-
-    fun isFirstLaunch(): Boolean {
-        return prefs.getBoolean("first_launch", true)
-    }
-
-    fun markFirstLaunchDone() {
-        prefs.edit().putBoolean("first_launch", false).apply()
+        prefs.edit {
+            putBoolean("templates_hint_shown", true)
+        }
     }
 }

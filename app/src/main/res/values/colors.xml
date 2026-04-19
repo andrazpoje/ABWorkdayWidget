@@ -3,19 +3,4 @@
 
     <color name="ic_launcher_background">#1976D2</color>
 
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-    <!-- Default cycle colors (Classic theme) -->
-
-    <color name="shiftA">#1976D2</color>
-    <color name="shiftB">#2E7D32</color>
-    <color name="shiftOff">#757575</color>
-
-    <!-- Text color used on colored status card -->
-
-    <color name="statusTextOnCard">#FFFFFFFF</color>
-
-    <color name="scroll_fade_color">#FFFFFFFF</color>
-
 </resources>

@@ -75,4 +75,14 @@
         android:name="com.dante.workcycle.ui.settings.StatusLabelsFragment"
         android:label="@string/status_labels_title" />
 
+    <fragment
+        android:id="@+id/workLogDebugFragment"
+        android:name="com.dante.workcycle.ui.worklog.WorkLogDebugFragment"
+        android:label="@string/work_log_debug_title" />
+
+    <fragment
+        android:id="@+id/workLogDashboardFragment"
+        android:name="com.dante.workcycle.ui.worklog.WorkLogDashboardFragment"
+        android:label="@string/work_log_debug_title" />
+
 </navigation>

@@ -26,8 +26,6 @@ class CalendarAdapter(
     class VH(card: MaterialCardView) : RecyclerView.ViewHolder(card) {
         val dayCard: MaterialCardView = card
         val dayCardFrame: FrameLayout = card.findViewById(R.id.dayCardFrame)
-        val dayContent: View = card.findViewById(R.id.dayContent)
-
         val dayNumber: TextView = card.findViewById(R.id.dayNumber)
         val dayLabel: TextView = card.findViewById(R.id.dayLabel)
 
@@ -143,7 +141,7 @@ class CalendarAdapter(
         holder.dayCard.isFocusable = true
         holder.dayCard.isEnabled = true
         holder.dayCard.setOnClickListener {
-            val position = holder.adapterPosition
+            val position = holder.bindingAdapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 onDayClick(items[position])
             }

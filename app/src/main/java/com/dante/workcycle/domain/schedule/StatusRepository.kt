@@ -28,10 +28,6 @@ class StatusRepository(context: Context) {
         }.apply()
     }
 
-    fun removeStatusLabel(date: LocalDate) {
-        prefs.edit().remove(buildKey(date)).apply()
-    }
-
     private fun buildKey(date: LocalDate): String {
         return "$STATUS_PREFIX$date"
     }

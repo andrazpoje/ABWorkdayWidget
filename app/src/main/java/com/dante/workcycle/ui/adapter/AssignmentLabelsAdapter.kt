@@ -3,6 +3,7 @@ package com.dante.workcycle.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
@@ -39,7 +40,11 @@ class AssignmentLabelsAdapter(
         holder.binding.textMeta.text = if (label.isSystem) {
             context.getString(R.string.assignment_label_type_system)
         } else {
-            context.getString(R.string.assignment_label_type_manual_usage, label.usageCount)
+            context.resources.getQuantityString(
+                R.plurals.assignment_label_type_manual_usage,
+                label.usageCount,
+                label.usageCount
+            )
         }
 
         holder.binding.viewColor.setBackgroundColor(label.color)
@@ -85,7 +90,23 @@ class AssignmentLabelsAdapter(
     }
 
     fun update(newItems: List<AssignmentLabel>) {
+        val oldItems = items
         items = newItems
-        notifyDataSetChanged()
+        DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = oldItems.size
+
+            override fun getNewListSize(): Int = newItems.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldItems[oldItemPosition].name.equals(
+                    newItems[newItemPosition].name,
+                    ignoreCase = true
+                )
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldItems[oldItemPosition] == newItems[newItemPosition]
+            }
+        }).dispatchUpdatesTo(this)
     }
 }

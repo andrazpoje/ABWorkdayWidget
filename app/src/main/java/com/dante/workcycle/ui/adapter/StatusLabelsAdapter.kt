@@ -3,6 +3,7 @@ package com.dante.workcycle.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
 import com.dante.workcycle.data.prefs.StatusLabelsPrefs
@@ -71,7 +72,23 @@ class StatusLabelsAdapter(
     }
 
     fun update(newItems: List<StatusLabel>) {
+        val oldItems = items
         items = newItems
-        notifyDataSetChanged()
+        DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = oldItems.size
+
+            override fun getNewListSize(): Int = newItems.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldItems[oldItemPosition].name.equals(
+                    newItems[newItemPosition].name,
+                    ignoreCase = true
+                )
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldItems[oldItemPosition] == newItems[newItemPosition]
+            }
+        }).dispatchUpdatesTo(this)
     }
 }

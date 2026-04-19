@@ -1,6 +1,5 @@
 package com.dante.workcycle.domain.schedule
 
-import android.content.Context
 import com.dante.workcycle.R
 
 object CyclePresetProvider {
@@ -44,9 +43,4 @@ object CyclePresetProvider {
         )
     )
 
-    fun findByDisplayName(context: Context, displayName: String): CyclePreset? {
-        return getPresets().firstOrNull {
-            context.getString(it.nameRes) == displayName
-        }
-    }
 }

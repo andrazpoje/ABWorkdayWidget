@@ -2,6 +2,7 @@ package com.dante.workcycle.data.prefs
 
 import android.content.Context
 import android.graphics.Color
+import androidx.core.content.edit
 import com.dante.workcycle.R
 import com.dante.workcycle.domain.model.StatusLabel
 import org.json.JSONArray
@@ -43,7 +44,7 @@ class StatusLabelsPrefs(private val context: Context) {
             runCatching { parseLabels(saved) }.getOrDefault(emptyList())
         }
 
-        val base = if (parsed.isEmpty()) defaultSystemLabels else parsed
+        val base = parsed.ifEmpty { defaultSystemLabels }
         val merged = mergeMissingSystemLabels(base)
 
         if (merged != parsed) {
@@ -76,7 +77,9 @@ class StatusLabelsPrefs(private val context: Context) {
             )
         }
 
-        prefs.edit().putString(KEY_LABELS, json.toString()).apply()
+        prefs.edit {
+            putString(KEY_LABELS, json.toString())
+        }
     }
 
     fun getDisplayName(label: StatusLabel): String {
@@ -86,17 +89,6 @@ class StatusLabelsPrefs(private val context: Context) {
             "sick" -> context.getString(R.string.assignment_system_label_sick)
             "vacation" -> context.getString(R.string.assignment_system_label_vacation)
             "standby" -> context.getString(R.string.assignment_system_label_standby)
-            else -> label.name
-        }
-    }
-
-    fun getShortDisplayName(label: StatusLabel): String {
-        if (!label.isSystem) return label.name
-
-        return when (label.iconKey) {
-            "sick" -> context.getString(R.string.assignment_system_label_sick_short)
-            "vacation" -> context.getString(R.string.assignment_system_label_vacation_short)
-            "standby" -> context.getString(R.string.assignment_system_label_standby_short)
             else -> label.name
         }
     }

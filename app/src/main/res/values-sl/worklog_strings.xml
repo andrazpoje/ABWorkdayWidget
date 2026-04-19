@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / NADZORNA PLOŠČA -->
+    <!-- ========================================================= -->
+    <string name="work_log_target">Norma</string>
+    <string name="work_log_balance">Saldo</string>
+
+    <string name="work_log_action_too_soon">Pred naslednjo akcijo počakaj vsaj 1 minuto</string>
+    <string name="work_log_event_clock_out_with_total">Odhod (skupaj %1$s)</string>
+
+    <string name="work_log_state_finished">Zaključeno</string>
+    <string name="work_log_state_finished_detail">Odhod ob %1$s</string>
+
+    <string name="work_log_meal_logged_short">Malica zabeležena</string>
+
+    <string name="work_log_state_working">Na delu</string>
+    <string name="work_log_state_break">Na odmoru</string>
+    <string name="work_log_state_off">Delovni dan ni začet</string>
+    <string name="work_log_state_off_detail">Začni delo za začetek evidence</string>
+
+    <string name="work_log_state_working_detail">Aktivna delovna prijava</string>
+    <string name="work_log_state_break_detail">Odmor je trenutno aktiven</string>
+
+    <string name="work_log_action_start">Začni delo</string>
+    <string name="work_log_action_finish">Zaključi delo</string>
+
+    <string name="work_log_event_clock_in">Prihod</string>
+    <string name="work_log_event_break_start">Začetek odmora</string>
+    <string name="work_log_event_break_end">Nazaj na delo</string>
+    <string name="work_log_event_meal">Malica</string>
+    <string name="work_log_event_note">Opomba</string>
+
+    <string name="work_log_break_started_at">Začetek odmora</string>
+    <string name="work_log_break_duration">Trajanje odmora</string>
+    <string name="work_log_break_action_resume">Nazaj na delo</string>
+    <string name="work_log_break_action_start">Odmor</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / OPOMBE -->
+    <!-- ========================================================= -->
+    <string name="work_log_add_note_title">Dodaj opombo</string>
+    <string name="work_log_add_note_hint">Vnesi opombo</string>
+    <string name="work_log_add_note_save">Shrani opombo</string>
+    <string name="work_log_add_note_empty">Opomba ne sme biti prazna</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / ROČNI UREJEVALNIK -->
+    <!-- ========================================================= -->
+    <string name="work_log_debug_title">Delovni čas</string>
+    <string name="work_log_date">Datum</string>
+    <string name="work_log_start_time">Začetek</string>
+    <string name="work_log_end_time">Konec</string>
+    <string name="work_log_break_minutes">Odmor (minute)</string>
+    <string name="work_log_note">Opomba</string>
+    <string name="work_log_total">Skupaj</string>
+    <string name="work_log_save">Shrani</string>
+    <string name="work_log_delete">Izbriši</string>
+    <string name="work_log_load_today">Danes</string>
+    <string name="work_log_saved">Delovni čas shranjen</string>
+    <string name="work_log_deleted">Delovni čas izbrisan</string>
+    <string name="work_log_invalid_time">Neveljaven zapis časa. Uporabi HH:mm</string>
+    <string name="work_log_total_value">%1$s</string>
+    <string name="work_log_empty_total">—</string>
+    <string name="work_log_select_time">Izberi uro</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / HITRE AKCIJE IN STANJA -->
+    <!-- ========================================================= -->
+    <string name="work_log_now">Zdaj</string>
+
+    <string name="work_log_today_label">Danes</string>
+    <string name="work_log_started_at">Začetek</string>
+    <string name="work_log_start_work">Začni delo</string>
+    <string name="work_log_quick_actions">Hitre akcije</string>
+    <string name="work_log_break">Odmor</string>
+    <string name="work_log_meal">Malica</string>
+    <string name="work_log_note_short">Opomba</string>
+    <string name="work_log_recent_events">Zadnji dogodki</string>
+    <string name="work_log_no_events_today">Danes še ni zabeleženih dogodkov.</string>
+</resources>

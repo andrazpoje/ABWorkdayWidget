@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.4
+
+### ✨ Added
+
+- Added Work Log dashboard for daily work time tracking
+- Added quick actions for Start Work / Finish Work flow
+- Added break handling with active break state and resume flow
+- Added meal logging with single-entry daily protection
+- Added note logging for manual workday notes
+- Added recent events timeline with clearer event history
+- Added break start time and break duration tracking
+- Added daily target hours (8h default) and balance (+ / - hours)
+- Added improved clock-out event summary with total worked time
+- Added one-minute action protection for work start/finish and break actions
+- Added toast feedback when actions are blocked too early
+
+### 🎨 Improved
+
+- Improved Work Log dashboard layout with fixed action area and scrollable recent events list
+- Improved status card UI for clearer working / break / finished states
+- Improved break state visuals with highlighted active break card styling
+- Improved spacing and top layout alignment for a cleaner Material 3 appearance
+- Improved action cards with centered labels and better visual consistency
+- Improved recent events formatting with date + time visibility
+- Improved note events to display actual note content instead of generic label only
+- Improved finished-day summary with clearer “Finished” state and clock-out context
+
+### 🛠 Fixed
+
+- Fixed accidental double-tap issues causing duplicated work events
+- Fixed illogical rapid action sequences in work start/finish flow
+- Fixed break action inconsistencies during active sessions
+- Fixed meal action availability before starting work
+- Fixed meal card alignment after meal logging
+- Fixed excessive top spacing caused by duplicated toolbar handling
+- Fixed outdated hardcoded strings by moving Work Log texts to string resources
+- Fixed multiple old resource warnings and cleaned unused legacy strings
+
+---
+
 ## v2.3
 
 ### ✨ Added

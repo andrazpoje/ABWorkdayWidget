@@ -17,9 +17,7 @@ import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CyclePreset
-import com.dante.workcycle.domain.schedule.CyclePresetProvider
 import com.dante.workcycle.domain.schedule.sanitizeLabel
-import com.dante.workcycle.domain.template.ScheduleTemplate
 import com.dante.workcycle.domain.template.ScheduleTemplateProvider
 import com.dante.workcycle.domain.template.TemplateManager
 import com.dante.workcycle.ui.template.TemplateDropdownAdapter
@@ -28,8 +26,10 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import java.util.Locale
-import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.CycleOverrideRepository
+import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.domain.schedule.CyclePresetProvider
+import com.dante.workcycle.domain.template.ScheduleTemplate
 
 fun HomeFragment.validateCycleInput(): Boolean {
     val raw = cycleDaysEdit.text?.toString().orEmpty().trim()
@@ -143,44 +143,6 @@ private fun HomeFragment.buildTemplateDropdownItems(): List<TemplateDropdownItem
     }
 }
 
-private fun HomeFragment.showClearTemplateDialog() {
-    MaterialAlertDialogBuilder(requireContext())
-        .setTitle(R.string.template_clear_dialog_title)
-        .setMessage(R.string.template_clear_dialog_message)
-        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-            presetDropdown.setText(
-                TemplateManager.getCurrentTemplateDisplayName(requireContext()),
-                false
-            )
-            dialog.dismiss()
-        }
-        .setPositiveButton(R.string.template_clear_dialog_confirm) { dialog, _ ->
-            TemplateManager.clearTemplate(requireContext())
-
-            runWithoutChangeTracking {
-                loadSettings()
-                updateTemplateUiState()
-                clearUnsavedChanges()
-            }
-
-            presetDropdown.setText(
-                TemplateManager.getCurrentTemplateDisplayName(requireContext()),
-                false
-            )
-
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.template_removed_message),
-                Toast.LENGTH_SHORT
-            ).show()
-
-            updateTodayStatus()
-            updateCyclePreview()
-            WidgetRefreshHelper.refresh(requireContext())
-            dialog.dismiss()
-        }
-        .show()
-}
 
 private fun MaterialAutoCompleteTextView.showDropdownIfPossible() {
     val adapterCount = adapter?.count ?: 0
@@ -189,7 +151,7 @@ private fun MaterialAutoCompleteTextView.showDropdownIfPossible() {
     }
 }
 
-private fun HomeFragment.configureAsSelectBox(dropdown: MaterialAutoCompleteTextView) {
+private fun configureAsSelectBox(dropdown: MaterialAutoCompleteTextView) {
     dropdown.keyListener = null
     dropdown.isCursorVisible = false
     dropdown.threshold = 0
@@ -252,20 +214,6 @@ fun HomeFragment.getCurrentCycleInputState(): Pair<List<String>, String> {
     return currentCycle to currentFirstDay
 }
 
-fun HomeFragment.wouldPresetChangeCurrentState(preset: CyclePreset): Boolean {
-    val (currentCycle, currentFirstDay) = getCurrentCycleInputState()
-
-    val normalizedPresetCycle = preset.cycleDaysProvider(requireContext()).map {
-        sanitizeLabel(it, "").take(HomeFragment.MAX_LABEL_LENGTH)
-    }
-
-    val normalizedPresetFirstDay = sanitizeLabel(
-        preset.defaultFirstDayProvider(requireContext()),
-        normalizedPresetCycle.firstOrNull() ?: ""
-    ).take(HomeFragment.MAX_LABEL_LENGTH)
-
-    return currentCycle != normalizedPresetCycle || currentFirstDay != normalizedPresetFirstDay
-}
 
 private fun HomeFragment.applyPresetWithOverrideCheck(preset: CyclePreset) {
     val repository = CycleOverrideRepository(requireContext())

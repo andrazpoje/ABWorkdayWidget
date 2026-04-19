@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / DASHBOARD -->
+    <!-- ========================================================= -->
+    <string name="work_log_target">Target</string>
+    <string name="work_log_balance">Balance</string>
+    <string name="work_log_target_default" translatable="false">8h 00m</string>
+    <string name="work_log_break_option_0" translatable="false">0</string>
+    <string name="work_log_break_option_30" translatable="false">30</string>
+    <string name="work_log_break_option_45" translatable="false">45</string>
+
+    <string name="work_log_action_too_soon">Please wait at least 1 minute before the next action</string>
+    <string name="work_log_event_clock_out_with_total">Departure (total %1$s)</string>
+
+    <string name="work_log_state_finished">Finished</string>
+    <string name="work_log_state_finished_detail">Ended at %1$s</string>
+
+    <string name="work_log_meal_logged_short">Meal logged</string>
+
+    <string name="work_log_state_working">Working</string>
+    <string name="work_log_state_break">On break</string>
+    <string name="work_log_state_off">Workday not started</string>
+    <string name="work_log_state_off_detail">Start work to begin tracking</string>
+
+    <string name="work_log_state_working_detail">Active work session</string>
+    <string name="work_log_state_break_detail">Break is currently active</string>
+
+    <string name="work_log_action_start">Start work</string>
+    <string name="work_log_action_finish">Finish work</string>
+
+    <string name="work_log_event_clock_in">Arrival</string>
+    <string name="work_log_event_break_start">Break started</string>
+    <string name="work_log_event_break_end">Back to work</string>
+    <string name="work_log_event_meal">Meal</string>
+    <string name="work_log_event_note">Note</string>
+
+    <string name="work_log_break_started_at">Break started</string>
+    <string name="work_log_break_duration">Break duration</string>
+    <string name="work_log_break_action_resume">Back to work</string>
+    <string name="work_log_break_action_start">Break</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / NOTES -->
+    <!-- ========================================================= -->
+    <string name="work_log_add_note_title">Add note</string>
+    <string name="work_log_add_note_hint">Enter note</string>
+    <string name="work_log_add_note_save">Save note</string>
+    <string name="work_log_add_note_empty">Note cannot be empty</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / MANUAL EDITOR -->
+    <!-- ========================================================= -->
+    <string name="work_log_debug_title">Work time</string>
+    <string name="work_log_date">Date</string>
+    <string name="work_log_start_time">Start time</string>
+    <string name="work_log_end_time">End time</string>
+    <string name="work_log_break_minutes">Break (minutes)</string>
+    <string name="work_log_note">Note</string>
+    <string name="work_log_total">Total</string>
+    <string name="work_log_save">Save</string>
+    <string name="work_log_delete">Delete</string>
+    <string name="work_log_load_today">Today</string>
+    <string name="work_log_saved">Work log saved</string>
+    <string name="work_log_deleted">Work log deleted</string>
+    <string name="work_log_invalid_time">Invalid time format. Use HH:mm</string>
+    <string name="work_log_total_value">%1$s</string>
+    <string name="work_log_empty_total">—</string>
+    <string name="work_log_select_time">Select time</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG / QUICK ACTIONS & STATES -->
+    <!-- ========================================================= -->
+    <string name="work_log_now">Now</string>
+
+    <string name="work_log_today_label">Today</string>
+    <string name="work_log_started_at">Started at</string>
+    <string name="work_log_start_work">Start work</string>
+    <string name="work_log_quick_actions">Quick actions</string>
+    <string name="work_log_break">Break</string>
+    <string name="work_log_meal">Meal</string>
+    <string name="work_log_note_short">Note</string>
+    <string name="work_log_recent_events">Recent events</string>
+    <string name="work_log_no_events_today">No events recorded today.</string>
+</resources>

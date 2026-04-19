@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================================================= -->
+    <!-- HELP / VSEBINA -->
+    <!-- ========================================================= -->
+    <string name="help_getting_started_content">• Najprej preveri Predloge (Templates) – mogoče že obstaja razpored, ki ti ustreza.\n• Če ne, nastavi začetni datum cikla.\n• Določi oznake cikla (npr. A, B ali Jutranja, Popoldanska, Nočna).\n• Izberi, katera oznaka velja na začetni datum.\n• Nastavi pravila (preskok vikendov ali praznikov po potrebi).\n• Shrani nastavitve.\n• Po želji dodaj widget na domači zaslon.</string>
+
+    <string name="help_cycle_logic_content">• Začetni datum je referenčna točka cikla.\n• Izbrana oznaka velja za ta datum.\n• Vsak naslednji veljaven dan premakne cikel naprej.\n• Preskočeni vikendi ali prazniki ne vplivajo na napredovanje cikla.</string>
+
+    <string name="help_assignments_content">• Assignmenti omogočajo dodatne oznake (npr. O1, dopust, bolniška).\n• Dan lahko urediš v 7-dnevnem pregledu ali koledarju.\n• Assignment lahko prepiše ali dopolni oznako cikla.\n• Prikaz assignmentov lahko vklopiš ali izklopiš v nastavitvah.</string>
+
+    <string name="help_preview_content">• Prikazuje naslednjih 7 dni glede na trenutne nastavitve.\n• Klikni na dan za urejanje assignmenta.\n• Spremembe se prikažejo po shranjevanju.\n• Upošteva pravila cikla in assignmente.</string>
+
+    <string name="help_calendar_content">• Prikazuje mesečni pregled cikla.\n• Vsak dan ima skrajšano oznako (A, B, O1).\n• Klik na dan prikaže podrobnosti.\n• Prikaže kombinacijo cikla in assignmenta.</string>
+
+    <string name="help_widget_content">• Widget prikazuje trenutni cikel na domačem zaslonu.\n• Samodejno se posodablja vsak dan.\n• Videz widgeta lahko prilagodiš v nastavitvah.\n• Uporablja iste podatke kot aplikacija.</string>
+
+    <string name="help_tips_content">• Uporabljaj kratke oznake (bolj pregledno v koledarju).\n• Naj bo cikel enostaven (A/B ali 2–3 izmene).\n• Assignmente uporabi za izjeme (dopust, bolniška).\n• Če kaj ne štima, preveri začetni datum in pravila.</string>
+
+    <!-- ========================================================= -->
+    <!-- HELP / NOVOSTI -->
+    <!-- ========================================================= -->
+    <string name="whats_new_title">Kaj je novega</string>
+    <string name="whats_new_version_format">Verzija %1$s</string>
+    <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
+    <string name="whats_new_content">• Dodan Work Log za dnevno beleženje delovnega časa\n• Dodani hitri gumbi Začni delo / Zaključi delo\n• Dodano beleženje odmora z aktivnim stanjem in vrnitvijo na delo\n• Dodano beleženje malice z dnevno zaščito\n• Dodano beleženje opomb za delovni dan\n• Dodana časovnica zadnjih dogodkov z datumom, uro in boljšo preglednostjo\n• Dodano spremljanje trajanja odmora in začetka odmora\n• Dodana dnevna norma ur in saldo (+ / - ure)\n• Dodana varnejša 1-minutna zaščita za začetek/zaključek dela in odmore\n• Izboljšan Work Log layout, razmiki in statusna kartica\n• Izboljšan prikaz zaključenega dneva in jasnejši prikaz odhoda\n• Popravljeni podvojeni kliki in bolj čista logika dogodkov</string>
+</resources>

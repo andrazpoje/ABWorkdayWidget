@@ -32,8 +32,6 @@ import com.dante.workcycle.data.prefs.LaunchPrefs
 import android.widget.ImageView
 import androidx.core.view.children
 import androidx.appcompat.widget.Toolbar
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -135,14 +133,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.helpFragment -> getString(R.string.help_title)
                 R.id.secondaryLabelsFragment -> getString(R.string.secondary_labels_title)
                 R.id.statusLabelsFragment -> getString(R.string.status_labels_title)
+                R.id.workLogDebugFragment -> getString(R.string.work_log_debug_title)
+                R.id.workLogDashboardFragment -> getString(R.string.work_log_debug_title)
                 else -> ""
             }
-
-            binding.toolbar.title = if (suffix.isEmpty()) {
-                appName
-            } else {
-                suffix
-            }
+            binding.toolbar.title = suffix.ifEmpty { appName }
 
             val showBottomNav = destination.id == R.id.homeFragment ||
                     destination.id == R.id.calendarFragment ||
@@ -199,12 +194,18 @@ class MainActivity : AppCompatActivity() {
 
         menu.findItem(R.id.action_settings)?.isVisible = showActions
         menu.findItem(R.id.action_help)?.isVisible = showActions
+        menu.findItem(R.id.action_settings)?.isVisible = showActions
 
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_work_log -> {
+                safeNavigate(R.id.workLogDashboardFragment)
+                true
+            }
+
             R.id.action_settings -> {
                 safeNavigate(R.id.settingsFragment)
                 true

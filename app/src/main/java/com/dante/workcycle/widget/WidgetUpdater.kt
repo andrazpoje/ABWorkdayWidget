@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import com.dante.workcycle.widget.WorkCycleWidgetProvider
 
 object WidgetUpdater {
 

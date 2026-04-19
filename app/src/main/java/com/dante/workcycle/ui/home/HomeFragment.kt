@@ -49,9 +49,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     var hasUnsavedChanges = false
     var isInitializing = false
-
-    var previewAssignmentDraftDate: LocalDate? = null
-    var previewAssignmentDraftLabel: String? = null
     var draftFirstCycleDayIndex: Int? = null
     lateinit var activityRoot: View
     lateinit var saveBarContainer: View

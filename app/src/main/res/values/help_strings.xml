@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================================================= -->
+    <!-- HELP / CONTENT -->
+    <!-- ========================================================= -->
+    <string name="help_getting_started_content">• First check Templates – there might already be a schedule that fits your needs.\n• If not, set the cycle start date.\n• Define cycle labels (e.g. A, B or Morning, Afternoon, Night).\n• Select which label applies on the start date.\n• Configure rules (skip weekends or holidays if needed).\n• Save your settings.\n• Optionally add the widget to your home screen.</string>
+    <string name="help_cycle_logic_content">• The start date is the reference point of the cycle.\n• The selected label applies to that date.\n• Each valid day advances the cycle.\n• Skipped weekends or holidays do not affect the cycle.</string>
+
+    <string name="help_assignments_content">• Assignments add extra labels (e.g. O1, vacation, sick leave).\n• Edit a day in the 7-day preview or calendar.\n• Assignments can override or complement the cycle.\n• You can toggle assignment visibility in settings.</string>
+
+    <string name="help_preview_content">• Shows the next 7 days based on current settings.\n• Tap a day to edit its assignment.\n• Changes appear after saving.\n• Reflects both cycle rules and assignments.</string>
+
+    <string name="help_calendar_content">• Displays a monthly overview of the cycle.\n• Each day shows a short label (A, B, O1).\n• Tap a day to see details.\n• Combines cycle and assignment data.</string>
+
+    <string name="help_widget_content">• The widget shows your current cycle.\n• It updates automatically every day.\n• You can customize its appearance in settings.\n• Uses the same data as the app.</string>
+
+    <string name="help_tips_content">• Use short labels for better readability.\n• Keep the cycle simple (A/B or 2–3 shifts).\n• Use assignments for exceptions.\n• If something looks wrong, check start date and rules.</string>
+
+    <!-- ========================================================= -->
+    <!-- HELP / WHAT'S NEW -->
+    <!-- ========================================================= -->
+    <string name="whats_new_title">What’s New</string>
+    <string name="whats_new_version_format">Version %1$s</string>
+    <string name="whats_new_view_full_changelog">View full changelog</string>
+    <string name="whats_new_content">• Added Work Log dashboard for daily work time tracking\n• Added quick Start / Finish Work actions\n• Added break tracking with active break state and resume flow\n• Added meal logging with daily protection\n• Added note logging for manual workday notes\n• Added recent events timeline with date, time and better event history\n• Added break duration tracking and break start time\n• Added daily target hours and balance (+ / - hours)\n• Added safer one-minute protection for work start/finish and break actions\n• Improved Work Log layout, spacing and status card design\n• Improved finished-day summary and clearer clock-out information\n• Fixed duplicate action taps and cleaner event handling</string>
+</resources>

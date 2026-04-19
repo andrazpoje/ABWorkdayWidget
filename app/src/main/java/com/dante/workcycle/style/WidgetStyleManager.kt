@@ -67,22 +67,6 @@ object WidgetStyleManager {
         saveCustom(context, KEY_WIDGET_BG_COLOR, color)
     }
 
-    fun updateOffDayColor(context: Context, color: Int) {
-        saveCustom(context, KEY_OFF_DAY_COLOR, color)
-    }
-
-    fun updatePrimaryTextColor(context: Context, color: Int) {
-        saveCustom(context, KEY_PRIMARY_TEXT_COLOR, color)
-    }
-
-    fun updateSecondaryTextColor(context: Context, color: Int) {
-        saveCustom(context, KEY_SECONDARY_TEXT_COLOR, color)
-    }
-
-    fun updateBorderColor(context: Context, color: Int) {
-        saveCustom(context, KEY_BORDER_COLOR, color)
-    }
-
     private fun saveCustom(context: Context, key: String, color: Int) {
         getPrefs(context).edit()
             .putString(KEY_THEME_PRESET, ThemePreset.CUSTOM.storageValue)

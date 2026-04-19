@@ -5,14 +5,11 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,22 +20,16 @@ import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
-import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.ui.adapter.CalendarAdapter
 import com.dante.workcycle.ui.dialogs.EditAssignmentDayBottomSheet
 import com.dante.workcycle.widget.WidgetRefreshHelper
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 import kotlin.math.abs
-import com.dante.workcycle.core.util.DateProvider
 import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
 import com.dante.workcycle.domain.model.CycleMode
 
@@ -341,35 +332,4 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
     }
 
-    private fun showDayDetails(date: LocalDate) {
-        val resolver = DefaultScheduleResolver(requireContext())
-        val label = shortenPrimaryCycleLabel(resolver.resolve(date).effectiveCycleLabel)
-
-        val dateText = date.format(
-            DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.getDefault())
-        )
-
-        val isHoliday = HolidayManager.isHoliday(requireContext(), date)
-
-        val dialog = BottomSheetDialog(requireContext())
-        val parent = requireActivity().findViewById<ViewGroup>(android.R.id.content)
-        val view = LayoutInflater.from(requireContext())
-            .inflate(R.layout.bottom_sheet_day_details, parent, false)
-
-        val title = view.findViewById<TextView>(R.id.dayDetailsTitle)
-        val cycleLabel = view.findViewById<TextView>(R.id.dayDetailsCycleLabel)
-        val holidayCard = view.findViewById<MaterialCardView>(R.id.dayDetailsHolidayCard)
-        val closeButton = view.findViewById<MaterialButton>(R.id.dayDetailsCloseButton)
-
-        title.text = dateText
-        cycleLabel.text = label
-        holidayCard.visibility = if (isHoliday) View.VISIBLE else View.GONE
-
-        closeButton.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.setContentView(view)
-        dialog.show()
-    }
 }

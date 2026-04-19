@@ -115,8 +115,6 @@ object ScheduleTemplateProvider {
         )
     )
 
-    fun getAll(): List<ScheduleTemplate> = templates
-
     fun getById(id: String?): ScheduleTemplate? {
         if (id.isNullOrBlank()) return null
         return templates.firstOrNull { it.id == id }

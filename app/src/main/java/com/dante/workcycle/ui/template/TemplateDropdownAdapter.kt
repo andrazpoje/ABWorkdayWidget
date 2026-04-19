@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import com.dante.workcycle.R
 
 class TemplateDropdownAdapter(
     context: Context,
@@ -39,7 +38,7 @@ class TemplateDropdownAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = LayoutInflater.from(context)
+        val view = convertView ?: LayoutInflater.from(context)
             .inflate(android.R.layout.simple_list_item_1, parent, false)
 
         val text = view.findViewById<TextView>(android.R.id.text1)
@@ -56,7 +55,7 @@ class TemplateDropdownAdapter(
         return when (val item = getItem(position)) {
 
             is TemplateDropdownItem.Header -> {
-                val view = LayoutInflater.from(context)
+                val view = convertView ?: LayoutInflater.from(context)
                     .inflate(android.R.layout.simple_list_item_1, parent, false)
 
                 val text = view.findViewById<TextView>(android.R.id.text1)
@@ -71,7 +70,7 @@ class TemplateDropdownAdapter(
             }
 
             is TemplateDropdownItem.Option -> {
-                val view = LayoutInflater.from(context)
+                val view = convertView ?: LayoutInflater.from(context)
                     .inflate(android.R.layout.simple_list_item_1, parent, false)
 
                 val text = view.findViewById<TextView>(android.R.id.text1)

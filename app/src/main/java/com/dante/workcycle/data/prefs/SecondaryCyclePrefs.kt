@@ -1,6 +1,7 @@
 package com.dante.workcycle.data.prefs
 
 import android.content.Context
+import androidx.core.content.edit
 import com.dante.workcycle.core.util.DateProvider
 import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
 import com.dante.workcycle.domain.model.CycleMode
@@ -15,7 +16,9 @@ class SecondaryCyclePrefs(context: Context) {
     }
 
     fun setEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_ENABLED, enabled).apply()
+        prefs.edit {
+            putBoolean(KEY_ENABLED, enabled)
+        }
     }
 
     fun getMode(): CycleMode {
@@ -24,7 +27,9 @@ class SecondaryCyclePrefs(context: Context) {
     }
 
     fun setMode(mode: CycleMode) {
-        prefs.edit().putString(KEY_MODE, mode.name).apply()
+        prefs.edit {
+            putString(KEY_MODE, mode.name)
+        }
     }
 
     fun getCycle(): List<String> {
@@ -36,7 +41,7 @@ class SecondaryCyclePrefs(context: Context) {
             ?.filter { it.isNotBlank() }
             .orEmpty()
 
-        return if (parsed.isEmpty()) defaultCycle() else parsed
+        return parsed.ifEmpty { defaultCycle() }
     }
 
     fun setCycle(labels: List<String>) {
@@ -44,8 +49,10 @@ class SecondaryCyclePrefs(context: Context) {
             .map { it.trim() }
             .filter { it.isNotBlank() }
 
-        val finalCycle = if (cleaned.isEmpty()) defaultCycle() else cleaned
-        prefs.edit().putString(KEY_CYCLE, finalCycle.joinToString(",")).apply()
+        val finalCycle = cleaned.ifEmpty { defaultCycle() }
+        prefs.edit {
+            putString(KEY_CYCLE, finalCycle.joinToString(","))
+        }
     }
 
     fun getStartDate(): LocalDate {
@@ -59,7 +66,9 @@ class SecondaryCyclePrefs(context: Context) {
     }
 
     fun setStartDate(date: LocalDate) {
-        prefs.edit().putString(KEY_START_DATE, date.toString()).apply()
+        prefs.edit {
+            putString(KEY_START_DATE, date.toString())
+        }
     }
 
     fun getFirstCycleDay(): String {
@@ -73,7 +82,9 @@ class SecondaryCyclePrefs(context: Context) {
     }
 
     fun setFirstCycleDay(label: String) {
-        prefs.edit().putString(KEY_FIRST_CYCLE_DAY, label.trim()).apply()
+        prefs.edit {
+            putString(KEY_FIRST_CYCLE_DAY, label.trim())
+        }
     }
 
     fun getAdvanceMode(): AssignmentCycleAdvanceMode {
@@ -86,7 +97,9 @@ class SecondaryCyclePrefs(context: Context) {
     }
 
     fun setAdvanceMode(mode: AssignmentCycleAdvanceMode) {
-        prefs.edit().putString(KEY_ADVANCE_MODE, mode.name).apply()
+        prefs.edit {
+            putString(KEY_ADVANCE_MODE, mode.name)
+        }
     }
 
     private fun defaultCycle(): List<String> {

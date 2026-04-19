@@ -5,10 +5,11 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -60,9 +61,10 @@ class EditAssignmentDayBottomSheet(
         val context = requireContext()
 
         val dialog = BottomSheetDialog(context, theme)
+        val contentParent = FrameLayout(context)
 
-        val view = LayoutInflater.from(context)
-            .inflate(R.layout.bottom_sheet_edit_secondary_day_v2, null, false)
+        val view = layoutInflater
+            .inflate(R.layout.bottom_sheet_edit_secondary_day_v2, contentParent, false)
 
         dialog.setContentView(view)
 
@@ -213,7 +215,7 @@ class EditAssignmentDayBottomSheet(
 
             val iconRes = getIconRes(label.iconKey)
             if (iconRes != null) {
-                chipIcon = context.getDrawable(iconRes)
+                chipIcon = AppCompatResources.getDrawable(context, iconRes)
                 isChipIconVisible = true
             }
 
@@ -355,7 +357,7 @@ class EditAssignmentDayBottomSheet(
                 null
             }
 
-            refreshCycleUi(view, resolved, cycle)
+            refreshCycleUi(view, resolved)
         }
 
         btnClearCycleOverride.setOnClickListener {
@@ -363,7 +365,7 @@ class EditAssignmentDayBottomSheet(
 
             draftCycleOverrideLabel = null
             cycleChipGroup.clearCheck()
-            refreshCycleUi(view, resolved, cycle)
+            refreshCycleUi(view, resolved)
         }
     }
     private fun applySecondarySectionTitles(view: View) {
@@ -538,8 +540,7 @@ class EditAssignmentDayBottomSheet(
 
     private fun refreshCycleUi(
         view: View,
-        resolved: ResolvedDay,
-        cycle: List<String>
+        resolved: ResolvedDay
     ) {
         bindDaySummaryCard(view, resolved)
         updateCycleActionVisibility(view)
@@ -668,35 +669,6 @@ class EditAssignmentDayBottomSheet(
         }
     }
 
-    private fun updateCycleInfoText(
-        textView: TextView,
-        baseLabel: String,
-        overrideLabel: String?
-    ) {
-        textView.text = if (overrideLabel.isNullOrBlank()) {
-            getString(R.string.bottom_sheet_cycle_info_base_only, baseLabel)
-        } else {
-            getString(R.string.bottom_sheet_cycle_info_with_override, baseLabel, overrideLabel)
-        }
-    }
-
-    private fun updateSecondaryInfoText(
-        textView: TextView,
-        baseLabel: String?,
-        overrideLabel: String?
-    ) {
-        val base = baseLabel?.trim()?.ifBlank { null }
-        val override = overrideLabel?.trim()?.ifBlank { null }
-        val active = override ?: base
-        val display = active ?: getString(R.string.none_label)
-
-        textView.text = if (override != null) {
-            getString(R.string.bottom_sheet_secondary_info_with_override, display)
-        } else {
-            getString(R.string.bottom_sheet_secondary_info, display)
-        }
-    }
-
     private fun createCycleChip(
         label: String,
         cycle: List<String>,
@@ -772,7 +744,7 @@ class EditAssignmentDayBottomSheet(
 
             val iconRes = getIconRes(label.iconKey)
             if (iconRes != null) {
-                chipIcon = context.getDrawable(iconRes)
+                chipIcon = AppCompatResources.getDrawable(context, iconRes)
                 chipIconTint = ColorStateList.valueOf(textColor)
                 isChipIconVisible = true
             } else {

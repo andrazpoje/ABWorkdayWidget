@@ -13,11 +13,6 @@ object AppPrefs {
     const val KEY_START_YEAR = "startYear"
     const val KEY_START_MONTH = "startMonth"
     const val KEY_START_DAY = "startDay"
-    const val KEY_START_IS_A = "startIsA"
-    const val KEY_LABEL_A = "labelA"
-    const val KEY_LABEL_B = "labelB"
-    const val KEY_CYCLE_SHIFT = "cycleShift"
-
     // cycle configuration
     const val KEY_FIRST_CYCLE_DAY = "firstCycleDay"
 

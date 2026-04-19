@@ -38,8 +38,6 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
 import androidx.core.view.isVisible
-import androidx.core.widget.NestedScrollView
-
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     companion object {
@@ -399,18 +397,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun updateScrollHint(
-        scrollView: NestedScrollView,
-        currentScrollY: Int = scrollView.scrollY
-    ) {
-        val child = scrollView.getChildAt(0) ?: run {
-            binding.viewBottomScrollHint.isVisible = false
-            return
-        }
-
-        val remaining = child.bottom - (scrollView.height + currentScrollY)
-        binding.viewBottomScrollHint.isVisible = remaining > 24
-    }
     private fun setupListeners() {
         val secondaryPrefs = SecondaryCyclePrefs(requireContext())
 

@@ -149,7 +149,7 @@
                     android:id="@+id/textStatusTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Status"
+                    android:text="@string/status_labels_title"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -167,7 +167,7 @@
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Počisti status" />
+                    android:text="@string/clear_status" />
             </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider

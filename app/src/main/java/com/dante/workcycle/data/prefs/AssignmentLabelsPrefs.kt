@@ -2,6 +2,7 @@ package com.dante.workcycle.data.prefs
 
 import android.content.Context
 import android.graphics.Color
+import androidx.core.content.edit
 import com.dante.workcycle.domain.model.AssignmentLabel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -52,7 +53,7 @@ class AssignmentLabelsPrefs(private val context: Context) {
             runCatching { parseLabels(saved) }.getOrDefault(emptyList())
         }
 
-        val base = if (parsed.isEmpty()) defaultLabels else parsed
+        val base = parsed.ifEmpty { defaultLabels }
         val merged = mergeMissingSystemLabels(base)
         val sorted = sortLabels(merged)
 
@@ -83,7 +84,9 @@ class AssignmentLabelsPrefs(private val context: Context) {
             )
         }
 
-        prefs.edit().putString(KEY_LABELS, json.toString()).apply()
+        prefs.edit {
+            putString(KEY_LABELS, json.toString())
+        }
     }
 
     fun addLabel(label: AssignmentLabel) {

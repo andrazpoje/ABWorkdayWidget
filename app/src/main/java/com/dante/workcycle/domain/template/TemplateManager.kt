@@ -34,23 +34,6 @@ object TemplateManager {
         return getActiveTemplate(context) != null
     }
 
-    fun isGeneralTemplate(context: Context): Boolean {
-        return when (getActiveTemplate(context)?.id) {
-            ScheduleTemplateProvider.TEMPLATE_AB,
-            ScheduleTemplateProvider.TEMPLATE_TWO_SHIFT,
-            ScheduleTemplateProvider.TEMPLATE_THREE_SHIFT -> true
-
-            else -> false
-        }
-    }
-
-    fun isProfessionalTemplate(context: Context): Boolean {
-        return when (getActiveTemplate(context)?.id) {
-            ScheduleTemplateProvider.TEMPLATE_POSTA_SLOVENIJE_AB -> true
-            else -> false
-        }
-    }
-
     fun isCycleEditingLocked(context: Context): Boolean {
         return getActiveTemplate(context)?.locksCycleEditing == true
     }
@@ -73,28 +56,6 @@ object TemplateManager {
 
     fun isAssignmentModeEditingLocked(context: Context): Boolean {
         return getAssignmentConfig(context)?.lockAssignmentModeEditing == true
-    }
-
-    fun isAssignmentPrefixRulesLocked(context: Context): Boolean {
-        return getAssignmentConfig(context)?.lockAssignmentPrefixRules == true
-    }
-
-    fun getAllowedAssignmentPrefixes(context: Context): List<String> {
-        return getAssignmentConfig(context)?.allowedPrefixes.orEmpty()
-    }
-
-    fun getStoredAllowedAssignmentPrefixes(context: Context): List<String> {
-        return context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-            .getString(KEY_ASSIGNMENT_ALLOWED_PREFIXES, null)
-            .orEmpty()
-            .split(",")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-    }
-
-    fun reapplyActiveTemplate(context: Context) {
-        val activeTemplate = getActiveTemplate(context) ?: return
-        applyTemplate(context, activeTemplate.id)
     }
 
     fun applyTemplate(context: Context, templateId: String) {

@@ -4,20 +4,18 @@ import android.app.Dialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.DialogFragment
 import com.dante.workcycle.R
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textview.MaterialTextView
 
 class ColorPickerDialog(
     private val titleText: String? = null,
-    private val initialColor: Int? = null,
+    initialColor: Int? = null,
     private val onColorSelected: (Int) -> Unit
 ) : DialogFragment() {
 
@@ -25,7 +23,7 @@ class ColorPickerDialog(
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_color_picker, null, false)
+        val view = layoutInflater.inflate(R.layout.dialog_color_picker, null, false)
 
         val titleView = view.findViewById<MaterialTextView>(R.id.colorPickerTitle)
         val previewCard = view.findViewById<MaterialCardView>(R.id.selectedColorPreview)
@@ -37,11 +35,11 @@ class ColorPickerDialog(
         val rows = COLOR_PALETTE.chunked(PALETTE_COLUMNS)
 
         rows.forEach { rowColors ->
-            val rowView = LayoutInflater.from(context)
+            val rowView = layoutInflater
                 .inflate(R.layout.item_color_picker_row, paletteContainer, false) as ViewGroup
 
             rowColors.forEach { color ->
-                val swatch = LayoutInflater.from(context)
+                val swatch = layoutInflater
                     .inflate(R.layout.item_color_swatch, rowView, false) as MaterialCardView
 
                 bindSwatch(
