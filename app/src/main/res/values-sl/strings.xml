@@ -18,4 +18,14 @@
     <string name="close">Zapri</string>
     <string name="revert">Povrni</string>
     <string name="reverted">Spremembe povrnjene</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG WIDGET -->
+    <!-- ========================================================= -->
+    <string name="work_log_widget_label">Evidenca dela</string>
+    <string name="work_log_widget_title">Evidenca dela</string>
+    <string name="work_log_widget_status_placeholder">Ni začeto</string>
+    <string name="work_log_widget_primary_placeholder">Odpri evidenco dela</string>
+    <string name="work_log_widget_secondary_placeholder">Tapni za današnji pregled</string>
+    <string name="work_log_widget_tertiary_placeholder">Čakanje na podatke v živo</string>
 </resources>

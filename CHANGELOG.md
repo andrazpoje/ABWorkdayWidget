@@ -4,6 +4,56 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.5
+
+### ✨ Added
+
+- Added dedicated Work Log settings section for work rules configuration
+- Added configurable daily target hours (daily work norm)
+- Added configurable default break duration
+- Added overtime tracking ON/OFF toggle
+- Added expected start time per primary cycle label
+- Added expected end time per primary cycle label
+- Added per-cycle time picker configuration for start and end expectations
+- Added session snapshot system for active work sessions (cycle label + expected start/end are locked during active work)
+- Added compact deviation display for start/end time comparison with business meaning
+- Added support for overnight and night-shift deviation handling across midnight
+- Added improved Work Log dashboard header showing active cycle label with date
+- Added slider-based primary action flow for Start / Finish / End Break actions
+
+### 🎨 Improved
+
+- Improved Work Log dashboard UX by replacing button-based primary actions with slider confirmation
+- Improved dashboard clarity by hiding secondary actions before work starts
+- Improved active session state visibility with cleaner status-first layout
+- Improved compact display of start/end deviation without adding large extra cards
+- Improved business logic for deviation colors and labels (Late start, Early finish, Overtime, etc.)
+- Improved expected time handling for multi-shift and night-shift workflows
+- Improved consistency of placeholders and dashboard state rendering
+- Improved accessibility and haptic behavior for slider interactions
+- Improved Slovenian and English translations for Work Log dashboard, widget, and notifications
+
+### 🛠 Fixed
+
+- Fixed slider staying disabled after finishing work due to lock-expiry UI refresh issue
+- Fixed incorrect primary cycle source in Expected Start settings (O1–O5 issue from secondary cycle prefs)
+- Fixed incorrect deviation calculation for night shifts showing absurd values like +1406 min
+- Fixed overnight expected end handling for shifts crossing midnight
+- Fixed notification permission safety for Android 13+ POST_NOTIFICATIONS flow
+- Fixed safer notification update handling with SecurityException guard
+- Fixed stale legacy resources and removed old unused dashboard/button leftovers
+- Fixed obsolete Work Log header adapter and deprecated primary-button code paths
+
+### 🧹 Cleanup
+
+- Removed old 1-minute action guard logic (replaced by slider confirmation flow)
+- Removed obsolete primary action button flow and related dead code
+- Removed unused Work Log resources, strings, and old dashboard layout leftovers
+- Cleaned Work Log string resources and normalized placeholders
+- Cleaned old legacy UI remnants from previous button-based dashboard versions
+
+---
+
 ## v2.4
 
 ### ✨ Added

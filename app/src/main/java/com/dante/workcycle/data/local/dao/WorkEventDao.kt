@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.dante.workcycle.data.local.entity.WorkEventEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -19,6 +20,9 @@ interface WorkEventDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(event: WorkEventEntity): Long
+
+    @Update
+    suspend fun update(event: WorkEventEntity)
 
     @Query("DELETE FROM work_events WHERE id = :id")
     suspend fun deleteById(id: Long)

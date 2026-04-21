@@ -1,11 +1,16 @@
 package com.dante.workcycle.ui.worklog
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -14,11 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
 import com.dante.workcycle.data.repository.RepositoryProvider
-import com.google.android.material.button.MaterialButton
+import com.dante.workcycle.ui.components.SlideToConfirmView
 import com.google.android.material.card.MaterialCardView
-import kotlinx.coroutines.launch
-import androidx.core.content.ContextCompat
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 
 class WorkLogDashboardFragment :
     Fragment(R.layout.fragment_work_log_dashboard) {
@@ -32,12 +37,28 @@ class WorkLogDashboardFragment :
     private lateinit var textStartedAt: TextView
     private lateinit var textWorkedToday: TextView
     private lateinit var textBreakAction: TextView
+    private lateinit var textExpectedStart: TextView
+    private lateinit var textExpectedEnd: TextView
+    private lateinit var textStartDeviation: TextView
+    private lateinit var textEndDeviation: TextView
+    private lateinit var groupStartedAt: View
+    private lateinit var groupWorkedToday: View
+    private lateinit var groupBreakInfo: View
+    private lateinit var groupExpectedTimes: View
+    private lateinit var groupExpectedStart: View
+    private lateinit var groupExpectedEnd: View
+    private lateinit var spacerExpectedTimes: View
+    private lateinit var groupTargetAndBalance: View
+    private lateinit var groupTarget: View
+    private lateinit var groupBalance: View
+    private lateinit var spacerTargetBalance: View
+    private lateinit var groupSecondaryActions: View
 
-    private lateinit var btnPrimaryAction: MaterialButton
+    private lateinit var slidePrimaryAction: SlideToConfirmView
 
     private lateinit var cardActionBreak: MaterialCardView
-    private lateinit var cardActionMeal: MaterialCardView
     private lateinit var cardActionNote: MaterialCardView
+    private lateinit var btnMealAction: com.google.android.material.button.MaterialButton
 
     private lateinit var textRecentEventsEmpty: TextView
     private lateinit var recyclerRecentEvents: RecyclerView
@@ -47,11 +68,26 @@ class WorkLogDashboardFragment :
     private lateinit var textBreakStartedAt: TextView
     private lateinit var textBreakDuration: TextView
 
-    private lateinit var textMealAction: TextView
-
     private lateinit var textTargetWork: TextView
     private lateinit var textBalance: TextView
 
+    private var latestUiState: WorkLogDashboardUiState = WorkLogDashboardUiState()
+    private var hasHandledNotificationPermissionPromptThisSession = false
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            hasHandledNotificationPermissionPromptThisSession = true
+
+            if (!granted) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.work_log_notification_permission_denied_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            viewModel.onSliderAction()
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,40 +116,58 @@ class WorkLogDashboardFragment :
         textStartedAt = view.findViewById(R.id.textStartedAt)
         textWorkedToday = view.findViewById(R.id.textWorkedToday)
         textBreakAction = view.findViewById(R.id.textBreakAction)
+        textExpectedStart = view.findViewById(R.id.textExpectedStart)
+        textExpectedEnd = view.findViewById(R.id.textExpectedEnd)
+        textStartDeviation = view.findViewById(R.id.textStartDeviation)
+        textEndDeviation = view.findViewById(R.id.textEndDeviation)
+        groupStartedAt = view.findViewById(R.id.groupStartedAt)
+        groupWorkedToday = view.findViewById(R.id.groupWorkedToday)
+        groupBreakInfo = view.findViewById(R.id.groupBreakInfo)
+        groupExpectedTimes = view.findViewById(R.id.groupExpectedTimes)
+        groupExpectedStart = view.findViewById(R.id.groupExpectedStart)
+        groupExpectedEnd = view.findViewById(R.id.groupExpectedEnd)
+        spacerExpectedTimes = view.findViewById(R.id.spacerExpectedTimes)
+        groupTargetAndBalance = view.findViewById(R.id.groupTargetAndBalance)
+        groupTarget = view.findViewById(R.id.groupTarget)
+        groupBalance = view.findViewById(R.id.groupBalance)
+        spacerTargetBalance = view.findViewById(R.id.spacerTargetBalance)
+        groupSecondaryActions = view.findViewById(R.id.groupSecondaryActions)
 
-        btnPrimaryAction = view.findViewById(R.id.btnPrimaryAction)
+        slidePrimaryAction = view.findViewById(R.id.slidePrimaryAction)
 
         cardActionBreak = view.findViewById(R.id.cardActionBreak)
-        cardActionMeal = view.findViewById(R.id.cardActionMeal)
         cardActionNote = view.findViewById(R.id.cardActionNote)
+        btnMealAction = view.findViewById(R.id.btnMealAction)
 
         textRecentEventsEmpty = view.findViewById(R.id.textRecentEventsEmpty)
         recyclerRecentEvents = view.findViewById(R.id.recyclerRecentEvents)
 
         textBreakStartedAt = view.findViewById(R.id.textBreakStartedAt)
         textBreakDuration = view.findViewById(R.id.textBreakDuration)
-        textMealAction = view.findViewById(R.id.textMealAction)
 
         textTargetWork = view.findViewById(R.id.textTargetWork)
         textBalance = view.findViewById(R.id.textBalance)
     }
 
     private fun setupRecyclerView() {
-        eventAdapter = WorkEventAdapter()
+        eventAdapter = WorkEventAdapter { item ->
+            showEditEventBottomSheet(item.event)
+        }
         recyclerRecentEvents.layoutManager = LinearLayoutManager(requireContext())
         recyclerRecentEvents.adapter = eventAdapter
+        recyclerRecentEvents.isNestedScrollingEnabled = false
     }
 
     private fun setupActions() {
-        btnPrimaryAction.setOnClickListener {
-            viewModel.onPrimaryAction()
+        slidePrimaryAction.setOnSlideCompleteListener {
+            handleSliderAction()
         }
 
         cardActionBreak.setOnClickListener {
             viewModel.onBreakAction()
         }
 
-        cardActionMeal.setOnClickListener {
+        btnMealAction.setOnClickListener {
             viewModel.onMealAction()
         }
 
@@ -125,27 +179,54 @@ class WorkLogDashboardFragment :
     private fun observeUi() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { state ->
+                latestUiState = state
                 textTodayDate.text = state.todayText
                 textWorkState.text = state.stateText
                 textWorkStateDetail.text = state.stateDetailText
                 textStartedAt.text = state.startedAtText
                 textWorkedToday.text = state.workedTodayText
+                textExpectedStart.text = state.expectedStartText
+                textExpectedEnd.text = state.expectedEndText
+                textStartDeviation.text = state.startDeviationText
+                textEndDeviation.text = state.endDeviationText
                 textTargetWork.text = state.targetWorkText
                 textBalance.text = state.balanceText
                 textBreakStartedAt.text = state.breakStartedAtText
                 textBreakDuration.text = state.breakDurationText
                 textBreakAction.text = state.breakActionText
-                textMealAction.text = state.mealActionText
-                btnPrimaryAction.text = state.primaryButtonText
+                btnMealAction.text = state.mealActionText
+
+                slidePrimaryAction.setLabelText(state.sliderActionText)
+                slidePrimaryAction.setLeadingIcon(state.sliderIconRes)
+                slidePrimaryAction.setHandleIcon(R.drawable.ic_arrow_forward_24)
+                slidePrimaryAction.setSlideEnabled(state.sliderEnabled)
+
+                groupStartedAt.isVisible = state.showStartedAt
+                groupWorkedToday.isVisible = state.showWorkedToday
+                groupBreakInfo.isVisible = state.showBreakInfo
+                groupExpectedTimes.isVisible = state.showExpectedStart || state.showExpectedEnd
+                groupExpectedStart.isVisible = state.showExpectedStart
+                groupExpectedEnd.isVisible = state.showExpectedEnd
+                spacerExpectedTimes.isVisible = state.showExpectedStart && state.showExpectedEnd
+                groupTargetAndBalance.isVisible = state.showTarget || state.showBalance
+                groupTarget.isVisible = state.showTarget
+                groupBalance.isVisible = state.showBalance
+                spacerTargetBalance.isVisible = state.showTarget && state.showBalance
+                groupSecondaryActions.isVisible = state.showSecondaryActions
+                cardActionBreak.isVisible = state.showBreakActionButton
 
                 cardActionBreak.alpha = if (state.breakButtonEnabled) 1f else 0.45f
                 cardActionBreak.isEnabled = state.breakButtonEnabled
 
-                cardActionMeal.alpha = if (state.mealButtonEnabled) 1f else 0.45f
-                cardActionMeal.isEnabled = state.mealButtonEnabled
+                btnMealAction.alpha = if (state.mealButtonEnabled) 1f else 0.6f
+                btnMealAction.isEnabled = state.mealButtonEnabled
+
+                textStartDeviation.isVisible = state.showStartDeviation
+                textEndDeviation.isVisible = state.showEndDeviation
+                applyDeviationTone(textStartDeviation, state.startDeviationTone)
+                applyDeviationTone(textEndDeviation, state.endDeviationTone)
 
                 applyStatusCardStyle(isOnBreak = state.isOnBreak)
-
                 renderRecentEvents(state.recentEvents)
 
                 state.message?.let { message ->
@@ -154,6 +235,51 @@ class WorkLogDashboardFragment :
                 }
             }
         }
+    }
+
+    private fun handleSliderAction() {
+        if (latestUiState.sliderAction != WorkLogSliderAction.START_WORK) {
+            viewModel.onSliderAction()
+            return
+        }
+
+        if (!shouldRequestNotificationPermissionForStartWork()) {
+            viewModel.onSliderAction()
+            return
+        }
+
+        if (hasHandledNotificationPermissionPromptThisSession) {
+            viewModel.onSliderAction()
+            return
+        }
+
+        showNotificationPermissionExplainer()
+    }
+
+    private fun shouldRequestNotificationPermissionForStartWork(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return false
+        }
+
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun showNotificationPermissionExplainer() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.work_log_notification_permission_title))
+            .setMessage(getString(R.string.work_log_notification_permission_message))
+            .setPositiveButton(getString(R.string.work_log_notification_permission_positive)) { _, _ ->
+                hasHandledNotificationPermissionPromptThisSession = true
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            .setNegativeButton(getString(R.string.work_log_notification_permission_negative)) { _, _ ->
+                hasHandledNotificationPermissionPromptThisSession = true
+                viewModel.onSliderAction()
+            }
+            .show()
     }
 
     private fun applyStatusCardStyle(isOnBreak: Boolean) {
@@ -190,11 +316,32 @@ class WorkLogDashboardFragment :
         }
     }
 
-    private fun renderRecentEvents(events: List<String>) {
+    private fun applyDeviationTone(textView: TextView, tone: WorkLogDeviationTone) {
+        val colorAttr = when (tone) {
+            WorkLogDeviationTone.DEFAULT -> com.google.android.material.R.attr.colorOnSurfaceVariant
+            WorkLogDeviationTone.ACCENT -> com.google.android.material.R.attr.colorPrimary
+            WorkLogDeviationTone.ERROR -> com.google.android.material.R.attr.colorError
+        }
+
+        textView.setTextColor(
+            MaterialColors.getColor(
+                textView,
+                colorAttr
+            )
+        )
+    }
+
+    private fun renderRecentEvents(events: List<WorkEventListItem>) {
         val isEmpty = events.isEmpty()
         textRecentEventsEmpty.isVisible = isEmpty
         recyclerRecentEvents.isVisible = !isEmpty
         eventAdapter.submitList(events)
+    }
+
+    private fun showEditEventBottomSheet(event: com.dante.workcycle.domain.model.WorkEvent) {
+        EditWorkLogEventBottomSheet(
+            event = event
+        ).show(childFragmentManager, "edit_work_log_event")
     }
 
     private fun showAddNoteDialog() {

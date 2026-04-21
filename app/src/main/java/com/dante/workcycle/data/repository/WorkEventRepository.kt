@@ -26,6 +26,10 @@ class WorkEventRepository(
         return dao.insert(event.toEntity())
     }
 
+    suspend fun update(event: WorkEvent) {
+        dao.update(event.toEntity())
+    }
+
     suspend fun deleteById(id: Long) {
         dao.deleteById(id)
     }

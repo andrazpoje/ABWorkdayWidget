@@ -7,11 +7,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
 
-class WorkEventAdapter : RecyclerView.Adapter<WorkEventAdapter.EventViewHolder>() {
+class WorkEventAdapter(
+    private val onItemClick: (WorkEventListItem) -> Unit
+) : RecyclerView.Adapter<WorkEventAdapter.EventViewHolder>() {
 
-    private var items: List<String> = emptyList()
+    private var items: List<WorkEventListItem> = emptyList()
 
-    fun submitList(newItems: List<String>) {
+    fun submitList(newItems: List<WorkEventListItem>) {
         val oldItems = items
         items = newItems
         DiffUtil.calculateDiff(object : DiffUtil.Callback() {
@@ -32,7 +34,7 @@ class WorkEventAdapter : RecyclerView.Adapter<WorkEventAdapter.EventViewHolder>(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_work_event, parent, false) as TextView
-        return EventViewHolder(view)
+        return EventViewHolder(view, onItemClick)
     }
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
@@ -42,11 +44,15 @@ class WorkEventAdapter : RecyclerView.Adapter<WorkEventAdapter.EventViewHolder>(
     override fun getItemCount(): Int = items.size
 
     class EventViewHolder(
-        private val textView: TextView
+        private val textView: TextView,
+        private val onItemClick: (WorkEventListItem) -> Unit
     ) : RecyclerView.ViewHolder(textView) {
 
-        fun bind(text: String) {
-            textView.text = text
+        fun bind(item: WorkEventListItem) {
+            textView.text = item.text
+            textView.setOnClickListener {
+                onItemClick(item)
+            }
         }
     }
 }

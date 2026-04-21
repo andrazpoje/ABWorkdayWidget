@@ -18,4 +18,14 @@
     <string name="close">Close</string>
     <string name="revert">Revert</string>
     <string name="reverted">Changes reverted</string>
+
+    <!-- ========================================================= -->
+    <!-- WORK LOG WIDGET -->
+    <!-- ========================================================= -->
+    <string name="work_log_widget_label">Work Log</string>
+    <string name="work_log_widget_title">Work Log</string>
+    <string name="work_log_widget_status_placeholder">Not started</string>
+    <string name="work_log_widget_primary_placeholder">Open Work Log</string>
+    <string name="work_log_widget_secondary_placeholder">Tap to view today</string>
+    <string name="work_log_widget_tertiary_placeholder">Waiting for live data</string>
 </resources>

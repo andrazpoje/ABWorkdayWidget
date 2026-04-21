@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dante.workcycle.R
 import com.dante.workcycle.data.repository.RepositoryProvider
+import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -121,6 +122,7 @@ class WorkLogDebugFragment : Fragment(R.layout.fragment_work_log_debug) {
                     ).show()
                 },
                 onSaved = {
+                    WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.work_log_saved),
@@ -132,6 +134,7 @@ class WorkLogDebugFragment : Fragment(R.layout.fragment_work_log_debug) {
 
         btnDelete.setOnClickListener {
             viewModel.delete {
+                WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.work_log_deleted),

@@ -10,7 +10,6 @@
     <string name="work_log_break_option_30" translatable="false">30</string>
     <string name="work_log_break_option_45" translatable="false">45</string>
 
-    <string name="work_log_action_too_soon">Pred naslednjo akcijo počakaj vsaj 1 minuto</string>
     <string name="work_log_event_clock_out_with_total">Odhod (skupaj %1$s)</string>
 
     <string name="work_log_state_finished">Zaključeno</string>
@@ -25,11 +24,22 @@
 
     <string name="work_log_state_working_detail">Aktivna delovna prijava</string>
     <string name="work_log_state_break_detail">Odmor je trenutno aktiven</string>
+    <string name="work_log_date_with_cycle_label">%1$s · %2$s</string>
+    <string name="work_log_deviation_on_time">Točno</string>
+    <string name="work_log_deviation_late_start">Zamuda %1$s</string>
+    <string name="work_log_deviation_early_start">Zgodnji prihod %1$s</string>
+    <string name="work_log_deviation_early_finish_label">Prezgodnji odhod %1$s</string>
+    <string name="work_log_deviation_overtime">Nadura %1$s</string>
+    <string name="work_log_deviation_extended_work">Daljše delo %1$s</string>
+    <string name="work_log_deviation_actual_with_meaning">%1$s · %2$s</string>
+    <string name="work_log_deviation_minutes_format">%1$s%2$d min</string>
 
-    <string name="work_log_action_start">Začni delo</string>
-    <string name="work_log_action_finish">Zaključi delo</string>
+    <string name="work_log_slide_start">Povleci za začetek dela</string>
+    <string name="work_log_slide_finish">Povleci za zaključek dela</string>
+    <string name="work_log_slide_end_break">Povleci za konec odmora</string>
 
     <string name="work_log_event_clock_in">Prihod</string>
+    <string name="work_log_event_clock_out_label">Odhod</string>
     <string name="work_log_event_break_start">Začetek odmora</string>
     <string name="work_log_event_break_end">Nazaj na delo</string>
     <string name="work_log_event_meal">Malica</string>
@@ -37,7 +47,6 @@
 
     <string name="work_log_break_started_at">Začetek odmora</string>
     <string name="work_log_break_duration">Trajanje odmora</string>
-    <string name="work_log_break_action_resume">Nazaj na delo</string>
     <string name="work_log_break_action_start">Odmor</string>
 
     <!-- ========================================================= -->
@@ -73,13 +82,87 @@
     <!-- ========================================================= -->
     <string name="work_log_now">Zdaj</string>
 
-    <string name="work_log_today_label">Danes</string>
     <string name="work_log_started_at">Začetek</string>
-    <string name="work_log_start_work">Začni delo</string>
-    <string name="work_log_quick_actions">Hitre akcije</string>
+    <string name="work_log_expected_start">Pričakovan začetek</string>
+    <string name="work_log_expected_end">Pričakovan konec</string>
     <string name="work_log_break">Odmor</string>
     <string name="work_log_meal">Malica</string>
     <string name="work_log_note_short">Opomba</string>
     <string name="work_log_recent_events">Zadnji dogodki</string>
     <string name="work_log_no_events_today">Danes še ni zabeleženih dogodkov.</string>
+    <string name="work_log_widget_status_not_started">Ni začeto</string>
+    <string name="work_log_widget_no_session_today">Danes ni delovne seje</string>
+    <string name="work_log_widget_tap_to_open">Tapni za odprtje evidence dela</string>
+    <string name="work_log_widget_started_at_value">Začetek ob %1$s</string>
+    <string name="work_log_widget_break_started_value">Odmor od %1$s</string>
+    <string name="work_log_widget_finished_at_value">Zaključeno ob %1$s</string>
+    <string name="work_log_widget_worked_today_value">Danes opravljeno %1$s</string>
+    <string name="work_log_widget_break_value">Odmor %1$s</string>
+    <string name="work_log_widget_balance_value">Saldo %1$s</string>
+    <string name="work_log_notification_title">Evidenca dela</string>
+    <string name="work_log_notification_started_at">Začetek: %1$s</string>
+    <string name="work_log_notification_worked_today">Danes opravljeno: %1$s</string>
+    <string name="work_log_notification_break">Odmor: %1$s</string>
+    <string name="work_log_notification_permission_title">Dovoli obvestila za aktivno delo?</string>
+    <string name="work_log_notification_permission_message">WorkCycle lahko med delom ali odmorom prikaže trajno obvestilo, da je trenutna seja vedno vidna. Delo lahko vseeno začneš tudi brez dovoljenja za obvestila.</string>
+    <string name="work_log_notification_permission_positive">Dovoli obvestila</string>
+    <string name="work_log_notification_permission_negative">Nadaljuj brez</string>
+    <string name="work_log_notification_permission_denied_message">Obvestila za aktivno delo so izklopljena, dokler ne omogočiš dovoljenja za obvestila.</string>
+    <string name="work_log_edit_event_title">Uredi %1$s</string>
+    <string name="work_log_edit_event_summary">Posodobi datum in uro za %1$s.</string>
+    <string name="work_log_edit_event_date_label">Datum</string>
+    <string name="work_log_edit_event_time_label">Ura</string>
+    <string name="work_log_edit_event_change_date">Spremeni datum</string>
+    <string name="work_log_edit_event_change_time">Spremeni uro</string>
+    <string name="work_log_edit_event_saved">Dogodek evidence dela je posodobljen</string>
+    <string name="work_log_edit_validation_clock_in">Ta sprememba bi začetek dela postavila v že aktivno delovno sejo.</string>
+    <string name="work_log_edit_validation_clock_out">Ta sprememba bi zaključek dela postavila pred začetek seje.</string>
+    <string name="work_log_edit_validation_break_start">Ta sprememba bi začetek odmora postavila izven aktivne delovne seje.</string>
+    <string name="work_log_edit_validation_break_end">Ta sprememba bi konec odmora postavila pred začetek odmora.</string>
+    <string name="work_log_help_title">Pomoč za delovni čas</string>
+    <string name="work_log_help_intro_title">Kako deluje evidenca dela</string>
+    <string name="work_log_help_intro_body">Evidenca dela združuje dnevno delovno sejo, odmore, malico, opombe, povzetek v gradniku in aktivno obvestilo na enem mestu.</string>
+    <string name="work_log_help_start_finish_title">Začetek in zaključek dela</string>
+    <string name="work_log_help_start_finish_body">Uporabi Začetek dela za začetek seje in Zaključek dela za njen konec. Nadzorna plošča nato posodobi stanje, skupni čas in saldo za trenutni dan.</string>
+    <string name="work_log_help_break_title">Odmori</string>
+    <string name="work_log_help_break_body">Odmor označi začetek pavze, ista akcija pa te vrne nazaj na delo. Čas odmora se pokaže na nadzorni plošči in v aktivnem obvestilu, če je to omogočeno.</string>
+    <string name="work_log_help_meal_notes_title">Malica in opombe</string>
+    <string name="work_log_help_meal_notes_body">Malica zabeleži dogodek malice za trenutni dan. Opomba doda kratko besedilo, ki ostane vidno v seznamu zadnjih dogodkov.</string>
+    <string name="work_log_help_recent_events_title">Urejanje zadnjih dogodkov</string>
+    <string name="work_log_help_recent_events_body">Tapni dogodek v seznamu zadnjih dogodkov za urejanje datuma ali ure. Pred shranjevanjem aplikacija preveri časovni potek, da vrstni red dogodkov ostane smiseln.</string>
+    <string name="work_log_help_widget_notification_title">Gradnik in obvestilo</string>
+    <string name="work_log_help_widget_notification_body">Gradnik evidence dela prikaže hiter povzetek za danes. Aktivno obvestilo se prikaže med delom in se samodejno posodablja za delo in odmor, ko je dovoljenje za obvestila omogočeno.</string>
+    <string name="work_log_settings_title">Nastavitve evidence dela</string>
+    <string name="work_log_settings_intro_title">Pravila dela</string>
+    <string name="work_log_settings_intro_body">Uredi osnovne nastavitve za dnevno normo, privzeti odmor, spremljanje nadur in pričakovane začetke dela.</string>
+    <string name="work_log_settings_default_break">Privzeti odmor</string>
+    <string name="work_log_settings_expected_times_section">Pričakovani začetki in konci dela po oznaki cikla</string>
+    <string name="work_log_settings_expected_start_section">Pričakovani začetki dela po oznaki cikla</string>
+    <string name="work_log_settings_expected_start_not_set">Ni nastavljeno</string>
+    <string name="work_log_settings_start_label">Začetek</string>
+    <string name="work_log_settings_end_label">Konec</string>
+    <string name="work_log_settings_expected_time_not_set">Ni nastavljeno</string>
+    <string name="work_log_settings_choose_daily_target">Izberi dnevno normo</string>
+    <string name="work_log_settings_choose_default_break">Izberi privzeti odmor</string>
+    <string name="work_log_settings_no_break">Brez odmora</string>
+    <string name="work_log_settings_enabled">Vklopljeno</string>
+    <string name="work_log_settings_disabled">Izklopljeno</string>
+    <string name="work_log_settings_hours_format">%1$d h</string>
+    <string name="work_log_settings_hours_minutes_format">%1$d h %2$d min</string>
+    <string name="work_log_settings_minutes_format">%1$d min</string>
+    <string name="work_log_settings_planned_title">Načrtovane možnosti</string>
+    <string name="work_log_settings_daily_target">Dnevna norma</string>
+    <string name="work_log_settings_daily_target_body">Nastavi privzeto pričakovano trajanje dela za en dan.</string>
+    <string name="work_log_settings_overtime">Spremljanje nadur</string>
+    <string name="work_log_settings_overtime_body">Določi, kako se izračuna in prikaže dodatni čas v saldu.</string>
+    <string name="work_log_settings_break_rules">Pravila odmorov</string>
+    <string name="work_log_settings_break_rules_body">Nastavi minimalne odmore, plačane ali neplačane odmore ter opomnike za odmore.</string>
+    <string name="work_log_settings_meal_rules">Pravila malice</string>
+    <string name="work_log_settings_meal_rules_body">Določi, kdaj je malica pričakovana in kako vpliva na dan.</string>
+    <string name="work_log_settings_rollover">Ura prehoda v nov delovni dan</string>
+    <string name="work_log_settings_rollover_body">Izberi, kdaj naj se pozno nočno delo šteje v naslednji dan.</string>
+    <string name="work_log_settings_weekly_target">Tedenska norma</string>
+    <string name="work_log_settings_weekly_target_body">Spremljaj pričakovani delovni čas čez cel teden, ne samo po dnevih.</string>
+    <string name="work_log_settings_reminders">Opomniki za pozabljen zaključek dela</string>
+    <string name="work_log_settings_reminders_body">Dodaj pravila za opomnike na dneve, ko je bilo delo začeto, ne pa tudi zaključeno.</string>
 </resources>

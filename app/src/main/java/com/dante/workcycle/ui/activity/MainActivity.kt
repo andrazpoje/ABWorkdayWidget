@@ -1,16 +1,23 @@
 package com.dante.workcycle.ui.activity
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.view.children
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -23,15 +30,11 @@ import com.dante.workcycle.core.ui.applyBottomNavInsetAsPadding
 import com.dante.workcycle.core.ui.applyTopStatusBarInsetAsMargin
 import com.dante.workcycle.core.ui.setupDefaultEdgeToEdge
 import com.dante.workcycle.core.ui.updateSystemBarIconContrast
+import com.dante.workcycle.data.prefs.LaunchPrefs
 import com.dante.workcycle.databinding.ActivityMainBinding
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.notifications.NotificationHelper
 import com.dante.workcycle.ui.home.HomeFragment
-import androidx.core.os.bundleOf
-import com.dante.workcycle.data.prefs.LaunchPrefs
-import android.widget.ImageView
-import androidx.core.view.children
-import androidx.appcompat.widget.Toolbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -135,18 +138,29 @@ class MainActivity : AppCompatActivity() {
                 R.id.statusLabelsFragment -> getString(R.string.status_labels_title)
                 R.id.workLogDebugFragment -> getString(R.string.work_log_debug_title)
                 R.id.workLogDashboardFragment -> getString(R.string.work_log_debug_title)
+                R.id.workLogHelpFragment -> getString(R.string.work_log_help_title)
+                R.id.workLogSettingsFragment -> getString(R.string.work_log_settings_title)
                 else -> ""
             }
             binding.toolbar.title = suffix.ifEmpty { appName }
 
             val showBottomNav = destination.id == R.id.homeFragment ||
-                    destination.id == R.id.calendarFragment ||
-                    destination.id == R.id.moreFragment
+                destination.id == R.id.calendarFragment ||
+                destination.id == R.id.moreFragment
 
             binding.bottomNavigation.visibility = if (showBottomNav) View.VISIBLE else View.GONE
 
             invalidateOptionsMenu()
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        if (!::navHostFragment.isInitialized) return
+
+        handleWorkLogLaunchIntent(intent)
     }
 
     private fun ensureNotificationFallbackScheduled() {
@@ -159,10 +173,10 @@ class MainActivity : AppCompatActivity() {
 
     fun isNotificationPermissionGranted(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
     }
 
     fun requestNotificationPermissionIfNeeded(onResult: (Boolean) -> Unit) {
@@ -187,19 +201,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val destinationId = navHostFragment.navController.currentDestination?.id
+        val showHomeActions = destinationId == R.id.homeFragment ||
+            destinationId == R.id.calendarFragment ||
+            destinationId == R.id.moreFragment
+        val showWorkLogActions = destinationId == R.id.workLogDashboardFragment
 
-        val showActions = destinationId == R.id.homeFragment ||
-                destinationId == R.id.calendarFragment ||
-                destinationId == R.id.moreFragment
-
-        menu.findItem(R.id.action_settings)?.isVisible = showActions
-        menu.findItem(R.id.action_help)?.isVisible = showActions
-        menu.findItem(R.id.action_settings)?.isVisible = showActions
+        menu.findItem(R.id.action_help)?.isVisible = showHomeActions || showWorkLogActions
+        menu.findItem(R.id.action_settings)?.isVisible = showHomeActions || showWorkLogActions
 
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val destinationId = navHostFragment.navController.currentDestination?.id
+
         return when (item.itemId) {
             R.id.action_work_log -> {
                 safeNavigate(R.id.workLogDashboardFragment)
@@ -207,23 +222,36 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.action_settings -> {
-                safeNavigate(R.id.settingsFragment)
+                if (destinationId == R.id.workLogDashboardFragment) {
+                    safeNavigate(R.id.workLogSettingsFragment)
+                } else {
+                    safeNavigate(R.id.settingsFragment)
+                }
                 true
             }
 
             R.id.action_help -> {
-                safeNavigate(R.id.helpFragment)
+                if (destinationId == R.id.workLogDashboardFragment) {
+                    safeNavigate(R.id.workLogHelpFragment)
+                } else {
+                    safeNavigate(R.id.helpFragment)
+                }
                 true
             }
 
             else -> super.onOptionsItemSelected(item)
         }
     }
+
     private fun handleLaunchDestination(
         navController: NavController,
         savedInstanceState: Bundle?
     ) {
         if (savedInstanceState != null) return
+
+        if (handleWorkLogLaunchIntent(intent)) {
+            return
+        }
 
         val launchPrefs = LaunchPrefs(this)
 
@@ -246,6 +274,42 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun handleWorkLogLaunchIntent(
+        launchIntent: Intent?
+    ): Boolean {
+        if (!WorkLogNavigationHelper.consumeOpenWorkLog(launchIntent)) {
+            return false
+        }
+
+        dismissVisibleDialogFragments()
+
+        binding.root.post {
+            safeNavigate(R.id.workLogDashboardFragment)
+        }
+
+        return true
+    }
+
+    private fun dismissVisibleDialogFragments() {
+        dismissVisibleDialogFragments(supportFragmentManager)
+        dismissVisibleDialogFragments(navHostFragment.childFragmentManager)
+
+        val currentFragment = navHostFragment.childFragmentManager.primaryNavigationFragment
+        if (currentFragment != null) {
+            dismissVisibleDialogFragments(currentFragment.childFragmentManager)
+        }
+    }
+
+    private fun dismissVisibleDialogFragments(fragmentManager: FragmentManager) {
+        fragmentManager.fragments
+            .filterIsInstance<DialogFragment>()
+            .filter { it.dialog?.isShowing == true }
+            .forEach { dialogFragment ->
+                dialogFragment.dismiss()
+            }
+    }
+
     private fun safeNavigate(@IdRes destinationId: Int) {
         val navController = navHostFragment.navController
         val currentId = navController.currentDestination?.id

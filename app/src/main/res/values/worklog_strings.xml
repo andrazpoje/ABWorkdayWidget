@@ -11,7 +11,6 @@
     <string name="work_log_break_option_30" translatable="false">30</string>
     <string name="work_log_break_option_45" translatable="false">45</string>
 
-    <string name="work_log_action_too_soon">Please wait at least 1 minute before the next action</string>
     <string name="work_log_event_clock_out_with_total">Departure (total %1$s)</string>
 
     <string name="work_log_state_finished">Finished</string>
@@ -26,11 +25,22 @@
 
     <string name="work_log_state_working_detail">Active work session</string>
     <string name="work_log_state_break_detail">Break is currently active</string>
+    <string name="work_log_date_with_cycle_label">%1$s · %2$s</string>
+    <string name="work_log_deviation_on_time">On time</string>
+    <string name="work_log_deviation_late_start">Late start %1$s</string>
+    <string name="work_log_deviation_early_start">Early start %1$s</string>
+    <string name="work_log_deviation_early_finish_label">Early finish %1$s</string>
+    <string name="work_log_deviation_overtime">Overtime %1$s</string>
+    <string name="work_log_deviation_extended_work">Extended work %1$s</string>
+    <string name="work_log_deviation_actual_with_meaning">%1$s · %2$s</string>
+    <string name="work_log_deviation_minutes_format">%1$s%2$d min</string>
 
-    <string name="work_log_action_start">Start work</string>
-    <string name="work_log_action_finish">Finish work</string>
+    <string name="work_log_slide_start">Slide to start work</string>
+    <string name="work_log_slide_finish">Slide to finish work</string>
+    <string name="work_log_slide_end_break">Slide to end break</string>
 
     <string name="work_log_event_clock_in">Arrival</string>
+    <string name="work_log_event_clock_out_label">Departure</string>
     <string name="work_log_event_break_start">Break started</string>
     <string name="work_log_event_break_end">Back to work</string>
     <string name="work_log_event_meal">Meal</string>
@@ -38,7 +48,6 @@
 
     <string name="work_log_break_started_at">Break started</string>
     <string name="work_log_break_duration">Break duration</string>
-    <string name="work_log_break_action_resume">Back to work</string>
     <string name="work_log_break_action_start">Break</string>
 
     <!-- ========================================================= -->
@@ -74,13 +83,86 @@
     <!-- ========================================================= -->
     <string name="work_log_now">Now</string>
 
-    <string name="work_log_today_label">Today</string>
     <string name="work_log_started_at">Started at</string>
-    <string name="work_log_start_work">Start work</string>
-    <string name="work_log_quick_actions">Quick actions</string>
+    <string name="work_log_expected_start">Expected start</string>
+    <string name="work_log_expected_end">Expected end</string>
     <string name="work_log_break">Break</string>
     <string name="work_log_meal">Meal</string>
     <string name="work_log_note_short">Note</string>
     <string name="work_log_recent_events">Recent events</string>
     <string name="work_log_no_events_today">No events recorded today.</string>
+    <string name="work_log_widget_status_not_started">Not started</string>
+    <string name="work_log_widget_no_session_today">No work session today</string>
+    <string name="work_log_widget_tap_to_open">Tap to open Work Log</string>
+    <string name="work_log_widget_started_at_value">Started at %1$s</string>
+    <string name="work_log_widget_break_started_value">Break started %1$s</string>
+    <string name="work_log_widget_finished_at_value">Finished at %1$s</string>
+    <string name="work_log_widget_worked_today_value">Worked today %1$s</string>
+    <string name="work_log_widget_break_value">Break %1$s</string>
+    <string name="work_log_widget_balance_value">Balance %1$s</string>
+    <string name="work_log_notification_title">Work Log</string>
+    <string name="work_log_notification_started_at">Started: %1$s</string>
+    <string name="work_log_notification_worked_today">Worked today: %1$s</string>
+    <string name="work_log_notification_break">Break: %1$s</string>
+    <string name="work_log_notification_permission_title">Allow active work notifications?</string>
+    <string name="work_log_notification_permission_message">WorkCycle can show a persistent notification while you are working or on a break, so your current session stays visible. You can continue starting work even if you do not allow notifications.</string>
+    <string name="work_log_notification_permission_positive">Allow notifications</string>
+    <string name="work_log_notification_permission_negative">Continue without</string>
+    <string name="work_log_notification_permission_denied_message">Active work notifications are off until notification permission is enabled.</string>
+    <string name="work_log_edit_event_title">Edit %1$s</string>
+    <string name="work_log_edit_event_summary">Update the date and time for %1$s.</string>
+    <string name="work_log_edit_event_date_label">Date</string>
+    <string name="work_log_edit_event_time_label">Time</string>
+    <string name="work_log_edit_event_change_date">Change date</string>
+    <string name="work_log_edit_event_change_time">Change time</string>
+    <string name="work_log_edit_event_saved">Work Log event updated</string>
+    <string name="work_log_edit_validation_clock_in">This change would place a work start while a session is already active.</string>
+    <string name="work_log_edit_validation_clock_out">This change would place a work finish before the session starts.</string>
+    <string name="work_log_edit_validation_break_start">This change would place a break start outside an active work session.</string>
+    <string name="work_log_edit_validation_break_end">This change would place a break end before a break starts.</string>
+    <string name="work_log_help_title">Work Log Help</string>
+    <string name="work_log_help_intro_title">How Work Log works</string>
+    <string name="work_log_help_intro_body">Work Log keeps track of your daily work session, breaks, meals, notes, widget summary, and active notification in one place.</string>
+    <string name="work_log_help_start_finish_title">Start and finish work</string>
+    <string name="work_log_help_start_finish_body">Use Start work to begin a session and Finish work to close it. The dashboard then updates the current state, daily total, and balance for the day.</string>
+    <string name="work_log_help_break_title">Breaks</string>
+    <string name="work_log_help_break_body">Break marks the start of a pause, and the same action returns you to work. Break timing is reflected on the dashboard and in the active notification when available.</string>
+    <string name="work_log_help_meal_notes_title">Meals and notes</string>
+    <string name="work_log_help_meal_notes_body">Meal logs a meal event for the day. Note lets you attach a short text note to the current day so context is preserved in Recent Events.</string>
+    <string name="work_log_help_recent_events_title">Recent Events editing</string>
+    <string name="work_log_help_recent_events_body">Tap an event in Recent Events to edit its date or time. The app validates the timeline before saving so event order stays safe and meaningful.</string>
+    <string name="work_log_help_widget_notification_title">Widget and notification</string>
+    <string name="work_log_help_widget_notification_body">The Work Log widget shows a quick summary for today. The active notification appears while work is running and updates automatically for work and break states when notification permission is enabled.</string>
+    <string name="work_log_settings_title">Work Log Settings</string>
+    <string name="work_log_settings_intro_title">Work Rules</string>
+    <string name="work_log_settings_intro_body">Adjust the daily target, default break, overtime tracking, and expected start and end times for Work Log.</string>
+    <string name="work_log_settings_default_break">Default break</string>
+    <string name="work_log_settings_expected_times_section">Expected start and end times by cycle label</string>
+    <string name="work_log_settings_expected_start_section">Expected start and end times by cycle label</string>
+    <string name="work_log_settings_start_label">Start</string>
+    <string name="work_log_settings_end_label">End</string>
+    <string name="work_log_settings_expected_time_not_set">Not set</string>
+    <string name="work_log_settings_choose_daily_target">Choose daily target</string>
+    <string name="work_log_settings_choose_default_break">Choose default break</string>
+    <string name="work_log_settings_no_break">No break</string>
+    <string name="work_log_settings_enabled">On</string>
+    <string name="work_log_settings_disabled">Off</string>
+    <string name="work_log_settings_hours_format">%1$d h</string>
+    <string name="work_log_settings_hours_minutes_format">%1$d h %2$d min</string>
+    <string name="work_log_settings_minutes_format">%1$d min</string>
+    <string name="work_log_settings_planned_title">Planned options</string>
+    <string name="work_log_settings_daily_target">Daily target hours</string>
+    <string name="work_log_settings_daily_target_body">Set the default expected work duration for a day.</string>
+    <string name="work_log_settings_overtime">Overtime tracking</string>
+    <string name="work_log_settings_overtime_body">Control how extra time is calculated and shown in balances.</string>
+    <string name="work_log_settings_break_rules">Break rules</string>
+    <string name="work_log_settings_break_rules_body">Configure minimum breaks, paid or unpaid break handling, and break reminders.</string>
+    <string name="work_log_settings_meal_rules">Meal rules</string>
+    <string name="work_log_settings_meal_rules_body">Define when meal logging is expected and how meal events affect the day.</string>
+    <string name="work_log_settings_rollover">Workday rollover time</string>
+    <string name="work_log_settings_rollover_body">Choose when late-night work should count toward the next day.</string>
+    <string name="work_log_settings_weekly_target">Weekly target</string>
+    <string name="work_log_settings_weekly_target_body">Track expected work time across the whole week, not only day by day.</string>
+    <string name="work_log_settings_reminders">Forgotten clock-out reminders</string>
+    <string name="work_log_settings_reminders_body">Add reminder rules for days when work was started but not finished.</string>
 </resources>

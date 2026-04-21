@@ -1,30 +1,38 @@
 package com.dante.workcycle.ui.worklog
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.dante.workcycle.R
+import com.dante.workcycle.data.prefs.WorkSettingsPrefs
+import com.dante.workcycle.data.prefs.WorkSessionPrefs
 import com.dante.workcycle.data.repository.WorkEventRepository
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.domain.model.WorkEventType.BREAK_END
 import com.dante.workcycle.domain.model.WorkEventType.BREAK_START
 import com.dante.workcycle.domain.model.WorkEventType.CLOCK_IN
 import com.dante.workcycle.domain.model.WorkEventType.CLOCK_OUT
 import com.dante.workcycle.domain.model.WorkEventType.MEAL
+import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
+import com.dante.workcycle.worklog.notification.WorkLogNotificationManager
+import com.dante.workcycle.worklog.notification.WorkLogNotificationState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.dante.workcycle.R
 
 class WorkLogDashboardViewModel(
     application: Application,
@@ -39,9 +47,21 @@ class WorkLogDashboardViewModel(
     private var observeJob: Job? = null
 
     private var actionLockUntilMillis: Long = 0L
+    private var actionLockRefreshJob: Job? = null
     private var tickerJob: Job? = null
+    private val notificationManager = WorkLogNotificationManager(application)
+    private val workSettingsPrefs = WorkSettingsPrefs(application)
+    private val workSessionPrefs = WorkSessionPrefs(application)
+    private val scheduleResolver = DefaultScheduleResolver(application)
+    private val settingsChangeListener =
+        android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == null || key in WORK_SETTINGS_KEYS) {
+                emitCurrentUiState()
+            }
+        }
 
     init {
+        workSettingsPrefs.registerListener(settingsChangeListener)
         observeToday()
     }
 
@@ -55,8 +75,9 @@ class WorkLogDashboardViewModel(
         observeJob = viewModelScope.launch {
             repository.observeByDate(selectedDate).collect { events ->
                 currentEvents = events
-                _uiState.value = buildUiState(events)
+                emitCurrentUiState()
                 restartTickerIfNeeded(events)
+                syncPersistentNotification(events)
             }
         }
     }
@@ -79,7 +100,7 @@ class WorkLogDashboardViewModel(
             tickerJob = viewModelScope.launch {
                 while (isActive) {
                     refreshDateIfNeeded()
-                    _uiState.value = buildUiState(currentEvents)
+                    emitCurrentUiState()
                     delay(30_000)
                 }
             }
@@ -90,25 +111,32 @@ class WorkLogDashboardViewModel(
         return System.currentTimeMillis() < actionLockUntilMillis
     }
 
-    private fun lockActionsForMoment() {
-        actionLockUntilMillis = System.currentTimeMillis() + 800L
+    private fun emitCurrentUiState() {
+        _uiState.value = buildUiState(currentEvents)
     }
 
-    fun onPrimaryAction() {
+    private fun lockActionsForMoment() {
+        actionLockUntilMillis = System.currentTimeMillis() + ACTION_LOCK_DURATION_MS
+        emitCurrentUiState()
+
+        actionLockRefreshJob?.cancel()
+        actionLockRefreshJob = viewModelScope.launch {
+            val remainingMillis = (actionLockUntilMillis - System.currentTimeMillis())
+                .coerceAtLeast(0L)
+            delay(remainingMillis)
+            emitCurrentUiState()
+        }
+    }
+
+    fun onSliderAction() {
         if (isActionLocked()) return
 
         viewModelScope.launch {
             refreshDateIfNeeded()
-            val sessionState = resolveSessionState(currentEvents)
-            val lastEvent = currentEvents.maxByOrNull { it.time }
 
-            when (sessionState) {
+            when (resolveSessionState(currentEvents)) {
                 SessionState.NOT_WORKING -> {
-                    if (!canRunActionAfterOneMinute(lastEvent)) {
-                        blockWithOneMinuteMessage()
-                        return@launch
-                    }
-
+                    createSessionSnapshot()
                     repository.insert(
                         WorkEvent(
                             date = selectedDate,
@@ -116,17 +144,9 @@ class WorkLogDashboardViewModel(
                             type = CLOCK_IN
                         )
                     )
-                    lockActionsForMoment()
                 }
 
-                SessionState.WORKING,
-                SessionState.ON_BREAK -> {
-                    val lastClockIn = currentEvents.lastOrNull { it.type == CLOCK_IN }
-                    if (!canRunActionAfterOneMinute(lastClockIn)) {
-                        blockWithOneMinuteMessage()
-                        return@launch
-                    }
-
+                SessionState.WORKING -> {
                     repository.insert(
                         WorkEvent(
                             date = selectedDate,
@@ -134,9 +154,22 @@ class WorkLogDashboardViewModel(
                             type = CLOCK_OUT
                         )
                     )
-                    lockActionsForMoment()
+                    workSessionPrefs.clearSnapshot()
+                }
+
+                SessionState.ON_BREAK -> {
+                    repository.insert(
+                        WorkEvent(
+                            date = selectedDate,
+                            time = LocalTime.now(),
+                            type = BREAK_END
+                        )
+                    )
                 }
             }
+
+            refreshWorkLogWidgets()
+            lockActionsForMoment()
         }
     }
 
@@ -149,12 +182,6 @@ class WorkLogDashboardViewModel(
                 SessionState.NOT_WORKING -> Unit
 
                 SessionState.WORKING -> {
-                    val lastClockIn = currentEvents.lastOrNull { it.type == CLOCK_IN }
-                    if (!canRunActionAfterOneMinute(lastClockIn)) {
-                        blockWithOneMinuteMessage()
-                        return@launch
-                    }
-
                     repository.insert(
                         WorkEvent(
                             date = selectedDate,
@@ -162,25 +189,11 @@ class WorkLogDashboardViewModel(
                             type = BREAK_START
                         )
                     )
+                    refreshWorkLogWidgets()
                     lockActionsForMoment()
                 }
 
-                SessionState.ON_BREAK -> {
-                    val activeBreakStart = findActiveBreakStart(currentEvents)
-                    if (!canRunActionAfterOneMinute(activeBreakStart)) {
-                        blockWithOneMinuteMessage()
-                        return@launch
-                    }
-
-                    repository.insert(
-                        WorkEvent(
-                            date = selectedDate,
-                            time = LocalTime.now(),
-                            type = BREAK_END
-                        )
-                    )
-                    lockActionsForMoment()
-                }
+                SessionState.ON_BREAK -> Unit
             }
         }
     }
@@ -212,20 +225,55 @@ class WorkLogDashboardViewModel(
         val clockIn = events.firstOrNull { it.type == CLOCK_IN }
         val workedText = calculateWorkedTodayText(events)
         val breakStart = findActiveBreakStart(events)
-        val breakStartedAtText = breakStart?.time?.format(timeFormatter()) ?: "—"
+        val hasStartedToday = clockIn != null
+        val hasBreakToday = events.any { it.type == BREAK_START || it.type == BREAK_END }
+        val todayResolved = scheduleResolver.resolve(selectedDate)
+        val todayCycleLabel = todayResolved.effectiveCycleLabel
+        val sessionSnapshot = if (sessionState == SessionState.NOT_WORKING) {
+            null
+        } else {
+            workSessionPrefs.getSnapshot()
+        }
+        val displayCycleLabel = sessionSnapshot?.cycleLabel ?: todayCycleLabel
+        val liveExpectedStartText = workSettingsPrefs.getExpectedStartConfig(todayCycleLabel)
+            ?.takeIf { it.enabled }
+            ?.startTime
+        val expectedStartText = sessionSnapshot?.expectedStart ?: liveExpectedStartText
+        val expectedEndConfig = workSettingsPrefs.getExpectedEndConfig(todayCycleLabel)
+        val liveExpectedEndText = expectedEndConfig
+            ?.takeIf { it.enabled }
+            ?.endTime
+        val expectedEndText = sessionSnapshot?.expectedEnd ?: liveExpectedEndText
+        val dailyTargetMinutes = workSettingsPrefs.getDailyTargetMinutes()
+        val overtimeTrackingEnabled = workSettingsPrefs.isOvertimeTrackingEnabled()
+        val breakStartedAtText = breakStart?.time?.format(timeFormatter()) ?: WORK_LOG_PLACEHOLDER
         val breakDurationText = if (sessionState == SessionState.ON_BREAK && breakStart != null) {
             formatDuration(minutesBetween(breakStart.time, LocalTime.now()))
         } else {
-            "—"
+            WORK_LOG_PLACEHOLDER
         }
         val formatter = DateTimeFormatter.ofPattern("d. MMM yyyy", Locale.getDefault())
 
         val lastClockOut = findLastClockOut(events)
         val hasAnyEvents = events.isNotEmpty()
+        val startDeviation = buildStartDeviation(
+            actualStartEvent = clockIn,
+            expectedStart = expectedStartText
+        )
+        val endDeviation = buildEndDeviation(
+            actualStartEvent = clockIn,
+            actualEndEvent = lastClockOut,
+            expectedStart = expectedStartText,
+            expectedEnd = expectedEndText,
+            overtimeTrackingEnabled = overtimeTrackingEnabled,
+            sessionState = sessionState
+        )
 
         val stateText: String
         val stateDetailText: String
-        val primaryButtonText: String
+        val sliderAction: WorkLogSliderAction
+        val sliderActionText: String
+        val sliderIconRes: Int
 
         when (sessionState) {
             SessionState.NOT_WORKING -> {
@@ -239,27 +287,33 @@ class WorkLogDashboardViewModel(
                     stateText = s(R.string.work_log_state_off)
                     stateDetailText = s(R.string.work_log_state_off_detail)
                 }
-                primaryButtonText = s(R.string.work_log_action_start)
+                sliderAction = WorkLogSliderAction.START_WORK
+                sliderActionText = s(R.string.work_log_slide_start)
+                sliderIconRes = R.drawable.ic_work_time_24
             }
 
             SessionState.WORKING -> {
                 stateText = s(R.string.work_log_state_working)
                 stateDetailText = s(R.string.work_log_state_working_detail)
-                primaryButtonText = s(R.string.work_log_action_finish)
+                sliderAction = WorkLogSliderAction.FINISH_WORK
+                sliderActionText = s(R.string.work_log_slide_finish)
+                sliderIconRes = R.drawable.ic_save_24
             }
 
             SessionState.ON_BREAK -> {
                 stateText = s(R.string.work_log_state_break)
                 stateDetailText = s(R.string.work_log_state_break_detail)
-                primaryButtonText = s(R.string.work_log_action_finish)
+                sliderAction = WorkLogSliderAction.END_BREAK
+                sliderActionText = s(R.string.work_log_slide_end_break)
+                sliderIconRes = R.drawable.ic_coffee_break_24
             }
         }
 
         val mealLoggedToday = hasMealLoggedToday(events)
         val mealButtonEnabled =
             sessionState != SessionState.NOT_WORKING &&
-                    !mealLoggedToday &&
-                    !isActionLocked()
+                !mealLoggedToday &&
+                !isActionLocked()
 
         val mealActionText = if (mealLoggedToday) {
             s(R.string.work_log_meal_logged_short)
@@ -267,34 +321,55 @@ class WorkLogDashboardViewModel(
             s(R.string.work_log_meal)
         }
 
-        val targetWorkText = "8h 00m"
-        val balanceText = calculateBalanceText(events)
-
         return WorkLogDashboardUiState(
-            todayText = selectedDate.format(formatter),
+            todayText = getApplication<Application>().getString(
+                R.string.work_log_date_with_cycle_label,
+                selectedDate.format(formatter),
+                displayCycleLabel
+            ),
             stateText = stateText,
             stateDetailText = stateDetailText,
-            startedAtText = clockIn?.time?.format(timeFormatter()) ?: "—",
-            targetWorkText = targetWorkText,
-            balanceText = balanceText,
+            sliderAction = sliderAction,
+            sliderActionText = sliderActionText,
+            sliderIconRes = sliderIconRes,
+            sliderEnabled = !isActionLocked(),
+            showSecondaryActions = hasStartedToday,
+            showBreakActionButton = sessionState == SessionState.WORKING,
+            showExpectedStart = !expectedStartText.isNullOrBlank(),
+            expectedStartText = expectedStartText ?: WORK_LOG_PLACEHOLDER,
+            showExpectedEnd = !expectedEndText.isNullOrBlank(),
+            expectedEndText = expectedEndText ?: WORK_LOG_PLACEHOLDER,
+            showStartedAt = hasStartedToday,
+            startedAtText = clockIn?.time?.format(timeFormatter()) ?: WORK_LOG_PLACEHOLDER,
+            showStartDeviation = startDeviation != null,
+            startDeviationText = startDeviation?.text.orEmpty(),
+            startDeviationTone = startDeviation?.tone ?: WorkLogDeviationTone.DEFAULT,
+            showWorkedToday = hasStartedToday,
             workedTodayText = workedText,
-            primaryButtonText = primaryButtonText,
-            breakActionText = if (sessionState == SessionState.ON_BREAK) {
-                s(R.string.work_log_break_action_resume)
-            } else {
-                s(R.string.work_log_break_action_start)
-            },
-            canBreak = sessionState != SessionState.NOT_WORKING,
-            breakButtonEnabled = sessionState != SessionState.NOT_WORKING && !isActionLocked(),
+            showTarget = hasStartedToday,
+            showBalance = hasStartedToday && overtimeTrackingEnabled,
+            targetWorkText = formatTargetMinutes(dailyTargetMinutes),
+            balanceText = calculateBalanceText(events, dailyTargetMinutes),
+            breakActionText = s(R.string.work_log_break_action_start),
+            breakButtonEnabled = sessionState == SessionState.WORKING && !isActionLocked(),
             isOnBreak = sessionState == SessionState.ON_BREAK,
+            showBreakInfo = hasBreakToday,
             breakStartedAtText = breakStartedAtText,
             breakDurationText = breakDurationText,
+            showEndDeviation = endDeviation != null,
+            endDeviationText = endDeviation?.text.orEmpty(),
+            endDeviationTone = endDeviation?.tone ?: WorkLogDeviationTone.DEFAULT,
             mealActionText = mealActionText,
             mealButtonEnabled = mealButtonEnabled,
             recentEvents = events
                 .takeLast(50)
                 .reversed()
-                .map { formatEvent(it) }
+                .map { event ->
+                    WorkEventListItem(
+                        event = event,
+                        text = formatEvent(event)
+                    )
+                }
         )
     }
 
@@ -319,7 +394,7 @@ class WorkLogDashboardViewModel(
     }
 
     private fun formatDuration(totalMinutes: Long): String {
-        if (totalMinutes < 0) return "—"
+        if (totalMinutes < 0) return WORK_LOG_PLACEHOLDER
         val hours = totalMinutes / 60
         val minutes = totalMinutes % 60
         return "${hours}h ${minutes}m"
@@ -368,7 +443,7 @@ class WorkLogDashboardViewModel(
             totalMinutes += minutesBetween(currentStart, LocalTime.now())
         }
 
-        if (totalMinutes <= 0L) return "—"
+        if (totalMinutes <= 0L) return WORK_LOG_PLACEHOLDER
 
         val hours = totalMinutes / 60
         val minutes = totalMinutes % 60
@@ -387,24 +462,18 @@ class WorkLogDashboardViewModel(
     }
 
     private fun formatEvent(event: WorkEvent): String {
-        val dateText = event.date.format(
-            DateTimeFormatter.ofPattern("dd.MM.")
-        )
+        val dateText = event.date.format(DateTimeFormatter.ofPattern("dd.MM."))
         val timeText = event.time.format(timeFormatter())
 
         return when (event.type) {
             CLOCK_IN -> "$dateText $timeText  ${s(R.string.work_log_event_clock_in)}"
-
             BREAK_START -> "$dateText $timeText  ${s(R.string.work_log_event_break_start)}"
-
             BREAK_END -> "$dateText $timeText  ${s(R.string.work_log_event_break_end)}"
-
             MEAL -> "$dateText $timeText  ${s(R.string.work_log_event_meal)}"
 
             WorkEventType.NOTE -> {
                 val noteText = event.note?.takeIf { it.isNotBlank() }
                     ?: s(R.string.work_log_event_note)
-
                 "$dateText $timeText  ${s(R.string.work_log_event_note)}: $noteText"
             }
 
@@ -420,8 +489,8 @@ class WorkLogDashboardViewModel(
         }
     }
 
-    private fun calculateBalanceText(events: List<WorkEvent>): String {
-        val targetMinutes = 8 * 60L
+    private fun calculateBalanceText(events: List<WorkEvent>, dailyTargetMinutes: Int): String {
+        val targetMinutes = dailyTargetMinutes.toLong()
         val workedMinutes = calculateWorkedMinutes(events)
         val diff = workedMinutes - targetMinutes
 
@@ -434,9 +503,15 @@ class WorkLogDashboardViewModel(
         return if (diff == 0L) {
             "0h 00m"
         } else {
-            val absMinutes = kotlin.math.abs(diff)
-            "$sign${formatDuration(absMinutes)}"
+            val absMinutes = kotlin.math.abs(diff).toInt()
+            "$sign${formatTargetMinutes(absMinutes)}"
         }
+    }
+
+    private fun formatTargetMinutes(totalMinutes: Int): String {
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+        return "${hours}h ${minutes.toString().padStart(2, '0')}m"
     }
 
     private fun calculateWorkedMinutes(events: List<WorkEvent>): Long {
@@ -447,9 +522,7 @@ class WorkLogDashboardViewModel(
 
         for (event in sorted) {
             when (event.type) {
-                CLOCK_IN -> {
-                    currentStart = event.time
-                }
+                CLOCK_IN -> currentStart = event.time
 
                 BREAK_START -> {
                     if (currentStart != null) {
@@ -458,9 +531,7 @@ class WorkLogDashboardViewModel(
                     }
                 }
 
-                BREAK_END -> {
-                    currentStart = event.time
-                }
+                BREAK_END -> currentStart = event.time
 
                 CLOCK_OUT -> {
                     if (currentStart != null) {
@@ -489,9 +560,7 @@ class WorkLogDashboardViewModel(
 
         for (event in filtered) {
             when (event.type) {
-                CLOCK_IN -> {
-                    currentStart = event.time
-                }
+                CLOCK_IN -> currentStart = event.time
 
                 BREAK_START -> {
                     if (currentStart != null) {
@@ -500,9 +569,7 @@ class WorkLogDashboardViewModel(
                     }
                 }
 
-                BREAK_END -> {
-                    currentStart = event.time
-                }
+                BREAK_END -> currentStart = event.time
 
                 CLOCK_OUT -> {
                     if (currentStart != null) {
@@ -561,21 +628,301 @@ class WorkLogDashboardViewModel(
         return events.any { it.type == MEAL }
     }
 
+    private fun buildStartDeviation(
+        actualStartEvent: WorkEvent?,
+        expectedStart: String?
+    ): DeviationInfo? {
+        val parsedExpectedStart = parseExpectedTime(expectedStart) ?: return null
+        val startEvent = actualStartEvent ?: return null
+        val expectedStartDateTime = buildExpectedStartDateTime(
+            sessionDate = startEvent.date,
+            expectedStart = parsedExpectedStart
+        )
+        val actualStartDateTime = LocalDateTime.of(startEvent.date, startEvent.time)
+        val diffMinutes = computeDeviationMinutes(
+            expectedDateTime = expectedStartDateTime,
+            actualDateTime = actualStartDateTime
+        ) ?: return null
+
+        return when {
+            diffMinutes > 0 -> {
+                DeviationInfo(
+                    text = getApplication<Application>().getString(
+                        R.string.work_log_deviation_late_start,
+                        formatSignedMinutes(diffMinutes)
+                    ),
+                    tone = WorkLogDeviationTone.ERROR
+                )
+            }
+
+            diffMinutes < 0 -> {
+                DeviationInfo(
+                    text = getApplication<Application>().getString(
+                        R.string.work_log_deviation_early_start,
+                        formatSignedMinutes(diffMinutes)
+                    ),
+                    tone = WorkLogDeviationTone.ACCENT
+                )
+            }
+
+            else -> {
+                DeviationInfo(
+                    text = s(R.string.work_log_deviation_on_time),
+                    tone = WorkLogDeviationTone.DEFAULT
+                )
+            }
+        }
+    }
+
+    private fun buildEndDeviation(
+        actualStartEvent: WorkEvent?,
+        actualEndEvent: WorkEvent?,
+        expectedStart: String?,
+        expectedEnd: String?,
+        overtimeTrackingEnabled: Boolean,
+        sessionState: SessionState
+    ): DeviationInfo? {
+        if (sessionState != SessionState.NOT_WORKING) return null
+
+        val startEvent = actualStartEvent ?: return null
+        val endEvent = actualEndEvent ?: return null
+        val expectedStartTime = parseExpectedTime(expectedStart) ?: startEvent.time
+        val parsedExpectedEnd = parseExpectedTime(expectedEnd) ?: return null
+        val expectedEndDateTime = buildExpectedEndDateTime(
+            sessionDate = startEvent.date,
+            expectedStart = expectedStartTime,
+            expectedEnd = parsedExpectedEnd
+        )
+        val actualEndDateTime = buildActualEndDateTime(
+            startEvent = startEvent,
+            endEvent = endEvent
+        )
+        val diffMinutes = computeDeviationMinutes(
+            expectedDateTime = expectedEndDateTime,
+            actualDateTime = actualEndDateTime
+        ) ?: return null
+        val actualEndText = endEvent.time.format(timeFormatter())
+
+        return when {
+            diffMinutes < 0 -> {
+                DeviationInfo(
+                    text = getApplication<Application>().getString(
+                        R.string.work_log_deviation_actual_with_meaning,
+                        actualEndText,
+                        getApplication<Application>().getString(
+                            R.string.work_log_deviation_early_finish_label,
+                            formatSignedMinutes(diffMinutes)
+                        )
+                    ),
+                    tone = WorkLogDeviationTone.ERROR
+                )
+            }
+
+            diffMinutes > 0 && overtimeTrackingEnabled -> {
+                DeviationInfo(
+                    text = getApplication<Application>().getString(
+                        R.string.work_log_deviation_actual_with_meaning,
+                        actualEndText,
+                        getApplication<Application>().getString(
+                            R.string.work_log_deviation_overtime,
+                            formatSignedMinutes(diffMinutes)
+                        )
+                    ),
+                    tone = WorkLogDeviationTone.ACCENT
+                )
+            }
+
+            diffMinutes > 0 -> {
+                DeviationInfo(
+                    text = getApplication<Application>().getString(
+                        R.string.work_log_deviation_actual_with_meaning,
+                        actualEndText,
+                        getApplication<Application>().getString(
+                            R.string.work_log_deviation_extended_work,
+                            formatSignedMinutes(diffMinutes)
+                        )
+                    ),
+                    tone = WorkLogDeviationTone.DEFAULT
+                )
+            }
+
+            else -> {
+                DeviationInfo(
+                    text = getApplication<Application>().getString(
+                        R.string.work_log_deviation_actual_with_meaning,
+                        actualEndText,
+                        s(R.string.work_log_deviation_on_time)
+                    ),
+                    tone = WorkLogDeviationTone.DEFAULT
+                )
+            }
+        }
+    }
+
+    private fun parseExpectedTime(value: String?): LocalTime? {
+        val safeValue = value?.trim().orEmpty()
+        if (safeValue.isBlank() || safeValue == WORK_LOG_PLACEHOLDER) return null
+        return runCatching { LocalTime.parse(safeValue, timeFormatter()) }.getOrNull()
+    }
+
+    private fun buildExpectedStartDateTime(
+        sessionDate: LocalDate,
+        expectedStart: LocalTime
+    ): LocalDateTime {
+        return LocalDateTime.of(sessionDate, expectedStart)
+    }
+
+    private fun buildExpectedEndDateTime(
+        sessionDate: LocalDate,
+        expectedStart: LocalTime,
+        expectedEnd: LocalTime
+    ): LocalDateTime {
+        val base = LocalDateTime.of(sessionDate, expectedEnd)
+        return if (expectedEnd.isBefore(expectedStart)) {
+            base.plusDays(1)
+        } else {
+            base
+        }
+    }
+
+    private fun buildActualEndDateTime(
+        startEvent: WorkEvent,
+        endEvent: WorkEvent
+    ): LocalDateTime {
+        val base = LocalDateTime.of(endEvent.date, endEvent.time)
+        return if (endEvent.date == startEvent.date && endEvent.time.isBefore(startEvent.time)) {
+            base.plusDays(1)
+        } else {
+            base
+        }
+    }
+
+    private fun computeDeviationMinutes(
+        expectedDateTime: LocalDateTime,
+        actualDateTime: LocalDateTime
+    ): Int? {
+        val bestMatch = listOf(
+            actualDateTime.minusDays(1),
+            actualDateTime,
+            actualDateTime.plusDays(1)
+        ).minByOrNull { candidate ->
+            kotlin.math.abs(ChronoUnit.MINUTES.between(expectedDateTime, candidate))
+        } ?: return null
+
+        val diffMinutes = ChronoUnit.MINUTES.between(expectedDateTime, bestMatch).toInt()
+        return if (kotlin.math.abs(diffMinutes) > MAX_DEVIATION_MINUTES) {
+            null
+        } else {
+            diffMinutes
+        }
+    }
+
+    private fun formatSignedMinutes(diffMinutes: Int): String {
+        val sign = if (diffMinutes > 0) "+" else "-"
+        return getApplication<Application>().getString(
+            R.string.work_log_deviation_minutes_format,
+            sign,
+            kotlin.math.abs(diffMinutes)
+        )
+    }
+
+    private fun createSessionSnapshot() {
+        val currentCycleLabel = scheduleResolver.resolve(selectedDate).effectiveCycleLabel
+        val expectedStart = workSettingsPrefs.getExpectedStartConfig(currentCycleLabel)
+            ?.takeIf { it.enabled }
+            ?.startTime
+        val expectedEnd = workSettingsPrefs.getExpectedEndConfig(currentCycleLabel)
+            ?.takeIf { it.enabled }
+            ?.endTime
+
+        workSessionPrefs.saveSnapshot(
+            WorkSessionPrefs.WorkSessionSnapshot(
+                cycleLabel = currentCycleLabel,
+                expectedStart = expectedStart,
+                expectedEnd = expectedEnd
+            )
+        )
+    }
+
     fun clearMessage() {
         _uiState.value = _uiState.value.copy(message = null)
     }
 
-    private fun canRunActionAfterOneMinute(
-        relevantEvent: WorkEvent?
-    ): Boolean {
-        if (relevantEvent == null) return true
-        return minutesBetween(relevantEvent.time, LocalTime.now()) >= 1
+    private fun syncPersistentNotification(events: List<WorkEvent>) {
+        when (resolveSessionState(events)) {
+            SessionState.NOT_WORKING -> {
+                notificationManager.remove()
+            }
+
+            SessionState.WORKING -> {
+                val clockIn = events.firstOrNull { it.type == CLOCK_IN }
+                val workedText = calculateWorkedTodayText(events)
+
+                notificationManager.showOrUpdate(
+                    WorkLogNotificationState(
+                        status = WorkLogNotificationState.Status.WORKING,
+                        title = s(R.string.work_log_notification_title),
+                        summaryText = s(R.string.work_log_state_working_detail),
+                        startTimeText = clockIn?.time?.format(timeFormatter())?.let {
+                            getApplication<Application>().getString(
+                                R.string.work_log_notification_started_at,
+                                it
+                            )
+                        },
+                        workedTodayText = workedText
+                            .takeUnless { it.isBlank() || it == WORK_LOG_PLACEHOLDER }
+                            ?.let {
+                                getApplication<Application>().getString(
+                                    R.string.work_log_notification_worked_today,
+                                    it
+                                )
+                            },
+                        breakText = null
+                    )
+                )
+            }
+
+            SessionState.ON_BREAK -> {
+                val clockIn = events.firstOrNull { it.type == CLOCK_IN }
+                val breakStart = findActiveBreakStart(events)
+                val workedText = calculateWorkedTodayText(events)
+                val breakDurationText = breakStart?.let {
+                    formatDuration(minutesBetween(it.time, LocalTime.now()))
+                }
+
+                notificationManager.showOrUpdate(
+                    WorkLogNotificationState(
+                        status = WorkLogNotificationState.Status.ON_BREAK,
+                        title = s(R.string.work_log_notification_title),
+                        summaryText = s(R.string.work_log_state_break_detail),
+                        startTimeText = clockIn?.time?.format(timeFormatter())?.let {
+                            getApplication<Application>().getString(
+                                R.string.work_log_notification_started_at,
+                                it
+                            )
+                        },
+                        workedTodayText = workedText
+                            .takeUnless { it.isBlank() || it == WORK_LOG_PLACEHOLDER }
+                            ?.let {
+                                getApplication<Application>().getString(
+                                    R.string.work_log_notification_worked_today,
+                                    it
+                                )
+                            },
+                        breakText = breakDurationText?.let {
+                            getApplication<Application>().getString(
+                                R.string.work_log_notification_break,
+                                it
+                            )
+                        }
+                    )
+                )
+            }
+        }
     }
 
-    private fun blockWithOneMinuteMessage() {
-        _uiState.value = _uiState.value.copy(
-            message = s(R.string.work_log_action_too_soon)
-        )
+    private fun refreshWorkLogWidgets() {
+        WidgetRefreshDispatcher.refreshWorkLogWidgets(getApplication())
     }
 
     fun onNoteAdded(note: String) {
@@ -602,6 +949,16 @@ class WorkLogDashboardViewModel(
         ON_BREAK
     }
 
+    private data class DeviationInfo(
+        val text: String,
+        val tone: WorkLogDeviationTone
+    )
+
+    override fun onCleared() {
+        workSettingsPrefs.unregisterListener(settingsChangeListener)
+        super.onCleared()
+    }
+
     class Factory(
         private val application: Application,
         private val repository: WorkEventRepository
@@ -614,5 +971,16 @@ class WorkLogDashboardViewModel(
                 repository
             ) as T
         }
+    }
+
+    private companion object {
+        const val ACTION_LOCK_DURATION_MS = 800L
+        const val MAX_DEVIATION_MINUTES = 18 * 60
+        val WORK_SETTINGS_KEYS = setOf(
+            WorkSettingsPrefs.KEY_DAILY_TARGET_MINUTES,
+            WorkSettingsPrefs.KEY_DEFAULT_BREAK_MINUTES,
+            WorkSettingsPrefs.KEY_OVERTIME_TRACKING_ENABLED,
+            WorkSettingsPrefs.KEY_EXPECTED_STARTS_BY_LABEL
+        )
     }
 }

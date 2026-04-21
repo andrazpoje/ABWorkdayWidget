@@ -85,4 +85,14 @@
         android:name="com.dante.workcycle.ui.worklog.WorkLogDashboardFragment"
         android:label="@string/work_log_debug_title" />
 
+    <fragment
+        android:id="@+id/workLogHelpFragment"
+        android:name="com.dante.workcycle.ui.worklog.WorkLogHelpFragment"
+        android:label="@string/work_log_help_title" />
+
+    <fragment
+        android:id="@+id/workLogSettingsFragment"
+        android:name="com.dante.workcycle.ui.worklog.WorkLogSettingsFragment"
+        android:label="@string/work_log_settings_title" />
+
 </navigation>
