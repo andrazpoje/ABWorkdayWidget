@@ -206,6 +206,7 @@ class MainActivity : AppCompatActivity() {
             destinationId == R.id.moreFragment
         val showWorkLogActions = destinationId == R.id.workLogDashboardFragment
 
+        menu.findItem(R.id.action_work_log)?.isVisible = destinationId != R.id.workLogDashboardFragment
         menu.findItem(R.id.action_help)?.isVisible = showHomeActions || showWorkLogActions
         menu.findItem(R.id.action_settings)?.isVisible = showHomeActions || showWorkLogActions
 

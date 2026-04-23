@@ -3,12 +3,13 @@ package com.dante.workcycle.ui.fragments
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.content.edit
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.dante.workcycle.BuildConfig
@@ -252,10 +253,15 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.textCustomColorsHelper.alpha = alpha
         binding.colorShiftA.alpha = alpha
         binding.colorShiftB.alpha = alpha
+        binding.colorShiftC.alpha = alpha
+        binding.colorOffDay.alpha = alpha
+        binding.textWidgetBackgroundHelper.alpha = alpha
         binding.colorBackground.alpha = alpha
 
         binding.colorShiftA.isEnabled = isCustomTheme
         binding.colorShiftB.isEnabled = isCustomTheme
+        binding.colorShiftC.isEnabled = isCustomTheme
+        binding.colorOffDay.isEnabled = isCustomTheme
         binding.colorBackground.isEnabled = isCustomTheme
     }
 
@@ -306,6 +312,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.colorShiftA.setColor(colors.shiftAColor)
         binding.colorShiftB.setLabel(getString(R.string.color_shift_b))
         binding.colorShiftB.setColor(colors.shiftBColor)
+        binding.colorShiftC.setLabel(getString(R.string.color_shift_c))
+        binding.colorShiftC.setColor(colors.shiftCColor)
+        binding.colorOffDay.setLabel(getString(R.string.color_off_day))
+        binding.colorOffDay.setColor(colors.offDayColor)
         binding.colorBackground.setLabel(getString(R.string.color_background))
         binding.colorBackground.setColor(colors.widgetBackgroundColor)
 
@@ -527,6 +537,38 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }.show(parentFragmentManager, "colorB")
         }
 
+        binding.colorShiftC.setOnRowClick {
+            if (!binding.settingsThemeCustom.isChecked) return@setOnRowClick
+
+            val currentColors = WidgetStyleManager.getColors(requireContext())
+
+            ColorPickerDialog(
+                titleText = getString(R.string.color_picker_title_cycle_c),
+                initialColor = currentColors.shiftCColor
+            ) {
+                WidgetStyleManager.applyPreset(requireContext(), ThemePreset.CUSTOM)
+                WidgetStyleManager.updateShiftCColor(requireContext(), it)
+                WidgetRefreshHelper.refresh(requireContext())
+                bindCurrentValues()
+            }.show(parentFragmentManager, "colorC")
+        }
+
+        binding.colorOffDay.setOnRowClick {
+            if (!binding.settingsThemeCustom.isChecked) return@setOnRowClick
+
+            val currentColors = WidgetStyleManager.getColors(requireContext())
+
+            ColorPickerDialog(
+                titleText = getString(R.string.color_picker_title_off_day),
+                initialColor = currentColors.offDayColor
+            ) {
+                WidgetStyleManager.applyPreset(requireContext(), ThemePreset.CUSTOM)
+                WidgetStyleManager.updateOffDayColor(requireContext(), it)
+                WidgetRefreshHelper.refresh(requireContext())
+                bindCurrentValues()
+            }.show(parentFragmentManager, "colorOffDay")
+        }
+
         binding.colorBackground.setOnRowClick {
             if (!binding.settingsThemeCustom.isChecked) return@setOnRowClick
 
@@ -741,7 +783,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun openChangelog() {
-        val intent = Intent(Intent.ACTION_VIEW, CHANGELOG_URL.toUri())
+        val uri = Uri.parse(CHANGELOG_URL.trim())
+        Log.d("CHANGELOG_URL", uri.toString())
+        val intent = Intent(Intent.ACTION_VIEW, uri)
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {

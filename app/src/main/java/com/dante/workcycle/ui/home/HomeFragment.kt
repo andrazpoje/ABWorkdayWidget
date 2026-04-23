@@ -74,6 +74,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var dateText: TextView
     lateinit var pickDateButton: MaterialButton
 
+    lateinit var presetInputLayout: TextInputLayout
     lateinit var presetDropdown: MaterialAutoCompleteTextView
 
     lateinit var activeTemplateCard: View
@@ -180,7 +181,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         githubLinkText.setOnClickListener {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                "https://github.com/andrazpoje/WorkCycle".toUri()
+                "https://github.com/andrazpoje/ABWorkdayWidget".toUri()
             )
             startActivity(intent)
         }
@@ -312,6 +313,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         dateText = root.findViewById(R.id.dateText)
         pickDateButton = root.findViewById(R.id.pickDateButton)
 
+        presetInputLayout = root.findViewById(R.id.presetInputLayout)
         presetDropdown = root.findViewById(R.id.presetDropdown)
 
         activeTemplateCard = root.findViewById(R.id.activeTemplateCard)

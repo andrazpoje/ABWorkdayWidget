@@ -1,10 +1,11 @@
 package com.dante.workcycle.widget
 
 import android.content.Context
+import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 
 object WidgetRefreshHelper {
 
     fun refresh(context: Context) {
-        WidgetUpdater.updateAllWidgets(context)
+        WidgetRefreshDispatcher.refreshAllWidgets(context)
     }
 }

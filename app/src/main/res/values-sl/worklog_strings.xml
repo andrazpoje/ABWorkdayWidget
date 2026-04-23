@@ -136,6 +136,10 @@
     <string name="work_log_settings_intro_title">Pravila dela</string>
     <string name="work_log_settings_intro_body">Uredi osnovne nastavitve za dnevno normo, privzeti odmor, spremljanje nadur in pričakovane začetke dela.</string>
     <string name="work_log_settings_default_break">Privzeti odmor</string>
+    <string name="work_log_settings_widget_info_mode">Podatek na widgetu med aktivno sejo</string>
+    <string name="work_log_settings_widget_info_mode_worked_today">Danes opravljeno (osvežuje se sproti)</string>
+    <string name="work_log_settings_widget_info_mode_start_time">Začetek dela (varčnejše)</string>
+    <string name="work_log_settings_widget_info_mode_helper">Sprotno osveževanje je bolj uporabno, vendar lahko nekoliko poveča porabo baterije.</string>
     <string name="work_log_settings_expected_times_section">Pričakovani začetki in konci dela po oznaki cikla</string>
     <string name="work_log_settings_expected_start_section">Pričakovani začetki dela po oznaki cikla</string>
     <string name="work_log_settings_expected_start_not_set">Ni nastavljeno</string>

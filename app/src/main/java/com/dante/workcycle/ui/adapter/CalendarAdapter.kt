@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.CalendarDayItem
 import com.dante.workcycle.R
+import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.google.android.material.card.MaterialCardView
@@ -33,6 +34,9 @@ class CalendarAdapter(
         val secondaryDot: View = card.findViewById(R.id.secondaryDot)
         val secondaryLabel: TextView = card.findViewById(R.id.secondaryLabel)
         val secondaryIcon: ImageView = card.findViewById(R.id.secondaryIcon)
+        val statusIconsContainer: View = card.findViewById(R.id.statusIconsContainer)
+        val statusIconFirst: ImageView = card.findViewById(R.id.statusIconFirst)
+        val statusIconSecond: ImageView = card.findViewById(R.id.statusIconSecond)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -75,6 +79,9 @@ class CalendarAdapter(
         holder.secondaryIcon.isVisible = false
         holder.secondaryDot.isVisible = false
         holder.secondaryLabel.isVisible = false
+        holder.statusIconsContainer.isVisible = false
+        holder.statusIconFirst.isVisible = false
+        holder.statusIconSecond.isVisible = false
 
         holder.dayCard.isClickable = false
         holder.dayCard.isFocusable = false
@@ -93,6 +100,9 @@ class CalendarAdapter(
         holder.secondaryLabel.isVisible = false
         holder.secondaryIcon.isVisible = false
         holder.secondaryDot.isVisible = false
+        holder.statusIconsContainer.isVisible = false
+        holder.statusIconFirst.isVisible = false
+        holder.statusIconSecond.isVisible = false
 
         holder.dayCard.strokeWidth = 0
         holder.dayCard.strokeColor = Color.TRANSPARENT
@@ -109,11 +119,7 @@ class CalendarAdapter(
         holder.dayLabel.setTypeface(null, android.graphics.Typeface.BOLD)
         holder.secondaryLabel.setTypeface(null, android.graphics.Typeface.NORMAL)
 
-        val backgroundColor = if (item.isOffDay) {
-            Color.parseColor("#9E9E9E")
-        } else {
-            item.cycleColor ?: Color.GRAY
-        }
+        val backgroundColor = item.cycleColor ?: Color.GRAY
 
         holder.dayCard.setCardBackgroundColor(backgroundColor)
 
@@ -134,6 +140,7 @@ class CalendarAdapter(
             assignmentColor = item.assignmentColor,
             fallbackTextColor = textColor
         )
+        bindStatusIcons(holder, item.statusIconResIds)
 
         applySelectionState(holder, item)
 
@@ -231,24 +238,23 @@ class CalendarAdapter(
     }
 
     private fun getIconRes(iconKey: String?): Int? {
-        return when (iconKey) {
-            "sick" -> R.drawable.ic_assignment_sick_24
-            "vacation" -> R.drawable.ic_assignment_vacation_24
-            "standby" -> R.drawable.ic_assignment_standby_24
-            "field" -> R.drawable.ic_assignment_field_24
-            else -> null
-        }
+        return StatusVisuals.getIconRes(iconKey)
+    }
+
+    private fun bindStatusIcons(holder: VH, iconResIds: List<Int>) {
+        val firstIcon = iconResIds.getOrNull(0)
+        val secondIcon = iconResIds.getOrNull(1)
+
+        holder.statusIconFirst.isVisible = firstIcon != null
+        holder.statusIconSecond.isVisible = secondIcon != null
+        holder.statusIconsContainer.isVisible = firstIcon != null || secondIcon != null
+
+        firstIcon?.let(holder.statusIconFirst::setImageResource)
+        secondIcon?.let(holder.statusIconSecond::setImageResource)
     }
 
     private fun applySelectionState(holder: VH, item: CalendarDayItem) {
-        val baseColor = if (
-            item.effectiveCycleLabel.equals(holder.itemView.context.getString(R.string.off_day_label), ignoreCase = true) ||
-            item.effectiveCycleLabel.equals(holder.itemView.context.getString(R.string.off_day_label).take(5), ignoreCase = true)
-        ) {
-            Color.parseColor("#9E9E9E")
-        } else {
-            item.primaryColor ?: Color.GRAY
-        }
+        val baseColor = item.primaryColor ?: Color.GRAY
 
         when {
             item.isSelected -> {

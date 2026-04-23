@@ -16,6 +16,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.dante.workcycle.R
 import com.dante.workcycle.core.util.DateProvider
+import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.domain.schedule.CycleManager
@@ -84,7 +85,7 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
 
         val widgetColors = WidgetStyleManager.getColors(context)
 
-        val todayColor = resolveWidgetCycleColor(
+        val todayColor = CycleColorHelper.getBackgroundColor(
             context = context,
             label = todayBase,
             cycle = cycle
@@ -358,25 +359,6 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         appWidgetManager.updateAppWidget(widgetId, views)
     }
 
-    private fun resolveWidgetCycleColor(
-        context: Context,
-        label: String,
-        cycle: List<String>
-    ): Int {
-        val colors = WidgetStyleManager.getColors(context)
-        val normalizedLabel = label.trim()
-
-        val index = cycle.indexOfFirst {
-            it.trim().equals(normalizedLabel, ignoreCase = true)
-        }
-
-        return when (index) {
-            0 -> colors.shiftAColor
-            1 -> colors.shiftBColor
-            else -> colors.offDayColor
-        }
-    }
-
     private fun applyWidgetStyle(context: Context, views: RemoteViews) {
         val prefs = context.getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
         val colors = WidgetStyleManager.getColors(context)
@@ -453,7 +435,7 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
                 }
         }
 
-        val color = resolveWidgetCycleColor(
+        val color = CycleColorHelper.getBackgroundColor(
             context = context,
             label = resolved.baseCycleLabel.trim(),
             cycle = cycle

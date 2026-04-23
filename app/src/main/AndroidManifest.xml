@@ -28,7 +28,8 @@
 
 		<receiver
 			android:name=".widget.WorkCycleWidgetProvider"
-			android:exported="true">
+			android:exported="true"
+			android:label="@string/widget_cycle_label">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -41,7 +42,8 @@
 
 		<receiver
 			android:name=".widget.worklog.WorkLogWidgetProvider"
-			android:exported="true">
+			android:exported="true"
+			android:label="@string/work_log_widget_label">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

@@ -10,6 +10,7 @@ data class ResolvedDay(
     val secondaryEffectiveLabel: String?,
 
     val statusLabel: String?,
+    val statusTags: Set<String> = emptySet(),
 
     val daySchedule: DaySchedule? = null,
     val isAssignmentFeatureEnabled: Boolean = false
@@ -23,6 +24,13 @@ data class ResolvedDay(
 
     val secondaryLabel: String?
         get() = secondaryEffectiveLabel
+
+    val statusSummary: String?
+        get() = statusTags
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString(", ")
 
     val isSecondaryOverridden: Boolean
         get() = hasSecondaryOverride && hasSecondaryBase

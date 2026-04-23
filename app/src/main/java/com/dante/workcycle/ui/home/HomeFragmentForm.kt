@@ -20,8 +20,7 @@ import com.dante.workcycle.domain.schedule.CyclePreset
 import com.dante.workcycle.domain.schedule.sanitizeLabel
 import com.dante.workcycle.domain.template.ScheduleTemplateProvider
 import com.dante.workcycle.domain.template.TemplateManager
-import com.dante.workcycle.ui.template.TemplateDropdownAdapter
-import com.dante.workcycle.ui.template.TemplateDropdownItem
+import com.dante.workcycle.ui.template.TemplatePickerBottomSheet
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -107,9 +106,9 @@ private fun HomeFragment.createNoFilterAdapter(items: List<String>): ArrayAdapte
     }
 }
 
-private fun HomeFragment.buildTemplateDropdownItems(): List<TemplateDropdownItem> {
+private fun HomeFragment.buildTemplatePickerSections(): List<TemplatePickerBottomSheet.Section> {
     val generalTemplates = listOfNotNull(
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_AB),
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_SINGLE_SHIFT),
         ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_TWO_SHIFT),
         ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_THREE_SHIFT),
         ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_4_ON_4_OFF),
@@ -117,30 +116,58 @@ private fun HomeFragment.buildTemplateDropdownItems(): List<TemplateDropdownItem
     )
 
     val professionalTemplates = listOfNotNull(
+        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_AB),
         ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_POSTA_SLOVENIJE_AB)
     )
 
-    return buildList {
-        add(TemplateDropdownItem.Header(getString(R.string.template_group_general)))
-        generalTemplates.forEach { template ->
-            add(
-                TemplateDropdownItem.Option(
-                    templateId = template.id,
-                    title = getString(template.titleRes)
-                )
-            )
-        }
+    return listOf(
+        TemplatePickerBottomSheet.Section(
+            title = shortTemplateGroupTitle(getString(R.string.template_group_general)),
+            items = generalTemplates.map(::toTemplatePickerItem)
+        ),
+        TemplatePickerBottomSheet.Section(
+            title = shortTemplateGroupTitle(getString(R.string.template_group_special)),
+            items = professionalTemplates.map(::toTemplatePickerItem)
+        )
+    )
+}
 
-        add(TemplateDropdownItem.Header(getString(R.string.template_group_special)))
-        professionalTemplates.forEach { template ->
-            add(
-                TemplateDropdownItem.Option(
-                    templateId = template.id,
-                    title = getString(template.titleRes)
-                )
-            )
-        }
+private fun HomeFragment.toTemplatePickerItem(
+    template: ScheduleTemplate
+): TemplatePickerBottomSheet.Item {
+    return TemplatePickerBottomSheet.Item(
+        templateId = template.id,
+        title = getString(template.getPickerTitleRes()),
+        description = getString(template.getPickerDescriptionRes())
+    )
+}
+
+private fun ScheduleTemplate.getPickerTitleRes(): Int {
+    return when (id) {
+        ScheduleTemplateProvider.TEMPLATE_POSTA_SLOVENIJE_AB ->
+            R.string.template_posta_slovenije_picker_title
+        else -> titleRes
     }
+}
+
+private fun ScheduleTemplate.getPickerDescriptionRes(): Int {
+    return when (id) {
+        ScheduleTemplateProvider.TEMPLATE_SINGLE_SHIFT ->
+            R.string.template_single_shift_picker_description
+        ScheduleTemplateProvider.TEMPLATE_TWO_SHIFT ->
+            R.string.template_two_shift_picker_description
+        ScheduleTemplateProvider.TEMPLATE_THREE_SHIFT ->
+            R.string.template_three_shift_picker_description
+        ScheduleTemplateProvider.TEMPLATE_AB ->
+            R.string.template_ab_picker_description
+        ScheduleTemplateProvider.TEMPLATE_POSTA_SLOVENIJE_AB ->
+            R.string.template_posta_slovenije_picker_description
+        else -> descriptionRes
+    }
+}
+
+private fun shortTemplateGroupTitle(title: String): String {
+    return title.substringBefore(" ").uppercase(Locale.getDefault())
 }
 
 
@@ -426,33 +453,49 @@ private fun HomeFragment.applyPresetInternal(
     }
 
     fun HomeFragment.setupPresetDropdown() {
-        val items = buildTemplateDropdownItems()
-        val adapter = TemplateDropdownAdapter(requireContext(), items)
-
-        presetDropdown.setAdapter(adapter)
-        configureAsSelectBox(presetDropdown)
+        presetDropdown.setAdapter(null)
+        presetDropdown.keyListener = null
+        presetDropdown.isCursorVisible = false
+        presetDropdown.threshold = Int.MAX_VALUE
 
         presetDropdown.setText(
             resolvePresetDisplayNameForCurrentState(),
             false
         )
 
-        presetDropdown.setOnItemClickListener { _, _, position, _ ->
-            when (val selected = adapter.getItem(position)) {
-                is TemplateDropdownItem.Option -> {
-                    val selectedTemplate = ScheduleTemplateProvider.getById(selected.templateId)
-                        ?: return@setOnItemClickListener
+        presetDropdown.setOnClickListener {
+            showTemplatePickerBottomSheet()
+        }
 
+        presetInputLayout.setEndIconOnClickListener {
+            showTemplatePickerBottomSheet()
+        }
+
+        presetDropdown.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                showTemplatePickerBottomSheet()
+            }
+        }
+    }
+
+    private fun HomeFragment.showTemplatePickerBottomSheet() {
+        if (!isAdded || parentFragmentManager.isStateSaved) return
+        if (parentFragmentManager.findFragmentByTag("templatePicker") != null) return
+
+        TemplatePickerBottomSheet(
+            sections = buildTemplatePickerSections(),
+            selectedTemplateId = TemplateManager.getActiveTemplate(requireContext())?.id,
+            onTemplateSelected = { templateId ->
+                val selectedTemplate = ScheduleTemplateProvider.getById(templateId)
+                if (selectedTemplate != null) {
                     showApplyTemplateDialog(
                         templateId = selectedTemplate.id,
                         templateTitle = getString(selectedTemplate.titleRes),
                         templateDescription = getString(selectedTemplate.descriptionRes)
                     )
                 }
-
-                is TemplateDropdownItem.Header -> Unit
             }
-        }
+        ).show(parentFragmentManager, "templatePicker")
     }
 
     private fun HomeFragment.resolvePresetDisplayNameForCurrentState(): String {

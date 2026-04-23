@@ -3,7 +3,7 @@ package com.dante.workcycle.data.prefs
 import android.content.Context
 import android.graphics.Color
 import androidx.core.content.edit
-import com.dante.workcycle.R
+import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.domain.model.StatusLabel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -14,7 +14,7 @@ class StatusLabelsPrefs(private val context: Context) {
 
     private val defaultSystemLabels = listOf(
         StatusLabel(
-            name = "Bolniška",
+            name = "Bolni\u0161ka",
             color = Color.parseColor("#E53935"),
             isSystem = true,
             isEnabled = true,
@@ -28,11 +28,39 @@ class StatusLabelsPrefs(private val context: Context) {
             iconKey = "vacation"
         ),
         StatusLabel(
-            name = "Dežurstvo",
+            name = "De\u017eurstvo",
             color = Color.parseColor("#8E24AA"),
             isSystem = true,
             isEnabled = true,
             iconKey = "standby"
+        ),
+        StatusLabel(
+            name = "Kr\u010denje",
+            color = Color.parseColor("#00897B"),
+            isSystem = true,
+            isEnabled = true,
+            iconKey = "reduction"
+        ),
+        StatusLabel(
+            name = "Nadome\u0161\u010danje",
+            color = Color.parseColor("#1E88E5"),
+            isSystem = true,
+            isEnabled = true,
+            iconKey = "replacement"
+        ),
+        StatusLabel(
+            name = "Sestanek",
+            color = Color.parseColor("#6D4C41"),
+            isSystem = true,
+            isEnabled = true,
+            iconKey = "meeting"
+        ),
+        StatusLabel(
+            name = "Teren",
+            color = Color.parseColor("#43A047"),
+            isSystem = true,
+            isEnabled = true,
+            iconKey = "terrain"
         )
     )
 
@@ -45,7 +73,7 @@ class StatusLabelsPrefs(private val context: Context) {
         }
 
         val base = parsed.ifEmpty { defaultSystemLabels }
-        val merged = mergeMissingSystemLabels(base)
+        val merged = sortLabels(mergeMissingSystemLabels(base))
 
         if (merged != parsed) {
             saveLabels(merged)
@@ -83,14 +111,7 @@ class StatusLabelsPrefs(private val context: Context) {
     }
 
     fun getDisplayName(label: StatusLabel): String {
-        if (!label.isSystem) return label.name
-
-        return when (label.iconKey) {
-            "sick" -> context.getString(R.string.assignment_system_label_sick)
-            "vacation" -> context.getString(R.string.assignment_system_label_vacation)
-            "standby" -> context.getString(R.string.assignment_system_label_standby)
-            else -> label.name
-        }
+        return StatusVisuals.getDisplayName(context, label)
     }
 
     private fun mergeMissingSystemLabels(existing: List<StatusLabel>): List<StatusLabel> {
@@ -104,6 +125,27 @@ class StatusLabelsPrefs(private val context: Context) {
         }
 
         return result
+    }
+
+    private fun sortLabels(labels: List<StatusLabel>): List<StatusLabel> {
+        fun systemOrderIndex(label: StatusLabel): Int {
+            return when (label.iconKey) {
+                "sick" -> 0
+                "vacation" -> 1
+                "standby" -> 2
+                "reduction" -> 3
+                "replacement" -> 4
+                "meeting" -> 5
+                "terrain" -> 6
+                else -> Int.MAX_VALUE
+            }
+        }
+
+        return labels.sortedWith(
+            compareBy<StatusLabel> { !it.isSystem }
+                .thenBy { systemOrderIndex(it) }
+                .thenBy { it.name.lowercase() }
+        )
     }
 
     private fun parseLabels(jsonString: String): List<StatusLabel> {

@@ -11,6 +11,7 @@ import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -24,10 +25,12 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var rowDailyTarget: View
     private lateinit var rowDefaultBreak: View
     private lateinit var rowOvertimeTracking: View
+    private lateinit var rowWidgetInfoMode: View
     private lateinit var containerExpectedStartRows: LinearLayout
     private lateinit var textDailyTargetValue: TextView
     private lateinit var textDefaultBreakValue: TextView
     private lateinit var textOvertimeTrackingValue: TextView
+    private lateinit var textWidgetInfoModeValue: TextView
     private lateinit var switchOvertimeTracking: MaterialSwitch
 
     private var isBindingSwitch = false
@@ -57,10 +60,12 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         rowDailyTarget = view.findViewById(R.id.rowDailyTarget)
         rowDefaultBreak = view.findViewById(R.id.rowDefaultBreak)
         rowOvertimeTracking = view.findViewById(R.id.rowOvertimeTracking)
+        rowWidgetInfoMode = view.findViewById(R.id.rowWidgetInfoMode)
         containerExpectedStartRows = view.findViewById(R.id.containerExpectedStartRows)
         textDailyTargetValue = view.findViewById(R.id.textDailyTargetValue)
         textDefaultBreakValue = view.findViewById(R.id.textDefaultBreakValue)
         textOvertimeTrackingValue = view.findViewById(R.id.textOvertimeTrackingValue)
+        textWidgetInfoModeValue = view.findViewById(R.id.textWidgetInfoModeValue)
         switchOvertimeTracking = view.findViewById(R.id.switchOvertimeTracking)
     }
 
@@ -75,6 +80,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
         rowOvertimeTracking.setOnClickListener {
             switchOvertimeTracking.toggle()
+        }
+
+        rowWidgetInfoMode.setOnClickListener {
+            showWidgetInfoModeDialog()
         }
 
         switchOvertimeTracking.setOnCheckedChangeListener { _, isChecked ->
@@ -104,6 +113,8 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         isBindingSwitch = true
         switchOvertimeTracking.isChecked = overtimeEnabled
         isBindingSwitch = false
+
+        textWidgetInfoModeValue.text = getWidgetInfoModeLabel(workSettingsPrefs.getWidgetInfoMode())
 
         bindExpectedTimeRows()
     }
@@ -138,6 +149,37 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun showWidgetInfoModeDialog() {
+        val modes = arrayOf(
+            WorkSettingsPrefs.WIDGET_INFO_MODE_WORKED_TODAY,
+            WorkSettingsPrefs.WIDGET_INFO_MODE_START_TIME
+        )
+        val labels = modes.map(::getWidgetInfoModeLabel).toTypedArray()
+        val checkedIndex = modes.indexOf(workSettingsPrefs.getWidgetInfoMode()).coerceAtLeast(0)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.work_log_settings_widget_info_mode)
+            .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
+                workSettingsPrefs.setWidgetInfoMode(modes[which])
+                WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
+                bindSettings()
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun getWidgetInfoModeLabel(mode: String): String {
+        return getString(
+            when (mode) {
+                WorkSettingsPrefs.WIDGET_INFO_MODE_WORKED_TODAY ->
+                    R.string.work_log_settings_widget_info_mode_worked_today
+                else ->
+                    R.string.work_log_settings_widget_info_mode_start_time
+            }
+        )
     }
 
     private fun formatHoursMinutesLabel(totalMinutes: Int): String {

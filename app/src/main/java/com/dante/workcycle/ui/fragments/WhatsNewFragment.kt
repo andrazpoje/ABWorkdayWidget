@@ -2,12 +2,13 @@ package com.dante.workcycle.ui.fragments
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
@@ -20,7 +21,7 @@ class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {
 
     companion object {
         private const val CHANGELOG_URL =
-            "https://github.com/andrazpoje/WorkCycle/blob/master/CHANGELOG.md"
+            "https://github.com/andrazpoje/ABWorkdayWidget/blob/master/CHANGELOG.md"
     }
 
     private lateinit var whatsNewContentContainer: View
@@ -76,7 +77,9 @@ class WhatsNewFragment : Fragment(R.layout.fragment_whats_new) {
     }
 
     private fun openChangelog() {
-        val intent = Intent(Intent.ACTION_VIEW, CHANGELOG_URL.toUri())
+        val uri = Uri.parse(CHANGELOG_URL.trim())
+        Log.d("CHANGELOG_URL", uri.toString())
+        val intent = Intent(Intent.ACTION_VIEW, uri)
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {

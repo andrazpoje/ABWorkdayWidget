@@ -45,16 +45,23 @@
     <string name="theme_dark">Temna</string>
     <string name="theme_custom">Po meri</string>
     <string name="color_theme">Barvna tema</string>
+    <string name="cycle_colors_title">Barve cikla</string>
     <string name="custom_colors_title">Barve po meri</string>
     <string name="custom_colors_helper">Te barve se uporabijo samo, ko je izbrana tema Po meri.</string>
-    <string name="color_shift_a">Cikel A</string>
-    <string name="color_shift_b">Cikel B</string>
+    <string name="color_shift_a">Barva prve oznake</string>
+    <string name="color_shift_b">Barva druge oznake</string>
+    <string name="color_shift_c">Barva tretje oznake</string>
+    <string name="color_off_day">Barva prostega dne</string>
     <string name="color_background">Ozadje</string>
+    <string name="widget_background_title">Ozadje klasičnega widgeta</string>
+    <string name="widget_background_helper">Uporabi se pri klasičnem videzu widgeta, ko je izbrana tema Po meri.</string>
     <string name="color_picker_title">Izberi barvo</string>
     <string name="color_picker_palette_label">Barvna paleta</string>
     <string name="color_picker_apply">Uporabi</string>
-    <string name="color_picker_title_cycle_a">Izberi barvo za Cikel A</string>
-    <string name="color_picker_title_cycle_b">Izberi barvo za Cikel B</string>
+    <string name="color_picker_title_cycle_a">Izberi barvo prve oznake</string>
+    <string name="color_picker_title_cycle_b">Izberi barvo druge oznake</string>
+    <string name="color_picker_title_cycle_c">Izberi barvo tretje oznake</string>
+    <string name="color_picker_title_off_day">Izberi barvo prostega dne</string>
     <string name="color_picker_title_background">Izberi barvo ozadja</string>
     <string name="color_row_default_label">Oznaka</string>
 
@@ -88,12 +95,18 @@
     <string name="templates_hint_text">Predloge najdeš na zaslonu Domov v sekciji Cikel. Tam lahko hitro izbereš že pripravljen razpored. Če si cikel nastaviš sam, bo prikazano Lastno določena.</string>
     <string name="template_group_general">Splošni template-i</string>
     <string name="template_group_special">Posebni template-i</string>
+    <string name="template_single_shift_title">Enotna izmena</string>
+    <string name="template_single_shift_description">Ista delovna oznaka vsak delovni dan. Primerno za uporabnike brez rotacijskega cikla.</string>
+    <string name="template_single_shift_picker_description">Ista delovna oznaka vsak delovni dan.</string>
     <string name="template_ab_title">A / B</string>
     <string name="template_ab_description">Preprost dvodnevni cikel z oznakama A in B.</string>
+    <string name="template_ab_picker_description">Dvodnevni cikel z oznakama A in B.</string>
     <string name="template_two_shift_title">2-izmensko</string>
     <string name="template_two_shift_description">Preprost dvoizmenski cikel: Dopoldan in Popoldan.</string>
+    <string name="template_two_shift_picker_description">Dopoldan in Popoldan.</string>
     <string name="template_three_shift_title">3-izmensko</string>
     <string name="template_three_shift_description">Standardni triizmenski cikel: Dopoldan, Popoldan in Nočna.</string>
+    <string name="template_three_shift_picker_description">Dopoldan, Popoldan in Nočna.</string>
     <string name="template_4on4off_title">4 dni delo / 4 dni prosto</string>
     <string name="template_4on4off_description">4 dni dela, nato 4 dni prosto. Pogost urnik v izmenskem delu.</string>
     <string name="template_panama_223_title">Panama 2-2-3</string>
@@ -102,8 +115,10 @@
     <string name="template_active_title">Aktiven template</string>
     <string name="template_active_title_format">Aktiven template: %1$s</string>
     <string name="template_locked_message">Nekatere nastavitve so zaklenjene, ker je aktiven template.</string>
-    <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
-    <string name="template_posta_slovenije_description">Fiksen A/B cikel za pismonoše. Cikel, pravila in začetni datum so zaklenjeni. Rajoni so omogočeni v načinu samo ročno.</string>
+    <string name="template_posta_slovenije_title">Pismonoša A/B</string>
+    <string name="template_posta_slovenije_description">Fiksen A/B cikel za pismonoše. Cikel, pravila in začetni datum so zaklenjeni. Sekundarne oznake so v ročnem načinu.</string>
+    <string name="template_posta_slovenije_picker_title">Pismonoša A/B</string>
+    <string name="template_posta_slovenije_picker_description">Cikel, pravila in začetni datum so zaklenjeni.</string>
     <string name="template_apply_confirm_message">Ta predloga bo uporabila izbran cikel in povezane nastavitve.</string>
     <string name="apply">Uporabi</string>
     <string name="template_locked_click_message">Ta nastavitev je zaklenjena, ker jo določa aktivni template.</string>
@@ -116,7 +131,7 @@
     <string name="template_locked_item_cycle">cikel</string>
     <string name="template_locked_item_rules">pravila</string>
     <string name="template_locked_item_start_date">začetni datum</string>
-    <string name="template_locked_item_assignment_mode">način assignmentov</string>
+    <string name="template_locked_item_assignment_mode">način sekundarnih oznak</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / PRAVILA, KOLEDAR IN DOMOV -->
@@ -165,11 +180,11 @@
     <string name="assignment_mode_helper">Izberi, kako se sekundarne oznake določijo za posamezen dan.</string>
     <string name="assignment_mode_cyclic_overrides">Ciklično + overridei</string>
     <string name="assignment_mode_manual_only">Samo ročno</string>
-    <string name="assignment_advance_mode_title">Napredovanje assignment cikla</string>
+    <string name="assignment_advance_mode_title">Napredovanje cikla sekundarnih oznak</string>
     <string name="assignment_advance_mode_helper">Izberi, ali cikel sekundarnih oznak napreduje vsak dan ali samo na delovne dni.</string>
     <string name="assignment_advance_mode_all_days">Vsak dan</string>
     <string name="assignment_advance_mode_working_days_only">Samo delovne dni</string>
-    <string name="assignment_mode_locked_by_template">Način assignmentov določa aktivni template.</string>
+    <string name="assignment_mode_locked_by_template">Način sekundarnih oznak določa aktivni template.</string>
     <string name="assignment_labels_title">Sekundarne oznake</string>
     <string name="assignment_labels_description">Sistemske oznake ostanejo fiksne in jih lahko samo omogočiš ali onemogočiš. Ročne sekundarne oznake lahko dodajaš, urejaš, brišeš in se razvrščajo po uporabi.</string>
     <string name="assignment_label_type_system">Sistemska oznaka</string>
@@ -217,6 +232,13 @@
     <string name="status_labels_system_section">Status oznake</string>
     <string name="edit_status_label">Uredi status oznako</string>
     <string name="clear_status">Počisti status</string>
+    <string name="status_system_label_reduction">Krčenje</string>
+    <string name="extra_status_tags_title">Dodatni statusi</string>
+    <string name="status_system_label_replacement">Nadomeščanje</string>
+    <string name="status_system_label_meeting">Sestanek</string>
+    <string name="status_system_label_terrain">Teren</string>
+    <string name="status_tags_exclusive_helper">Te oznake ne moreš kombinirati z drugimi oznakami.</string>
+    <string name="status_tags_conflict_message">Izbrane so konfliktne statusne oznake. Preveri izbor.</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / STATISTIKA -->

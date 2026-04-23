@@ -5,7 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
-import com.dante.workcycle.widget.WidgetRefreshHelper
+import com.dante.workcycle.widget.WidgetUpdater
 import com.dante.workcycle.widget.worklog.WorkLogWidgetProvider
 
 object WidgetRefreshDispatcher {
@@ -18,7 +18,7 @@ object WidgetRefreshDispatcher {
     }
 
     fun refreshCycleWidgets(context: Context) {
-        WidgetRefreshHelper.refresh(context)
+        WidgetUpdater.updateAllWidgets(context)
     }
 
     fun refreshAllWidgets(context: Context) {

@@ -137,6 +137,10 @@
     <string name="work_log_settings_intro_title">Work Rules</string>
     <string name="work_log_settings_intro_body">Adjust the daily target, default break, overtime tracking, and expected start and end times for Work Log.</string>
     <string name="work_log_settings_default_break">Default break</string>
+    <string name="work_log_settings_widget_info_mode">Widget info during active session</string>
+    <string name="work_log_settings_widget_info_mode_worked_today">Worked today (live refresh)</string>
+    <string name="work_log_settings_widget_info_mode_start_time">Start time (battery saver)</string>
+    <string name="work_log_settings_widget_info_mode_helper">Live updates are more useful, but may slightly increase battery usage.</string>
     <string name="work_log_settings_expected_times_section">Expected start and end times by cycle label</string>
     <string name="work_log_settings_expected_start_section">Expected start and end times by cycle label</string>
     <string name="work_log_settings_start_label">Start</string>

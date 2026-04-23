@@ -389,27 +389,9 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/settings_widget_title"
+                        android:text="@string/cycle_colors_title"
                         android:textSize="18sp"
                         android:textStyle="bold" />
-
-                    <RadioGroup
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp">
-
-                        <RadioButton
-                            android:id="@+id/settingsWidgetStyleClassic"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_widget_style_classic" />
-
-                        <RadioButton
-                            android:id="@+id/settingsWidgetStyleMinimal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_widget_style_minimal" />
-                    </RadioGroup>
 
                     <TextView
                         android:layout_width="match_parent"
@@ -467,6 +449,72 @@
                         android:id="@+id/colorShiftB"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
+
+                    <com.dante.workcycle.ui.views.ColorRowView
+                        android:id="@+id/colorShiftC"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <com.dante.workcycle.ui.views.ColorRowView
+                        android:id="@+id/colorOffDay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_widget_title"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                        <RadioButton
+                            android:id="@+id/settingsWidgetStyleClassic"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_widget_style_classic" />
+
+                        <RadioButton
+                            android:id="@+id/settingsWidgetStyleMinimal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_widget_style_minimal" />
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/widget_background_title"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textWidgetBackgroundHelper"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/widget_background_helper"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp" />
 
                     <com.dante.workcycle.ui.views.ColorRowView
                         android:id="@+id/colorBackground"

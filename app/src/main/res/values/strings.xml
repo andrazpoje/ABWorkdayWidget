@@ -8,6 +8,10 @@
     <string name="app_version">Version %1$s</string>
     <string name="app_version_short">v%1$s</string>
     <string name="bullet_label_format">• %1$s</string>
+    <string name="widget_cycle_label">Work Cycle</string>
+    <string name="widget_cycle_preview_primary">Morning</string>
+    <string name="widget_cycle_preview_secondary">Standby</string>
+    <string name="widget_cycle_preview_context">Today</string>
 
     <!-- ========================================================= -->
     <!-- CORE / COMMON ACTIONS -->
@@ -22,10 +26,13 @@
     <!-- ========================================================= -->
     <!-- WORK LOG WIDGET -->
     <!-- ========================================================= -->
-    <string name="work_log_widget_label">Work Log</string>
-    <string name="work_log_widget_title">Work Log</string>
+    <string name="work_log_widget_label">Work Time</string>
+    <string name="work_log_widget_title">Work Time</string>
     <string name="work_log_widget_status_placeholder">Not started</string>
     <string name="work_log_widget_primary_placeholder">Open Work Log</string>
     <string name="work_log_widget_secondary_placeholder">Tap to view today</string>
     <string name="work_log_widget_tertiary_placeholder">Waiting for live data</string>
+    <string name="work_log_widget_preview_status">Working</string>
+    <string name="work_log_widget_preview_primary">Started 07:00</string>
+    <string name="work_log_widget_preview_secondary">Today 3h 25m</string>
 </resources>

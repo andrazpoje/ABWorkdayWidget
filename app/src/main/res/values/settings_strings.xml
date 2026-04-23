@@ -45,16 +45,23 @@
     <string name="theme_dark">Dark</string>
     <string name="theme_custom">Custom</string>
     <string name="color_theme">Color theme</string>
+    <string name="cycle_colors_title">Cycle colors</string>
     <string name="custom_colors_title">Custom colors</string>
     <string name="custom_colors_helper">These colors are used only when the Custom theme is selected.</string>
-    <string name="color_shift_a">Cycle A</string>
-    <string name="color_shift_b">Cycle B</string>
+    <string name="color_shift_a">First label color</string>
+    <string name="color_shift_b">Second label color</string>
+    <string name="color_shift_c">Third label color</string>
+    <string name="color_off_day">Off-day color</string>
     <string name="color_background">Background</string>
+    <string name="widget_background_title">Classic widget background</string>
+    <string name="widget_background_helper">Used by the classic widget style when the Custom theme is selected.</string>
     <string name="color_picker_title">Choose color</string>
     <string name="color_picker_palette_label">Color palette</string>
     <string name="color_picker_apply">Apply</string>
-    <string name="color_picker_title_cycle_a">Choose color for Cycle A</string>
-    <string name="color_picker_title_cycle_b">Choose color for Cycle B</string>
+    <string name="color_picker_title_cycle_a">Choose first label color</string>
+    <string name="color_picker_title_cycle_b">Choose second label color</string>
+    <string name="color_picker_title_cycle_c">Choose third label color</string>
+    <string name="color_picker_title_off_day">Choose off-day color</string>
     <string name="color_picker_title_background">Choose background color</string>
     <string name="color_row_default_label">Label</string>
 
@@ -88,12 +95,18 @@
     <string name="templates_hint_text">You can find templates on the Home screen in the Cycle section. There you can quickly choose a predefined schedule. If you configure the cycle manually, it will be shown as Custom.</string>
     <string name="template_group_general">General templates</string>
     <string name="template_group_special">Special templates</string>
+    <string name="template_single_shift_title">Single shift</string>
+    <string name="template_single_shift_description">The same work label every working day. Suitable for users without a rotating schedule.</string>
+    <string name="template_single_shift_picker_description">The same work label every working day.</string>
     <string name="template_ab_title">A / B</string>
     <string name="template_ab_description">Simple two-day cycle with labels A and B.</string>
+    <string name="template_ab_picker_description">Two-day cycle with labels A and B.</string>
     <string name="template_two_shift_title">2-shift</string>
     <string name="template_two_shift_description">A simple two-shift cycle: Morning and Afternoon.</string>
+    <string name="template_two_shift_picker_description">Morning and Afternoon.</string>
     <string name="template_three_shift_title">3-shift</string>
     <string name="template_three_shift_description">A standard three-shift cycle: Morning, Afternoon and Night.</string>
+    <string name="template_three_shift_picker_description">Morning, Afternoon and Night.</string>
     <string name="template_4on4off_title">4-on / 4-off</string>
     <string name="template_4on4off_description">4 days of work followed by 4 days off. Common in shift-based jobs.</string>
     <string name="template_panama_223_title">Panama 2-2-3</string>
@@ -102,8 +115,10 @@
     <string name="template_active_title">Active template</string>
     <string name="template_active_title_format">Active template: %1$s</string>
     <string name="template_locked_message">Some settings are locked because a template is active.</string>
-    <string name="template_posta_slovenije_title">Pošta Slovenije – pismonoša A/B</string>
-    <string name="template_posta_slovenije_description">Fixed A/B cycle for postal workers. Cycle, rules, and start date are locked. Assignments are enabled in manual-only mode.</string>
+    <string name="template_posta_slovenije_title">Mail carrier A/B</string>
+    <string name="template_posta_slovenije_description">Fixed A/B cycle for mail carriers. Cycle, rules, and start date are locked. Secondary labels are manual-only.</string>
+    <string name="template_posta_slovenije_picker_title">Mail carrier A/B</string>
+    <string name="template_posta_slovenije_picker_description">Cycle, rules, and start date are locked.</string>
     <string name="template_apply_confirm_message">This template will apply the selected cycle and related settings.</string>
     <string name="apply">Apply</string>
     <string name="template_locked_click_message">This setting is locked because an active template controls it.</string>
@@ -116,7 +131,7 @@
     <string name="template_locked_item_cycle">cycle</string>
     <string name="template_locked_item_rules">rules</string>
     <string name="template_locked_item_start_date">start date</string>
-    <string name="template_locked_item_assignment_mode">assignment mode</string>
+    <string name="template_locked_item_assignment_mode">secondary label mode</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / RULES, CALENDAR & HOME -->
@@ -169,7 +184,7 @@
     <string name="assignment_advance_mode_helper">Choose whether the secondary label cycle advances every day or only on working days.</string>
     <string name="assignment_advance_mode_all_days">Every day</string>
     <string name="assignment_advance_mode_working_days_only">Working days only</string>
-    <string name="assignment_mode_locked_by_template">Assignment mode is controlled by the active template.</string>
+    <string name="assignment_mode_locked_by_template">Secondary label mode is controlled by the active template.</string>
     <string name="assignment_labels_title">Secondary labels</string>
     <string name="assignment_labels_description">System labels stay fixed and can only be enabled or disabled. Manual labels can be added, edited, deleted, and are sorted by usage.</string>
     <string name="assignment_label_type_system">System label</string>
@@ -187,6 +202,10 @@
     <string name="assignment_system_label_vacation">Vacation</string>
     <string name="assignment_system_label_standby">Standby</string>
     <string name="assignment_system_label_field">Field work</string>
+    <string name="status_system_label_reduction">Reduction</string>
+    <string name="status_system_label_replacement">Replacement</string>
+    <string name="status_system_label_meeting">Meeting</string>
+    <string name="status_system_label_terrain">Terrain</string>
     <string name="assignment_system_label_sick_short">Sick</string>
     <string name="assignment_system_label_vacation_short">Vac.</string>
     <string name="assignment_system_label_standby_short">Stand.</string>
@@ -215,6 +234,9 @@
     <string name="status_labels_system_section">Status labels</string>
     <string name="edit_status_label">Edit status label</string>
     <string name="clear_status">Clear status</string>
+    <string name="extra_status_tags_title">Extra status tags</string>
+    <string name="status_tags_exclusive_helper">This tag cannot be combined with other tags.</string>
+    <string name="status_tags_conflict_message">Conflicting status tags were detected. Please review the selection.</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / STATISTICS -->

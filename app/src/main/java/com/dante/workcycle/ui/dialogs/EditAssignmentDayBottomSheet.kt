@@ -5,10 +5,12 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
@@ -16,15 +18,20 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.dante.workcycle.R
+import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AssignmentCyclePrefs
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
+import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.domain.model.AssignmentLabel
 import com.dante.workcycle.domain.model.ResolvedDay
+import com.dante.workcycle.domain.model.StatusLabel
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.CycleOverrideRepository
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.domain.schedule.ManualScheduleRepository
+import com.dante.workcycle.domain.schedule.StatusRepository
+import com.dante.workcycle.domain.schedule.StatusTagRules
 import com.dante.workcycle.domain.template.TemplateManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -37,37 +44,30 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-import com.dante.workcycle.data.prefs.StatusLabelsPrefs
-import com.dante.workcycle.domain.model.StatusLabel
-import com.dante.workcycle.domain.schedule.StatusRepository
-import android.view.HapticFeedbackConstants
-
 
 class EditAssignmentDayBottomSheet(
     private val date: LocalDate,
     private val onSaved: (() -> Unit)? = null
 ) : DialogFragment() {
 
-    private var savedCycleOverrideLabel: String? = null
     private var draftCycleOverrideLabel: String? = null
 
-    private var savedAssignmentLabel: String? = null
     private var draftAssignmentLabel: String? = null
 
-    private var savedStatusLabel: String? = null
-    private var draftStatusLabel: String? = null
+    private var draftStatusTags = linkedSetOf<String>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
 
         val dialog = BottomSheetDialog(context, theme)
         val contentParent = FrameLayout(context)
-
-        val view = layoutInflater
-            .inflate(R.layout.bottom_sheet_edit_secondary_day_v2, contentParent, false)
+        val view = layoutInflater.inflate(
+            R.layout.bottom_sheet_edit_secondary_day_v2,
+            contentParent,
+            false
+        )
 
         dialog.setContentView(view)
-
 
         dialog.setOnShowListener {
             val bottomSheet = dialog.findViewById<View>(
@@ -79,9 +79,8 @@ class EditAssignmentDayBottomSheet(
         }
 
         val statusRepository = StatusRepository(context)
-
-        savedStatusLabel = statusRepository.getStatusLabel(date)
-        draftStatusLabel = savedStatusLabel
+        val statusLabelsPrefs = StatusLabelsPrefs(context)
+        draftStatusTags = statusRepository.getStatusTags(date)
 
         val canEditCycleOverride = TemplateManager.allowsCycleOverrides(context)
         val assignmentPrefs = AssignmentCyclePrefs(context)
@@ -93,23 +92,20 @@ class EditAssignmentDayBottomSheet(
         val labelsPrefs = AssignmentLabelsPrefs(context)
 
         val resolved = resolver.resolve(date)
-        bindStatusSection(view, resolved)
         val cycle = CycleManager.loadCycle(context)
 
-        savedCycleOverrideLabel = cycleOverrideRepository.getOverrideLabel(date)
+        draftCycleOverrideLabel = cycleOverrideRepository.getOverrideLabel(date)
             ?.trim()
             ?.ifBlank { null }
-        draftCycleOverrideLabel = savedCycleOverrideLabel
 
-        savedAssignmentLabel = manualScheduleRepository.getSecondaryManualLabel(date)
+        draftAssignmentLabel = manualScheduleRepository.getSecondaryManualLabel(date)
             ?.trim()
             ?.ifBlank { null }
-        draftAssignmentLabel = savedAssignmentLabel
 
         bindHeader(view)
         bindDaySummaryCard(view, resolved)
+        bindStatusSection(view, resolved)
         applySecondarySectionTitles(view)
-
         bindCycleSection(
             view = view,
             cycle = cycle,
@@ -133,31 +129,36 @@ class EditAssignmentDayBottomSheet(
             )
         }
 
-        val btnSave = view.findViewById<MaterialButton>(R.id.btnSave)
-        val btnCancel = view.findViewById<MaterialButton>(R.id.btnCancel)
-
-        btnSave.setOnClickListener {
+        view.findViewById<MaterialButton>(R.id.btnSave).setOnClickListener {
             if (canEditCycleOverride) {
                 cycleOverrideRepository.setOverrideLabel(date, draftCycleOverrideLabel)
             }
 
             if (isAssignmentEnabled) {
                 manualScheduleRepository.setSecondaryManualLabel(date, draftAssignmentLabel)
-
                 draftAssignmentLabel
                     ?.takeIf { it.isNotBlank() }
-                    ?.let { labelsPrefs.markLabelUsed(it) }
+                    ?.let(labelsPrefs::markLabelUsed)
             } else {
                 manualScheduleRepository.setSecondaryManualLabel(date, null)
             }
 
-            statusRepository.setStatusLabel(date, draftStatusLabel)
+            if (!StatusTagRules.isValid(draftStatusTags, statusLabelsPrefs.getLabels())) {
+                Toast.makeText(
+                    context,
+                    getString(R.string.status_tags_conflict_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            statusRepository.setStatusTags(date, draftStatusTags)
 
             onSaved?.invoke()
             dialog.dismiss()
         }
 
-        btnCancel.setOnClickListener {
+        view.findViewById<MaterialButton>(R.id.btnCancel).setOnClickListener {
             dialog.dismiss()
         }
 
@@ -182,83 +183,17 @@ class EditAssignmentDayBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(view) { root, insets ->
             val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            v.setPadding(
-                v.paddingLeft,
-                v.paddingTop,
-                v.paddingRight,
+            root.setPadding(
+                root.paddingLeft,
+                root.paddingTop,
+                root.paddingRight,
                 systemInsets.bottom
             )
 
             insets
-        }
-    }
-
-    private fun createStatusChip(
-        label: StatusLabel,
-        isSelected: Boolean
-    ): Chip {
-        val context = requireContext()
-
-        return Chip(context).apply {
-            id = View.generateViewId()
-            text = label.name
-            isCheckable = true
-            isChecked = isSelected
-            isClickable = !isSelected
-            isEnabled = !isSelected
-
-            chipBackgroundColor = ColorStateList.valueOf(label.color)
-            setTextColor(getReadableTextColor(label.color))
-
-            val iconRes = getIconRes(label.iconKey)
-            if (iconRes != null) {
-                chipIcon = AppCompatResources.getDrawable(context, iconRes)
-                isChipIconVisible = true
-            }
-
-            setOnClickListener {
-                performSelectionFeedback(this)
-            }
-        }
-    }
-
-    private fun bindStatusSection(
-        view: View,
-        resolved: ResolvedDay
-    ) {
-        val statusChipGroup = view.findViewById<ChipGroup>(R.id.statusChipGroup)
-        val btnClearStatus = view.findViewById<MaterialButton>(R.id.btnClearStatus)
-
-        val prefs = StatusLabelsPrefs(requireContext())
-        val labels: List<StatusLabel> = prefs.getSelectableLabels()
-
-        statusChipGroup.removeAllViews()
-
-        labels.forEach { label: StatusLabel ->
-            val chip = createStatusChip(label, label.name == draftStatusLabel)
-            statusChipGroup.addView(chip)
-        }
-        updateStatusActionVisibility(view)
-
-        statusChipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
-            val selectedId = checkedIds.firstOrNull()
-
-            draftStatusLabel = if (selectedId != null) {
-                group.findViewById<Chip>(selectedId)?.text?.toString()?.trim()
-            } else {
-                null
-            }
-
-            refreshStatusUi(view, resolved)
-        }
-
-        btnClearStatus.setOnClickListener {
-            draftStatusLabel = null
-            statusChipGroup.clearCheck()
-            refreshStatusUi(view, resolved)
         }
     }
 
@@ -280,14 +215,9 @@ class EditAssignmentDayBottomSheet(
         val card = view.findViewById<MaterialCardView>(R.id.daySummaryCard)
 
         val activePrimary = draftCycleOverrideLabel ?: resolved.baseCycleLabel
-
-        val activeSecondary = draftAssignmentLabel
-            ?: resolved.secondaryEffectiveLabel
-            ?: "—"
-
-        val activeStatus = draftStatusLabel
-            ?: resolved.statusLabel
-            ?: "—"
+        val activeSecondary = draftAssignmentLabel ?: resolved.secondaryEffectiveLabel ?: "-"
+        val activeStatusTags = draftStatusTags
+        val activeStatus = formatStatusTags(activeStatusTags) ?: "-"
 
         primary.text = activePrimary
         secondary.text = getString(R.string.day_summary_secondary_value, activeSecondary)
@@ -296,8 +226,56 @@ class EditAssignmentDayBottomSheet(
         applySummaryCardStyle(
             card = card,
             activePrimary = activePrimary,
-            activeStatus = if (activeStatus == "—") null else activeStatus
+            activeStatusTags = activeStatusTags
         )
+    }
+
+    private fun bindStatusSection(
+        view: View,
+        resolved: ResolvedDay
+    ) {
+        val statusChipGroup = view.findViewById<ChipGroup>(R.id.statusChipGroup)
+        val statusExclusiveHelper = view.findViewById<TextView>(R.id.textStatusExclusiveHelper)
+        val btnClearStatus = view.findViewById<MaterialButton>(R.id.btnClearStatus)
+        val labels = StatusLabelsPrefs(requireContext()).getSelectableLabels()
+
+        statusChipGroup.removeAllViews()
+
+        labels.forEach { label ->
+            val chip = createStatusChip(
+                label = label,
+                isSelected = label.name in draftStatusTags,
+                isEnabled = StatusTagRules.canSelect(label, draftStatusTags, labels)
+            )
+            chip.setOnCheckedChangeListener { _, isChecked ->
+                draftStatusTags = if (isChecked) {
+                    StatusTagRules.applySelection(label, draftStatusTags, labels)
+                } else {
+                    LinkedHashSet(draftStatusTags).apply {
+                        remove(label.name)
+                    }
+                }
+
+                refreshStatusUi(view, resolved)
+            }
+            statusChipGroup.addView(chip)
+        }
+
+        val showExclusiveHelper = labels.any { label ->
+            label.name in draftStatusTags && StatusVisuals.usesExclusiveHelper(label)
+        }
+        statusExclusiveHelper.visibility = if (showExclusiveHelper) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        updateStatusActionVisibility(view)
+
+        btnClearStatus.setOnClickListener {
+            draftStatusTags = linkedSetOf()
+            refreshStatusUi(view, resolved)
+        }
     }
 
     private fun bindCycleSection(
@@ -312,7 +290,6 @@ class EditAssignmentDayBottomSheet(
         val dividerCycleTop = view.findViewById<MaterialDivider>(R.id.dividerCycleTop)
         val dividerCycleBottom = view.findViewById<MaterialDivider>(R.id.dividerCycleBottom)
         val cycleSectionContainer = view.findViewById<View>(R.id.cycleSectionContainer)
-
         val hint = view.findViewById<TextView>(R.id.textCycleOverrideHint)
 
         textCycleOverrideTitle.isVisible = true
@@ -368,6 +345,7 @@ class EditAssignmentDayBottomSheet(
             refreshCycleUi(view, resolved)
         }
     }
+
     private fun applySecondarySectionTitles(view: View) {
         view.findViewById<TextView>(R.id.textSystemAssignments)?.text =
             getString(R.string.secondary_label_title)
@@ -378,6 +356,7 @@ class EditAssignmentDayBottomSheet(
         view.findViewById<MaterialButton>(R.id.btnClearAssignment)?.text =
             getString(R.string.secondary_clear)
     }
+
     private fun bindAssignmentSection(
         view: View,
         labelsPrefs: AssignmentLabelsPrefs,
@@ -392,10 +371,8 @@ class EditAssignmentDayBottomSheet(
         val selectable = labelsPrefs.getSelectableLabels()
 
         val systemLabels = selectable.filter {
-            it.isSystem &&
-                    it.iconKey !in listOf("sick", "vacation", "standby")
+            it.isSystem && it.iconKey !in listOf("sick", "vacation", "standby")
         }
-
         val manualLabels = selectable.filterNot { it.isSystem }
 
         textSystemAssignments.isVisible = systemLabels.isNotEmpty()
@@ -559,23 +536,8 @@ class EditAssignmentDayBottomSheet(
         resolved: ResolvedDay
     ) {
         bindDaySummaryCard(view, resolved)
+        bindStatusSection(view, resolved)
         updateStatusActionVisibility(view)
-    }
-
-    private fun getStatusHighlightColor(status: String?): Int? {
-        return when (status?.trim()) {
-            "Bolniška" -> Color.parseColor("#E53935")
-            "Dopust" -> Color.parseColor("#F9A825")
-            "Dežurstvo" -> Color.parseColor("#8E24AA")
-            "Sick leave" -> Color.parseColor("#E53935")
-            "Vacation" -> Color.parseColor("#F9A825")
-            "Standby" -> Color.parseColor("#8E24AA")
-            else -> null
-        }
-    }
-
-    private fun performSelectionFeedback(target: View) {
-        target.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
     }
 
     private fun updateCycleActionVisibility(view: View) {
@@ -586,10 +548,8 @@ class EditAssignmentDayBottomSheet(
     }
 
     private fun updateStatusActionVisibility(view: View) {
-        val btnClearStatus =
-            view.findViewById<MaterialButton>(R.id.btnClearStatus)
-
-        btnClearStatus.isVisible = !draftStatusLabel.isNullOrBlank()
+        val btnClearStatus = view.findViewById<MaterialButton>(R.id.btnClearStatus)
+        btnClearStatus.isVisible = draftStatusTags.isNotEmpty()
     }
 
     private fun updateSecondaryActionVisibility(view: View) {
@@ -599,11 +559,10 @@ class EditAssignmentDayBottomSheet(
         btnClearAssignment.isVisible = !draftAssignmentLabel.isNullOrBlank()
     }
 
-
     private fun applySummaryCardStyle(
         card: MaterialCardView,
         activePrimary: String,
-        activeStatus: String?
+        activeStatusTags: Set<String>
     ) {
         val cycle = CycleManager.loadCycle(requireContext())
 
@@ -621,19 +580,17 @@ class EditAssignmentDayBottomSheet(
 
         card.setCardBackgroundColor(background)
 
-        val statusStrokeColor = getStatusHighlightColor(activeStatus)
+        val statusStrokeColor = getStatusHighlightColor(activeStatusTags)
         card.strokeColor = statusStrokeColor ?: CycleColorHelper.getSoftStroke(baseColor)
-        card.strokeWidth = if (activeStatus != null) 4 else 2
-        card.cardElevation = if (activeStatus != null) 8f else 4f
-
+        card.strokeWidth = if (activeStatusTags.isNotEmpty()) 4 else 2
+        card.cardElevation = if (activeStatusTags.isNotEmpty()) 8f else 4f
     }
 
     private fun isDarkTheme(): Boolean {
         val nightModeFlags = resources.configuration.uiMode and
-                android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            android.content.res.Configuration.UI_MODE_NIGHT_MASK
         return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
     }
-
 
     private fun setupCycleChips(
         chipGroup: ChipGroup,
@@ -643,12 +600,13 @@ class EditAssignmentDayBottomSheet(
         chipGroup.removeAllViews()
 
         cycle.forEach { label ->
-            val chip = createCycleChip(
-                label = label,
-                cycle = cycle,
-                isSelected = label == selectedLabel
+            chipGroup.addView(
+                createCycleChip(
+                    label = label,
+                    cycle = cycle,
+                    isSelected = label == selectedLabel
+                )
             )
-            chipGroup.addView(chip)
         }
     }
 
@@ -757,6 +715,61 @@ class EditAssignmentDayBottomSheet(
         }
     }
 
+    private fun createStatusChip(
+        label: StatusLabel,
+        isSelected: Boolean,
+        isEnabled: Boolean
+    ): Chip {
+        val context = requireContext()
+
+        return Chip(context).apply {
+            id = View.generateViewId()
+            text = StatusVisuals.getDisplayName(context, label)
+            isCheckable = true
+            isChecked = isSelected
+            this.isClickable = isEnabled
+            this.isEnabled = isEnabled
+
+            chipBackgroundColor = ColorStateList.valueOf(label.color)
+            val textColor = getReadableTextColor(label.color)
+            setTextColor(textColor)
+
+            val iconRes = StatusVisuals.getIconRes(label.iconKey)
+            if (iconRes != null) {
+                chipIcon = AppCompatResources.getDrawable(context, iconRes)
+                chipIconTint = ColorStateList.valueOf(textColor)
+                isChipIconVisible = true
+            } else {
+                isChipIconVisible = false
+            }
+
+            setOnClickListener {
+                if (!isEnabled) return@setOnClickListener
+                performSelectionFeedback(this)
+            }
+        }
+    }
+
+    private fun formatStatusTags(tags: Set<String>): String? {
+        return tags.map { it.trim() }
+            .filter { it.isNotBlank() }
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString(", ")
+    }
+
+    private fun getStatusHighlightColor(tags: Set<String>): Int? {
+        if (tags.isEmpty()) return null
+
+        val prefs = StatusLabelsPrefs(requireContext())
+        return tags.firstNotNullOfOrNull { tag ->
+            prefs.getLabelByName(tag)?.color
+        }
+    }
+
+    private fun performSelectionFeedback(target: View) {
+        target.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+    }
+
     private fun getReadableTextColor(backgroundColor: Int): Int {
         return if (ColorUtils.calculateLuminance(backgroundColor) < 0.5) {
             Color.WHITE
@@ -770,13 +783,7 @@ class EditAssignmentDayBottomSheet(
     }
 
     private fun getIconRes(iconKey: String?): Int? {
-        return when (iconKey) {
-            "sick" -> R.drawable.ic_assignment_sick_24
-            "vacation" -> R.drawable.ic_assignment_vacation_24
-            "standby" -> R.drawable.ic_assignment_standby_24
-            "field" -> R.drawable.ic_assignment_field_24
-            else -> null
-        }
+        return StatusVisuals.getIconRes(iconKey)
     }
 
     private fun resolveThemeColor(attrRes: Int): Int {

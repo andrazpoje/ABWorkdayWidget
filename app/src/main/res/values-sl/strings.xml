@@ -8,6 +8,10 @@
     <string name="app_version">v%1$s</string>
     <string name="app_version_short">v%1$s</string>
     <string name="bullet_label_format">• %1$s</string>
+    <string name="widget_cycle_label">Delovni cikel</string>
+    <string name="widget_cycle_preview_primary">Dopoldne</string>
+    <string name="widget_cycle_preview_secondary">Dežurstvo</string>
+    <string name="widget_cycle_preview_context">Danes</string>
 
     <!-- ========================================================= -->
     <!-- CORE / COMMON ACTIONS -->
@@ -22,10 +26,13 @@
     <!-- ========================================================= -->
     <!-- WORK LOG WIDGET -->
     <!-- ========================================================= -->
-    <string name="work_log_widget_label">Evidenca dela</string>
-    <string name="work_log_widget_title">Evidenca dela</string>
+    <string name="work_log_widget_label">Delovni čas</string>
+    <string name="work_log_widget_title">Delovni čas</string>
     <string name="work_log_widget_status_placeholder">Ni začeto</string>
     <string name="work_log_widget_primary_placeholder">Odpri evidenco dela</string>
     <string name="work_log_widget_secondary_placeholder">Tapni za današnji pregled</string>
     <string name="work_log_widget_tertiary_placeholder">Čakanje na podatke v živo</string>
+    <string name="work_log_widget_preview_status">Delo poteka</string>
+    <string name="work_log_widget_preview_primary">Začetek 07:00</string>
+    <string name="work_log_widget_preview_secondary">Danes 3 h 25 min</string>
 </resources>

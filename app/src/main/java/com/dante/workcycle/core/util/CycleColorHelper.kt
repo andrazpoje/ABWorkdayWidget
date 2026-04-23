@@ -3,9 +3,8 @@ package com.dante.workcycle.core.util
 import android.content.Context
 import android.graphics.Color
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.toColorInt
-import com.dante.workcycle.core.theme.CycleThemeManager
 import com.dante.workcycle.data.prefs.AppPrefs
+import com.dante.workcycle.style.WidgetStyleManager
 
 object CycleColorHelper {
 
@@ -32,18 +31,17 @@ object CycleColorHelper {
 // fallback na prvi element cikla namesto sive
         val safeIndex = if (index == -1) 0 else index
 
-        return when (CycleThemeManager.loadTheme(context)) {
-            CycleThemeManager.THEME_PASTEL -> getPastelColor(safeIndex)
-            CycleThemeManager.THEME_DARK -> getDarkColor(safeIndex)
-            else -> getClassicColor(safeIndex)
+        val colors = WidgetStyleManager.getColors(context)
+        return when (safeIndex) {
+            0 -> colors.shiftAColor
+            1 -> colors.shiftBColor
+            2 -> colors.shiftCColor
+            else -> colors.shiftCColor
         }
     }
 
     private fun isSkippedOverrideActiveForLabel(context: Context, label: String): Boolean {
         val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-        val overrideEnabled = prefs.getBoolean(AppPrefs.KEY_OVERRIDE_SKIPPED, true)
-        if (!overrideEnabled) return false
-
         val skippedOverrideLabel = prefs.getString(AppPrefs.KEY_SKIPPED_LABEL, AppPrefs.DEFAULT_SKIPPED_LABEL)
             ?.trim()
             .takeUnless { it.isNullOrBlank() }
@@ -53,53 +51,7 @@ object CycleColorHelper {
     }
 
     private fun getSkippedDayColor(context: Context): Int {
-        return when (CycleThemeManager.loadTheme(context)) {
-            CycleThemeManager.THEME_PASTEL -> "#90A4AE".toColorInt()
-            CycleThemeManager.THEME_DARK -> "#455A64".toColorInt()
-            else -> "#78909C".toColorInt()
-        }
-    }
-
-    private fun getClassicColor(index: Int): Int {
-        val palette = listOf(
-            "#1976D2",
-            "#388E3C",
-            "#F57C00",
-            "#7B1FA2",
-            "#D32F2F",
-            "#00838F",
-            "#5D4037",
-            "#455A64"
-        )
-        return palette[index % palette.size].toColorInt()
-    }
-
-    private fun getPastelColor(index: Int): Int {
-        val palette = listOf(
-            "#64B5F6",
-            "#81C784",
-            "#FFB74D",
-            "#BA68C8",
-            "#E57373",
-            "#4DD0E1",
-            "#A1887F",
-            "#90A4AE"
-        )
-        return palette[index % palette.size].toColorInt()
-    }
-
-    private fun getDarkColor(index: Int): Int {
-        val palette = listOf(
-            "#0D47A1",
-            "#1B5E20",
-            "#E65100",
-            "#4A148C",
-            "#B71C1C",
-            "#006064",
-            "#3E2723",
-            "#263238"
-        )
-        return palette[index % palette.size].toColorInt()
+        return WidgetStyleManager.getColors(context).offDayColor
     }
 
     fun getTextColorForBackground(backgroundColor: Int): Int {

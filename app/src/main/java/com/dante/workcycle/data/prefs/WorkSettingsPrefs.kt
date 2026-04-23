@@ -39,6 +39,25 @@ class WorkSettingsPrefs(context: Context) {
         }
     }
 
+    fun getWidgetInfoMode(): String {
+        return prefs.getString(
+            KEY_WIDGET_INFO_MODE,
+            WIDGET_INFO_MODE_START_TIME
+        ) ?: WIDGET_INFO_MODE_START_TIME
+    }
+
+    fun setWidgetInfoMode(mode: String) {
+        val safeMode = when (mode) {
+            WIDGET_INFO_MODE_WORKED_TODAY,
+            WIDGET_INFO_MODE_START_TIME -> mode
+            else -> WIDGET_INFO_MODE_START_TIME
+        }
+
+        prefs.edit {
+            putString(KEY_WIDGET_INFO_MODE, safeMode)
+        }
+    }
+
     fun getExpectedStartConfig(label: String): ExpectedStartConfig? {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank()) return null
@@ -151,6 +170,9 @@ class WorkSettingsPrefs(context: Context) {
         const val KEY_DEFAULT_BREAK_MINUTES = "default_break_minutes"
         const val KEY_OVERTIME_TRACKING_ENABLED = "overtime_tracking_enabled"
         const val KEY_EXPECTED_STARTS_BY_LABEL = "expected_starts_by_label"
+        const val KEY_WIDGET_INFO_MODE = "widget_info_mode"
+        const val WIDGET_INFO_MODE_WORKED_TODAY = "worked_today"
+        const val WIDGET_INFO_MODE_START_TIME = "start_time"
 
         const val DEFAULT_DAILY_TARGET_MINUTES = 480
         const val DEFAULT_BREAK_MINUTES = 30

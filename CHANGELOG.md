@@ -4,6 +4,56 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+- Added dedicated Work Log widget (Work Time) for quick work session overview
+- Added live Work Log widget refresh mode for active sessions ("Today completed")
+- Added battery-saving static widget mode ("Work start")
+- Added new Work Log widget setting for choosing active session info mode
+- Added separate widget previews for Work Cycle and Work Time widgets
+- Added dedicated template picker bottom sheet instead of dropdown selection
+- Added new Single Shift preset for users without rotating schedules
+- Added restored advanced presets: 4-on / 4-off and Panama 2-2-3
+- Added third primary cycle color support for 3-shift schedules
+- Added new Cycle Colors settings section with unified color control across app
+- Added status icons inside Calendar month view for faster visual overview
+- Added expanded system status support:
+  - Sick leave
+  - Vacation
+  - Standby
+  - Reduction
+  - Replacement
+  - Meeting
+  - Terrain
+
+### 🎨 Improved
+
+- Improved template selection UX with grouped General / Special sections
+- Improved template card layout with cleaner compact preset cards
+- Improved template naming consistency (Pismonoša A/B)
+- Improved cycle color consistency between 7-day preview, Calendar, and widget
+- Improved Work Log widget support for minimal and classic widget styles
+- Improved status labels UI with clearer helper text for exclusive statuses
+- Improved settings terminology by replacing old assignment wording with secondary labels
+- Improved calendar compactness by showing status icons instead of long status text
+- Improved widget naming clarity:
+  - Work Cycle
+  - Work Time
+- Improved widget picker previews for clearer widget distinction
+- Improved dark preset cycle colors for better readability and stronger contrast
+
+### 🛠 Fixed
+
+- Fixed Work Log widget not respecting minimal/classic widget style changes
+- Fixed Work Log widget background not restoring correctly after switching styles
+- Fixed Work Log widget not refreshing correctly during active work sessions
+- Fixed status helper text visibility and empty spacing issues
+- Fixed leftover "System label" text appearing in status labels screen
+- Fixed template naming inconsistencies across Home, picker, and summary views
+- Fixed cycle color mismatch between app views and widget rendering
+- Fixed calendar rendering consistency for off-days and status priority display
+- Fixed widget preview loading issues inside Android widget picker
+
+---
+
 ## v2.5
 
 ### ✨ Added

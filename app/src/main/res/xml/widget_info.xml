@@ -6,6 +6,7 @@
     android:minResizeHeight="56dp"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/widget_layout"
+    android:previewLayout="@layout/widget_preview_cycle"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
-    android:label="@string/app_name" />
+    android:label="@string/widget_cycle_label" />

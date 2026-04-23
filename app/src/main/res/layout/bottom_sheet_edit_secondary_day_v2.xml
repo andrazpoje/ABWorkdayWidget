@@ -149,7 +149,7 @@
                     android:id="@+id/textStatusTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/status_labels_title"
+                    android:text="@string/extra_status_tags_title"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -157,10 +157,19 @@
                     android:id="@+id/statusChipGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="6dp"
                     app:chipSpacingHorizontal="8dp"
-                    app:chipSpacingVertical="8dp"
-                    app:singleSelection="true" />
+                    app:chipSpacingVertical="4dp" />
+
+                <TextView
+                    android:id="@+id/textStatusExclusiveHelper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/status_tags_exclusive_helper"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnClearStatus"

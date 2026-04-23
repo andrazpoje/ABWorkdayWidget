@@ -5,6 +5,7 @@ import java.time.LocalDate
 
 object ScheduleTemplateProvider {
 
+    const val TEMPLATE_SINGLE_SHIFT = "template_single_shift"
     const val TEMPLATE_AB = "template_ab"
     const val TEMPLATE_TWO_SHIFT = "template_two_shift"
     const val TEMPLATE_THREE_SHIFT = "template_three_shift"
@@ -18,12 +19,12 @@ object ScheduleTemplateProvider {
 
         // Splošni template-i
         ScheduleTemplate(
-            id = TEMPLATE_AB,
-            titleRes = R.string.template_ab_title,
-            descriptionRes = R.string.template_ab_description,
-            fixedCycle = listOf("A", "B"),
+            id = TEMPLATE_SINGLE_SHIFT,
+            titleRes = R.string.template_single_shift_title,
+            descriptionRes = R.string.template_single_shift_description,
+            fixedCycle = listOf("Dopoldne"),
             fixedStartDate = LocalDate.now(),
-            fixedFirstCycleDay = "A",
+            fixedFirstCycleDay = "Dopoldne",
             locksCycleEditing = false,
             locksRulesEditing = false
         ),
@@ -91,6 +92,17 @@ object ScheduleTemplateProvider {
         ),
 
         // Posebni / poklicni template
+        ScheduleTemplate(
+            id = TEMPLATE_AB,
+            titleRes = R.string.template_ab_title,
+            descriptionRes = R.string.template_ab_description,
+            fixedCycle = listOf("A", "B"),
+            fixedStartDate = LocalDate.now(),
+            fixedFirstCycleDay = "A",
+            locksCycleEditing = false,
+            locksRulesEditing = false
+        ),
+
         ScheduleTemplate(
             id = TEMPLATE_POSTA_SLOVENIJE_AB,
             titleRes = R.string.template_posta_slovenije_title,

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
+import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.databinding.ItemCyclePreviewBinding
@@ -66,14 +67,11 @@ class CyclePreviewAdapter :
             binding.dayCycleText.setTypeface(null, android.graphics.Typeface.BOLD)
             binding.daySecondaryText.setTypeface(null, android.graphics.Typeface.NORMAL)
 
-            val bgColor = if (item.isOffDay) {
-                Color.parseColor("#9E9E9E")
-            } else {
-                getCycleBackgroundColor(
-                    label = item.colorLabel,
-                    cycle = cycle
-                )
-            }
+            val bgColor = getCycleBackgroundColor(
+                context = context,
+                label = item.colorLabel,
+                cycle = cycle
+            )
 
             val textColor = if (ColorUtils.calculateLuminance(bgColor) > 0.5) {
                 Color.BLACK
@@ -117,28 +115,11 @@ class CyclePreviewAdapter :
         }
 
         private fun getCycleBackgroundColor(
+            context: Context,
             label: String,
             cycle: List<String>
         ): Int {
-            val cleanedCycle = cycle
-                .map { it.trim() }
-                .filter { it.isNotBlank() }
-
-            if (cleanedCycle.isEmpty()) return Color.GRAY
-
-            val normalizedLabel = label.trim()
-            val index = cleanedCycle.indexOfFirst {
-                it.equals(normalizedLabel, ignoreCase = true)
-            }
-
-            return when (if (index == -1) 0 else index) {
-                0 -> Color.parseColor("#1976D2")
-                1 -> Color.parseColor("#388E3C")
-                2 -> Color.parseColor("#F57C00")
-                3 -> Color.parseColor("#7B1FA2")
-                4 -> Color.parseColor("#D32F2F")
-                else -> Color.parseColor("#1976D2")
-            }
+            return CycleColorHelper.getBackgroundColor(context, label, cycle)
         }
 
         private fun bindSecondaryIndicator(
@@ -230,13 +211,15 @@ class CyclePreviewAdapter :
         }
 
         private fun getStatusColor(status: String): Int? {
-            return when (status.trim()) {
+            return when (status.substringBefore(",").trim().removeSuffix("+")) {
                 "Bolniška" -> Color.parseColor("#E53935")
                 "Dopust" -> Color.parseColor("#F9A825")
                 "Dežurstvo" -> Color.parseColor("#8E24AA")
                 "Sick leave" -> Color.parseColor("#E53935")
                 "Vacation" -> Color.parseColor("#F9A825")
                 "Standby" -> Color.parseColor("#8E24AA")
+                "Krčenje" -> Color.parseColor("#00897B")
+                "Reduction" -> Color.parseColor("#00897B")
                 else -> null
             }
         }
@@ -244,7 +227,7 @@ class CyclePreviewAdapter :
         private fun getIconRes(iconKey: String?): Int? {
             return when (iconKey) {
                 "sick" -> R.drawable.ic_assignment_sick_24
-                "vacation" -> R.drawable.ic_assignment_vacation_24
+                "vacation" -> R.drawable.ic_vacation_24
                 "standby" -> R.drawable.ic_assignment_standby_24
                 "field" -> R.drawable.ic_assignment_field_24
                 else -> null

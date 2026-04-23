@@ -142,7 +142,7 @@ fun HomeFragment.updateCyclePreview() {
                 if (shouldShowSecondaryOverrideMarker) "$secondary*" else secondary
             }
 
-        val statusLabel = resolved.statusLabel
+        val statusLabel = resolved.statusSummary
             ?.trim()
             ?.ifBlank { null }
 
@@ -152,7 +152,7 @@ fun HomeFragment.updateCyclePreview() {
                 title = title,
                 dateText = date.format(dateFormatter),
                 cycleLabel = resolved.effectiveCycleLabel.ifEmpty { "-" },
-                colorLabel = resolved.baseCycleLabel,
+                colorLabel = if (isOffDay) offDayLabel else resolved.baseCycleLabel,
                 secondaryLabel = secondaryLabel,
                 statusLabel = statusLabel,
                 helperText = blockLabel,

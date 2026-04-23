@@ -16,10 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.CalendarDayItem
 import com.dante.workcycle.R
+import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
+import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.ui.adapter.CalendarAdapter
@@ -220,6 +222,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
         val resolver = DefaultScheduleResolver(ctx)
         val labelsPrefs = AssignmentLabelsPrefs(ctx)
+        val statusLabelsPrefs = StatusLabelsPrefs(ctx)
         val cycle = CycleManager.loadCycle(ctx)
         val today = com.dante.workcycle.core.util.DateProvider.today()
 
@@ -243,12 +246,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             val effectiveCycleLabel = resolved.effectiveCycleLabel
             val baseCycleLabel = resolved.baseCycleLabel
 
-            val cycleColor = CycleColorHelper.getBackgroundColor(
-                context = ctx,
-                label = baseCycleLabel,
-                cycle = cycle
-            )
-
             val rawSecondaryLabel = resolved.secondaryLabel
                 ?.trim()
                 ?.ifBlank { null }
@@ -268,16 +265,38 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             val assignmentColor = rawSecondaryLabel
                 ?.let { labelsPrefs.getLabelByName(it)?.color }
 
+            val statusSummary = resolved.statusSummary
+                ?.trim()
+                ?.ifBlank { null }
+
+            val fallbackStatusLabel = statusSummary
+                ?.let(::shortenStatusSummary)
+
+            val fallbackStatusColor = resolved.statusTags.firstOrNull()
+                ?.let { statusLabelsPrefs.getLabelByName(it)?.color }
+
+            val statusIconResIds = StatusVisuals.sortByPriority(
+                resolved.statusTags.mapNotNull(statusLabelsPrefs::getLabelByName)
+            ).mapNotNull { label ->
+                StatusVisuals.getIconRes(label.iconKey)
+            }.take(2)
+
             val skippedOverrideLabel = CycleManager.getSkippedDayOverrideLabelOrNull(ctx, current)
+            val cycleColor = CycleColorHelper.getBackgroundColor(
+                context = ctx,
+                label = skippedOverrideLabel ?: baseCycleLabel,
+                cycle = cycle
+            )
 
             result.add(
                 CalendarDayItem(
                     date = current,
                     dayNumber = current.dayOfMonth.toString(),
                     effectiveCycleLabel = shortenPrimaryCycleLabel(effectiveCycleLabel),
-                    assignmentLabel = displaySecondaryLabel,
+                    assignmentLabel = displaySecondaryLabel ?: fallbackStatusLabel,
+                    statusIconResIds = statusIconResIds,
                     cycleColor = cycleColor,
-                    assignmentColor = assignmentColor,
+                    assignmentColor = assignmentColor ?: fallbackStatusColor,
                     isOffDay = skippedOverrideLabel != null,
                     isToday = current == today,
                     isCurrentMonth = true,
@@ -317,6 +336,23 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             labelsPrefs.getShortDisplayName(matchedLabel)
         } else {
             if (normalized.length <= 5) normalized else normalized.take(5)
+        }
+    }
+
+    private fun shortenStatusSummary(summary: String): String {
+        val parts = summary.split(",")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+
+        if (parts.isEmpty()) return ""
+
+        val first = parts.first()
+        val compactFirst = if (first.length <= 5) first else first.take(5)
+
+        return if (parts.size == 1) {
+            compactFirst
+        } else {
+            "$compactFirst+"
         }
     }
 

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
+import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.databinding.ItemLabelBinding
 import com.dante.workcycle.domain.model.StatusLabel
@@ -38,20 +39,21 @@ class StatusLabelsAdapter(
 
         holder.binding.textLabel.text = prefs.getDisplayName(label)
         holder.binding.textLabel.setTypeface(null, Typeface.BOLD)
-        holder.binding.textMeta.text = context.getString(R.string.assignment_label_type_system)
-        holder.binding.textMeta.alpha = 0.6f
+        if (StatusVisuals.usesExclusiveHelper(label)) {
+            holder.binding.textMeta.text =
+                context.getString(R.string.status_tags_exclusive_helper)
+            holder.binding.textMeta.visibility = View.VISIBLE
+            holder.binding.textMeta.alpha = 0.7f
+        } else {
+            holder.binding.textMeta.text = ""
+            holder.binding.textMeta.visibility = View.GONE
+        }
 
         holder.binding.viewColor.setBackgroundColor(label.color)
 
         holder.binding.iconSystem.visibility = View.VISIBLE
 
-        val iconRes = when (label.iconKey) {
-            "sick" -> R.drawable.ic_assignment_sick_24
-            "vacation" -> R.drawable.ic_assignment_vacation_24
-            "standby" -> R.drawable.ic_assignment_standby_24
-            "field" -> R.drawable.ic_assignment_field_24
-            else -> null
-        }
+        val iconRes = StatusVisuals.getIconRes(label.iconKey)
 
         if (iconRes != null) {
             holder.binding.iconSystem.setImageResource(iconRes)

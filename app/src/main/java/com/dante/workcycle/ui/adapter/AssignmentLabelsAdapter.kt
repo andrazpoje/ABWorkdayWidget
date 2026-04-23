@@ -54,7 +54,7 @@ class AssignmentLabelsAdapter(
 
             val iconRes = when (label.iconKey) {
                 "sick" -> R.drawable.ic_assignment_sick_24
-                "vacation" -> R.drawable.ic_assignment_vacation_24
+                "vacation" -> R.drawable.ic_vacation_24
                 "standby" -> R.drawable.ic_assignment_standby_24
                 "field" -> R.drawable.ic_assignment_field_24
                 else -> null

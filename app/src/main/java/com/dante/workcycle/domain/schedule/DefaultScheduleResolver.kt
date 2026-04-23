@@ -85,7 +85,8 @@ class DefaultScheduleResolver(
             )
         }
 
-        val statusLabel = statusRepository.getStatusLabel(date)
+        val statusTags = statusRepository.getStatusTags(date)
+        val statusLabel = statusTags.firstOrNull()
             ?.trim()
             ?.ifBlank { null }
 
@@ -103,6 +104,7 @@ class DefaultScheduleResolver(
             secondaryOverrideLabel = secondaryOverrideLabel,
             secondaryEffectiveLabel = secondaryEffectiveLabel,
             statusLabel = statusLabel,
+            statusTags = statusTags,
             daySchedule = daySchedule,
             isAssignmentFeatureEnabled = secondaryResolved.isEnabled
         )

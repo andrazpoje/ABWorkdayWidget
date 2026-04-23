@@ -3,6 +3,7 @@ package com.dante.workcycle.widget.worklog
 import android.content.Context
 import com.dante.workcycle.R
 import com.dante.workcycle.core.util.DateProvider
+import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.data.repository.RepositoryProvider
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
@@ -16,6 +17,9 @@ class WorkLogWidgetStateFactory(
 
     private val repository by lazy {
         RepositoryProvider.workEventRepository(context)
+    }
+    private val workSettingsPrefs by lazy {
+        WorkSettingsPrefs(context)
     }
 
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -52,38 +56,44 @@ class WorkLogWidgetStateFactory(
 
     private fun createWorkingState(events: List<WorkEvent>): WorkLogWidgetState {
         val clockIn = events.firstOrNull { it.type == WorkEventType.CLOCK_IN }
+        val startedAtText = context.getString(
+            R.string.work_log_widget_started_at_value,
+            clockIn?.time?.format(timeFormatter).orEmpty()
+        )
+        val isLiveMode = isLiveWidgetInfoMode()
         val workedMinutes = calculateWorkedMinutes(events)
 
         return WorkLogWidgetState(
             title = context.getString(R.string.work_log_widget_title),
             statusText = context.getString(R.string.work_log_state_working),
-            primaryValueText = context.getString(
-                R.string.work_log_widget_started_at_value,
-                clockIn?.time?.format(timeFormatter).orEmpty()
-            ),
-            secondaryValueText = formatWorkedTodayText(workedMinutes),
-            tertiaryValueText = null
+            primaryValueText = if (isLiveMode) formatWorkedTodayText(workedMinutes) else startedAtText,
+            secondaryValueText = if (isLiveMode) startedAtText else null,
+            tertiaryValueText = null,
+            requiresMinuteRefresh = isLiveMode
         )
     }
 
     private fun createOnBreakState(events: List<WorkEvent>): WorkLogWidgetState {
         val breakStart = findActiveBreakStart(events)
+        val breakStartedText = context.getString(
+            R.string.work_log_widget_break_started_value,
+            breakStart?.time?.format(timeFormatter).orEmpty()
+        )
+        val isLiveMode = isLiveWidgetInfoMode()
         val workedMinutes = calculateWorkedMinutes(events)
 
         return WorkLogWidgetState(
             title = context.getString(R.string.work_log_widget_title),
             statusText = context.getString(R.string.work_log_state_break),
-            primaryValueText = context.getString(
-                R.string.work_log_widget_break_started_value,
-                breakStart?.time?.format(timeFormatter).orEmpty()
-            ),
-            secondaryValueText = formatWorkedTodayText(workedMinutes),
-            tertiaryValueText = breakStart?.let {
+            primaryValueText = if (isLiveMode) formatWorkedTodayText(workedMinutes) else breakStartedText,
+            secondaryValueText = if (isLiveMode) breakStartedText else null,
+            tertiaryValueText = if (isLiveMode) breakStart?.let {
                 context.getString(
                     R.string.work_log_widget_break_value,
                     formatDuration(minutesBetween(it.time, LocalTime.now()))
                 )
-            }
+            } else null,
+            requiresMinuteRefresh = isLiveMode
         )
     }
 
@@ -210,6 +220,11 @@ class WorkLogWidgetStateFactory(
             R.string.work_log_widget_worked_today_value,
             formatDuration(workedMinutes)
         )
+    }
+
+    private fun isLiveWidgetInfoMode(): Boolean {
+        return workSettingsPrefs.getWidgetInfoMode() ==
+                WorkSettingsPrefs.WIDGET_INFO_MODE_WORKED_TODAY
     }
 
     private fun formatBalanceText(workedMinutes: Long): String {
