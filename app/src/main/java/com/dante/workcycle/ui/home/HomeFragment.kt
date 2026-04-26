@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -88,6 +89,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var previewRecyclerView: RecyclerView
     lateinit var previewAdapter: CyclePreviewAdapter
+    lateinit var previewWeekTitle: TextView
+    lateinit var previousPreviewWeekButton: ImageButton
+    lateinit var nextPreviewWeekButton: ImageButton
 
     lateinit var switchSaturdays: SwitchMaterial
     lateinit var switchSundays: SwitchMaterial
@@ -101,6 +105,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var widgetHint: TextView
 
     var selectedDate: LocalDate = LocalDate.now()
+    var previewWeekOffset: Int = 0
     lateinit var supportedCountries: List<HolidayCountry>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -118,6 +123,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupFirstCycleDayDropdown()
         setupPresetDropdown()
         setupPreviewRecyclerView()
+        setupPreviewWeekNavigator()
         setupHolidayCountryDropdown()
         migrateLegacySettingsIfNeeded()
         loadSettings()
@@ -337,6 +343,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         openWidgetsButton = root.findViewById(R.id.openWidgetsButton)
 
         previewRecyclerView = root.findViewById(R.id.previewRecyclerView)
+        previewWeekTitle = root.findViewById(R.id.previewWeekTitle)
+        previousPreviewWeekButton = root.findViewById(R.id.previousPreviewWeekButton)
+        nextPreviewWeekButton = root.findViewById(R.id.nextPreviewWeekButton)
     }
 
     fun runWithoutChangeTracking(block: () -> Unit) {

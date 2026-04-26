@@ -204,6 +204,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private fun bindExpectedTimeRows() {
         containerExpectedStartRows.removeAllViews()
 
+        // TODO(expected-time-layers): This settings UI intentionally lists only primary cycle
+        // labels today. When secondary labels get expected start/end support, add a separate
+        // section backed by a layer-aware prefs model instead of mixing primary and secondary
+        // labels in this same list.
         val labels = CycleManager.loadCycle(requireContext())
             .map { it.trim() }
             .filter { it.isNotBlank() }

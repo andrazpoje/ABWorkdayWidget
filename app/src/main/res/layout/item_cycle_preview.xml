@@ -46,67 +46,76 @@
 
         <!-- DESNO: PRIMARY + SECONDARY + STATUS -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_weight="1"
             android:gravity="end"
             android:orientation="vertical">
 
-            <!-- PRIMARY -->
-            <TextView
-                android:id="@+id/dayCycleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                tools:text="A" />
-
-            <!-- SECONDARY -->
             <LinearLayout
-                android:id="@+id/assignmentContainer"
-                android:layout_width="wrap_content"
+                android:id="@+id/cycleLabelRow"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:gravity="end"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:gravity="end|center_vertical"
+                android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/viewSecondaryIcon"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="4dp"
-                    android:contentDescription="@null"
-                    android:visibility="gone"
-                    tools:src="@drawable/ic_assignment_vacation_24"
-                    tools:visibility="visible" />
-
-                <View
-                    android:id="@+id/viewSecondaryDot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_marginEnd="4dp"
-                    android:background="@drawable/bg_label_color_circle"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
+                <!-- PRIMARY -->
                 <TextView
-                    android:id="@+id/daySecondaryText"
+                    android:id="@+id/dayCycleText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textSize="12sp"
-                    tools:text="O2"
-                    tools:visibility="visible" />
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    tools:text="B" />
+
+                <!-- SECONDARY -->
+                <LinearLayout
+                    android:id="@+id/assignmentContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/viewSecondaryIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@null"
+                        android:visibility="gone" />
+
+                    <View
+                        android:id="@+id/viewSecondaryDot"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/bg_label_color_circle"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/daySecondaryText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxWidth="96dp"
+                        android:maxLines="1"
+                        android:textSize="14sp"
+                        tools:text=" • Š1"
+                        tools:visibility="visible" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- STATUS -->
             <TextView
                 android:id="@+id/statusText"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="gone"

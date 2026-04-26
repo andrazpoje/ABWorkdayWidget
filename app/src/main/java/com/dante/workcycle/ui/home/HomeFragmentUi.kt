@@ -53,6 +53,18 @@ fun HomeFragment.setupPreviewRecyclerView() {
     }
 }
 
+fun HomeFragment.setupPreviewWeekNavigator() {
+    previousPreviewWeekButton.setOnClickListener {
+        previewWeekOffset -= 1
+        updateCyclePreview()
+    }
+
+    nextPreviewWeekButton.setOnClickListener {
+        previewWeekOffset += 1
+        updateCyclePreview()
+    }
+}
+
 fun updateTodayStatus() = Unit
 
 fun HomeFragment.revertToSavedState() {
@@ -93,7 +105,8 @@ fun HomeFragment.updateCyclePreview() {
 
     val ctx = context ?: return
 
-    val today = DateProvider.today()
+    val startDate = DateProvider.today().plusDays(previewWeekOffset.toLong() * 7L)
+    updatePreviewWeekTitle(startDate)
 
     val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
     val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
@@ -104,7 +117,7 @@ fun HomeFragment.updateCyclePreview() {
     val list = mutableListOf<CyclePreviewAdapter.PreviewItem>()
 
     for (offset in 0..6) {
-        val date = today.plusDays(offset.toLong())
+        val date = startDate.plusDays(offset.toLong())
 
         val resolved = try {
             resolver.resolve(date)
@@ -164,6 +177,17 @@ fun HomeFragment.updateCyclePreview() {
     val cycle = CycleManager.loadCycle(ctx)
     previewAdapter.submitPreviewItems(list, cycle)
 }
+
+private fun HomeFragment.updatePreviewWeekTitle(startDate: LocalDate) {
+    val endDate = startDate.plusDays(6)
+    val locale = Locale.getDefault()
+    val startPattern = if (startDate.year == endDate.year) "d. MMM" else "d. MMM yyyy"
+    val startFormatter = DateTimeFormatter.ofPattern(startPattern, locale)
+    val endFormatter = DateTimeFormatter.ofPattern("d. MMM yyyy", locale)
+
+    previewWeekTitle.text = "${startDate.format(startFormatter)} – ${endDate.format(endFormatter)}"
+}
+
 private fun HomeFragment.buildPreviewBlockLabel(
     date: LocalDate,
     baseLabel: String

@@ -62,6 +62,10 @@ class WorkSettingsPrefs(context: Context) {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank()) return null
 
+        // TODO(expected-time-layers): This storage is currently keyed only by label text and is
+        // used for primary cycle labels. When secondary assignment labels can define expected
+        // times, introduce a layer-aware key/model (for example CycleLayer.PRIMARY/SECONDARY)
+        // instead of overloading plain label names. Keep the current key backward-compatible.
         val json = prefs.getString(KEY_EXPECTED_STARTS_BY_LABEL, null).orEmpty()
         if (json.isBlank()) return null
 
@@ -111,6 +115,9 @@ class WorkSettingsPrefs(context: Context) {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank()) return null
 
+        // TODO(expected-time-layers): Resolve from the same future layer-aware expected-time
+        // model as getExpectedStartConfig(), so secondary labels such as S1/O1/K1 can safely
+        // override primary cycle label times without colliding on label text.
         val json = prefs.getString(KEY_EXPECTED_STARTS_BY_LABEL, null).orEmpty()
         if (json.isBlank()) return null
 
@@ -169,6 +176,9 @@ class WorkSettingsPrefs(context: Context) {
         const val KEY_DAILY_TARGET_MINUTES = "daily_target_minutes"
         const val KEY_DEFAULT_BREAK_MINUTES = "default_break_minutes"
         const val KEY_OVERTIME_TRACKING_ENABLED = "overtime_tracking_enabled"
+        // TODO(expected-time-layers): Add a new layer-aware key before secondary expected times
+        // ship. Suggested shape: expected_times_by_layer_and_label -> PRIMARY[label],
+        // SECONDARY[label]. Do not migrate this legacy key until the UI and resolver are ready.
         const val KEY_EXPECTED_STARTS_BY_LABEL = "expected_starts_by_label"
         const val KEY_WIDGET_INFO_MODE = "widget_info_mode"
         const val WIDGET_INFO_MODE_WORKED_TODAY = "worked_today"

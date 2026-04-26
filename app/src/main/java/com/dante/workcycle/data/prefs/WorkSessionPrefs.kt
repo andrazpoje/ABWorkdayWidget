@@ -42,6 +42,9 @@ class WorkSessionPrefs(context: Context) {
 
     data class WorkSessionSnapshot(
         val cycleLabel: String,
+        // TODO(expected-time-layers): When secondary assignment labels can provide expected
+        // times, include the resolved layer/source in this snapshot so an active session keeps
+        // using the same expected-time rule even if the day labels are edited later.
         val expectedStart: String?,
         val expectedEnd: String?
     )

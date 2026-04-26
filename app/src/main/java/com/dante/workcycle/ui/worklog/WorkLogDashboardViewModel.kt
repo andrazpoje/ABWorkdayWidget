@@ -235,6 +235,12 @@ class WorkLogDashboardViewModel(
             workSessionPrefs.getSnapshot()
         }
         val displayCycleLabel = sessionSnapshot?.cycleLabel ?: todayCycleLabel
+        // TODO(expected-time-layers): Replace this primary-only lookup with a small resolver that
+        // checks expected times in priority order:
+        // 1) secondary assignment label from todayResolved.secondaryEffectiveLabel,
+        // 2) primary cycle label from todayResolved.effectiveCycleLabel,
+        // 3) global WorkSettingsPrefs defaults.
+        // Keep sessionSnapshot as the frozen source while a session is active.
         val liveExpectedStartText = workSettingsPrefs.getExpectedStartConfig(todayCycleLabel)
             ?.takeIf { it.enabled }
             ?.startTime
@@ -827,7 +833,11 @@ class WorkLogDashboardViewModel(
     }
 
     private fun createSessionSnapshot() {
-        val currentCycleLabel = scheduleResolver.resolve(selectedDate).effectiveCycleLabel
+        val resolvedDay = scheduleResolver.resolve(selectedDate)
+        val currentCycleLabel = resolvedDay.effectiveCycleLabel
+        // TODO(expected-time-layers): Snapshot should eventually store the resolved expected-time
+        // source too, not only the display cycle label. Future order: secondary assignment label
+        // (resolvedDay.secondaryEffectiveLabel), primary cycle label, then global defaults.
         val expectedStart = workSettingsPrefs.getExpectedStartConfig(currentCycleLabel)
             ?.takeIf { it.enabled }
             ?.startTime

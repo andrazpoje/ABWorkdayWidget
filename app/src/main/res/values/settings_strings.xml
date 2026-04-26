@@ -139,6 +139,8 @@
     <string name="today_label">Today</string>
     <string name="tomorrow_label">Tomorrow</string>
     <string name="home_next_7_days_subtitle">Next 7 days overview</string>
+    <string name="home_preview_previous_week">Previous week</string>
+    <string name="home_preview_next_week">Next week</string>
     <string name="rules_section">Rules</string>
     <string name="skip_saturdays">Skip Saturdays</string>
     <string name="skip_sundays">Skip Sundays</string>

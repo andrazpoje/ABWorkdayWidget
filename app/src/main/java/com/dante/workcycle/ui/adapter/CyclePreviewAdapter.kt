@@ -9,9 +9,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.dante.workcycle.R
 import com.dante.workcycle.core.util.CycleColorHelper
-import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.databinding.ItemCyclePreviewBinding
 import java.time.LocalDate
@@ -80,9 +78,6 @@ class CyclePreviewAdapter :
             }
 
             binding.root.setCardBackgroundColor(bgColor)
-            binding.daySecondaryText.setTextColor(
-                ColorUtils.setAlphaComponent(textColor, 180)
-            )
             binding.dayTitleText.setTextColor(textColor)
             binding.dayDateText.setTextColor(textColor)
             binding.dayCycleText.setTextColor(textColor)
@@ -98,19 +93,11 @@ class CyclePreviewAdapter :
                 textColor = textColor
             )
 
-            val hasStatus = !item.statusLabel.isNullOrBlank()
-
             binding.dayCycleText.alpha = 1f
             binding.root.alpha = if (!item.helperText.isNullOrBlank()) 0.96f else 1f
 
             binding.root.setOnClickListener {
                 onClick?.invoke(item)
-            }
-
-            binding.daySecondaryText.alpha = when {
-                hasStatus -> 0.48f
-                item.secondaryLabel?.contains("*") == true -> 1f
-                else -> 0.65f
             }
         }
 
@@ -144,6 +131,7 @@ class CyclePreviewAdapter :
                 icon.visibility = View.GONE
                 text.visibility = View.GONE
                 text.text = ""
+                text.alpha = 1f
                 return
             }
 
@@ -155,38 +143,17 @@ class CyclePreviewAdapter :
                 icon.visibility = View.GONE
                 text.visibility = View.GONE
                 text.text = ""
+                text.alpha = 1f
                 return
             }
 
-            val cleanName = trimmedName.removeSuffix("*").trim()
-            val labelsPrefs = AssignmentLabelsPrefs(context)
-            val secondary = labelsPrefs.getLabelByName(cleanName)
-            val iconRes = getIconRes(secondary?.iconKey)
-
             container.visibility = View.VISIBLE
-            text.text = context.getString(R.string.bullet_label_format, trimmedName)
+            dot.visibility = View.GONE
+            icon.visibility = View.GONE
+            text.text = " • $trimmedName"
             text.visibility = View.VISIBLE
-            text.setTextColor(ColorUtils.setAlphaComponent(textColor, 180))
-
-            when {
-                iconRes != null -> {
-                    icon.setImageResource(iconRes)
-                    icon.setColorFilter(textColor)
-                    icon.visibility = View.VISIBLE
-                    dot.visibility = View.GONE
-                }
-
-                secondary != null -> {
-                    dot.visibility = View.VISIBLE
-                    dot.setBackgroundColor(secondary.color)
-                    icon.visibility = View.GONE
-                }
-
-                else -> {
-                    dot.visibility = View.GONE
-                    icon.visibility = View.GONE
-                }
-            }
+            text.setTextColor(textColor)
+            text.alpha = 1f
         }
 
         private fun bindStatusIndicator(
@@ -224,15 +191,6 @@ class CyclePreviewAdapter :
             }
         }
 
-        private fun getIconRes(iconKey: String?): Int? {
-            return when (iconKey) {
-                "sick" -> R.drawable.ic_assignment_sick_24
-                "vacation" -> R.drawable.ic_vacation_24
-                "standby" -> R.drawable.ic_assignment_standby_24
-                "field" -> R.drawable.ic_assignment_field_24
-                else -> null
-            }
-        }
     }
 
     private class PreviewDiffCallback : DiffUtil.ItemCallback<PreviewItem>() {
