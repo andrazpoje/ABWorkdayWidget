@@ -11,6 +11,7 @@
     <string name="work_log_break_option_45" translatable="false">45</string>
 
     <string name="work_log_event_clock_out_with_total">Odhod (skupaj %1$s)</string>
+    <string name="work_log_event_clock_out_total_detail">Skupaj %1$s</string>
 
     <string name="work_log_state_finished">Zaključeno</string>
     <string name="work_log_state_finished_detail">Odhod ob %1$s</string>
@@ -90,6 +91,8 @@
     <string name="work_log_note_short">Opomba</string>
     <string name="work_log_recent_events">Zadnji dogodki</string>
     <string name="work_log_no_events_today">Danes še ni zabeleženih dogodkov.</string>
+    <string name="work_log_recent_events_empty_title">Še ni dogodkov</string>
+    <string name="work_log_recent_events_empty_helper">Začni beleženje dela, da se tukaj prikažejo današnji dogodki.</string>
     <string name="work_log_widget_status_not_started">Ni začeto</string>
     <string name="work_log_widget_no_session_today">Danes ni seje</string>
     <string name="work_log_widget_tap_to_open">Tapni za odprtje</string>
@@ -108,6 +111,19 @@
     <string name="work_log_notification_permission_positive">Dovoli obvestila</string>
     <string name="work_log_notification_permission_negative">Nadaljuj brez</string>
     <string name="work_log_notification_permission_denied_message">Obvestila za aktivno delo so izklopljena, dokler ne omogočiš dovoljenja za obvestila.</string>
+    <string name="work_log_start_warning_title">Začeti delo?</string>
+    <string name="work_log_start_warning_message">Ta dan je označen kot %1$s. Ali želiš vseeno začeti beleženje dela?</string>
+    <string name="work_log_start_warning_message_multi">Ta dan je označen kot %1$s. Ali želiš vseeno začeti beleženje dela?</string>
+    <string name="work_log_start_warning_cancel">Prekliči</string>
+    <string name="work_log_start_warning_confirm">Začni vseeno</string>
+    <string name="work_log_start_warning_off_day">Prosto</string>
+    <string name="work_log_start_warning_reason_off_day">prost dan</string>
+    <string name="work_log_start_warning_reason_vacation">Dopust</string>
+    <string name="work_log_start_warning_reason_sick_leave">Bolniška</string>
+    <string name="work_log_start_warning_reason_separator">, </string>
+    <string name="work_log_start_warning_reason_pair_format">%1$s in %2$s</string>
+    <string name="work_log_start_warning_remove_status_and_start">Odstrani %1$s in začni</string>
+    <string name="work_log_start_warning_remove_statuses_and_start">Odstrani statuse in začni</string>
     <string name="work_log_edit_event_title">Uredi %1$s</string>
     <string name="work_log_edit_event_summary">Posodobi datum in uro za %1$s.</string>
     <string name="work_log_edit_event_date_label">Datum</string>

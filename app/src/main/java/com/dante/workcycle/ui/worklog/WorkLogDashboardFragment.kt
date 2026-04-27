@@ -53,6 +53,7 @@ class WorkLogDashboardFragment :
     private lateinit var groupBalance: View
     private lateinit var spacerTargetBalance: View
     private lateinit var groupSecondaryActions: View
+    private lateinit var spacerActionBreak: View
 
     private lateinit var slidePrimaryAction: SlideToConfirmView
 
@@ -60,7 +61,7 @@ class WorkLogDashboardFragment :
     private lateinit var cardActionNote: MaterialCardView
     private lateinit var btnMealAction: com.google.android.material.button.MaterialButton
 
-    private lateinit var textRecentEventsEmpty: TextView
+    private lateinit var groupRecentEventsEmpty: View
     private lateinit var recyclerRecentEvents: RecyclerView
 
     private lateinit var cardTodayStatus: MaterialCardView
@@ -132,6 +133,7 @@ class WorkLogDashboardFragment :
         groupBalance = view.findViewById(R.id.groupBalance)
         spacerTargetBalance = view.findViewById(R.id.spacerTargetBalance)
         groupSecondaryActions = view.findViewById(R.id.groupSecondaryActions)
+        spacerActionBreak = view.findViewById(R.id.spacerActionBreak)
 
         slidePrimaryAction = view.findViewById(R.id.slidePrimaryAction)
 
@@ -139,7 +141,7 @@ class WorkLogDashboardFragment :
         cardActionNote = view.findViewById(R.id.cardActionNote)
         btnMealAction = view.findViewById(R.id.btnMealAction)
 
-        textRecentEventsEmpty = view.findViewById(R.id.textRecentEventsEmpty)
+        groupRecentEventsEmpty = view.findViewById(R.id.groupRecentEventsEmpty)
         recyclerRecentEvents = view.findViewById(R.id.recyclerRecentEvents)
 
         textBreakStartedAt = view.findViewById(R.id.textBreakStartedAt)
@@ -214,6 +216,7 @@ class WorkLogDashboardFragment :
                 spacerTargetBalance.isVisible = state.showTarget && state.showBalance
                 groupSecondaryActions.isVisible = state.showSecondaryActions
                 cardActionBreak.isVisible = state.showBreakActionButton
+                spacerActionBreak.isVisible = state.showBreakActionButton
 
                 cardActionBreak.alpha = if (state.breakButtonEnabled) 1f else 0.45f
                 cardActionBreak.isEnabled = state.breakButtonEnabled
@@ -223,10 +226,9 @@ class WorkLogDashboardFragment :
 
                 textStartDeviation.isVisible = state.showStartDeviation
                 textEndDeviation.isVisible = state.showEndDeviation
+                applyStatusCardStyle(state.visualState)
                 applyDeviationTone(textStartDeviation, state.startDeviationTone)
                 applyDeviationTone(textEndDeviation, state.endDeviationTone)
-
-                applyStatusCardStyle(isOnBreak = state.isOnBreak)
                 renderRecentEvents(state.recentEvents)
 
                 state.message?.let { message ->
@@ -243,6 +245,15 @@ class WorkLogDashboardFragment :
             return
         }
 
+        latestUiState.startWarning?.let { warning ->
+            showStartWarningDialog(warning)
+            return
+        }
+
+        continueStartWorkFlow()
+    }
+
+    private fun continueStartWorkFlow() {
         if (!shouldRequestNotificationPermissionForStartWork()) {
             viewModel.onSliderAction()
             return
@@ -254,6 +265,35 @@ class WorkLogDashboardFragment :
         }
 
         showNotificationPermissionExplainer()
+    }
+
+    private fun showStartWarningDialog(warning: WorkLogStartWarning) {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.work_log_start_warning_title))
+            .setMessage(getString(R.string.work_log_start_warning_message_multi, warning.reasonText))
+            .setNegativeButton(getString(R.string.work_log_start_warning_cancel), null)
+            .setPositiveButton(getString(R.string.work_log_start_warning_confirm)) { _, _ ->
+                continueStartWorkFlow()
+            }
+
+        val removableLabels = warning.removableStatusLabels
+        if (removableLabels.isNotEmpty()) {
+            val removeButtonText = if (removableLabels.size == 1) {
+                getString(
+                    R.string.work_log_start_warning_remove_status_and_start,
+                    removableLabels.first()
+                )
+            } else {
+                getString(R.string.work_log_start_warning_remove_statuses_and_start)
+            }
+
+            builder.setNeutralButton(removeButtonText) { _, _ ->
+                viewModel.removeStartWarningStatusesForSelectedDate()
+                continueStartWorkFlow()
+            }
+        }
+
+        builder.show()
     }
 
     private fun shouldRequestNotificationPermissionForStartWork(): Boolean {
@@ -282,38 +322,57 @@ class WorkLogDashboardFragment :
             .show()
     }
 
-    private fun applyStatusCardStyle(isOnBreak: Boolean) {
+    private fun applyStatusCardStyle(visualState: WorkLogDashboardVisualState) {
         val context = requireContext()
 
-        if (isOnBreak) {
-            val breakContainer = MaterialColors.getColor(
-                context,
+        val (containerAttr, outlineAttr, contentAttr) = when (visualState) {
+            WorkLogDashboardVisualState.WORKING -> Triple(
+                com.google.android.material.R.attr.colorPrimaryContainer,
+                com.google.android.material.R.attr.colorPrimary,
+                com.google.android.material.R.attr.colorOnPrimaryContainer
+            )
+
+            WorkLogDashboardVisualState.BREAK -> Triple(
                 com.google.android.material.R.attr.colorTertiaryContainer,
-                ContextCompat.getColor(context, android.R.color.darker_gray)
-            )
-            val breakOutline = MaterialColors.getColor(
-                context,
                 com.google.android.material.R.attr.colorTertiary,
-                ContextCompat.getColor(context, android.R.color.white)
+                com.google.android.material.R.attr.colorOnTertiaryContainer
             )
 
-            cardTodayStatus.setCardBackgroundColor(breakContainer)
-            cardTodayStatus.strokeColor = breakOutline
-        } else {
-            val surface = MaterialColors.getColor(
-                context,
-                com.google.android.material.R.attr.colorSurface,
-                ContextCompat.getColor(context, android.R.color.black)
-            )
-            val outline = MaterialColors.getColor(
-                context,
+            WorkLogDashboardVisualState.FINISHED -> Triple(
+                com.google.android.material.R.attr.colorSurfaceVariant,
                 com.google.android.material.R.attr.colorOutline,
-                ContextCompat.getColor(context, android.R.color.darker_gray)
+                com.google.android.material.R.attr.colorOnSurfaceVariant
             )
 
-            cardTodayStatus.setCardBackgroundColor(surface)
-            cardTodayStatus.strokeColor = outline
+            WorkLogDashboardVisualState.NOT_STARTED -> Triple(
+                com.google.android.material.R.attr.colorSurface,
+                com.google.android.material.R.attr.colorOutline,
+                com.google.android.material.R.attr.colorOnSurface
+            )
         }
+
+        val container = MaterialColors.getColor(
+            context,
+            containerAttr,
+            ContextCompat.getColor(context, android.R.color.black)
+        )
+        val outline = MaterialColors.getColor(
+            context,
+            outlineAttr,
+            ContextCompat.getColor(context, android.R.color.darker_gray)
+        )
+        val content = MaterialColors.getColor(
+            context,
+            contentAttr,
+            ContextCompat.getColor(context, android.R.color.white)
+        )
+
+        cardTodayStatus.setCardBackgroundColor(container)
+        cardTodayStatus.strokeColor = outline
+        textTodayDate.setTextColor(content)
+        textWorkState.setTextColor(content)
+        textWorkStateDetail.setTextColor(content)
+        textWorkedToday.setTextColor(content)
     }
 
     private fun applyDeviationTone(textView: TextView, tone: WorkLogDeviationTone) {
@@ -333,7 +392,7 @@ class WorkLogDashboardFragment :
 
     private fun renderRecentEvents(events: List<WorkEventListItem>) {
         val isEmpty = events.isEmpty()
-        textRecentEventsEmpty.isVisible = isEmpty
+        groupRecentEventsEmpty.isVisible = isEmpty
         recyclerRecentEvents.isVisible = !isEmpty
         eventAdapter.submitList(events)
     }

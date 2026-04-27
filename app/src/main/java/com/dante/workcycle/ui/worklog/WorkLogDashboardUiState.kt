@@ -16,21 +16,38 @@ enum class WorkLogDeviationTone {
     ERROR
 }
 
+enum class WorkLogDashboardVisualState {
+    NOT_STARTED,
+    WORKING,
+    BREAK,
+    FINISHED
+}
+
 const val WORK_LOG_PLACEHOLDER = "-"
 
 data class WorkEventListItem(
     val event: WorkEvent,
-    val text: String
+    val timeText: String,
+    val titleText: String,
+    val detailText: String? = null,
+    @DrawableRes val iconRes: Int
+)
+
+data class WorkLogStartWarning(
+    val reasonText: String,
+    val removableStatusLabels: List<String> = emptyList()
 )
 
 data class WorkLogDashboardUiState(
     val todayText: String = "",
     val stateText: String = "",
     val stateDetailText: String = "",
+    val visualState: WorkLogDashboardVisualState = WorkLogDashboardVisualState.NOT_STARTED,
     val sliderAction: WorkLogSliderAction = WorkLogSliderAction.START_WORK,
     val sliderActionText: String = "",
     @DrawableRes val sliderIconRes: Int = R.drawable.ic_work_time_24,
     val sliderEnabled: Boolean = true,
+    val startWarning: WorkLogStartWarning? = null,
     val showSecondaryActions: Boolean = false,
     val showBreakActionButton: Boolean = false,
     val showExpectedStart: Boolean = false,

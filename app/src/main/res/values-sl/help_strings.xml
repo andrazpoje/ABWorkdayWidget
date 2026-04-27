@@ -24,5 +24,5 @@
     <string name="whats_new_title">Kaj je novega</string>
     <string name="whats_new_version_format">Verzija %1$s</string>
     <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
-    <string name="whats_new_content">Dodan Work Log widget (Delovni čas)\n• Live osveževanje widgeta\n• Nov Single Shift preset\n• Vrnjena Panama in 4-on/4-off predloga\n• Izboljšan template picker\n• Statusne ikone v koledarju\n• Razširjene statusne oznake\n• Tretja barva cikla\n• Poenotene barve med previewjem, koledarjem in widgetom</string>
+    <string name="whats_new_content">• Nov tedenski pregled na domačem zaslonu z navigacijo po tednih\n• Bolj jasen prikaz primarne in sekundarne oznake, npr. B • Š1\n• Izboljšan Work Log widget s prikazom salda\n• Work Log zdaj upošteva pričakovani čas tudi po sekundarni oznaki\n• Dodano opozorilo pred začetkom dela na prost dan, dopust ali bolniško\n• Izboljšan videz Work Log nadzorne plošče in zadnjih dogodkov</string>
 </resources>

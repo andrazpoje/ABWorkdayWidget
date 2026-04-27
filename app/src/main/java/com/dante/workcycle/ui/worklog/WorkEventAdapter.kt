@@ -1,8 +1,11 @@
 package com.dante.workcycle.ui.worklog
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.R
@@ -33,7 +36,7 @@ class WorkEventAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_work_event, parent, false) as TextView
+            .inflate(R.layout.item_work_event, parent, false)
         return EventViewHolder(view, onItemClick)
     }
 
@@ -44,13 +47,23 @@ class WorkEventAdapter(
     override fun getItemCount(): Int = items.size
 
     class EventViewHolder(
-        private val textView: TextView,
+        view: View,
         private val onItemClick: (WorkEventListItem) -> Unit
-    ) : RecyclerView.ViewHolder(textView) {
+    ) : RecyclerView.ViewHolder(view) {
+
+        private val textTime: TextView = view.findViewById(R.id.textEventTime)
+        private val iconEvent: ImageView = view.findViewById(R.id.iconEvent)
+        private val textTitle: TextView = view.findViewById(R.id.textEventTitle)
+        private val textDetail: TextView = view.findViewById(R.id.textEventDetail)
 
         fun bind(item: WorkEventListItem) {
-            textView.text = item.text
-            textView.setOnClickListener {
+            textTime.text = item.timeText
+            iconEvent.setImageResource(item.iconRes)
+            textTitle.text = item.titleText
+            textDetail.text = item.detailText.orEmpty()
+            textDetail.isVisible = !item.detailText.isNullOrBlank()
+
+            itemView.setOnClickListener {
                 onItemClick(item)
             }
         }

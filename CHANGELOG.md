@@ -4,6 +4,66 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.7
+
+---
+
+### ✨ Added
+
+- Added weekly navigation to the Home 7-day preview
+- Added previous / next week controls for the Home weekly overview
+- Added quick return-to-current-week home icon in the weekly preview
+- Added secondary label support for Work Log expected start/end times
+- Added fallback order for expected work times:
+  - Secondary label time
+  - Primary cycle time
+  - Global default work rules
+- Added safety warning before starting Work Log on:
+  - Off day
+  - Vacation
+  - Sick leave
+- Added option to remove Vacation / Sick leave status and start work
+- Added combined warning handling when multiple warning reasons apply
+- Added `StatusSemantics` helper for business-level status behavior
+
+### 🎨 Improved
+
+- Improved Home 7-day preview into a clearer weekly overview
+- Improved primary + secondary label display in Home preview:
+  - `B • Š1`
+  - status shown separately below
+- Improved secondary label readability in Home preview cards
+- Improved Work Log widget layout with clearer hierarchy
+- Improved Work Log widget by showing Balance / Saldo as an additional quick info item
+- Improved Work Log widget compact spacing for smaller widget sizes
+- Improved Work Log Dashboard status card hierarchy
+- Improved Work Log Dashboard state-specific visual tones:
+  - Working
+  - Break
+  - Finished
+  - Not started
+- Improved Work Log Dashboard secondary actions with compact quick-action layout
+- Improved Recent events from plain log text into structured timeline rows
+- Improved Recent events empty state with clearer title and helper text
+- Improved Work Log UI spacing, typography, and dark mode readability
+- Improved expected start/end display behavior on off-days
+- Improved Bottom Sheet day summary to show effective day state, including Off days
+
+### 🛠 Fixed
+
+- Fixed secondary labels being too visually weak compared to primary cycle/status
+- Fixed Home preview status layout being too stacked and harder to read
+- Fixed Work Log expected time fallback when secondary labels are used
+- Fixed expected start/end showing incorrectly on Off days without explicit work time
+- Fixed Start Work warning being shown for normal working statuses such as Terrain / Standby
+- Fixed warning logic so normal secondary labels like Š1 / O1 / K1 do not trigger warnings
+- Fixed Work Log start warning logic being tied to UI status visuals instead of business semantics
+- Fixed Vacation / Sick leave removal flow so only removable non-working statuses are removed
+- Fixed Recent events debug-like display style
+- Fixed long Recent event notes/details safely truncating instead of breaking layout
+
+---
+
 ## v2.6
 
 ---

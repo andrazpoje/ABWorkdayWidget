@@ -23,5 +23,5 @@
     <string name="whats_new_title">What’s New</string>
     <string name="whats_new_version_format">Version %1$s</string>
     <string name="whats_new_view_full_changelog">View full changelog</string>
-    <string name="whats_new_content">Added Work Log widget (Work Time)\n• Live widget refresh\n• New Single Shift preset\n• Restored Panama and 4-on/4-off templates\n• Improved template picker\n• Calendar status icons\n• Expanded system status labels\n• Third cycle color support\n• Unified colors across preview, calendar, and widget</string>
+    <string name="whats_new_content">• New weekly overview on Home with week navigation\n• Clearer primary and secondary label display, e.g. B • Š1\n• Improved Work Log widget with balance display\n• Work Log now supports expected times from secondary labels\n• Added warning before starting work on off days, vacation or sick leave\n• Improved Work Log dashboard and recent events layout</string>
 </resources>

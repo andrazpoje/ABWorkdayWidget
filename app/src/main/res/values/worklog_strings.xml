@@ -12,6 +12,7 @@
     <string name="work_log_break_option_45" translatable="false">45</string>
 
     <string name="work_log_event_clock_out_with_total">Departure (total %1$s)</string>
+    <string name="work_log_event_clock_out_total_detail">Total %1$s</string>
 
     <string name="work_log_state_finished">Finished</string>
     <string name="work_log_state_finished_detail">Ended at %1$s</string>
@@ -91,6 +92,8 @@
     <string name="work_log_note_short">Note</string>
     <string name="work_log_recent_events">Recent events</string>
     <string name="work_log_no_events_today">No events recorded today.</string>
+    <string name="work_log_recent_events_empty_title">No events yet</string>
+    <string name="work_log_recent_events_empty_helper">Start tracking work to see events here.</string>
     <string name="work_log_widget_status_not_started">Not started</string>
     <string name="work_log_widget_no_session_today">No session today</string>
     <string name="work_log_widget_tap_to_open">Tap to open</string>
@@ -109,6 +112,19 @@
     <string name="work_log_notification_permission_positive">Allow notifications</string>
     <string name="work_log_notification_permission_negative">Continue without</string>
     <string name="work_log_notification_permission_denied_message">Active work notifications are off until notification permission is enabled.</string>
+    <string name="work_log_start_warning_title">Start work?</string>
+    <string name="work_log_start_warning_message">This day is marked as %1$s. Do you still want to start tracking work?</string>
+    <string name="work_log_start_warning_message_multi">This day is marked as %1$s. Do you still want to start tracking work?</string>
+    <string name="work_log_start_warning_cancel">Cancel</string>
+    <string name="work_log_start_warning_confirm">Start anyway</string>
+    <string name="work_log_start_warning_off_day">Off</string>
+    <string name="work_log_start_warning_reason_off_day">off day</string>
+    <string name="work_log_start_warning_reason_vacation">Vacation</string>
+    <string name="work_log_start_warning_reason_sick_leave">Sick leave</string>
+    <string name="work_log_start_warning_reason_separator">, </string>
+    <string name="work_log_start_warning_reason_pair_format">%1$s and %2$s</string>
+    <string name="work_log_start_warning_remove_status_and_start">Remove %1$s and start</string>
+    <string name="work_log_start_warning_remove_statuses_and_start">Remove statuses and start</string>
     <string name="work_log_edit_event_title">Edit %1$s</string>
     <string name="work_log_edit_event_summary">Update the date and time for %1$s.</string>
     <string name="work_log_edit_event_date_label">Date</string>

@@ -6,14 +6,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.dante.workcycle.R
+import com.dante.workcycle.core.status.StatusSemantics
+import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.data.prefs.WorkSessionPrefs
 import com.dante.workcycle.data.repository.WorkEventRepository
 import com.dante.workcycle.domain.model.CycleLayer
 import com.dante.workcycle.domain.model.ResolvedDay
+import com.dante.workcycle.domain.model.StatusLabel
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
+import com.dante.workcycle.domain.schedule.StatusRepository
 import com.dante.workcycle.domain.model.WorkEventType.BREAK_END
 import com.dante.workcycle.domain.model.WorkEventType.BREAK_START
 import com.dante.workcycle.domain.model.WorkEventType.CLOCK_IN
@@ -55,6 +59,7 @@ class WorkLogDashboardViewModel(
     private val workSettingsPrefs = WorkSettingsPrefs(application)
     private val workSessionPrefs = WorkSessionPrefs(application)
     private val scheduleResolver = DefaultScheduleResolver(application)
+    private val statusRepository = StatusRepository(application)
     private val settingsChangeListener =
         android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == null || key in WORK_SETTINGS_KEYS) {
@@ -272,6 +277,7 @@ class WorkLogDashboardViewModel(
         val sliderAction: WorkLogSliderAction
         val sliderActionText: String
         val sliderIconRes: Int
+        val visualState: WorkLogDashboardVisualState
 
         when (sessionState) {
             SessionState.NOT_WORKING -> {
@@ -281,9 +287,11 @@ class WorkLogDashboardViewModel(
                         R.string.work_log_state_finished_detail,
                         lastClockOut.time.format(timeFormatter())
                     )
+                    visualState = WorkLogDashboardVisualState.FINISHED
                 } else {
                     stateText = s(R.string.work_log_state_off)
                     stateDetailText = s(R.string.work_log_state_off_detail)
+                    visualState = WorkLogDashboardVisualState.NOT_STARTED
                 }
                 sliderAction = WorkLogSliderAction.START_WORK
                 sliderActionText = s(R.string.work_log_slide_start)
@@ -293,6 +301,7 @@ class WorkLogDashboardViewModel(
             SessionState.WORKING -> {
                 stateText = s(R.string.work_log_state_working)
                 stateDetailText = s(R.string.work_log_state_working_detail)
+                visualState = WorkLogDashboardVisualState.WORKING
                 sliderAction = WorkLogSliderAction.FINISH_WORK
                 sliderActionText = s(R.string.work_log_slide_finish)
                 sliderIconRes = R.drawable.ic_save_24
@@ -301,6 +310,7 @@ class WorkLogDashboardViewModel(
             SessionState.ON_BREAK -> {
                 stateText = s(R.string.work_log_state_break)
                 stateDetailText = s(R.string.work_log_state_break_detail)
+                visualState = WorkLogDashboardVisualState.BREAK
                 sliderAction = WorkLogSliderAction.END_BREAK
                 sliderActionText = s(R.string.work_log_slide_end_break)
                 sliderIconRes = R.drawable.ic_coffee_break_24
@@ -327,10 +337,16 @@ class WorkLogDashboardViewModel(
             ),
             stateText = stateText,
             stateDetailText = stateDetailText,
+            visualState = visualState,
             sliderAction = sliderAction,
             sliderActionText = sliderActionText,
             sliderIconRes = sliderIconRes,
             sliderEnabled = !isActionLocked(),
+            startWarning = if (sliderAction == WorkLogSliderAction.START_WORK) {
+                collectStartWarning(todayResolved)
+            } else {
+                null
+            },
             showSecondaryActions = hasStartedToday,
             showBreakActionButton = sessionState == SessionState.WORKING,
             showExpectedStart = !expectedStartText.isNullOrBlank(),
@@ -362,12 +378,7 @@ class WorkLogDashboardViewModel(
             recentEvents = events
                 .takeLast(50)
                 .reversed()
-                .map { event ->
-                    WorkEventListItem(
-                        event = event,
-                        text = formatEvent(event)
-                    )
-                }
+                .map(::buildRecentEventItem)
         )
     }
 
@@ -459,30 +470,61 @@ class WorkLogDashboardViewModel(
         return (endMinutes - startMinutes).toLong()
     }
 
-    private fun formatEvent(event: WorkEvent): String {
-        val dateText = event.date.format(DateTimeFormatter.ofPattern("dd.MM."))
+    private fun buildRecentEventItem(event: WorkEvent): WorkEventListItem {
         val timeText = event.time.format(timeFormatter())
 
         return when (event.type) {
-            CLOCK_IN -> "$dateText $timeText  ${s(R.string.work_log_event_clock_in)}"
-            BREAK_START -> "$dateText $timeText  ${s(R.string.work_log_event_break_start)}"
-            BREAK_END -> "$dateText $timeText  ${s(R.string.work_log_event_break_end)}"
-            MEAL -> "$dateText $timeText  ${s(R.string.work_log_event_meal)}"
+            CLOCK_IN -> WorkEventListItem(
+                event = event,
+                timeText = timeText,
+                titleText = s(R.string.work_log_event_clock_in),
+                iconRes = R.drawable.ic_work_time_24
+            )
+
+            BREAK_START -> WorkEventListItem(
+                event = event,
+                timeText = timeText,
+                titleText = s(R.string.work_log_event_break_start),
+                iconRes = R.drawable.ic_coffee_break_24
+            )
+
+            BREAK_END -> WorkEventListItem(
+                event = event,
+                timeText = timeText,
+                titleText = s(R.string.work_log_event_break_end),
+                iconRes = R.drawable.ic_work_time_24
+            )
+
+            MEAL -> WorkEventListItem(
+                event = event,
+                timeText = timeText,
+                titleText = s(R.string.work_log_event_meal),
+                iconRes = R.drawable.ic_lunch_dining_24
+            )
 
             WorkEventType.NOTE -> {
                 val noteText = event.note?.takeIf { it.isNotBlank() }
-                    ?: s(R.string.work_log_event_note)
-                "$dateText $timeText  ${s(R.string.work_log_event_note)}: $noteText"
+                WorkEventListItem(
+                    event = event,
+                    timeText = timeText,
+                    titleText = s(R.string.work_log_event_note),
+                    detailText = noteText,
+                    iconRes = R.drawable.ic_edit_note_24
+                )
             }
 
             CLOCK_OUT -> {
                 val totalAtClockOut = calculateWorkedTextUntilEvent(currentEvents, event)
-                "$dateText $timeText  ${
-                    getApplication<Application>().getString(
-                        R.string.work_log_event_clock_out_with_total,
+                WorkEventListItem(
+                    event = event,
+                    timeText = timeText,
+                    titleText = s(R.string.work_log_event_clock_out_label),
+                    detailText = getApplication<Application>().getString(
+                        R.string.work_log_event_clock_out_total_detail,
                         totalAtClockOut
-                    )
-                }"
+                    ),
+                    iconRes = R.drawable.ic_save_24
+                )
             }
         }
     }
@@ -912,6 +954,115 @@ class WorkLogDashboardViewModel(
             normalized.equals("Off", ignoreCase = true)
     }
 
+    fun removeStartWarningStatusesForSelectedDate() {
+        refreshDateIfNeeded()
+
+        val currentTags = statusRepository.getStatusTags(selectedDate)
+        if (currentTags.isEmpty()) return
+
+        val removableNames = resolveExclusiveNonWorkingStatusLabels(
+            statusTags = currentTags,
+            statusPrefs = StatusLabelsPrefs(getApplication<Application>())
+        ).map { it.name.lowercase() }
+            .toSet()
+
+        if (removableNames.isEmpty()) return
+
+        val keptTags = currentTags.filterNot { it.lowercase() in removableNames }
+        statusRepository.setStatusTags(selectedDate, keptTags)
+        emitCurrentUiState()
+    }
+
+    private fun collectStartWarning(resolvedDay: ResolvedDay): WorkLogStartWarning? {
+        val reasons = collectStartWarningReasons(resolvedDay)
+        if (reasons.isEmpty()) return null
+
+        return WorkLogStartWarning(
+            reasonText = formatStartWarningReasons(reasons.map { it.label }),
+            removableStatusLabels = reasons.mapNotNull { it.removableStatusLabel }
+        )
+    }
+
+    private fun collectStartWarningReasons(resolvedDay: ResolvedDay): List<StartWarningReason> {
+        val reasons = mutableListOf<StartWarningReason>()
+        val statusPrefs = StatusLabelsPrefs(getApplication<Application>())
+        val warningStatuses = resolveExclusiveNonWorkingStatusLabels(
+            statusTags = resolvedDay.statusTags,
+            statusPrefs = statusPrefs
+        )
+
+        warningStatuses.forEach { label ->
+            val reasonLabel = getExclusiveNonWorkingReasonLabel(label)
+            reasons.add(
+                StartWarningReason(
+                    label = reasonLabel,
+                    removableStatusLabel = reasonLabel
+                )
+            )
+        }
+
+        if (isOffDayLabel(resolvedDay.effectiveCycleLabel)) {
+            reasons.add(
+                StartWarningReason(
+                    label = s(R.string.work_log_start_warning_reason_off_day)
+                )
+            )
+        }
+
+        return reasons
+    }
+
+    private fun resolveExclusiveNonWorkingStatusLabels(
+        statusTags: Set<String>,
+        statusPrefs: StatusLabelsPrefs
+    ): List<StatusLabel> {
+        val tagNames = statusTags
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .map { it.lowercase() }
+            .toSet()
+
+        if (tagNames.isEmpty()) return emptyList()
+
+        return statusPrefs.getLabels().filter { label ->
+            label.name.lowercase() in tagNames &&
+                StatusSemantics.isExclusiveNonWorkingStatus(label)
+        }
+    }
+
+    private fun getExclusiveNonWorkingReasonLabel(label: StatusLabel): String {
+        val resId = when (label.iconKey) {
+            StatusSemantics.ICON_KEY_VACATION -> R.string.work_log_start_warning_reason_vacation
+            StatusSemantics.ICON_KEY_SICK -> R.string.work_log_start_warning_reason_sick_leave
+            else -> return StatusLabelsPrefs(getApplication<Application>()).getDisplayName(label)
+        }
+
+        return s(resId)
+    }
+
+    private fun formatStartWarningReasons(labels: List<String>): String {
+        return when (labels.size) {
+            0 -> ""
+            1 -> labels.first()
+            2 -> getApplication<Application>().getString(
+                R.string.work_log_start_warning_reason_pair_format,
+                labels[0],
+                labels[1]
+            )
+            else -> {
+                val separator = getApplication<Application>().getString(
+                    R.string.work_log_start_warning_reason_separator
+                )
+                val allButLast = labels.dropLast(1).joinToString(separator = separator)
+                getApplication<Application>().getString(
+                    R.string.work_log_start_warning_reason_pair_format,
+                    allButLast,
+                    labels.last()
+                )
+            }
+        }
+    }
+
     fun clearMessage() {
         _uiState.value = _uiState.value.copy(message = null)
     }
@@ -1025,6 +1176,11 @@ class WorkLogDashboardViewModel(
     private data class ExpectedTimes(
         val startTime: String?,
         val endTime: String?
+    )
+
+    private data class StartWarningReason(
+        val label: String,
+        val removableStatusLabel: String? = null
     )
 
     override fun onCleared() {
