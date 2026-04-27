@@ -14,7 +14,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.edit
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -25,13 +24,16 @@ import com.dante.workcycle.R
 import com.dante.workcycle.core.ui.applyImeInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.core.util.DateProvider
 import com.dante.workcycle.data.prefs.AppPrefs
+import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.databinding.FragmentHomeBinding
 import com.dante.workcycle.domain.holiday.HolidayCountry
+import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.domain.template.TemplateManager
 import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
-import com.dante.workcycle.ui.settings.PrimaryCycleSettingsController
 import com.dante.workcycle.widget.WorkCycleWidgetProvider
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.ChipGroup
@@ -39,6 +41,9 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
@@ -47,7 +52,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         const val SECTION_RULES = "rules"
         const val MAX_CYCLE_ITEMS = 16
         const val MAX_LABEL_LENGTH = 24
+        private const val UPCOMING_EVENTS_LOOKAHEAD_DAYS = 30
+        private const val UPCOMING_EVENTS_MAX_ITEMS = 5
     }
+
+    private data class UpcomingEvent(
+        val dateText: String,
+        val label: String
+    )
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -105,10 +117,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var saveButton: MaterialButton
     lateinit var openWidgetsButton: MaterialButton
-    lateinit var openCycleSettingsButton: MaterialButton
 
     lateinit var widgetHint: TextView
-    lateinit var cycleSettingsSummaryText: TextView
+    lateinit var upcomingEventsEmptyText: TextView
+    lateinit var upcomingEventsList: View
+    lateinit var upcomingEventRows: List<View>
+    lateinit var upcomingEventDateTexts: List<TextView>
+    lateinit var upcomingEventLabelTexts: List<TextView>
 
     var selectedDate: LocalDate = LocalDate.now()
     var previewWeekOffset: Int = 0
@@ -138,7 +153,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         updateTodayStatus()
         updateCyclePreview()
         updateWidgetHint()
-        updateHomeConfigSummary()
+        updateUpcomingEvents()
 
         versionText.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
 
@@ -158,13 +173,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         openWidgetsButton.setOnClickListener {
             requestAddWidget()
-        }
-
-        openCycleSettingsButton.setOnClickListener {
-            findNavController().navigate(
-                R.id.settingsFragment,
-                bundleOf(PrimaryCycleSettingsController.ARG_SCROLL_TO_CYCLE_SETTINGS to true)
-            )
         }
 
         pickDateButton.setOnClickListener {
@@ -220,7 +228,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             loadSettings()
             updateCyclePreview()
             updateWidgetHint()
-            updateHomeConfigSummary()
+            updateUpcomingEvents()
             updateUnsavedChangesState()
         }
     }
@@ -334,8 +342,29 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         rulesSection = root.findViewById(R.id.rulesSection)
 
         widgetHint = root.findViewById(R.id.widgetHint)
-        cycleSettingsSummaryText = root.findViewById(R.id.cycleSettingsSummaryText)
-        openCycleSettingsButton = root.findViewById(R.id.openCycleSettingsButton)
+        upcomingEventsEmptyText = root.findViewById(R.id.upcomingEventsEmptyText)
+        upcomingEventsList = root.findViewById(R.id.upcomingEventsList)
+        upcomingEventRows = listOf(
+            root.findViewById(R.id.upcomingEventRow1),
+            root.findViewById(R.id.upcomingEventRow2),
+            root.findViewById(R.id.upcomingEventRow3),
+            root.findViewById(R.id.upcomingEventRow4),
+            root.findViewById(R.id.upcomingEventRow5)
+        )
+        upcomingEventDateTexts = listOf(
+            root.findViewById(R.id.upcomingEventDate1),
+            root.findViewById(R.id.upcomingEventDate2),
+            root.findViewById(R.id.upcomingEventDate3),
+            root.findViewById(R.id.upcomingEventDate4),
+            root.findViewById(R.id.upcomingEventDate5)
+        )
+        upcomingEventLabelTexts = listOf(
+            root.findViewById(R.id.upcomingEventLabel1),
+            root.findViewById(R.id.upcomingEventLabel2),
+            root.findViewById(R.id.upcomingEventLabel3),
+            root.findViewById(R.id.upcomingEventLabel4),
+            root.findViewById(R.id.upcomingEventLabel5)
+        )
         dateText = root.findViewById(R.id.dateText)
         pickDateButton = root.findViewById(R.id.pickDateButton)
 
@@ -387,19 +416,71 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         ).show()
     }
 
-    private fun updateHomeConfigSummary() {
-        val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
-        cycleSettingsSummaryText.text = if (activeTemplate != null) {
-            getString(
-                R.string.home_cycle_settings_summary_template,
-                getString(activeTemplate.titleRes)
-            )
-        } else {
-            getString(
-                R.string.home_cycle_settings_summary_custom,
-                CycleManager.loadCycle(requireContext()).joinToString(", ")
-            )
+    fun updateUpcomingEvents() {
+        val events = collectUpcomingEvents()
+
+        upcomingEventsEmptyText.isVisible = events.isEmpty()
+        upcomingEventsList.isVisible = events.isNotEmpty()
+        upcomingEventsEmptyText.text = getString(R.string.home_upcoming_events_empty)
+
+        upcomingEventRows.forEachIndexed { index, row ->
+            val event = events.getOrNull(index)
+            row.isVisible = event != null
+            upcomingEventDateTexts[index].text = event?.dateText.orEmpty()
+            upcomingEventLabelTexts[index].text = event?.label.orEmpty()
         }
+    }
+
+    private fun collectUpcomingEvents(): List<UpcomingEvent> {
+        val context = requireContext()
+        val resolver = DefaultScheduleResolver(context)
+        val statusLabelsPrefs = StatusLabelsPrefs(context)
+        val statusLabels = statusLabelsPrefs.getLabels()
+        val offDayLabel = getString(R.string.off_day_label)
+        val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+            .withLocale(Locale.getDefault())
+        val separator = getString(R.string.home_upcoming_event_reason_separator)
+        val events = mutableListOf<UpcomingEvent>()
+
+        for (dayOffset in 1..UPCOMING_EVENTS_LOOKAHEAD_DAYS) {
+            val date = DateProvider.today().plusDays(dayOffset.toLong())
+            val resolved = runCatching { resolver.resolve(date) }.getOrNull() ?: continue
+            val reasons = mutableListOf<String>()
+            val isWeekend = date.dayOfWeek.value >= 6
+            val isHoliday = HolidayManager.isHoliday(context, date)
+            val isOffDay = resolved.effectiveCycleLabel.equals(offDayLabel, ignoreCase = true)
+
+            if (isHoliday) {
+                reasons.add(getString(R.string.home_upcoming_event_holiday))
+            } else if (isOffDay && !isWeekend) {
+                reasons.add(getString(R.string.home_upcoming_event_off_day))
+            }
+
+            resolved.statusTags.forEach { rawStatus ->
+                val statusLabel = statusLabels.firstOrNull {
+                    it.name.equals(rawStatus, ignoreCase = true)
+                }
+                val displayName = statusLabel?.let(statusLabelsPrefs::getDisplayName)
+                    ?: rawStatus.trim()
+
+                if (displayName.isNotBlank()) {
+                    reasons.add(displayName)
+                }
+            }
+
+            if (reasons.isNotEmpty()) {
+                events.add(
+                    UpcomingEvent(
+                        dateText = date.format(dateFormatter),
+                        label = reasons.distinct().joinToString(separator)
+                    )
+                )
+            }
+
+            if (events.size >= UPCOMING_EVENTS_MAX_ITEMS) break
+        }
+
+        return events
     }
 
     private fun HomeFragment.showTemplateLockedMessage() {

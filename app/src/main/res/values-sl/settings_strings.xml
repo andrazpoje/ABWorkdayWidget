@@ -15,6 +15,11 @@
     <string name="home_cycle_settings_summary_template">Aktiven template: %1$s</string>
     <string name="home_cycle_settings_summary_custom">Lastni cikel: %1$s</string>
     <string name="open_cycle_settings">Nastavitve cikla</string>
+    <string name="home_upcoming_events_title">Bližajoči dogodki</string>
+    <string name="home_upcoming_events_empty">V naslednjih dneh ni posebnih dogodkov.</string>
+    <string name="home_upcoming_event_holiday">Praznik</string>
+    <string name="home_upcoming_event_off_day">Prost dan</string>
+    <string name="home_upcoming_event_reason_separator">\u0020•\u0020</string>
     <string name="unsaved_changes_title">Neshranjene spremembe</string>
     <string name="unsaved_changes_message">Imaš neshranjene spremembe. Ali jih želiš shraniti pred izhodom?</string>
 

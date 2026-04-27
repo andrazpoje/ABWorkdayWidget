@@ -1,6 +1,7 @@
 package com.dante.workcycle.core.status
 
 import android.content.Context
+import android.graphics.Color
 import com.dante.workcycle.R
 import com.dante.workcycle.domain.model.StatusLabel
 
@@ -43,6 +44,19 @@ object StatusVisuals {
             "meeting" -> R.drawable.ic_meeting_24
             "terrain" -> R.drawable.ic_terrain_24
             "field" -> R.drawable.ic_assignment_field_24
+            else -> null
+        }
+    }
+
+    fun getDefaultColor(iconKey: String?): Int? {
+        return when (iconKey) {
+            "sick" -> Color.parseColor("#E53935")
+            "vacation" -> Color.parseColor("#FFD54F")
+            "standby" -> Color.parseColor("#7E57C2")
+            "terrain" -> Color.parseColor("#00ACC1")
+            "meeting" -> Color.parseColor("#3949AB")
+            "replacement" -> Color.parseColor("#8D6E63")
+            "reduction" -> Color.parseColor("#607D8B")
             else -> null
         }
     }

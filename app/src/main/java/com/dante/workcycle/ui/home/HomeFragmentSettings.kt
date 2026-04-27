@@ -35,6 +35,7 @@ fun HomeFragment.saveChangesAndRefresh(): Boolean {
     refreshWidget()
     updateTodayStatus()
     updateCyclePreview()
+    updateUpcomingEvents()
     clearUnsavedChanges()
 
     Toast.makeText(

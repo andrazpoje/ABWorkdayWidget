@@ -1,7 +1,6 @@
 package com.dante.workcycle.data.prefs
 
 import android.content.Context
-import android.graphics.Color
 import androidx.core.content.edit
 import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.domain.model.StatusLabel
@@ -15,49 +14,49 @@ class StatusLabelsPrefs(private val context: Context) {
     private val defaultSystemLabels = listOf(
         StatusLabel(
             name = "Bolni\u0161ka",
-            color = Color.parseColor("#E53935"),
+            color = requireSystemColor("sick"),
             isSystem = true,
             isEnabled = true,
             iconKey = "sick"
         ),
         StatusLabel(
             name = "Dopust",
-            color = Color.parseColor("#F9A825"),
+            color = requireSystemColor("vacation"),
             isSystem = true,
             isEnabled = true,
             iconKey = "vacation"
         ),
         StatusLabel(
             name = "De\u017eurstvo",
-            color = Color.parseColor("#8E24AA"),
+            color = requireSystemColor("standby"),
             isSystem = true,
             isEnabled = true,
             iconKey = "standby"
         ),
         StatusLabel(
             name = "Kr\u010denje",
-            color = Color.parseColor("#00897B"),
+            color = requireSystemColor("reduction"),
             isSystem = true,
             isEnabled = true,
             iconKey = "reduction"
         ),
         StatusLabel(
             name = "Nadome\u0161\u010danje",
-            color = Color.parseColor("#1E88E5"),
+            color = requireSystemColor("replacement"),
             isSystem = true,
             isEnabled = true,
             iconKey = "replacement"
         ),
         StatusLabel(
             name = "Sestanek",
-            color = Color.parseColor("#6D4C41"),
+            color = requireSystemColor("meeting"),
             isSystem = true,
             isEnabled = true,
             iconKey = "meeting"
         ),
         StatusLabel(
             name = "Teren",
-            color = Color.parseColor("#43A047"),
+            color = requireSystemColor("terrain"),
             isSystem = true,
             isEnabled = true,
             iconKey = "terrain"
@@ -73,7 +72,7 @@ class StatusLabelsPrefs(private val context: Context) {
         }
 
         val base = parsed.ifEmpty { defaultSystemLabels }
-        val merged = sortLabels(mergeMissingSystemLabels(base))
+        val merged = sortLabels(refreshSystemLabels(mergeMissingSystemLabels(base)))
 
         if (merged != parsed) {
             saveLabels(merged)
@@ -127,6 +126,22 @@ class StatusLabelsPrefs(private val context: Context) {
         return result
     }
 
+    private fun refreshSystemLabels(labels: List<StatusLabel>): List<StatusLabel> {
+        return labels.map { label ->
+            val semanticColor = if (label.isSystem) {
+                StatusVisuals.getDefaultColor(label.iconKey)
+            } else {
+                null
+            }
+
+            if (semanticColor != null && semanticColor != label.color) {
+                label.copy(color = semanticColor)
+            } else {
+                label
+            }
+        }
+    }
+
     private fun sortLabels(labels: List<StatusLabel>): List<StatusLabel> {
         fun systemOrderIndex(label: StatusLabel): Int {
             return when (label.iconKey) {
@@ -172,5 +187,11 @@ class StatusLabelsPrefs(private val context: Context) {
     companion object {
         private const val PREFS_NAME = "status_labels_prefs"
         private const val KEY_LABELS = "status_labels"
+
+        private fun requireSystemColor(iconKey: String): Int {
+            return requireNotNull(StatusVisuals.getDefaultColor(iconKey)) {
+                "Missing default status color for $iconKey"
+            }
+        }
     }
 }

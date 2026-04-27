@@ -41,6 +41,7 @@ object CycleColorHelper {
             0 -> colors.shiftAColor
             1 -> colors.shiftBColor
             2 -> colors.shiftCColor
+            // TODO: Future: dynamic primary cycle color palette for 4+ primary cycle labels.
             else -> colors.shiftCColor
         }
     }

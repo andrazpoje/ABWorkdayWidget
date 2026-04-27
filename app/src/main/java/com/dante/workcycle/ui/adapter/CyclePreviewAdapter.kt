@@ -2,6 +2,7 @@ package com.dante.workcycle.ui.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,7 @@ class CyclePreviewAdapter :
         val colorLabel: String,
         val secondaryLabel: String? = null,
         val statusLabel: String? = null,
+        val statusColor: Int? = null,
         val helperText: String? = null,
         val isOffDay: Boolean = false
     )
@@ -90,6 +92,8 @@ class CyclePreviewAdapter :
 
             bindStatusIndicator(
                 status = item.statusLabel,
+                statusColor = item.statusColor,
+                cardBackgroundColor = bgColor,
                 textColor = textColor
             )
 
@@ -158,6 +162,8 @@ class CyclePreviewAdapter :
 
         private fun bindStatusIndicator(
             status: String?,
+            statusColor: Int?,
+            cardBackgroundColor: Int,
             textColor: Int
         ) {
             val text = binding.statusText
@@ -166,29 +172,56 @@ class CyclePreviewAdapter :
             if (trimmed.isBlank()) {
                 text.visibility = View.GONE
                 text.text = ""
+                text.background = null
                 return
             }
 
+            val badgeColor = resolveStatusBadgeColor(statusColor, cardBackgroundColor, textColor)
+            val badgeTextColor = getReadableTextColor(badgeColor)
+
             text.visibility = View.VISIBLE
             text.text = trimmed
-
-            val statusColor = getStatusColor(trimmed)
-            text.setTextColor(statusColor ?: ColorUtils.setAlphaComponent(textColor, 220))
+            text.background = createStatusBadgeBackground(text.context, badgeColor)
+            text.setTextColor(badgeTextColor)
             text.alpha = 1f
         }
 
-        private fun getStatusColor(status: String): Int? {
-            return when (status.substringBefore(",").trim().removeSuffix("+")) {
-                "Bolniška" -> Color.parseColor("#E53935")
-                "Dopust" -> Color.parseColor("#F9A825")
-                "Dežurstvo" -> Color.parseColor("#8E24AA")
-                "Sick leave" -> Color.parseColor("#E53935")
-                "Vacation" -> Color.parseColor("#F9A825")
-                "Standby" -> Color.parseColor("#8E24AA")
-                "Krčenje" -> Color.parseColor("#00897B")
-                "Reduction" -> Color.parseColor("#00897B")
-                else -> null
+        private fun resolveStatusBadgeColor(
+            statusColor: Int?,
+            cardBackgroundColor: Int,
+            textColor: Int
+        ): Int {
+            if (statusColor != null) return statusColor
+
+            return ColorUtils.blendARGB(cardBackgroundColor, textColor, 0.28f)
+        }
+
+        private fun createStatusBadgeBackground(context: Context, color: Int): GradientDrawable {
+            val radius = 999f
+            val strokeColor = if (ColorUtils.calculateLuminance(color) > 0.5) {
+                ColorUtils.blendARGB(color, Color.BLACK, 0.18f)
+            } else {
+                ColorUtils.blendARGB(color, Color.WHITE, 0.20f)
             }
+
+            return GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = radius
+                setColor(color)
+                setStroke(dpToPx(context, 1f), strokeColor)
+            }
+        }
+
+        private fun getReadableTextColor(backgroundColor: Int): Int {
+            return if (ColorUtils.calculateLuminance(backgroundColor) > 0.5) {
+                Color.BLACK
+            } else {
+                Color.WHITE
+            }
+        }
+
+        private fun dpToPx(context: Context, dp: Float): Int {
+            return (dp * context.resources.displayMetrics.density).toInt()
         }
 
     }

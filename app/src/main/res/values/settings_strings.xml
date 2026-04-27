@@ -15,6 +15,11 @@
     <string name="home_cycle_settings_summary_template">Active template: %1$s</string>
     <string name="home_cycle_settings_summary_custom">Custom cycle: %1$s</string>
     <string name="open_cycle_settings">Cycle settings</string>
+    <string name="home_upcoming_events_title">Upcoming special days</string>
+    <string name="home_upcoming_events_empty">No upcoming special days.</string>
+    <string name="home_upcoming_event_holiday">Holiday</string>
+    <string name="home_upcoming_event_off_day">Off day</string>
+    <string name="home_upcoming_event_reason_separator">\u0020•\u0020</string>
     <string name="unsaved_changes_title">Unsaved changes</string>
     <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
 

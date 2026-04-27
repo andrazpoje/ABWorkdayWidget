@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_widgets_24"
+        android:icon="@drawable/ic_week_view"
         android:title="@string/nav_home" />
 
     <item

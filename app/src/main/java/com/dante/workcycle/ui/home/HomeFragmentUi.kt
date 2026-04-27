@@ -9,7 +9,9 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dante.workcycle.R
+import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.data.prefs.AppPrefs
+import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
@@ -46,6 +48,7 @@ fun HomeFragment.setupPreviewRecyclerView() {
                     date = item.date,
                     onSaved = {
                         updateCyclePreview()
+                        updateUpcomingEvents()
                         WidgetRefreshHelper.refresh(ctx)
                     }
                 ).show(parentFragmentManager, "editDay")
@@ -98,6 +101,7 @@ fun HomeFragment.revertToSavedState() {
 
     updateTodayStatus()
     updateCyclePreview()
+    updateUpcomingEvents()
 
     clearUnsavedChanges()
     draftFirstCycleDayIndex = null
@@ -119,6 +123,7 @@ fun HomeFragment.updateCyclePreview() {
         .withLocale(Locale.getDefault())
 
     val resolver = DefaultScheduleResolver(ctx)
+    val statusLabelsPrefs = StatusLabelsPrefs(ctx)
 
     val list = mutableListOf<CyclePreviewAdapter.PreviewItem>()
 
@@ -165,6 +170,10 @@ fun HomeFragment.updateCyclePreview() {
             ?.trim()
             ?.ifBlank { null }
 
+        val statusColor = StatusVisuals.sortByPriority(
+            resolved.statusTags.mapNotNull(statusLabelsPrefs::getLabelByName)
+        ).firstOrNull()?.color
+
         list.add(
             CyclePreviewAdapter.PreviewItem(
                 date = date,
@@ -174,6 +183,7 @@ fun HomeFragment.updateCyclePreview() {
                 colorLabel = if (isOffDay) offDayLabel else resolved.baseCycleLabel,
                 secondaryLabel = secondaryLabel,
                 statusLabel = statusLabel,
+                statusColor = statusColor,
                 helperText = blockLabel,
                 isOffDay = isOffDay
             )
