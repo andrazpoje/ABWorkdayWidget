@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.view.View
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dante.workcycle.R
 import com.dante.workcycle.data.prefs.AppPrefs
@@ -61,6 +62,11 @@ fun HomeFragment.setupPreviewWeekNavigator() {
 
     nextPreviewWeekButton.setOnClickListener {
         previewWeekOffset += 1
+        updateCyclePreview()
+    }
+
+    previewTodayButton.setOnClickListener {
+        previewWeekOffset = 0
         updateCyclePreview()
     }
 }
@@ -186,6 +192,33 @@ private fun HomeFragment.updatePreviewWeekTitle(startDate: LocalDate) {
     val endFormatter = DateTimeFormatter.ofPattern("d. MMM yyyy", locale)
 
     previewWeekTitle.text = "${startDate.format(startFormatter)} – ${endDate.format(endFormatter)}"
+    updatePreviewTodayButton()
+}
+
+private fun HomeFragment.updatePreviewTodayButton() {
+    previewTodayButton.visibility = if (previewWeekOffset == 0) View.GONE else View.VISIBLE
+
+    val buttonParams = previewTodayButton.layoutParams as? ConstraintLayout.LayoutParams ?: return
+    val titleParams = previewWeekTitle.layoutParams as? ConstraintLayout.LayoutParams ?: return
+
+    buttonParams.startToStart = ConstraintLayout.LayoutParams.UNSET
+    buttonParams.startToEnd = ConstraintLayout.LayoutParams.UNSET
+    buttonParams.endToStart = ConstraintLayout.LayoutParams.UNSET
+    buttonParams.endToEnd = ConstraintLayout.LayoutParams.UNSET
+
+    titleParams.startToEnd = previousPreviewWeekButton.id
+    titleParams.endToStart = nextPreviewWeekButton.id
+
+    if (previewWeekOffset < 0) {
+        buttonParams.startToEnd = previousPreviewWeekButton.id
+        titleParams.startToEnd = previewTodayButton.id
+    } else if (previewWeekOffset > 0) {
+        buttonParams.endToStart = nextPreviewWeekButton.id
+        titleParams.endToStart = previewTodayButton.id
+    }
+
+    previewTodayButton.layoutParams = buttonParams
+    previewWeekTitle.layoutParams = titleParams
 }
 
 private fun HomeFragment.buildPreviewBlockLabel(

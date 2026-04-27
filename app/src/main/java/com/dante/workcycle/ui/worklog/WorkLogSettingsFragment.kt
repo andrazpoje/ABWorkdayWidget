@@ -1,5 +1,6 @@
 package com.dante.workcycle.ui.worklog
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,9 @@ import androidx.fragment.app.Fragment
 import com.dante.workcycle.R
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
+import com.dante.workcycle.domain.model.CycleLayer
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -204,17 +207,41 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private fun bindExpectedTimeRows() {
         containerExpectedStartRows.removeAllViews()
 
-        // TODO(expected-time-layers): This settings UI intentionally lists only primary cycle
-        // labels today. When secondary labels get expected start/end support, add a separate
-        // section backed by a layer-aware prefs model instead of mixing primary and secondary
-        // labels in this same list.
-        val labels = CycleManager.loadCycle(requireContext())
+        val primaryLabels = CycleManager.loadCycle(requireContext())
             .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+
+        val secondaryLabels = AssignmentLabelsPrefs(requireContext())
+            .getSelectableLabels()
+            .map { it.name.trim() }
             .filter { it.isNotBlank() }
             .distinct()
 
         val inflater = LayoutInflater.from(requireContext())
 
+        addExpectedTimeSectionHeader(R.string.work_log_settings_primary_expected_times_section)
+        bindExpectedTimeRows(
+            inflater = inflater,
+            layer = CycleLayer.PRIMARY,
+            labels = primaryLabels
+        )
+
+        if (secondaryLabels.isNotEmpty()) {
+            addExpectedTimeSectionHeader(R.string.work_log_settings_secondary_expected_times_section)
+            bindExpectedTimeRows(
+                inflater = inflater,
+                layer = CycleLayer.SECONDARY,
+                labels = secondaryLabels
+            )
+        }
+    }
+
+    private fun bindExpectedTimeRows(
+        inflater: LayoutInflater,
+        layer: CycleLayer,
+        labels: List<String>
+    ) {
         labels.forEachIndexed { index, label ->
             val row = inflater.inflate(
                 R.layout.item_work_log_expected_start_setting,
@@ -228,8 +255,8 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             val switchStartEnabled = row.findViewById<MaterialSwitch>(R.id.switchExpectedStart)
             val switchEndEnabled = row.findViewById<MaterialSwitch>(R.id.switchExpectedEnd)
 
-            val startConfig = workSettingsPrefs.getExpectedStartConfig(label)
-            val endConfig = workSettingsPrefs.getExpectedEndConfig(label)
+            val startConfig = workSettingsPrefs.getExpectedStartConfig(layer, label)
+            val endConfig = workSettingsPrefs.getExpectedEndConfig(layer, label)
             val isStartEnabled = startConfig?.enabled == true
             val isEndEnabled = endConfig?.enabled == true
             val savedStartTime = startConfig?.startTime
@@ -243,22 +270,22 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
             switchStartEnabled.isChecked = isStartEnabled
             switchStartEnabled.setOnCheckedChangeListener { _, checked ->
-                workSettingsPrefs.setExpectedStartEnabled(label, checked)
+                workSettingsPrefs.setExpectedStartEnabled(layer, label, checked)
                 bindExpectedTimeRows()
             }
 
             switchEndEnabled.isChecked = isEndEnabled
             switchEndEnabled.setOnCheckedChangeListener { _, checked ->
-                workSettingsPrefs.setExpectedEndEnabled(label, checked)
+                workSettingsPrefs.setExpectedEndEnabled(layer, label, checked)
                 bindExpectedTimeRows()
             }
 
             textStartTime.setOnClickListener {
-                showExpectedStartTimePicker(label)
+                showExpectedStartTimePicker(layer, label)
             }
 
             textEndTime.setOnClickListener {
-                showExpectedEndTimePicker(label)
+                showExpectedEndTimePicker(layer, label)
             }
 
             containerExpectedStartRows.addView(row)
@@ -282,8 +309,20 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         }
     }
 
-    private fun showExpectedStartTimePicker(label: String) {
-        val currentTime = parseTimeOrNull(workSettingsPrefs.getExpectedStartTimeOrDefault(label))
+    private fun addExpectedTimeSectionHeader(titleRes: Int) {
+        containerExpectedStartRows.addView(
+            TextView(requireContext()).apply {
+                text = getString(titleRes)
+                textSize = 13f
+                alpha = 0.75f
+                setTypeface(typeface, Typeface.BOLD)
+                setPadding(0, 14, 0, 6)
+            }
+        )
+    }
+
+    private fun showExpectedStartTimePicker(layer: CycleLayer, label: String) {
+        val currentTime = parseTimeOrNull(workSettingsPrefs.getExpectedStartTimeOrDefault(layer, label))
             ?: LocalTime.of(8, 0)
 
         val picker = MaterialTimePicker.Builder()
@@ -295,15 +334,15 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
         picker.addOnPositiveButtonClickListener {
             val selectedTime = LocalTime.of(picker.hour, picker.minute)
-            workSettingsPrefs.setExpectedStartTime(label, timeFormatter.format(selectedTime))
+            workSettingsPrefs.setExpectedStartTime(layer, label, timeFormatter.format(selectedTime))
             bindExpectedTimeRows()
         }
 
-        picker.show(childFragmentManager, "expected_start_time_picker_$label")
+        picker.show(childFragmentManager, "expected_start_time_picker_${layer.name}_$label")
     }
 
-    private fun showExpectedEndTimePicker(label: String) {
-        val currentTime = parseTimeOrNull(workSettingsPrefs.getExpectedEndTimeOrDefault(label))
+    private fun showExpectedEndTimePicker(layer: CycleLayer, label: String) {
+        val currentTime = parseTimeOrNull(workSettingsPrefs.getExpectedEndTimeOrDefault(layer, label))
             ?: LocalTime.of(16, 0)
 
         val picker = MaterialTimePicker.Builder()
@@ -315,11 +354,11 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
         picker.addOnPositiveButtonClickListener {
             val selectedTime = LocalTime.of(picker.hour, picker.minute)
-            workSettingsPrefs.setExpectedEndTime(label, timeFormatter.format(selectedTime))
+            workSettingsPrefs.setExpectedEndTime(layer, label, timeFormatter.format(selectedTime))
             bindExpectedTimeRows()
         }
 
-        picker.show(childFragmentManager, "expected_end_time_picker_$label")
+        picker.show(childFragmentManager, "expected_end_time_picker_${layer.name}_$label")
     }
 
     private fun parseTimeOrNull(value: String?): LocalTime? {

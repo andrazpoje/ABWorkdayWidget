@@ -33,6 +33,6 @@
     <string name="work_log_widget_secondary_placeholder">Tapni za današnji pregled</string>
     <string name="work_log_widget_tertiary_placeholder">Čakanje na podatke v živo</string>
     <string name="work_log_widget_preview_status">Delo poteka</string>
-    <string name="work_log_widget_preview_primary">Začetek 07:00</string>
-    <string name="work_log_widget_preview_secondary">Danes 3 h 25 min</string>
+    <string name="work_log_widget_preview_primary">Opravljeno 3 h 25 min</string>
+    <string name="work_log_widget_preview_secondary">Začetek 07:00</string>
 </resources>

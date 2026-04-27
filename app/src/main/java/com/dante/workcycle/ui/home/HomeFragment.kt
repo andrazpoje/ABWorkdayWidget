@@ -92,6 +92,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var previewWeekTitle: TextView
     lateinit var previousPreviewWeekButton: ImageButton
     lateinit var nextPreviewWeekButton: ImageButton
+    lateinit var previewTodayButton: ImageButton
 
     lateinit var switchSaturdays: SwitchMaterial
     lateinit var switchSundays: SwitchMaterial
@@ -346,6 +347,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         previewWeekTitle = root.findViewById(R.id.previewWeekTitle)
         previousPreviewWeekButton = root.findViewById(R.id.previousPreviewWeekButton)
         nextPreviewWeekButton = root.findViewById(R.id.nextPreviewWeekButton)
+        previewTodayButton = root.findViewById(R.id.previewTodayButton)
     }
 
     fun runWithoutChangeTracking(block: () -> Unit) {

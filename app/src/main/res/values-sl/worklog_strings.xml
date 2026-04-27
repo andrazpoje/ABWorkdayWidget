@@ -91,12 +91,12 @@
     <string name="work_log_recent_events">Zadnji dogodki</string>
     <string name="work_log_no_events_today">Danes še ni zabeleženih dogodkov.</string>
     <string name="work_log_widget_status_not_started">Ni začeto</string>
-    <string name="work_log_widget_no_session_today">Danes ni delovne seje</string>
-    <string name="work_log_widget_tap_to_open">Tapni za odprtje evidence dela</string>
-    <string name="work_log_widget_started_at_value">Začetek ob %1$s</string>
-    <string name="work_log_widget_break_started_value">Odmor od %1$s</string>
-    <string name="work_log_widget_finished_at_value">Zaključeno ob %1$s</string>
-    <string name="work_log_widget_worked_today_value">Danes opravljeno %1$s</string>
+    <string name="work_log_widget_no_session_today">Danes ni seje</string>
+    <string name="work_log_widget_tap_to_open">Tapni za odprtje</string>
+    <string name="work_log_widget_started_at_value">Začetek %1$s</string>
+    <string name="work_log_widget_break_started_value">Odmor %1$s</string>
+    <string name="work_log_widget_finished_at_value">Konec %1$s</string>
+    <string name="work_log_widget_worked_today_value">Opravljeno %1$s</string>
     <string name="work_log_widget_break_value">Odmor %1$s</string>
     <string name="work_log_widget_balance_value">Saldo %1$s</string>
     <string name="work_log_notification_title">Evidenca dela</string>
@@ -143,6 +143,8 @@
     <string name="work_log_settings_expected_times_section">Pričakovani začetki in konci dela po oznaki cikla</string>
     <string name="work_log_settings_expected_start_section">Pričakovani začetki dela po oznaki cikla</string>
     <string name="work_log_settings_expected_start_not_set">Ni nastavljeno</string>
+    <string name="work_log_settings_primary_expected_times_section">Oznake cikla</string>
+    <string name="work_log_settings_secondary_expected_times_section">Sekundarne oznake</string>
     <string name="work_log_settings_start_label">Začetek</string>
     <string name="work_log_settings_end_label">Konec</string>
     <string name="work_log_settings_expected_time_not_set">Ni nastavljeno</string>

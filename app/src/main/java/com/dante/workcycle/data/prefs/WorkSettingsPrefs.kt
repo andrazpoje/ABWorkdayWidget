@@ -3,6 +3,7 @@ package com.dante.workcycle.data.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.dante.workcycle.domain.model.CycleLayer
 import org.json.JSONObject
 
 class WorkSettingsPrefs(context: Context) {
@@ -59,21 +60,22 @@ class WorkSettingsPrefs(context: Context) {
     }
 
     fun getExpectedStartConfig(label: String): ExpectedStartConfig? {
+        return getExpectedStartConfig(CycleLayer.PRIMARY, label)
+    }
+
+    fun getExpectedStartConfig(layer: CycleLayer, label: String): ExpectedStartConfig? {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank()) return null
 
-        // TODO(expected-time-layers): This storage is currently keyed only by label text and is
-        // used for primary cycle labels. When secondary assignment labels can define expected
-        // times, introduce a layer-aware key/model (for example CycleLayer.PRIMARY/SECONDARY)
-        // instead of overloading plain label names. Keep the current key backward-compatible.
-        val json = prefs.getString(KEY_EXPECTED_STARTS_BY_LABEL, null).orEmpty()
-        if (json.isBlank()) return null
+        val layerItem = getExpectedTimeItem(layer, cleanedLabel)
+        val item = when {
+            layerItem != null && hasExpectedStartFields(layerItem) -> layerItem
+            layer == CycleLayer.PRIMARY -> getLegacyExpectedTimeItem(cleanedLabel)
+            else -> null
+        }
+            ?: return null
 
         return runCatching {
-            val root = JSONObject(json)
-            if (!root.has(cleanedLabel)) return null
-
-            val item = root.optJSONObject(cleanedLabel) ?: return null
             ExpectedStartConfig(
                 enabled = item.optBoolean("enabled", false),
                 startTime = item.optString("startTime", "").takeIf { it.isNotBlank() }
@@ -82,50 +84,62 @@ class WorkSettingsPrefs(context: Context) {
     }
 
     fun setExpectedStartEnabled(label: String, enabled: Boolean) {
+        setExpectedStartEnabled(CycleLayer.PRIMARY, label, enabled)
+    }
+
+    fun setExpectedStartEnabled(layer: CycleLayer, label: String, enabled: Boolean) {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank()) return
 
-        val root = loadExpectedStartsRoot()
-        val item = root.optJSONObject(cleanedLabel) ?: JSONObject()
+        val root = loadExpectedTimesRoot()
+        val item = getOrCreateExpectedTimeItem(root, layer, cleanedLabel)
         val startTime = item.optString("startTime", "").ifBlank { DEFAULT_EXPECTED_START_TIME }
 
         item.put("enabled", enabled)
         item.put("startTime", startTime)
-        root.put(cleanedLabel, item)
-        saveExpectedStartsRoot(root)
+        saveExpectedTimesRoot(root)
     }
 
     fun setExpectedStartTime(label: String, startTime: String) {
+        setExpectedStartTime(CycleLayer.PRIMARY, label, startTime)
+    }
+
+    fun setExpectedStartTime(layer: CycleLayer, label: String, startTime: String) {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank() || startTime.isBlank()) return
 
-        val root = loadExpectedStartsRoot()
-        val item = root.optJSONObject(cleanedLabel) ?: JSONObject()
+        val root = loadExpectedTimesRoot()
+        val item = getOrCreateExpectedTimeItem(root, layer, cleanedLabel)
         item.put("enabled", true)
         item.put("startTime", startTime)
-        root.put(cleanedLabel, item)
-        saveExpectedStartsRoot(root)
+        saveExpectedTimesRoot(root)
     }
 
     fun getExpectedStartTimeOrDefault(label: String): String {
         return getExpectedStartConfig(label)?.startTime ?: DEFAULT_EXPECTED_START_TIME
     }
 
+    fun getExpectedStartTimeOrDefault(layer: CycleLayer, label: String): String {
+        return getExpectedStartConfig(layer, label)?.startTime ?: DEFAULT_EXPECTED_START_TIME
+    }
+
     fun getExpectedEndConfig(label: String): ExpectedEndConfig? {
+        return getExpectedEndConfig(CycleLayer.PRIMARY, label)
+    }
+
+    fun getExpectedEndConfig(layer: CycleLayer, label: String): ExpectedEndConfig? {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank()) return null
 
-        // TODO(expected-time-layers): Resolve from the same future layer-aware expected-time
-        // model as getExpectedStartConfig(), so secondary labels such as S1/O1/K1 can safely
-        // override primary cycle label times without colliding on label text.
-        val json = prefs.getString(KEY_EXPECTED_STARTS_BY_LABEL, null).orEmpty()
-        if (json.isBlank()) return null
+        val layerItem = getExpectedTimeItem(layer, cleanedLabel)
+        val item = when {
+            layerItem != null && hasExpectedEndFields(layerItem) -> layerItem
+            layer == CycleLayer.PRIMARY -> getLegacyExpectedTimeItem(cleanedLabel)
+            else -> null
+        }
+            ?: return null
 
         return runCatching {
-            val root = JSONObject(json)
-            if (!root.has(cleanedLabel)) return null
-
-            val item = root.optJSONObject(cleanedLabel) ?: return null
             ExpectedEndConfig(
                 enabled = item.optBoolean("endEnabled", false),
                 endTime = item.optString("endTime", "").takeIf { it.isNotBlank() }
@@ -134,33 +148,43 @@ class WorkSettingsPrefs(context: Context) {
     }
 
     fun setExpectedEndEnabled(label: String, enabled: Boolean) {
+        setExpectedEndEnabled(CycleLayer.PRIMARY, label, enabled)
+    }
+
+    fun setExpectedEndEnabled(layer: CycleLayer, label: String, enabled: Boolean) {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank()) return
 
-        val root = loadExpectedStartsRoot()
-        val item = root.optJSONObject(cleanedLabel) ?: JSONObject()
+        val root = loadExpectedTimesRoot()
+        val item = getOrCreateExpectedTimeItem(root, layer, cleanedLabel)
         val endTime = item.optString("endTime", "").ifBlank { DEFAULT_EXPECTED_END_TIME }
 
         item.put("endEnabled", enabled)
         item.put("endTime", endTime)
-        root.put(cleanedLabel, item)
-        saveExpectedStartsRoot(root)
+        saveExpectedTimesRoot(root)
     }
 
     fun setExpectedEndTime(label: String, endTime: String) {
+        setExpectedEndTime(CycleLayer.PRIMARY, label, endTime)
+    }
+
+    fun setExpectedEndTime(layer: CycleLayer, label: String, endTime: String) {
         val cleanedLabel = label.trim()
         if (cleanedLabel.isBlank() || endTime.isBlank()) return
 
-        val root = loadExpectedStartsRoot()
-        val item = root.optJSONObject(cleanedLabel) ?: JSONObject()
+        val root = loadExpectedTimesRoot()
+        val item = getOrCreateExpectedTimeItem(root, layer, cleanedLabel)
         item.put("endEnabled", true)
         item.put("endTime", endTime)
-        root.put(cleanedLabel, item)
-        saveExpectedStartsRoot(root)
+        saveExpectedTimesRoot(root)
     }
 
     fun getExpectedEndTimeOrDefault(label: String): String {
         return getExpectedEndConfig(label)?.endTime ?: DEFAULT_EXPECTED_END_TIME
+    }
+
+    fun getExpectedEndTimeOrDefault(layer: CycleLayer, label: String): String {
+        return getExpectedEndConfig(layer, label)?.endTime ?: DEFAULT_EXPECTED_END_TIME
     }
 
     fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
@@ -176,9 +200,7 @@ class WorkSettingsPrefs(context: Context) {
         const val KEY_DAILY_TARGET_MINUTES = "daily_target_minutes"
         const val KEY_DEFAULT_BREAK_MINUTES = "default_break_minutes"
         const val KEY_OVERTIME_TRACKING_ENABLED = "overtime_tracking_enabled"
-        // TODO(expected-time-layers): Add a new layer-aware key before secondary expected times
-        // ship. Suggested shape: expected_times_by_layer_and_label -> PRIMARY[label],
-        // SECONDARY[label]. Do not migrate this legacy key until the UI and resolver are ready.
+        const val KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL = "expected_times_by_layer_and_label"
         const val KEY_EXPECTED_STARTS_BY_LABEL = "expected_starts_by_label"
         const val KEY_WIDGET_INFO_MODE = "widget_info_mode"
         const val WIDGET_INFO_MODE_WORKED_TODAY = "worked_today"
@@ -204,16 +226,54 @@ class WorkSettingsPrefs(context: Context) {
         val endTime: String?
     )
 
-    private fun loadExpectedStartsRoot(): JSONObject {
-        val saved = prefs.getString(KEY_EXPECTED_STARTS_BY_LABEL, null).orEmpty()
+    private fun getExpectedTimeItem(layer: CycleLayer, label: String): JSONObject? {
+        val root = loadExpectedTimesRoot()
+        return root.optJSONObject(layer.name)?.optJSONObject(label)
+    }
+
+    private fun getLegacyExpectedTimeItem(label: String): JSONObject? {
+        return loadExpectedStartsRoot().optJSONObject(label)
+    }
+
+    private fun getOrCreateExpectedTimeItem(
+        root: JSONObject,
+        layer: CycleLayer,
+        label: String
+    ): JSONObject {
+        val layerRoot = root.optJSONObject(layer.name) ?: JSONObject().also {
+            root.put(layer.name, it)
+        }
+
+        return layerRoot.optJSONObject(label) ?: JSONObject().also {
+            layerRoot.put(label, it)
+        }
+    }
+
+    private fun hasExpectedStartFields(item: JSONObject): Boolean {
+        return item.has("enabled") || item.has("startTime")
+    }
+
+    private fun hasExpectedEndFields(item: JSONObject): Boolean {
+        return item.has("endEnabled") || item.has("endTime")
+    }
+
+    private fun loadExpectedTimesRoot(): JSONObject {
+        val saved = prefs.getString(KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL, null).orEmpty()
         return runCatching {
             if (saved.isBlank()) JSONObject() else JSONObject(saved)
         }.getOrElse { JSONObject() }
     }
 
-    private fun saveExpectedStartsRoot(root: JSONObject) {
+    private fun saveExpectedTimesRoot(root: JSONObject) {
         prefs.edit {
-            putString(KEY_EXPECTED_STARTS_BY_LABEL, root.toString())
+            putString(KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL, root.toString())
         }
+    }
+
+    private fun loadExpectedStartsRoot(): JSONObject {
+        val saved = prefs.getString(KEY_EXPECTED_STARTS_BY_LABEL, null).orEmpty()
+        return runCatching {
+            if (saved.isBlank()) JSONObject() else JSONObject(saved)
+        }.getOrElse { JSONObject() }
     }
 }

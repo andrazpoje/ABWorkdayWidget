@@ -38,9 +38,9 @@
                     android:contentDescription="@string/home_preview_previous_week"
                     android:padding="8dp"
                     android:src="@drawable/ic_arrow_back_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/previewWeekTitle"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/previewWeekTitle"
                     app:tint="?attr/colorOnSurface" />
 
                 <TextView
@@ -51,7 +51,6 @@
                     android:padding="8dp"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/nextPreviewWeekButton"
                     app:layout_constraintStart_toEndOf="@id/previousPreviewWeekButton"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -64,10 +63,24 @@
                     android:contentDescription="@string/home_preview_next_week"
                     android:padding="8dp"
                     android:src="@drawable/ic_arrow_forward_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/previewWeekTitle"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/previewWeekTitle"
                     app:tint="?attr/colorOnSurface" />
+
+                <ImageButton
+                    android:id="@+id/previewTodayButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/home_preview_today"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_home_24"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/previewWeekTitle"
+                    app:layout_constraintStart_toEndOf="@id/previousPreviewWeekButton"
+                    app:layout_constraintTop_toTopOf="@id/previewWeekTitle"
+                    app:tint="?attr/colorOnSurfaceVariant" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -9,6 +9,8 @@ import com.dante.workcycle.R
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.data.prefs.WorkSessionPrefs
 import com.dante.workcycle.data.repository.WorkEventRepository
+import com.dante.workcycle.domain.model.CycleLayer
+import com.dante.workcycle.domain.model.ResolvedDay
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
@@ -235,20 +237,10 @@ class WorkLogDashboardViewModel(
             workSessionPrefs.getSnapshot()
         }
         val displayCycleLabel = sessionSnapshot?.cycleLabel ?: todayCycleLabel
-        // TODO(expected-time-layers): Replace this primary-only lookup with a small resolver that
-        // checks expected times in priority order:
-        // 1) secondary assignment label from todayResolved.secondaryEffectiveLabel,
-        // 2) primary cycle label from todayResolved.effectiveCycleLabel,
-        // 3) global WorkSettingsPrefs defaults.
-        // Keep sessionSnapshot as the frozen source while a session is active.
-        val liveExpectedStartText = workSettingsPrefs.getExpectedStartConfig(todayCycleLabel)
-            ?.takeIf { it.enabled }
-            ?.startTime
+        val liveExpectedTimes = resolveExpectedTimes(todayResolved)
+        val liveExpectedStartText = liveExpectedTimes.startTime
         val expectedStartText = sessionSnapshot?.expectedStart ?: liveExpectedStartText
-        val expectedEndConfig = workSettingsPrefs.getExpectedEndConfig(todayCycleLabel)
-        val liveExpectedEndText = expectedEndConfig
-            ?.takeIf { it.enabled }
-            ?.endTime
+        val liveExpectedEndText = liveExpectedTimes.endTime
         val expectedEndText = sessionSnapshot?.expectedEnd ?: liveExpectedEndText
         val dailyTargetMinutes = workSettingsPrefs.getDailyTargetMinutes()
         val overtimeTrackingEnabled = workSettingsPrefs.isOvertimeTrackingEnabled()
@@ -835,23 +827,89 @@ class WorkLogDashboardViewModel(
     private fun createSessionSnapshot() {
         val resolvedDay = scheduleResolver.resolve(selectedDate)
         val currentCycleLabel = resolvedDay.effectiveCycleLabel
-        // TODO(expected-time-layers): Snapshot should eventually store the resolved expected-time
-        // source too, not only the display cycle label. Future order: secondary assignment label
-        // (resolvedDay.secondaryEffectiveLabel), primary cycle label, then global defaults.
-        val expectedStart = workSettingsPrefs.getExpectedStartConfig(currentCycleLabel)
-            ?.takeIf { it.enabled }
-            ?.startTime
-        val expectedEnd = workSettingsPrefs.getExpectedEndConfig(currentCycleLabel)
-            ?.takeIf { it.enabled }
-            ?.endTime
+        val expectedTimes = resolveExpectedTimes(resolvedDay)
 
         workSessionPrefs.saveSnapshot(
             WorkSessionPrefs.WorkSessionSnapshot(
                 cycleLabel = currentCycleLabel,
-                expectedStart = expectedStart,
-                expectedEnd = expectedEnd
+                expectedStart = expectedTimes.startTime,
+                expectedEnd = expectedTimes.endTime
             )
         )
+    }
+
+    private fun resolveExpectedTimes(resolvedDay: ResolvedDay): ExpectedTimes {
+        return ExpectedTimes(
+            startTime = resolveExpectedStartTime(resolvedDay),
+            endTime = resolveExpectedEndTime(resolvedDay)
+        )
+    }
+
+    private fun resolveExpectedStartTime(resolvedDay: ResolvedDay): String? {
+        val secondary = resolvedDay.secondaryEffectiveLabel
+            ?.trim()
+            ?.ifBlank { null }
+            ?.let { label ->
+                workSettingsPrefs.getExpectedStartConfig(CycleLayer.SECONDARY, label)
+                    ?.takeIf { it.enabled }
+                    ?.startTime
+            }
+
+        if (!secondary.isNullOrBlank()) return secondary
+
+        val primary = workSettingsPrefs.getExpectedStartConfig(CycleLayer.PRIMARY, resolvedDay.effectiveCycleLabel)
+            ?.takeIf { it.enabled }
+            ?.startTime
+
+        if (!primary.isNullOrBlank()) return primary
+
+        return if (isDefaultExpectedTimeAllowed(resolvedDay)) {
+            WorkSettingsPrefs.DEFAULT_EXPECTED_START_TIME
+        } else {
+            null
+        }
+    }
+
+    private fun resolveExpectedEndTime(resolvedDay: ResolvedDay): String? {
+        val secondary = resolvedDay.secondaryEffectiveLabel
+            ?.trim()
+            ?.ifBlank { null }
+            ?.let { label ->
+                workSettingsPrefs.getExpectedEndConfig(CycleLayer.SECONDARY, label)
+                    ?.takeIf { it.enabled }
+                    ?.endTime
+            }
+
+        if (!secondary.isNullOrBlank()) return secondary
+
+        val primary = workSettingsPrefs.getExpectedEndConfig(CycleLayer.PRIMARY, resolvedDay.effectiveCycleLabel)
+            ?.takeIf { it.enabled }
+            ?.endTime
+
+        if (!primary.isNullOrBlank()) return primary
+
+        return if (isDefaultExpectedTimeAllowed(resolvedDay)) {
+            WorkSettingsPrefs.DEFAULT_EXPECTED_END_TIME
+        } else {
+            null
+        }
+    }
+
+    private fun isDefaultExpectedTimeAllowed(resolvedDay: ResolvedDay): Boolean {
+        val label = resolvedDay.effectiveCycleLabel.trim()
+        if (label.isBlank()) return false
+        if (isOffDayLabel(label)) return false
+
+        return true
+    }
+
+    private fun isOffDayLabel(label: String): Boolean {
+        val normalized = label.trim()
+        if (normalized.isBlank()) return false
+
+        return normalized.equals(getApplication<Application>().getString(R.string.off_day_label), ignoreCase = true) ||
+            normalized.equals("Prosto", ignoreCase = true) ||
+            normalized.equals("Off", ignoreCase = true)
     }
 
     fun clearMessage() {
@@ -964,6 +1022,11 @@ class WorkLogDashboardViewModel(
         val tone: WorkLogDeviationTone
     )
 
+    private data class ExpectedTimes(
+        val startTime: String?,
+        val endTime: String?
+    )
+
     override fun onCleared() {
         workSettingsPrefs.unregisterListener(settingsChangeListener)
         super.onCleared()
@@ -990,6 +1053,7 @@ class WorkLogDashboardViewModel(
             WorkSettingsPrefs.KEY_DAILY_TARGET_MINUTES,
             WorkSettingsPrefs.KEY_DEFAULT_BREAK_MINUTES,
             WorkSettingsPrefs.KEY_OVERTIME_TRACKING_ENABLED,
+            WorkSettingsPrefs.KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL,
             WorkSettingsPrefs.KEY_EXPECTED_STARTS_BY_LABEL
         )
     }

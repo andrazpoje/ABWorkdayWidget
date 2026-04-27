@@ -33,6 +33,6 @@
     <string name="work_log_widget_secondary_placeholder">Tap to view today</string>
     <string name="work_log_widget_tertiary_placeholder">Waiting for live data</string>
     <string name="work_log_widget_preview_status">Working</string>
-    <string name="work_log_widget_preview_primary">Started 07:00</string>
-    <string name="work_log_widget_preview_secondary">Today 3h 25m</string>
+    <string name="work_log_widget_preview_primary">Worked 3h 25m</string>
+    <string name="work_log_widget_preview_secondary">Start 07:00</string>
 </resources>

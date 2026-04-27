@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v2.6
+
+---
+
 - Added dedicated Work Log widget (Work Time) for quick work session overview
 - Added live Work Log widget refresh mode for active sessions ("Today completed")
 - Added battery-saving static widget mode ("Work start")

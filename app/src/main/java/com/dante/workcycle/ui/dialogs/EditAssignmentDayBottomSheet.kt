@@ -214,7 +214,7 @@ class EditAssignmentDayBottomSheet(
         val status = view.findViewById<TextView>(R.id.daySummaryStatus)
         val card = view.findViewById<MaterialCardView>(R.id.daySummaryCard)
 
-        val activePrimary = draftCycleOverrideLabel ?: resolved.baseCycleLabel
+        val activePrimary = draftCycleOverrideLabel ?: resolved.effectiveCycleLabel
         val activeSecondary = draftAssignmentLabel ?: resolved.secondaryEffectiveLabel ?: "-"
         val activeStatusTags = draftStatusTags
         val activeStatus = formatStatusTags(activeStatusTags) ?: "-"

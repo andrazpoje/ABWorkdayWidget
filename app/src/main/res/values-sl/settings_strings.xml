@@ -141,6 +141,7 @@
     <string name="home_next_7_days_subtitle">Pregled naslednjih 7 dni</string>
     <string name="home_preview_previous_week">Prejšnji teden</string>
     <string name="home_preview_next_week">Naslednji teden</string>
+    <string name="home_preview_today">Trenutni teden</string>
     <string name="rules_section">Pravila</string>
     <string name="skip_saturdays">Preskoči sobote</string>
     <string name="skip_sundays">Preskoči nedelje</string>

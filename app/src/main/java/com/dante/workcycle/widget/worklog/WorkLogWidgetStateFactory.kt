@@ -67,8 +67,8 @@ class WorkLogWidgetStateFactory(
             title = context.getString(R.string.work_log_widget_title),
             statusText = context.getString(R.string.work_log_state_working),
             primaryValueText = if (isLiveMode) formatWorkedTodayText(workedMinutes) else startedAtText,
-            secondaryValueText = if (isLiveMode) startedAtText else null,
-            tertiaryValueText = null,
+            secondaryValueText = if (isLiveMode) startedAtText else formatWorkedTodayText(workedMinutes),
+            tertiaryValueText = formatBalanceText(workedMinutes),
             requiresMinuteRefresh = isLiveMode
         )
     }
@@ -86,13 +86,8 @@ class WorkLogWidgetStateFactory(
             title = context.getString(R.string.work_log_widget_title),
             statusText = context.getString(R.string.work_log_state_break),
             primaryValueText = if (isLiveMode) formatWorkedTodayText(workedMinutes) else breakStartedText,
-            secondaryValueText = if (isLiveMode) breakStartedText else null,
-            tertiaryValueText = if (isLiveMode) breakStart?.let {
-                context.getString(
-                    R.string.work_log_widget_break_value,
-                    formatDuration(minutesBetween(it.time, LocalTime.now()))
-                )
-            } else null,
+            secondaryValueText = if (isLiveMode) breakStartedText else formatWorkedTodayText(workedMinutes),
+            tertiaryValueText = formatBalanceText(workedMinutes),
             requiresMinuteRefresh = isLiveMode
         )
     }
@@ -109,7 +104,7 @@ class WorkLogWidgetStateFactory(
                 lastClockOut?.time?.format(timeFormatter).orEmpty()
             ),
             secondaryValueText = formatWorkedTodayText(workedMinutes),
-            tertiaryValueText = null
+            tertiaryValueText = formatBalanceText(workedMinutes)
         )
     }
 
@@ -228,7 +223,7 @@ class WorkLogWidgetStateFactory(
     }
 
     private fun formatBalanceText(workedMinutes: Long): String {
-        val targetMinutes = 8 * 60L
+        val targetMinutes = workSettingsPrefs.getDailyTargetMinutes().toLong()
         val difference = workedMinutes - targetMinutes
         val sign = when {
             difference > 0L -> "+"
@@ -236,13 +231,21 @@ class WorkLogWidgetStateFactory(
             else -> ""
         }
 
-        val value = if (difference == 0L) {
-            "0h 00m"
-        } else {
-            sign + formatDuration(kotlin.math.abs(difference))
-        }
+        val value = if (difference == 0L) "0m" else sign + formatCompactDuration(kotlin.math.abs(difference))
 
         return context.getString(R.string.work_log_widget_balance_value, value)
+    }
+
+    private fun formatCompactDuration(totalMinutes: Long): String {
+        val safeMinutes = totalMinutes.coerceAtLeast(0L)
+        val hours = safeMinutes / 60
+        val minutes = safeMinutes % 60
+
+        return if (hours == 0L) {
+            "${minutes}m"
+        } else {
+            "${hours}h ${minutes.toString().padStart(2, '0')}m"
+        }
     }
 
     private fun formatDuration(totalMinutes: Long): String {

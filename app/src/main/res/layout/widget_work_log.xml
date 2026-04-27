@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_widget_classic"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/workLogWidgetTitle"
@@ -16,52 +16,57 @@
         android:text="@string/work_log_widget_title"
         android:textAllCaps="true"
         android:textColor="#CCFFFFFF"
-        android:textSize="12sp"
+        android:includeFontPadding="false"
+        android:textSize="11sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/workLogWidgetStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:ellipsize="end"
+        android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/work_log_widget_status_placeholder"
         android:textColor="#FFFFFFFF"
-        android:textSize="18sp"
+        android:textSize="19sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/workLogWidgetPrimaryValue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="6dp"
         android:ellipsize="end"
+        android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/work_log_widget_primary_placeholder"
         android:textColor="#F2FFFFFF"
-        android:textSize="14sp" />
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/workLogWidgetSecondaryValue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="3dp"
         android:ellipsize="end"
+        android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/work_log_widget_secondary_placeholder"
         android:textColor="#CCFFFFFF"
-        android:textSize="13sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/workLogWidgetTertiaryValue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:ellipsize="end"
+        android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/work_log_widget_tertiary_placeholder"
         android:textColor="#CCFFFFFF"
-        android:textSize="13sp" />
+        android:textSize="12sp" />
 
 </LinearLayout>
