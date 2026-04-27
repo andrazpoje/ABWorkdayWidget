@@ -751,7 +751,10 @@ class EditAssignmentDayBottomSheet(
     }
 
     private fun formatStatusTags(tags: Set<String>): String? {
-        return tags.map { it.trim() }
+        val prefs = StatusLabelsPrefs(requireContext())
+        return tags.map { tag ->
+            prefs.getLabelByName(tag)?.let(prefs::getDisplayName) ?: tag.trim()
+        }
             .filter { it.isNotBlank() }
             .takeIf { it.isNotEmpty() }
             ?.joinToString(", ")

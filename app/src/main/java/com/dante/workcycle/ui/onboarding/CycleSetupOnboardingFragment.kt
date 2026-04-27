@@ -73,7 +73,8 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
     private fun initializeSelection() {
         val template = selectedTemplate()
         selectedStartDate = template?.fixedStartDate ?: LocalDate.now()
-        selectedFirstLabel = template?.fixedFirstCycleDay ?: labelsForCurrentSelection().first()
+        selectedFirstLabel = template?.resolveFixedFirstCycleDay(requireContext())
+            ?: labelsForCurrentSelection().first()
     }
 
     private fun setupClicks() {
@@ -148,7 +149,8 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
 
         val template = selectedTemplate()
         selectedStartDate = template?.fixedStartDate ?: LocalDate.now()
-        selectedFirstLabel = template?.fixedFirstCycleDay ?: labelsForCurrentSelection().first()
+        selectedFirstLabel = template?.resolveFixedFirstCycleDay(requireContext())
+            ?: labelsForCurrentSelection().first()
 
         currentStep = Step.TEMPLATE
         render()
@@ -517,7 +519,7 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
     }
 
     private fun labelsForCurrentSelection(): List<String> {
-        return selectedTemplate()?.fixedCycle
+        return selectedTemplate()?.resolveFixedCycle(requireContext())
             ?: CycleManager.loadCycle(requireContext()).ifEmpty { listOf("A", "B") }
     }
 

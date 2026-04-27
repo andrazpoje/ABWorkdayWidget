@@ -125,6 +125,13 @@
     <string name="label_morning">Morning</string>
     <string name="label_afternoon">Afternoon</string>
     <string name="label_night">Night</string>
+    <string name="template_label_single_shift">Morning</string>
+    <string name="template_label_two_shift_morning">Morning</string>
+    <string name="template_label_two_shift_afternoon">Afternoon</string>
+    <string name="template_label_three_shift_morning">Morning</string>
+    <string name="template_label_three_shift_afternoon">Afternoon</string>
+    <string name="template_label_night">Night</string>
+    <string name="template_label_work">Work</string>
     <string name="preset_hint_description">Select a cycle template here. If you manually change the cycle or rules, it will switch to Custom.</string>
     <string name="template_none">Custom</string>
     <string name="template_group_general">General templates</string>
@@ -245,7 +252,7 @@
     <string name="status_system_label_reduction">Reduction</string>
     <string name="status_system_label_replacement">Replacement</string>
     <string name="status_system_label_meeting">Meeting</string>
-    <string name="status_system_label_terrain">Terrain</string>
+    <string name="status_system_label_terrain">Field work</string>
     <string name="assignment_system_label_sick_short">Sick</string>
     <string name="assignment_system_label_vacation_short">Vac.</string>
     <string name="assignment_system_label_standby_short">Stand.</string>

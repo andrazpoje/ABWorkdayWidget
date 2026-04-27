@@ -179,7 +179,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     getString(
                         R.string.template_reference_date_format,
                         template.fixedStartDate.format(dateFormatter),
-                        template.fixedFirstCycleDay
+                        template.resolveFixedFirstCycleDay(requireContext())
                     )
                 )
         }

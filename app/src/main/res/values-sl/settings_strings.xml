@@ -125,6 +125,13 @@
     <string name="label_morning">Jutranja</string>
     <string name="label_afternoon">Popoldanska</string>
     <string name="label_night">Nočna</string>
+    <string name="template_label_single_shift">Dopoldne</string>
+    <string name="template_label_two_shift_morning">Dopoldan</string>
+    <string name="template_label_two_shift_afternoon">Popoldan</string>
+    <string name="template_label_three_shift_morning">Jutranja</string>
+    <string name="template_label_three_shift_afternoon">Popoldanska</string>
+    <string name="template_label_night">Nočna</string>
+    <string name="template_label_work">Delo</string>
     <string name="preset_hint_description">Predlogo cikla lahko izbereš tukaj. Če ročno spremeniš cikel ali pravila, se stanje nastavi na Lastno določena.</string>
     <string name="template_none">Lastno določena</string>
     <string name="template_group_general">Splošni template-i</string>

@@ -678,7 +678,7 @@ class PrimaryCycleSettingsController(
             fragment.getString(
                 R.string.template_reference_date_format,
                 template.fixedStartDate.format(dateFormatter),
-                template.fixedFirstCycleDay
+                template.resolveFixedFirstCycleDay(context)
             ),
             lockedSummary.takeIf { it.isNotBlank() }
         )

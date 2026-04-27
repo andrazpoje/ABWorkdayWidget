@@ -632,7 +632,7 @@ private fun HomeFragment.applyPresetInternal(
             getString(
                 R.string.template_reference_date_format,
                 template.fixedStartDate.format(dateFormatter),
-                template.fixedFirstCycleDay
+                template.resolveFixedFirstCycleDay(requireContext())
             ),
             lockedSummary.takeIf { it.isNotBlank() }
         )

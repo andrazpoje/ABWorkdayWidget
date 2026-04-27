@@ -26,7 +26,9 @@ object ScheduleTemplateProvider {
             fixedStartDate = LocalDate.now(),
             fixedFirstCycleDay = "Dopoldne",
             locksCycleEditing = false,
-            locksRulesEditing = false
+            locksRulesEditing = false,
+            fixedCycleRes = listOf(R.string.template_label_single_shift),
+            fixedFirstCycleDayRes = R.string.template_label_single_shift
         ),
 
         ScheduleTemplate(
@@ -37,7 +39,12 @@ object ScheduleTemplateProvider {
             fixedStartDate = LocalDate.now(),
             fixedFirstCycleDay = "Dopoldan",
             locksCycleEditing = false,
-            locksRulesEditing = false
+            locksRulesEditing = false,
+            fixedCycleRes = listOf(
+                R.string.template_label_two_shift_morning,
+                R.string.template_label_two_shift_afternoon
+            ),
+            fixedFirstCycleDayRes = R.string.template_label_two_shift_morning
         ),
 
         ScheduleTemplate(
@@ -48,7 +55,13 @@ object ScheduleTemplateProvider {
             fixedStartDate = LocalDate.now(),
             fixedFirstCycleDay = "Dopoldan",
             locksCycleEditing = false,
-            locksRulesEditing = false
+            locksRulesEditing = false,
+            fixedCycleRes = listOf(
+                R.string.template_label_three_shift_morning,
+                R.string.template_label_three_shift_afternoon,
+                R.string.template_label_night
+            ),
+            fixedFirstCycleDayRes = R.string.template_label_three_shift_morning
         ),
 
         ScheduleTemplate(
@@ -66,7 +79,18 @@ object ScheduleTemplateProvider {
             allowsStartDateEditing = true,
             skipSaturdays = false,
             skipSundays = false,
-            skipHolidays = false
+            skipHolidays = false,
+            fixedCycleRes = listOf(
+                R.string.template_label_work,
+                R.string.template_label_work,
+                R.string.template_label_work,
+                R.string.template_label_work,
+                R.string.off_day_label,
+                R.string.off_day_label,
+                R.string.off_day_label,
+                R.string.off_day_label
+            ),
+            fixedFirstCycleDayRes = R.string.template_label_work
         ),
 
         ScheduleTemplate(
@@ -88,7 +112,24 @@ object ScheduleTemplateProvider {
             allowsStartDateEditing = true,
             skipSaturdays = false,
             skipSundays = false,
-            skipHolidays = false
+            skipHolidays = false,
+            fixedCycleRes = listOf(
+                R.string.template_label_work,
+                R.string.template_label_work,
+                R.string.off_day_label,
+                R.string.off_day_label,
+                R.string.template_label_work,
+                R.string.template_label_work,
+                R.string.template_label_work,
+                R.string.off_day_label,
+                R.string.off_day_label,
+                R.string.template_label_work,
+                R.string.template_label_work,
+                R.string.off_day_label,
+                R.string.off_day_label,
+                R.string.off_day_label
+            ),
+            fixedFirstCycleDayRes = R.string.template_label_work
         ),
 
         // Posebni / poklicni template

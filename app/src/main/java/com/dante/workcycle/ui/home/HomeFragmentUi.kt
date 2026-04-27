@@ -166,13 +166,16 @@ fun HomeFragment.updateCyclePreview() {
                 if (shouldShowSecondaryOverrideMarker) "$secondary*" else secondary
             }
 
-        val statusLabel = resolved.statusSummary
-            ?.trim()
-            ?.ifBlank { null }
-
-        val statusColor = StatusVisuals.sortByPriority(
+        val statusDisplayLabels = StatusVisuals.sortByPriority(
             resolved.statusTags.mapNotNull(statusLabelsPrefs::getLabelByName)
-        ).firstOrNull()?.color
+        )
+
+        val statusLabel = statusDisplayLabels
+            .map(statusLabelsPrefs::getDisplayName)
+            .takeIf { it.isNotEmpty() }
+            ?.joinToString(", ")
+
+        val statusColor = statusDisplayLabels.firstOrNull()?.color
 
         list.add(
             CyclePreviewAdapter.PreviewItem(

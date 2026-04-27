@@ -75,7 +75,10 @@ object TemplateManager {
 
         TemplatePrefs.setActiveTemplateId(context, template.id)
 
-        CycleManager.saveCycle(context, template.fixedCycle)
+        val fixedCycle = template.resolveFixedCycle(context)
+        val fixedFirstCycleDay = template.resolveFixedFirstCycleDay(context)
+
+        CycleManager.saveCycle(context, fixedCycle)
         CycleManager.saveStartDate(context, template.fixedStartDate)
 
         context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
@@ -83,7 +86,7 @@ object TemplateManager {
                 putInt(AppPrefs.KEY_START_YEAR, template.fixedStartDate.year)
                 putInt(AppPrefs.KEY_START_MONTH, template.fixedStartDate.monthValue)
                 putInt(AppPrefs.KEY_START_DAY, template.fixedStartDate.dayOfMonth)
-                putString(AppPrefs.KEY_FIRST_CYCLE_DAY, template.fixedFirstCycleDay)
+                putString(AppPrefs.KEY_FIRST_CYCLE_DAY, fixedFirstCycleDay)
 
                 if (template.locksRulesEditing) {
                     putBoolean(AppPrefs.KEY_SKIP_SATURDAYS, template.skipSaturdays)
