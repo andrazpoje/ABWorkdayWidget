@@ -29,6 +29,7 @@ data class WorkEventListItem(
     val event: WorkEvent,
     val timeText: String,
     val titleText: String,
+    val editBadgeText: String? = null,
     val detailText: String? = null,
     @DrawableRes val iconRes: Int
 )

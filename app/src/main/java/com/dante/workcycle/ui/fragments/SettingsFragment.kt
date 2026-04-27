@@ -24,7 +24,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
-import com.dante.workcycle.data.prefs.LaunchPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.databinding.FragmentSettingsBinding
 import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
@@ -34,6 +33,7 @@ import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.style.WidgetStyleManager
 import com.dante.workcycle.ui.activity.MainActivity
 import com.dante.workcycle.ui.dialogs.ColorPickerDialog
+import com.dante.workcycle.ui.settings.PrimaryCycleSettingsController
 import com.dante.workcycle.widget.WidgetRefreshHelper
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
@@ -49,6 +49,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private val binding get() = _binding!!
 
     private var isInitializing = false
+    private lateinit var primaryCycleSettingsController: PrimaryCycleSettingsController
 
     private data class AssignmentAdvanceModeUiItem(
         val mode: AssignmentCycleAdvanceMode,
@@ -66,9 +67,19 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.settingsContentContainer.applySystemBarsHorizontalInsetAsPadding()
 
         val secondaryPrefs = SecondaryCyclePrefs(requireContext())
+        val scrollToCycleSettings = arguments?.getBoolean(
+            PrimaryCycleSettingsController.ARG_SCROLL_TO_CYCLE_SETTINGS,
+            false
+        ) == true
 
         isInitializing = true
         bindCurrentValues()
+        primaryCycleSettingsController = PrimaryCycleSettingsController(
+            fragment = this,
+            root = view,
+            onSaved = { updateActiveTemplateInfoCard() }
+        )
+        primaryCycleSettingsController.initialize(expandCycleSection = scrollToCycleSettings)
 
         binding.switchSecondaryEnabled.isChecked = secondaryPrefs.isEnabled()
         when (secondaryPrefs.getMode()) {
@@ -81,9 +92,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         updateSecondaryUi()
         updateCustomColorsUi()
         updateActiveTemplateInfoCard()
-        setupTemplatesHint()
         setupListeners()
         setupScrollHint()
+        scrollToCycleSettingsIfRequested(scrollToCycleSettings)
         isInitializing = false
     }
 
@@ -174,23 +185,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
     }
 
-    private fun setupTemplatesHint() {
-        val launchPrefs = LaunchPrefs(requireContext())
-
-        binding.templatesHintCard.visibility =
-            if (launchPrefs.shouldShowTemplatesHint()) View.VISIBLE else View.GONE
-
-        binding.buttonCloseTemplatesHint.setOnClickListener {
-            binding.templatesHintCard.visibility = View.GONE
-            launchPrefs.markTemplatesHintShown()
-        }
-
-        binding.templatesHintCard.setOnClickListener {
-            binding.templatesHintCard.visibility = View.GONE
-            launchPrefs.markTemplatesHintShown()
-        }
-    }
-
     private fun updateSecondaryUi() {
         val enabled = binding.switchSecondaryEnabled.isChecked
         val isManual = binding.radioManual.isChecked
@@ -216,9 +210,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         binding.btnSecondaryLabels.alpha =
             if (enabled && isManual) 1f else 0.4f
-
-        binding.btnStatusLabels.visibility = View.VISIBLE
-        binding.btnStatusLabels.alpha = 1f
 
         val alpha = if (enabled && !isLockedByTemplate) 1f else 0.4f
         binding.radioCyclic.alpha = alpha
@@ -407,6 +398,17 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             } else {
                 hint.visibility = View.GONE
             }
+        }
+    }
+
+    private fun scrollToCycleSettingsIfRequested(shouldScroll: Boolean) {
+        if (!shouldScroll) return
+
+        binding.settingsScrollView.post {
+            binding.settingsScrollView.smoothScrollTo(
+                0,
+                binding.primaryCycleSettingsContainer.top
+            )
         }
     }
 

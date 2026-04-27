@@ -14,5 +14,12 @@ data class WorkEventEntity(
     val time: LocalTime,
     val type: WorkEventType,
     val note: String? = null,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val editAuditOldDate: LocalDate? = null,
+    val editAuditOldTime: LocalTime? = null,
+    val editAuditNewDate: LocalDate? = null,
+    val editAuditNewTime: LocalTime? = null,
+    val editAuditEditedAt: Long? = null,
+    val editAuditWasFutureTime: Boolean = false,
+    val editAuditSource: String? = null
 )

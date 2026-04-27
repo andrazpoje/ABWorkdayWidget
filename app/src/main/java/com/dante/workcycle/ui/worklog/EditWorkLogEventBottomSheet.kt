@@ -11,16 +11,19 @@ import androidx.lifecycle.lifecycleScope
 import com.dante.workcycle.R
 import com.dante.workcycle.data.repository.RepositoryProvider
 import com.dante.workcycle.domain.model.WorkEvent
+import com.dante.workcycle.domain.model.WorkEventEditAudit
 import com.dante.workcycle.domain.model.WorkEventType
 import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -141,7 +144,28 @@ class EditWorkLogEventBottomSheet(
                 return@launch
             }
 
-            viewModel.save()
+            if (viewModel.isFutureTimeEdit()) {
+                showFutureTimeWarning()
+            } else {
+                persistEdit(wasFutureTime = false)
+            }
+        }
+    }
+
+    private fun showFutureTimeWarning() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.work_log_edit_future_time_title)
+            .setMessage(R.string.work_log_edit_future_time_message)
+            .setNegativeButton(R.string.work_log_edit_future_time_cancel, null)
+            .setPositiveButton(R.string.work_log_edit_future_time_confirm) { _, _ ->
+                persistEdit(wasFutureTime = true)
+            }
+            .show()
+    }
+
+    private fun persistEdit(wasFutureTime: Boolean) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.save(wasFutureTime = wasFutureTime)
             WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
             onSaved?.invoke()
 
@@ -193,6 +217,17 @@ class EditWorkLogEventBottomSheet(
             _uiState.value = _uiState.value.copy(time = time)
         }
 
+        fun isFutureTimeEdit(): Boolean {
+            if (!hasTimeCorrection()) return false
+
+            val selectedDateTime = LocalDateTime.of(
+                uiState.value.date,
+                uiState.value.time
+            )
+
+            return selectedDateTime.isAfter(LocalDateTime.now())
+        }
+
         suspend fun validate(): Int? {
             val updatedEvent = originalEvent.copy(
                 date = uiState.value.date,
@@ -210,13 +245,34 @@ class EditWorkLogEventBottomSheet(
             )
         }
 
-        suspend fun save() {
+        suspend fun save(wasFutureTime: Boolean) {
+            val updatedDate = uiState.value.date
+            val updatedTime = uiState.value.time
+            val audit = if (hasTimeCorrection()) {
+                WorkEventEditAudit(
+                    oldDate = originalEvent.date,
+                    oldTime = originalEvent.time,
+                    newDate = updatedDate,
+                    newTime = updatedTime,
+                    editedAt = System.currentTimeMillis(),
+                    wasFutureTime = wasFutureTime
+                )
+            } else {
+                originalEvent.editAudit
+            }
+
             repository.update(
                 originalEvent.copy(
-                    date = uiState.value.date,
-                    time = uiState.value.time
+                    date = updatedDate,
+                    time = updatedTime,
+                    editAudit = audit
                 )
             )
+        }
+
+        private fun hasTimeCorrection(): Boolean {
+            return originalEvent.date != uiState.value.date ||
+                originalEvent.time != uiState.value.time
         }
 
         class Factory(

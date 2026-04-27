@@ -132,6 +132,15 @@
     <string name="work_log_edit_event_change_date">Change date</string>
     <string name="work_log_edit_event_change_time">Change time</string>
     <string name="work_log_edit_event_saved">Work Log event updated</string>
+    <string name="work_log_edit_future_time_title">Time is in the future</string>
+    <string name="work_log_edit_future_time_message">The selected time is in the future. Do you still want to save this correction?</string>
+    <string name="work_log_edit_future_time_cancel">Cancel</string>
+    <string name="work_log_edit_future_time_confirm">Save anyway</string>
+    <string name="work_log_event_edited">Edited</string>
+    <string name="work_log_event_edit_previous_time">Previous: %1$s</string>
+    <string name="work_log_event_edit_new_time">New: %1$s</string>
+    <string name="work_log_event_edit_changed_at">Changed at: %1$s</string>
+    <string name="work_log_event_edit_future_saved">Saved as a future time</string>
     <string name="work_log_edit_validation_clock_in">This change would place a work start while a session is already active.</string>
     <string name="work_log_edit_validation_clock_out">This change would place a work finish before the session starts.</string>
     <string name="work_log_edit_validation_break_start">This change would place a break start outside an active work session.</string>

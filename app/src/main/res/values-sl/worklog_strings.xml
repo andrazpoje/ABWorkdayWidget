@@ -131,6 +131,15 @@
     <string name="work_log_edit_event_change_date">Spremeni datum</string>
     <string name="work_log_edit_event_change_time">Spremeni uro</string>
     <string name="work_log_edit_event_saved">Dogodek evidence dela je posodobljen</string>
+    <string name="work_log_edit_future_time_title">Čas je v prihodnosti</string>
+    <string name="work_log_edit_future_time_message">Izbrani čas je v prihodnosti. Ali želiš vseeno shraniti ta popravek?</string>
+    <string name="work_log_edit_future_time_cancel">Prekliči</string>
+    <string name="work_log_edit_future_time_confirm">Shrani vseeno</string>
+    <string name="work_log_event_edited">Urejeno</string>
+    <string name="work_log_event_edit_previous_time">Prej: %1$s</string>
+    <string name="work_log_event_edit_new_time">Zdaj: %1$s</string>
+    <string name="work_log_event_edit_changed_at">Popravljeno ob: %1$s</string>
+    <string name="work_log_event_edit_future_saved">Shranjeno kot čas v prihodnosti</string>
     <string name="work_log_edit_validation_clock_in">Ta sprememba bi začetek dela postavila v že aktivno delovno sejo.</string>
     <string name="work_log_edit_validation_clock_out">Ta sprememba bi zaključek dela postavila pred začetek seje.</string>
     <string name="work_log_edit_validation_break_start">Ta sprememba bi začetek odmora postavila izven aktivne delovne seje.</string>

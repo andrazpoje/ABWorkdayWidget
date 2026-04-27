@@ -54,12 +54,15 @@ class WorkEventAdapter(
         private val textTime: TextView = view.findViewById(R.id.textEventTime)
         private val iconEvent: ImageView = view.findViewById(R.id.iconEvent)
         private val textTitle: TextView = view.findViewById(R.id.textEventTitle)
+        private val textEditedBadge: TextView = view.findViewById(R.id.textEventEditedBadge)
         private val textDetail: TextView = view.findViewById(R.id.textEventDetail)
 
         fun bind(item: WorkEventListItem) {
             textTime.text = item.timeText
             iconEvent.setImageResource(item.iconRes)
             textTitle.text = item.titleText
+            textEditedBadge.text = item.editBadgeText.orEmpty()
+            textEditedBadge.isVisible = !item.editBadgeText.isNullOrBlank()
             textDetail.text = item.detailText.orEmpty()
             textDetail.isVisible = !item.detailText.isNullOrBlank()
 

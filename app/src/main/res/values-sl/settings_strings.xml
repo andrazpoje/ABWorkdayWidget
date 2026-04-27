@@ -11,6 +11,10 @@
     <string name="settings_notifications_title">Obvestila</string>
     <string name="settings_schedule_title">Razpored</string>
     <string name="settings_saved">Nastavitve shranjene</string>
+    <string name="home_cycle_settings_summary_title">Konfiguracija cikla</string>
+    <string name="home_cycle_settings_summary_template">Aktiven template: %1$s</string>
+    <string name="home_cycle_settings_summary_custom">Lastni cikel: %1$s</string>
+    <string name="open_cycle_settings">Nastavitve cikla</string>
     <string name="unsaved_changes_title">Neshranjene spremembe</string>
     <string name="unsaved_changes_message">Imaš neshranjene spremembe. Ali jih želiš shraniti pred izhodom?</string>
 
@@ -72,7 +76,7 @@
     <string name="welcome_subtitle">Kratek vodič za prvi začetek. Tukaj hitro nastaviš svoj cikel, razumeš koledar in začneš uporabljati widget.</string>
     <string name="continue_label">Nadaljuj</string>
     <string name="cycle_locked_by_template">Način določa aktivni template</string>
-    <string name="cycle_section">Cikel</string>
+    <string name="cycle_section">Primarni cikel</string>
     <string name="start_date">Začetni datum: %1$s</string>
     <string name="select_date">Izberi datum</string>
     <string name="cycle_days_label">Oznake cikla</string>
@@ -92,7 +96,6 @@
     <string name="label_night">Nočna</string>
     <string name="preset_hint_description">Predlogo cikla lahko izbereš tukaj. Če ročno spremeniš cikel ali pravila, se stanje nastavi na Lastno določena.</string>
     <string name="template_none">Lastno določena</string>
-    <string name="templates_hint_text">Predloge najdeš na zaslonu Domov v sekciji Cikel. Tam lahko hitro izbereš že pripravljen razpored. Če si cikel nastaviš sam, bo prikazano Lastno določena.</string>
     <string name="template_group_general">Splošni template-i</string>
     <string name="template_group_special">Posebni template-i</string>
     <string name="template_single_shift_title">Enotna izmena</string>
@@ -178,7 +181,7 @@
     <string name="show_assignment_icons_calendar">Prikaži sekundarne oznake v koledarju</string>
     <string name="show_assignment_icons_weekly">Prikaži sekundarne oznake v tedenskem pregledu</string>
     <string name="show_assignment_icons_helper">Prikaže ali skrije sekundarne oznake v koledarju in pregledu naslednjih 7 dni.</string>
-    <string name="assignment_section_title">Oznake</string>
+    <string name="assignment_section_title">Sekundarni cikel</string>
     <string name="assignment_enable">Omogoči sekundarne oznake</string>
     <string name="assignment_mode_helper">Izberi, kako se sekundarne oznake določijo za posamezen dan.</string>
     <string name="assignment_mode_cyclic_overrides">Ciklično + overridei</string>
@@ -231,7 +234,8 @@
     <!-- SETTINGS / STATUSNE OZNAKE -->
     <!-- ========================================================= -->
     <string name="status_labels_title">Statusne oznake</string>
-    <string name="status_labels_description">Status oznake so ločene od sekundarnih oznak. Lahko jih omogočiš ali onemogočiš ter prilagodiš njihove barve.</string>
+    <string name="status_labels_description">Statusne oznake so ločene od sekundarnih oznak. Lahko jih omogočiš ali onemogočiš ter prilagodiš njihove barve.</string>
+    <string name="open_status_labels_settings">Uredi statusne oznake</string>
     <string name="status_labels_system_section">Status oznake</string>
     <string name="edit_status_label">Uredi status oznako</string>
     <string name="clear_status">Počisti status</string>

@@ -11,6 +11,10 @@
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_schedule_title">Schedule</string>
     <string name="settings_saved">Settings saved</string>
+    <string name="home_cycle_settings_summary_title">Cycle configuration</string>
+    <string name="home_cycle_settings_summary_template">Active template: %1$s</string>
+    <string name="home_cycle_settings_summary_custom">Custom cycle: %1$s</string>
+    <string name="open_cycle_settings">Cycle settings</string>
     <string name="unsaved_changes_title">Unsaved changes</string>
     <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
 
@@ -72,7 +76,7 @@
     <string name="welcome_subtitle">A quick guide to help you set up your cycle, understand the calendar, and start using the widget.</string>
     <string name="continue_label">Continue</string>
     <string name="cycle_locked_by_template">Controlled by the active template</string>
-    <string name="cycle_section">Cycle</string>
+    <string name="cycle_section">Primary cycle</string>
     <string name="start_date">Start date: %1$s</string>
     <string name="select_date">Select date</string>
     <string name="cycle_days_label">Cycle days</string>
@@ -92,7 +96,6 @@
     <string name="label_night">Night</string>
     <string name="preset_hint_description">Select a cycle template here. If you manually change the cycle or rules, it will switch to Custom.</string>
     <string name="template_none">Custom</string>
-    <string name="templates_hint_text">You can find templates on the Home screen in the Cycle section. There you can quickly choose a predefined schedule. If you configure the cycle manually, it will be shown as Custom.</string>
     <string name="template_group_general">General templates</string>
     <string name="template_group_special">Special templates</string>
     <string name="template_single_shift_title">Single shift</string>
@@ -178,7 +181,7 @@
     <string name="show_assignment_icons_calendar">Show secondary labels in calendar</string>
     <string name="show_assignment_icons_weekly">Show secondary labels in weekly preview</string>
     <string name="show_assignment_icons_helper">Show or hide secondary labels in the calendar and the next 7 days preview.</string>
-    <string name="assignment_section_title">Labels</string>
+    <string name="assignment_section_title">Secondary cycle</string>
     <string name="assignment_enable">Enable secondary labels</string>
     <string name="assignment_mode_helper">Choose how secondary labels are resolved for each day.</string>
     <string name="assignment_mode_cyclic_overrides">Cyclic + overrides</string>
@@ -234,6 +237,7 @@
     <!-- ========================================================= -->
     <string name="status_labels_title">Status labels</string>
     <string name="status_labels_description">Status labels are managed separately from secondary labels. You can enable or disable them and customize their colors.</string>
+    <string name="open_status_labels_settings">Manage status labels</string>
     <string name="status_labels_system_section">Status labels</string>
     <string name="edit_status_label">Edit status label</string>
     <string name="clear_status">Clear status</string>

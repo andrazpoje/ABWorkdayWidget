@@ -33,9 +33,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
@@ -74,6 +76,10 @@ class WorkLogDashboardViewModel(
 
     private fun s(resId: Int): String {
         return getApplication<Application>().getString(resId)
+    }
+
+    private fun s(resId: Int, vararg formatArgs: Any): String {
+        return getApplication<Application>().getString(resId, *formatArgs)
     }
 
     private fun observeToday() {
@@ -473,7 +479,7 @@ class WorkLogDashboardViewModel(
     private fun buildRecentEventItem(event: WorkEvent): WorkEventListItem {
         val timeText = event.time.format(timeFormatter())
 
-        return when (event.type) {
+        val item = when (event.type) {
             CLOCK_IN -> WorkEventListItem(
                 event = event,
                 timeText = timeText,
@@ -527,6 +533,42 @@ class WorkLogDashboardViewModel(
                 )
             }
         }
+
+        return applyEditAuditDisplay(item)
+    }
+
+    private fun applyEditAuditDisplay(item: WorkEventListItem): WorkEventListItem {
+        val audit = item.event.editAudit ?: return item
+        val details = mutableListOf<String>()
+
+        if (!item.detailText.isNullOrBlank()) {
+            details += item.detailText
+        }
+
+        details += s(
+            R.string.work_log_event_edit_previous_time,
+            audit.oldTime.format(timeFormatter())
+        )
+        details += s(
+            R.string.work_log_event_edit_new_time,
+            audit.newTime.format(timeFormatter())
+        )
+        details += s(
+            R.string.work_log_event_edit_changed_at,
+            LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(audit.editedAt),
+                ZoneId.systemDefault()
+            ).format(timeFormatter())
+        )
+
+        if (audit.wasFutureTime) {
+            details += s(R.string.work_log_event_edit_future_saved)
+        }
+
+        return item.copy(
+            editBadgeText = s(R.string.work_log_event_edited),
+            detailText = details.joinToString(" • ")
+        )
     }
 
     private fun calculateBalanceText(events: List<WorkEvent>, dailyTargetMinutes: Int): String {

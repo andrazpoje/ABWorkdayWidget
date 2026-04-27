@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -27,8 +28,10 @@ import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.databinding.FragmentHomeBinding
 import com.dante.workcycle.domain.holiday.HolidayCountry
+import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.template.TemplateManager
 import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
+import com.dante.workcycle.ui.settings.PrimaryCycleSettingsController
 import com.dante.workcycle.widget.WorkCycleWidgetProvider
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.ChipGroup
@@ -102,8 +105,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var saveButton: MaterialButton
     lateinit var openWidgetsButton: MaterialButton
+    lateinit var openCycleSettingsButton: MaterialButton
 
     lateinit var widgetHint: TextView
+    lateinit var cycleSettingsSummaryText: TextView
 
     var selectedDate: LocalDate = LocalDate.now()
     var previewWeekOffset: Int = 0
@@ -133,6 +138,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         updateTodayStatus()
         updateCyclePreview()
         updateWidgetHint()
+        updateHomeConfigSummary()
 
         versionText.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
 
@@ -152,6 +158,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         openWidgetsButton.setOnClickListener {
             requestAddWidget()
+        }
+
+        openCycleSettingsButton.setOnClickListener {
+            findNavController().navigate(
+                R.id.settingsFragment,
+                bundleOf(PrimaryCycleSettingsController.ARG_SCROLL_TO_CYCLE_SETTINGS to true)
+            )
         }
 
         pickDateButton.setOnClickListener {
@@ -204,6 +217,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onResume() {
         super.onResume()
         if (!isInitializing) {
+            loadSettings()
+            updateCyclePreview()
+            updateWidgetHint()
+            updateHomeConfigSummary()
             updateUnsavedChangesState()
         }
     }
@@ -317,6 +334,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         rulesSection = root.findViewById(R.id.rulesSection)
 
         widgetHint = root.findViewById(R.id.widgetHint)
+        cycleSettingsSummaryText = root.findViewById(R.id.cycleSettingsSummaryText)
+        openCycleSettingsButton = root.findViewById(R.id.openCycleSettingsButton)
         dateText = root.findViewById(R.id.dateText)
         pickDateButton = root.findViewById(R.id.pickDateButton)
 
@@ -366,6 +385,21 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             getString(R.string.notification_permission_denied),
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    private fun updateHomeConfigSummary() {
+        val activeTemplate = TemplateManager.getActiveTemplate(requireContext())
+        cycleSettingsSummaryText.text = if (activeTemplate != null) {
+            getString(
+                R.string.home_cycle_settings_summary_template,
+                getString(activeTemplate.titleRes)
+            )
+        } else {
+            getString(
+                R.string.home_cycle_settings_summary_custom,
+                CycleManager.loadCycle(requireContext()).joinToString(", ")
+            )
+        }
     }
 
     private fun HomeFragment.showTemplateLockedMessage() {
