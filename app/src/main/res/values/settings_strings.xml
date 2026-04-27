@@ -84,7 +84,7 @@
     <string name="cycle_days_hint">Enter cycle labels separated by commas. Example: A, B or Morning, Afternoon, Night</string>
     <string name="first_cycle_day_label">Cycle day on start date</string>
     <string name="first_cycle_day_hint">Select a label from the cycle that applies to the selected start date.</string>
-    <string name="assignment_first_day_hint">First day on start date</string>
+    <string name="assignment_first_day_hint">First label</string>
     <string name="preset_label">Cycle template</string>
     <string name="preset_hint">Choose cycle template</string>
     <string name="preset_applied">Cycle template applied: %1$s</string>
@@ -182,12 +182,15 @@
     <string name="show_assignment_icons_weekly">Show secondary labels in weekly preview</string>
     <string name="show_assignment_icons_helper">Show or hide secondary labels in the calendar and the next 7 days preview.</string>
     <string name="assignment_section_title">Secondary cycle</string>
+    <string name="secondary_cycle_description">An additional schedule layer, such as routes, shifts, or work areas.</string>
     <string name="assignment_enable">Enable secondary labels</string>
-    <string name="assignment_mode_helper">Choose how secondary labels are resolved for each day.</string>
-    <string name="assignment_mode_cyclic_overrides">Cyclic + overrides</string>
+    <string name="assignment_mode_label">Mode</string>
+    <string name="assignment_mode_helper">Choose how secondary labels are resolved for each day. Manual changes can override the cyclic value.</string>
+    <string name="assignment_mode_cyclic_overrides">Cyclic</string>
     <string name="assignment_mode_manual_only">Manual only</string>
-    <string name="assignment_advance_mode_title">Secondary label cycle advance</string>
-    <string name="assignment_advance_mode_helper">Choose whether the secondary label cycle advances every day or only on working days.</string>
+    <string name="assignment_advance_mode_title">Cycle progression</string>
+    <string name="assignment_advance_mode_helper">Choose whether the cycle advances every day or only on workdays.</string>
+    <string name="assignment_advance_mode_dropdown_hint">Progression</string>
     <string name="assignment_advance_mode_all_days">Every day</string>
     <string name="assignment_advance_mode_working_days_only">Working days only</string>
     <string name="assignment_mode_locked_by_template">Secondary label mode is controlled by the active template.</string>
@@ -270,8 +273,10 @@
     <string name="error_label_too_long_detailed">Label "%1$s" is too long (max %2$d characters)</string>
     <string name="error_first_day_not_in_cycle">First day "%1$s" is not in cycle</string>
     <string name="fix_errors">Please fix input errors</string>
-    <string name="assignment_start_date_hint">Start date (yyyy-MM-dd)</string>
-    <string name="assignment_cycle_hint">Labels (e.g. A,B,C or Route1,Route2)</string>
+    <string name="assignment_start_date_hint">Cycle start date</string>
+    <string name="assignment_cycle_labels_title">Secondary cycle labels</string>
+    <string name="assignment_cycle_hint">Add labels that rotate in the selected order.</string>
+    <string name="secondary_cycle_add_label">+ Add</string>
     <string name="cycle_day_fallback">Day %1$d</string>
 
     <!-- ========================================================= -->

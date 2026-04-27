@@ -47,6 +47,7 @@ data class WorkLogDashboardUiState(
     val sliderAction: WorkLogSliderAction = WorkLogSliderAction.START_WORK,
     val sliderActionText: String = "",
     @DrawableRes val sliderIconRes: Int = R.drawable.ic_work_time_24,
+    val showPrimaryAction: Boolean = true,
     val sliderEnabled: Boolean = true,
     val startWarning: WorkLogStartWarning? = null,
     val showSecondaryActions: Boolean = false,

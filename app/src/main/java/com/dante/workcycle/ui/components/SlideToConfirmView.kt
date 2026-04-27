@@ -43,7 +43,7 @@ class SlideToConfirmView @JvmOverloads constructor(
         handleCard = findViewById(R.id.cardSlideHandle)
         handleIconView = findViewById(R.id.imageSlideHandleIcon)
 
-        handleCard.setOnTouchListener(::onHandleTouch)
+        handleCard.setOnTouchListener { _, event -> onHandleTouch(event) }
         post { updateMaxTranslation() }
     }
 
@@ -91,7 +91,7 @@ class SlideToConfirmView @JvmOverloads constructor(
         return true
     }
 
-    private fun onHandleTouch(view: android.view.View, event: MotionEvent): Boolean {
+    private fun onHandleTouch(event: MotionEvent): Boolean {
         if (!slideEnabled || isCompleting) return false
 
         when (event.actionMasked) {

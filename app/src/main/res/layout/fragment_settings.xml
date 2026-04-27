@@ -124,33 +124,61 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
                         android:text="@string/assignment_section_title"
                         android:textSize="18sp"
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:includeFontPadding="false"
+                        android:text="@string/secondary_cycle_description"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="13sp" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switchSecondaryEnabled"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="14dp"
                         android:text="@string/assignment_enable" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:includeFontPadding="false"
+                        android:text="@string/assignment_mode_label"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <RadioGroup
                         android:id="@+id/radioGroupMode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp">
+                        android:layout_marginTop="4dp">
 
                         <RadioButton
                             android:id="@+id/radioCyclic"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:minHeight="40dp"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
                             android:text="@string/assignment_mode_cyclic_overrides" />
 
                         <RadioButton
                             android:id="@+id/radioManual"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:minHeight="40dp"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
                             android:text="@string/assignment_mode_manual_only" />
                     </RadioGroup>
 
@@ -158,7 +186,8 @@
                         android:id="@+id/assignmentModeHelperText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="6dp"
+                        android:includeFontPadding="false"
                         android:text="@string/assignment_mode_helper"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
@@ -167,12 +196,23 @@
                         android:id="@+id/layoutCyclicSettings"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:text="@string/assignment_cycle_labels_title"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:includeFontPadding="false"
                             android:text="@string/assignment_cycle_hint"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="12sp" />
@@ -182,7 +222,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            app:chipSpacing="8dp"
+                            app:chipSpacingHorizontal="8dp"
+                            app:chipSpacingVertical="6dp"
                             app:singleLine="false" />
 
                         <com.google.android.material.button.MaterialButton
@@ -190,14 +231,15 @@
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/add_symbol" />
+                            android:layout_marginTop="6dp"
+                            android:minHeight="40dp"
+                            android:text="@string/secondary_cycle_add_label" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/editStartDateLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="12dp"
                             android:hint="@string/assignment_start_date_hint">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -223,14 +265,19 @@
                                 android:id="@+id/secondaryFirstDayDropdown"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="none" />
+                                android:gravity="center_vertical"
+                                android:includeFontPadding="false"
+                                android:inputType="none"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="12dp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/secondaryAdvanceModeTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginTop="18dp"
+                            android:includeFontPadding="false"
                             android:text="@string/assignment_advance_mode_title"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
@@ -240,6 +287,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:alpha="0.75"
+                            android:includeFontPadding="false"
                             android:text="@string/assignment_advance_mode_helper"
                             android:textAppearance="?attr/textAppearanceBodySmall" />
 
@@ -247,14 +295,18 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
+                            android:hint="@string/assignment_advance_mode_dropdown_hint"
                             app:endIconMode="dropdown_menu">
 
                             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                                 android:id="@+id/secondaryAdvanceModeDropdown"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="@string/assignment_advance_mode_title"
-                                android:inputType="none" />
+                                android:gravity="center_vertical"
+                                android:includeFontPadding="false"
+                                android:inputType="none"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="12dp" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>

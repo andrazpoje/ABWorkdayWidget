@@ -84,7 +84,7 @@
     <string name="cycle_days_hint">Vnesi oznake cikla (npr. A, B ali Jutranja, Popoldanska, Nočna)</string>
     <string name="first_cycle_day_label">Začetna oznaka cikla</string>
     <string name="first_cycle_day_hint">Izberi oznako iz cikla, ki velja na izbrani začetni datum.</string>
-    <string name="assignment_first_day_hint">Prvi dan na začetni datum</string>
+    <string name="assignment_first_day_hint">Prva oznaka</string>
     <string name="preset_label">Predloga cikla</string>
     <string name="preset_hint">Izberi predlogo cikla</string>
     <string name="preset_applied">Predloga cikla uporabljena: %1$s</string>
@@ -182,12 +182,15 @@
     <string name="show_assignment_icons_weekly">Prikaži sekundarne oznake v tedenskem pregledu</string>
     <string name="show_assignment_icons_helper">Prikaže ali skrije sekundarne oznake v koledarju in pregledu naslednjih 7 dni.</string>
     <string name="assignment_section_title">Sekundarni cikel</string>
+    <string name="secondary_cycle_description">Dodatna plast urnika, npr. rajoni, izmene ali delovna mesta.</string>
     <string name="assignment_enable">Omogoči sekundarne oznake</string>
-    <string name="assignment_mode_helper">Izberi, kako se sekundarne oznake določijo za posamezen dan.</string>
-    <string name="assignment_mode_cyclic_overrides">Ciklično + overridei</string>
+    <string name="assignment_mode_label">Način</string>
+    <string name="assignment_mode_helper">Ciklične oznake lahko po potrebi ročno prilagodiš za posamezne dni.</string>
+    <string name="assignment_mode_cyclic_overrides">Ciklično</string>
     <string name="assignment_mode_manual_only">Samo ročno</string>
-    <string name="assignment_advance_mode_title">Napredovanje cikla sekundarnih oznak</string>
-    <string name="assignment_advance_mode_helper">Izberi, ali cikel sekundarnih oznak napreduje vsak dan ali samo na delovne dni.</string>
+    <string name="assignment_advance_mode_title">Napredovanje cikla</string>
+    <string name="assignment_advance_mode_helper">Določi, ali cikel napreduje vsak dan ali samo na delovne dni.</string>
+    <string name="assignment_advance_mode_dropdown_hint">Napredovanje</string>
     <string name="assignment_advance_mode_all_days">Vsak dan</string>
     <string name="assignment_advance_mode_working_days_only">Samo delovne dni</string>
     <string name="assignment_mode_locked_by_template">Način sekundarnih oznak določa aktivni template.</string>
@@ -274,8 +277,10 @@
     <string name="error_label_too_long_detailed">Oznaka "%1$s" je predolga (največ %2$d znakov)</string>
     <string name="error_first_day_not_in_cycle">Začetni dan "%1$s" ni v ciklu</string>
     <string name="fix_errors">Popravi napake v vnosu</string>
-    <string name="assignment_start_date_hint">Začetni datum (yyyy-MM-dd)</string>
-    <string name="assignment_cycle_hint">Oznake (npr. A,B,C ali Rajon1,Rajon2)</string>
+    <string name="assignment_start_date_hint">Začetni datum cikla</string>
+    <string name="assignment_cycle_labels_title">Oznake sekundarnega cikla</string>
+    <string name="assignment_cycle_hint">Dodaj oznake, ki se izmenjujejo po izbranem zaporedju.</string>
+    <string name="secondary_cycle_add_label">+ Dodaj</string>
     <string name="cycle_day_fallback">Dan %1$d</string>
 
     <!-- ========================================================= -->

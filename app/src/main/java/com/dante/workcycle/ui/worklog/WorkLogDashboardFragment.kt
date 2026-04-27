@@ -201,6 +201,7 @@ class WorkLogDashboardFragment :
                 slidePrimaryAction.setLabelText(state.sliderActionText)
                 slidePrimaryAction.setLeadingIcon(state.sliderIconRes)
                 slidePrimaryAction.setHandleIcon(R.drawable.ic_arrow_forward_24)
+                slidePrimaryAction.isVisible = state.showPrimaryAction
                 slidePrimaryAction.setSlideEnabled(state.sliderEnabled)
 
                 groupStartedAt.isVisible = state.showStartedAt

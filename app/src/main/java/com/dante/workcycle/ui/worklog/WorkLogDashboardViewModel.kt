@@ -159,6 +159,8 @@ class WorkLogDashboardViewModel(
                     )
                 }
 
+                SessionState.FINISHED -> Unit
+
                 SessionState.WORKING -> {
                     repository.insert(
                         WorkEvent(
@@ -193,6 +195,7 @@ class WorkLogDashboardViewModel(
             refreshDateIfNeeded()
             when (resolveSessionState(currentEvents)) {
                 SessionState.NOT_WORKING -> Unit
+                SessionState.FINISHED -> Unit
 
                 SessionState.WORKING -> {
                     repository.insert(
@@ -219,7 +222,8 @@ class WorkLogDashboardViewModel(
             val sessionState = resolveSessionState(currentEvents)
             val mealAlreadyLogged = hasMealLoggedToday(currentEvents)
 
-            val canLogMeal = sessionState != SessionState.NOT_WORKING && !mealAlreadyLogged
+            val canLogMeal = sessionState in listOf(SessionState.WORKING, SessionState.ON_BREAK) &&
+                !mealAlreadyLogged
             if (!canLogMeal) return@launch
 
             repository.insert(
@@ -242,10 +246,10 @@ class WorkLogDashboardViewModel(
         val hasBreakToday = events.any { it.type == BREAK_START || it.type == BREAK_END }
         val todayResolved = scheduleResolver.resolve(selectedDate)
         val todayCycleLabel = todayResolved.effectiveCycleLabel
-        val sessionSnapshot = if (sessionState == SessionState.NOT_WORKING) {
-            null
-        } else {
+        val sessionSnapshot = if (sessionState == SessionState.WORKING || sessionState == SessionState.ON_BREAK) {
             workSessionPrefs.getSnapshot()
+        } else {
+            null
         }
         val displayCycleLabel = sessionSnapshot?.cycleLabel ?: todayCycleLabel
         val liveExpectedTimes = resolveExpectedTimes(todayResolved)
@@ -264,7 +268,6 @@ class WorkLogDashboardViewModel(
         val formatter = DateTimeFormatter.ofPattern("d. MMM yyyy", Locale.getDefault())
 
         val lastClockOut = findLastClockOut(events)
-        val hasAnyEvents = events.isNotEmpty()
         val startDeviation = buildStartDeviation(
             actualStartEvent = clockIn,
             expectedStart = expectedStartText
@@ -287,18 +290,21 @@ class WorkLogDashboardViewModel(
 
         when (sessionState) {
             SessionState.NOT_WORKING -> {
-                if (hasAnyEvents && lastClockOut != null) {
-                    stateText = s(R.string.work_log_state_finished)
-                    stateDetailText = getApplication<Application>().getString(
-                        R.string.work_log_state_finished_detail,
-                        lastClockOut.time.format(timeFormatter())
-                    )
-                    visualState = WorkLogDashboardVisualState.FINISHED
-                } else {
-                    stateText = s(R.string.work_log_state_off)
-                    stateDetailText = s(R.string.work_log_state_off_detail)
-                    visualState = WorkLogDashboardVisualState.NOT_STARTED
-                }
+                stateText = s(R.string.work_log_state_off)
+                stateDetailText = s(R.string.work_log_state_off_detail)
+                visualState = WorkLogDashboardVisualState.NOT_STARTED
+                sliderAction = WorkLogSliderAction.START_WORK
+                sliderActionText = s(R.string.work_log_slide_start)
+                sliderIconRes = R.drawable.ic_work_time_24
+            }
+
+            SessionState.FINISHED -> {
+                stateText = s(R.string.work_log_state_finished)
+                stateDetailText = getApplication<Application>().getString(
+                    R.string.work_log_state_finished_detail,
+                    lastClockOut?.time?.format(timeFormatter()) ?: WORK_LOG_PLACEHOLDER
+                )
+                visualState = WorkLogDashboardVisualState.FINISHED
                 sliderAction = WorkLogSliderAction.START_WORK
                 sliderActionText = s(R.string.work_log_slide_start)
                 sliderIconRes = R.drawable.ic_work_time_24
@@ -325,7 +331,7 @@ class WorkLogDashboardViewModel(
 
         val mealLoggedToday = hasMealLoggedToday(events)
         val mealButtonEnabled =
-            sessionState != SessionState.NOT_WORKING &&
+            sessionState in listOf(SessionState.WORKING, SessionState.ON_BREAK) &&
                 !mealLoggedToday &&
                 !isActionLocked()
 
@@ -347,8 +353,12 @@ class WorkLogDashboardViewModel(
             sliderAction = sliderAction,
             sliderActionText = sliderActionText,
             sliderIconRes = sliderIconRes,
-            sliderEnabled = !isActionLocked(),
-            startWarning = if (sliderAction == WorkLogSliderAction.START_WORK) {
+            showPrimaryAction = sessionState != SessionState.FINISHED,
+            sliderEnabled = sessionState != SessionState.FINISHED && !isActionLocked(),
+            startWarning = if (
+                sessionState != SessionState.FINISHED &&
+                sliderAction == WorkLogSliderAction.START_WORK
+            ) {
                 collectStartWarning(todayResolved)
             } else {
                 null
@@ -668,38 +678,39 @@ class WorkLogDashboardViewModel(
     }
 
     private fun resolveSessionState(events: List<WorkEvent>): SessionState {
-        var isWorking = false
-        var isOnBreak = false
+        var state = SessionState.NOT_WORKING
 
-        for (event in events.sortedBy { it.time }) {
+        val sortedEvents = events.sortedWith(
+            compareBy<WorkEvent> { it.time }.thenBy { it.id }
+        )
+
+        for (event in sortedEvents) {
             when (event.type) {
-                CLOCK_IN -> {
-                    isWorking = true
-                    isOnBreak = false
-                }
+                CLOCK_IN -> state = SessionState.WORKING
 
                 BREAK_START -> {
-                    if (isWorking) isOnBreak = true
+                    if (state == SessionState.WORKING) {
+                        state = SessionState.ON_BREAK
+                    }
                 }
 
                 BREAK_END -> {
-                    if (isWorking) isOnBreak = false
+                    if (state == SessionState.ON_BREAK) {
+                        state = SessionState.WORKING
+                    }
                 }
 
                 CLOCK_OUT -> {
-                    isWorking = false
-                    isOnBreak = false
+                    if (state == SessionState.WORKING || state == SessionState.ON_BREAK) {
+                        state = SessionState.FINISHED
+                    }
                 }
 
                 else -> Unit
             }
         }
 
-        return when {
-            !isWorking -> SessionState.NOT_WORKING
-            isOnBreak -> SessionState.ON_BREAK
-            else -> SessionState.WORKING
-        }
+        return state
     }
 
     private fun timeFormatter(): DateTimeFormatter {
@@ -764,7 +775,7 @@ class WorkLogDashboardViewModel(
         overtimeTrackingEnabled: Boolean,
         sessionState: SessionState
     ): DeviationInfo? {
-        if (sessionState != SessionState.NOT_WORKING) return null
+        if (sessionState != SessionState.FINISHED) return null
 
         val startEvent = actualStartEvent ?: return null
         val endEvent = actualEndEvent ?: return null
@@ -1111,7 +1122,8 @@ class WorkLogDashboardViewModel(
 
     private fun syncPersistentNotification(events: List<WorkEvent>) {
         when (resolveSessionState(events)) {
-            SessionState.NOT_WORKING -> {
+            SessionState.NOT_WORKING,
+            SessionState.FINISHED -> {
                 notificationManager.remove()
             }
 
@@ -1206,6 +1218,7 @@ class WorkLogDashboardViewModel(
 
     private enum class SessionState {
         NOT_WORKING,
+        FINISHED,
         WORKING,
         ON_BREAK
     }
