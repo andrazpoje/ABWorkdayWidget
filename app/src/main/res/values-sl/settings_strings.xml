@@ -87,6 +87,7 @@
     <string name="cycle_days_label">Oznake cikla</string>
     <string name="cycle_days_hint_placeholder">A, B, Jutranja, Popoldanska, Nočna</string>
     <string name="cycle_days_hint">Vnesi oznake cikla (npr. A, B ali Jutranja, Popoldanska, Nočna)</string>
+    <string name="primary_cycle_label_length_helper">Za najboljši prikaz priporočamo kratke oznake, približno 10\u201312 znakov. Daljše oznake se prikažejo, kjer je dovolj prostora.</string>
     <string name="first_cycle_day_label">Začetna oznaka cikla</string>
     <string name="first_cycle_day_hint">Izberi oznako iz cikla, ki velja na izbrani začetni datum.</string>
     <string name="assignment_first_day_hint">Prva oznaka</string>
@@ -243,6 +244,7 @@
     <!-- ========================================================= -->
     <string name="status_labels_title">Statusne oznake</string>
     <string name="status_labels_description">Statusne oznake so ločene od sekundarnih oznak. Lahko jih omogočiš ali onemogočiš ter prilagodiš njihove barve.</string>
+    <string name="status_label_length_helper">Statusne oznake so lahko daljše, vendar se lahko v koledarju prikažejo kot ikona ali skrajšana oznaka.</string>
     <string name="open_status_labels_settings">Uredi statusne oznake</string>
     <string name="status_labels_system_section">Status oznake</string>
     <string name="edit_status_label">Uredi status oznako</string>
@@ -285,6 +287,7 @@
     <string name="assignment_start_date_hint">Začetni datum cikla</string>
     <string name="assignment_cycle_labels_title">Oznake sekundarnega cikla</string>
     <string name="assignment_cycle_hint">Dodaj oznake, ki se izmenjujejo po izbranem zaporedju.</string>
+    <string name="secondary_cycle_label_length_helper">Za najboljši prikaz v tedenskem pregledu priporočamo oznake približno 8\u201312 znakov. V koledarju in widgetih se daljše oznake lahko skrajšajo.</string>
     <string name="secondary_cycle_add_label">+ Dodaj</string>
     <string name="cycle_day_fallback">Dan %1$d</string>
 

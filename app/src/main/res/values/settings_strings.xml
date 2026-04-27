@@ -87,6 +87,7 @@
     <string name="cycle_days_label">Cycle days</string>
     <string name="cycle_days_hint_placeholder">A, B, Morning, Afternoon, Night</string>
     <string name="cycle_days_hint">Enter cycle labels separated by commas. Example: A, B or Morning, Afternoon, Night</string>
+    <string name="primary_cycle_label_length_helper">For the best display, use short labels, ideally around 10\u201312 characters. Longer labels are shown where space allows.</string>
     <string name="first_cycle_day_label">Cycle day on start date</string>
     <string name="first_cycle_day_hint">Select a label from the cycle that applies to the selected start date.</string>
     <string name="assignment_first_day_hint">First label</string>
@@ -245,6 +246,7 @@
     <!-- ========================================================= -->
     <string name="status_labels_title">Status labels</string>
     <string name="status_labels_description">Status labels are managed separately from secondary labels. You can enable or disable them and customize their colors.</string>
+    <string name="status_label_length_helper">Status labels may be longer, but they can appear as an icon or shortened label in the calendar.</string>
     <string name="open_status_labels_settings">Manage status labels</string>
     <string name="status_labels_system_section">Status labels</string>
     <string name="edit_status_label">Edit status label</string>
@@ -281,6 +283,7 @@
     <string name="assignment_start_date_hint">Cycle start date</string>
     <string name="assignment_cycle_labels_title">Secondary cycle labels</string>
     <string name="assignment_cycle_hint">Add labels that rotate in the selected order.</string>
+    <string name="secondary_cycle_label_length_helper">For the best weekly overview display, use labels around 8\u201312 characters. Longer labels may be shortened in the calendar and widgets.</string>
     <string name="secondary_cycle_add_label">+ Add</string>
     <string name="cycle_day_fallback">Day %1$d</string>
 

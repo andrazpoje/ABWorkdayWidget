@@ -235,6 +235,16 @@
                             android:minHeight="40dp"
                             android:text="@string/secondary_cycle_add_label" />
 
+                        <TextView
+                            android:id="@+id/secondaryCycleLengthHelper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:includeFontPadding="false"
+                            android:text="@string/secondary_cycle_label_length_helper"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp" />
+
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/editStartDateLayout"
                             android:layout_width="match_parent"

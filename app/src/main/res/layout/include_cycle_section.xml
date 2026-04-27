@@ -189,8 +189,17 @@
                     android:id="@+id/cycleDaysHint"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="6dp"
                     android:text="@string/cycle_days_hint"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/cycleDaysLengthHelper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/primary_cycle_label_length_helper"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="12sp" />
 
                 <TextView

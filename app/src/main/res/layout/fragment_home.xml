@@ -166,9 +166,8 @@
 
                             <TextView
                                 android:id="@+id/upcomingEventDate1"
-                                android:layout_width="0dp"
+                                android:layout_width="106dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1.05"
                                 android:ellipsize="end"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
@@ -179,10 +178,10 @@
                                 android:id="@+id/upcomingEventLabel1"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="16dp"
                                 android:layout_weight="1"
                                 android:ellipsize="end"
-                                android:gravity="end"
+                                android:gravity="start"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
                                 android:textColor="?attr/colorOnSurface"
@@ -200,9 +199,8 @@
 
                             <TextView
                                 android:id="@+id/upcomingEventDate2"
-                                android:layout_width="0dp"
+                                android:layout_width="106dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1.05"
                                 android:ellipsize="end"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
@@ -213,10 +211,10 @@
                                 android:id="@+id/upcomingEventLabel2"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="16dp"
                                 android:layout_weight="1"
                                 android:ellipsize="end"
-                                android:gravity="end"
+                                android:gravity="start"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
                                 android:textColor="?attr/colorOnSurface"
@@ -234,9 +232,8 @@
 
                             <TextView
                                 android:id="@+id/upcomingEventDate3"
-                                android:layout_width="0dp"
+                                android:layout_width="106dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1.05"
                                 android:ellipsize="end"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
@@ -247,10 +244,10 @@
                                 android:id="@+id/upcomingEventLabel3"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="16dp"
                                 android:layout_weight="1"
                                 android:ellipsize="end"
-                                android:gravity="end"
+                                android:gravity="start"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
                                 android:textColor="?attr/colorOnSurface"
@@ -268,9 +265,8 @@
 
                             <TextView
                                 android:id="@+id/upcomingEventDate4"
-                                android:layout_width="0dp"
+                                android:layout_width="106dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1.05"
                                 android:ellipsize="end"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
@@ -281,10 +277,10 @@
                                 android:id="@+id/upcomingEventLabel4"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="16dp"
                                 android:layout_weight="1"
                                 android:ellipsize="end"
-                                android:gravity="end"
+                                android:gravity="start"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
                                 android:textColor="?attr/colorOnSurface"
@@ -302,9 +298,8 @@
 
                             <TextView
                                 android:id="@+id/upcomingEventDate5"
-                                android:layout_width="0dp"
+                                android:layout_width="106dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1.05"
                                 android:ellipsize="end"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
@@ -315,10 +310,10 @@
                                 android:id="@+id/upcomingEventLabel5"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="16dp"
                                 android:layout_weight="1"
                                 android:ellipsize="end"
-                                android:gravity="end"
+                                android:gravity="start"
                                 android:includeFontPadding="false"
                                 android:maxLines="1"
                                 android:textColor="?attr/colorOnSurface"
@@ -339,16 +334,6 @@
                 <include layout="@layout/include_cycle_section" />
                 <include layout="@layout/include_rules_section" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/versionText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="4dp"
-                android:alpha="0.7"
-                android:text=""
-                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/githubLinkText"

@@ -79,7 +79,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var widgetPromptContainer: View
     lateinit var githubLinkText: TextView
-    lateinit var versionText: TextView
     lateinit var mainScrollView: NestedScrollView
 
     lateinit var revertButton: MaterialButton
@@ -154,8 +153,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         updateCyclePreview()
         updateWidgetHint()
         updateUpcomingEvents()
-
-        versionText.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
 
         setupSection(cycleHeader, cycleSection, cycleArrow, SECTION_CYCLE)
         setupSection(rulesHeader, rulesSection, rulesArrow, SECTION_RULES)
@@ -336,7 +333,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         widgetPromptContainer = root.findViewById(R.id.widgetPromptContainer)
         githubLinkText = root.findViewById(R.id.githubLinkText)
-        versionText = root.findViewById(R.id.versionText)
 
         cycleSection = root.findViewById(R.id.cycleSection)
         rulesSection = root.findViewById(R.id.rulesSection)
