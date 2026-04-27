@@ -131,4 +131,25 @@ object ScheduleTemplateProvider {
         if (id.isNullOrBlank()) return null
         return templates.firstOrNull { it.id == id }
     }
+
+    fun getGeneralTemplates(): List<ScheduleTemplate> {
+        return templates.filter { template ->
+            template.id in setOf(
+                TEMPLATE_SINGLE_SHIFT,
+                TEMPLATE_TWO_SHIFT,
+                TEMPLATE_THREE_SHIFT,
+                TEMPLATE_4_ON_4_OFF,
+                TEMPLATE_PANAMA_223
+            )
+        }
+    }
+
+    fun getSpecialTemplates(): List<ScheduleTemplate> {
+        return templates.filter { template ->
+            template.id in setOf(
+                TEMPLATE_AB,
+                TEMPLATE_POSTA_SLOVENIJE_AB
+            )
+        }
+    }
 }

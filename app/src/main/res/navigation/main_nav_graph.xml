@@ -10,6 +10,11 @@
         android:label="@string/nav_home" />
 
     <fragment
+        android:id="@+id/onboardingFragment"
+        android:name="com.dante.workcycle.ui.onboarding.CycleSetupOnboardingFragment"
+        android:label="@string/onboarding_welcome_title" />
+
+    <fragment
         android:id="@+id/calendarFragment"
         android:name="com.dante.workcycle.ui.fragments.CalendarFragment"
         android:label="@string/nav_calendar" />

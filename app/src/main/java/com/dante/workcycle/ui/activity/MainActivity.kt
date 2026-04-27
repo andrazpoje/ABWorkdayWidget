@@ -14,7 +14,6 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
@@ -65,6 +64,8 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
+        LaunchPrefs(this).migrateExistingUsersIfNeeded()
+
         setupDefaultEdgeToEdge()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -112,6 +113,7 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.homeFragment,
+                R.id.onboardingFragment,
                 R.id.calendarFragment,
                 R.id.moreFragment
             )
@@ -129,6 +131,7 @@ class MainActivity : AppCompatActivity() {
             val suffix = when (destination.id) {
                 R.id.homeFragment -> ""
                 R.id.calendarFragment -> getString(R.string.nav_calendar)
+                R.id.onboardingFragment -> getString(R.string.onboarding_welcome_title)
                 R.id.moreFragment -> getString(R.string.nav_more)
                 R.id.statisticsFragment -> getString(R.string.statistics_title)
                 R.id.whatsNewFragment -> getString(R.string.whats_new_title)
@@ -260,10 +263,7 @@ class MainActivity : AppCompatActivity() {
             when {
                 !launchPrefs.isOnboardingCompleted() -> {
                     runCatching {
-                        navController.navigate(
-                            R.id.helpFragment,
-                            bundleOf("isOnboarding" to true)
-                        )
+                        navController.navigate(R.id.onboardingFragment)
                     }
                 }
 

@@ -26,6 +26,7 @@ import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.core.util.DateProvider
 import com.dante.workcycle.data.prefs.AppPrefs
+import com.dante.workcycle.data.prefs.LaunchPrefs
 import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.databinding.FragmentHomeBinding
 import com.dante.workcycle.domain.holiday.HolidayCountry
@@ -275,6 +276,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun showWhatsNewIfAppUpdated(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) return
+
+        val launchPrefs = LaunchPrefs(requireContext())
+        if (!launchPrefs.isOnboardingCompleted()) return
 
         val prefs = requireContext().getSharedPreferences(
             AppPrefs.NAME,

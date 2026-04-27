@@ -107,27 +107,14 @@ private fun HomeFragment.createNoFilterAdapter(items: List<String>): ArrayAdapte
 }
 
 private fun HomeFragment.buildTemplatePickerSections(): List<TemplatePickerBottomSheet.Section> {
-    val generalTemplates = listOfNotNull(
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_SINGLE_SHIFT),
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_TWO_SHIFT),
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_THREE_SHIFT),
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_4_ON_4_OFF),
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_PANAMA_223)
-    )
-
-    val professionalTemplates = listOfNotNull(
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_AB),
-        ScheduleTemplateProvider.getById(ScheduleTemplateProvider.TEMPLATE_POSTA_SLOVENIJE_AB)
-    )
-
     return listOf(
         TemplatePickerBottomSheet.Section(
             title = shortTemplateGroupTitle(getString(R.string.template_group_general)),
-            items = generalTemplates.map(::toTemplatePickerItem)
+            items = ScheduleTemplateProvider.getGeneralTemplates().map(::toTemplatePickerItem)
         ),
         TemplatePickerBottomSheet.Section(
             title = shortTemplateGroupTitle(getString(R.string.template_group_special)),
-            items = professionalTemplates.map(::toTemplatePickerItem)
+            items = ScheduleTemplateProvider.getSpecialTemplates().map(::toTemplatePickerItem)
         )
     )
 }
