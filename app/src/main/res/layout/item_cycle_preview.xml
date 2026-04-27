@@ -22,9 +22,9 @@
 
         <!-- LEVO: DAN + DATUM -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1.4"
+            android:minWidth="86dp"
             android:orientation="vertical">
 
             <TextView
@@ -63,13 +63,15 @@
                 <!-- PRIMARY -->
                 <TextView
                     android:id="@+id/dayCycleText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
+                    android:gravity="end"
+                    android:includeFontPadding="false"
                     android:maxLines="1"
                     android:textSize="22sp"
                     android:textStyle="bold"
-                    tools:text="B" />
+                    tools:text="Dopoldansko • Skladišče" />
 
                 <!-- SECONDARY -->
                 <LinearLayout

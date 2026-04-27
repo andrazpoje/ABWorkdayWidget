@@ -2,7 +2,11 @@ package com.dante.workcycle.ui.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,9 +66,8 @@ class CyclePreviewAdapter :
 
             binding.dayTitleText.text = item.title
             binding.dayDateText.text = item.dateText
-            binding.dayCycleText.text = item.cycleLabel
 
-            binding.dayCycleText.setTypeface(null, android.graphics.Typeface.BOLD)
+            binding.dayCycleText.setTypeface(null, Typeface.NORMAL)
             binding.daySecondaryText.setTypeface(null, android.graphics.Typeface.NORMAL)
 
             val bgColor = getCycleBackgroundColor(
@@ -82,10 +85,9 @@ class CyclePreviewAdapter :
             binding.root.setCardBackgroundColor(bgColor)
             binding.dayTitleText.setTextColor(textColor)
             binding.dayDateText.setTextColor(textColor)
-            binding.dayCycleText.setTextColor(textColor)
-
-            bindSecondaryIndicator(
+            bindCycleAndSecondaryLabel(
                 context = context,
+                primaryLabel = item.cycleLabel,
                 secondaryName = item.secondaryLabel,
                 textColor = textColor
             )
@@ -113,8 +115,9 @@ class CyclePreviewAdapter :
             return CycleColorHelper.getBackgroundColor(context, label, cycle)
         }
 
-        private fun bindSecondaryIndicator(
+        private fun bindCycleAndSecondaryLabel(
             context: Context,
+            primaryLabel: String,
             secondaryName: String?,
             textColor: Int
         ) {
@@ -136,6 +139,9 @@ class CyclePreviewAdapter :
                 text.visibility = View.GONE
                 text.text = ""
                 text.alpha = 1f
+                binding.dayCycleText.text = primaryLabel
+                binding.dayCycleText.setTextColor(textColor)
+                binding.dayCycleText.setTypeface(null, Typeface.BOLD)
                 return
             }
 
@@ -148,16 +154,36 @@ class CyclePreviewAdapter :
                 text.visibility = View.GONE
                 text.text = ""
                 text.alpha = 1f
+                binding.dayCycleText.text = primaryLabel
+                binding.dayCycleText.setTextColor(textColor)
+                binding.dayCycleText.setTypeface(null, Typeface.BOLD)
                 return
             }
 
-            container.visibility = View.VISIBLE
+            container.visibility = View.GONE
             dot.visibility = View.GONE
             icon.visibility = View.GONE
-            text.text = " • $trimmedName"
-            text.visibility = View.VISIBLE
-            text.setTextColor(textColor)
+            text.visibility = View.GONE
             text.alpha = 1f
+            text.text = ""
+
+            val combined = "$primaryLabel \u2022 $trimmedName"
+            binding.dayCycleText.text = SpannableString(combined).apply {
+                setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0,
+                    primaryLabel.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                setSpan(
+                    StyleSpan(Typeface.NORMAL),
+                    primaryLabel.length,
+                    combined.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            binding.dayCycleText.setTextColor(textColor)
+            binding.dayCycleText.setTypeface(null, Typeface.NORMAL)
         }
 
         private fun bindStatusIndicator(
