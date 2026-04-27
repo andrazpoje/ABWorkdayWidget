@@ -328,7 +328,7 @@ class WorkLogDashboardFragment :
         val (containerAttr, outlineAttr, contentAttr) = when (visualState) {
             WorkLogDashboardVisualState.WORKING -> Triple(
                 com.google.android.material.R.attr.colorPrimaryContainer,
-                com.google.android.material.R.attr.colorPrimary,
+                androidx.appcompat.R.attr.colorPrimary,
                 com.google.android.material.R.attr.colorOnPrimaryContainer
             )
 
@@ -378,8 +378,8 @@ class WorkLogDashboardFragment :
     private fun applyDeviationTone(textView: TextView, tone: WorkLogDeviationTone) {
         val colorAttr = when (tone) {
             WorkLogDeviationTone.DEFAULT -> com.google.android.material.R.attr.colorOnSurfaceVariant
-            WorkLogDeviationTone.ACCENT -> com.google.android.material.R.attr.colorPrimary
-            WorkLogDeviationTone.ERROR -> com.google.android.material.R.attr.colorError
+            WorkLogDeviationTone.ACCENT -> androidx.appcompat.R.attr.colorPrimary
+            WorkLogDeviationTone.ERROR -> androidx.appcompat.R.attr.colorError
         }
 
         textView.setTextColor(

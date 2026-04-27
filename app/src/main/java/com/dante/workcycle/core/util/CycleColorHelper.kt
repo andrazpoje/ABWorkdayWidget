@@ -3,6 +3,7 @@ package com.dante.workcycle.core.util
 import android.content.Context
 import android.graphics.Color
 import androidx.core.graphics.ColorUtils
+import com.dante.workcycle.R
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.style.WidgetStyleManager
 
@@ -13,6 +14,10 @@ object CycleColorHelper {
         label: String,
         cycle: List<String>
     ): Int {
+        if (isOffDayLabel(context, label)) {
+            return getSkippedDayColor(context)
+        }
+
         if (isSkippedOverrideActiveForLabel(context, label)) {
             return getSkippedDayColor(context)
         }
@@ -38,6 +43,15 @@ object CycleColorHelper {
             2 -> colors.shiftCColor
             else -> colors.shiftCColor
         }
+    }
+
+    private fun isOffDayLabel(context: Context, label: String): Boolean {
+        val normalized = label.trim()
+        if (normalized.isBlank()) return false
+
+        return normalized.equals(context.getString(R.string.off_day_label), ignoreCase = true) ||
+            normalized.equals("Prosto", ignoreCase = true) ||
+            normalized.equals("Off", ignoreCase = true)
     }
 
     private fun isSkippedOverrideActiveForLabel(context: Context, label: String): Boolean {

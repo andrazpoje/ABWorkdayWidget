@@ -81,7 +81,7 @@ class TemplatePickerBottomSheet(
     private fun createItem(item: Item): MaterialCardView {
         val context = requireContext()
         val isSelected = item.templateId == selectedTemplateId
-        val colorPrimary = resolveThemeColor(com.google.android.material.R.attr.colorPrimary)
+        val colorPrimary = resolveThemeColor(androidx.appcompat.R.attr.colorPrimary)
         val surfaceColor = resolveThemeColor(com.google.android.material.R.attr.colorSurface)
         val selectedColor = ColorUtils.setAlphaComponent(colorPrimary, 28)
 
