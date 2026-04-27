@@ -258,28 +258,23 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                         !resolved.secondaryBaseLabel.isNullOrBlank()
 
             val displaySecondaryLabel = rawSecondaryLabel?.let {
-                val value = shortenSecondaryLabel(it)
-                if (shouldShowSecondaryOverrideMarker) "$value*" else value
+                if (shouldShowSecondaryOverrideMarker) "$it*" else it
             }
 
             val assignmentColor = rawSecondaryLabel
                 ?.let { labelsPrefs.getLabelByName(it)?.color }
 
-            val statusSummary = resolved.statusSummary
-                ?.trim()
-                ?.ifBlank { null }
-
-            val fallbackStatusLabel = statusSummary
-                ?.let(::shortenStatusSummary)
-
-            val fallbackStatusColor = resolved.statusTags.firstOrNull()
-                ?.let { statusLabelsPrefs.getLabelByName(it)?.color }
-
-            val statusIconResIds = StatusVisuals.sortByPriority(
+            val statusLabels = StatusVisuals.sortByPriority(
                 resolved.statusTags.mapNotNull(statusLabelsPrefs::getLabelByName)
-            ).mapNotNull { label ->
+            ).take(2)
+
+            val statusIconResIds = statusLabels.mapNotNull { label ->
                 StatusVisuals.getIconRes(label.iconKey)
-            }.take(2)
+            }
+
+            val statusIconColors = statusLabels
+                .filter { StatusVisuals.getIconRes(it.iconKey) != null }
+                .map { it.color }
 
             val skippedOverrideLabel = CycleManager.getSkippedDayOverrideLabelOrNull(ctx, current)
             val cycleColor = CycleColorHelper.getBackgroundColor(
@@ -292,11 +287,12 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
                 CalendarDayItem(
                     date = current,
                     dayNumber = current.dayOfMonth.toString(),
-                    effectiveCycleLabel = shortenPrimaryCycleLabel(effectiveCycleLabel),
-                    assignmentLabel = displaySecondaryLabel ?: fallbackStatusLabel,
+                    effectiveCycleLabel = effectiveCycleLabel,
+                    assignmentLabel = displaySecondaryLabel,
                     statusIconResIds = statusIconResIds,
+                    statusIconColors = statusIconColors,
                     cycleColor = cycleColor,
-                    assignmentColor = assignmentColor ?: fallbackStatusColor,
+                    assignmentColor = assignmentColor,
                     isOffDay = skippedOverrideLabel != null,
                     isToday = current == today,
                     isCurrentMonth = true,
@@ -319,41 +315,6 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         }
 
         return result
-    }
-
-    private fun shortenPrimaryCycleLabel(label: String): String {
-        val normalized = label.trim()
-        return if (normalized.length <= 5) normalized else normalized.take(5)
-    }
-
-    private fun shortenSecondaryLabel(label: String): String {
-        val normalized = label.trim().removeSuffix("*").trim()
-
-        val labelsPrefs = AssignmentLabelsPrefs(requireContext())
-        val matchedLabel = labelsPrefs.getLabelByName(normalized)
-
-        return if (matchedLabel != null && matchedLabel.isSystem) {
-            labelsPrefs.getShortDisplayName(matchedLabel)
-        } else {
-            if (normalized.length <= 5) normalized else normalized.take(5)
-        }
-    }
-
-    private fun shortenStatusSummary(summary: String): String {
-        val parts = summary.split(",")
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-
-        if (parts.isEmpty()) return ""
-
-        val first = parts.first()
-        val compactFirst = if (first.length <= 5) first else first.take(5)
-
-        return if (parts.size == 1) {
-            compactFirst
-        } else {
-            "$compactFirst+"
-        }
     }
 
     private fun DayOfWeek.toMondayBasedIndex(): Int {

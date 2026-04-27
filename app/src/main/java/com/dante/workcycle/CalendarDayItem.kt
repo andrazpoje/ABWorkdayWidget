@@ -9,6 +9,7 @@ data class CalendarDayItem(
     val effectiveCycleLabel: String = "",
     val assignmentLabel: String? = null,
     val statusIconResIds: List<Int> = emptyList(),
+    val statusIconColors: List<Int> = emptyList(),
 
     val cycleColor: Int? = null,
     val assignmentColor: Int? = null,

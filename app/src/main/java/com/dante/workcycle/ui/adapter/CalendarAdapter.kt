@@ -2,6 +2,7 @@ package com.dante.workcycle.ui.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,15 +10,13 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.dante.workcycle.CalendarDayItem
 import com.dante.workcycle.R
-import com.dante.workcycle.core.status.StatusVisuals
-import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.google.android.material.card.MaterialCardView
+import java.util.Locale
 
 class CalendarAdapter(
     private val items: List<CalendarDayItem>,
@@ -64,6 +63,7 @@ class CalendarAdapter(
 
         holder.secondaryLabel.alpha = 1f
         holder.secondaryLabel.text = ""
+        holder.secondaryLabel.background = null
 
         holder.dayCard.setCardBackgroundColor(Color.TRANSPARENT)
         holder.dayCard.strokeWidth = 0
@@ -79,7 +79,7 @@ class CalendarAdapter(
         holder.secondaryIcon.isVisible = false
         holder.secondaryDot.isVisible = false
         holder.secondaryLabel.isVisible = false
-        holder.statusIconsContainer.isVisible = false
+        holder.statusIconsContainer.visibility = View.GONE
         holder.statusIconFirst.isVisible = false
         holder.statusIconSecond.isVisible = false
 
@@ -97,12 +97,17 @@ class CalendarAdapter(
 
         holder.secondaryContainer.isVisible = false
         holder.secondaryLabel.text = ""
+        holder.secondaryLabel.background = null
         holder.secondaryLabel.isVisible = false
         holder.secondaryIcon.isVisible = false
         holder.secondaryDot.isVisible = false
-        holder.statusIconsContainer.isVisible = false
+        holder.statusIconsContainer.visibility = View.INVISIBLE
         holder.statusIconFirst.isVisible = false
         holder.statusIconSecond.isVisible = false
+        holder.statusIconFirst.background = null
+        holder.statusIconSecond.background = null
+        holder.statusIconFirst.clearColorFilter()
+        holder.statusIconSecond.clearColorFilter()
 
         holder.dayCard.strokeWidth = 0
         holder.dayCard.strokeColor = Color.TRANSPARENT
@@ -140,7 +145,12 @@ class CalendarAdapter(
             assignmentColor = item.assignmentColor,
             fallbackTextColor = textColor
         )
-        bindStatusIcons(holder, item.statusIconResIds)
+        bindStatusIcons(
+            holder = holder,
+            iconResIds = item.statusIconResIds,
+            iconColors = item.statusIconColors,
+            cellBackgroundColor = backgroundColor
+        )
 
         applySelectionState(holder, item)
 
@@ -171,6 +181,7 @@ class CalendarAdapter(
         if (!showIndicators) {
             holder.secondaryContainer.isVisible = false
             holder.secondaryLabel.text = ""
+            holder.secondaryLabel.background = null
             holder.secondaryLabel.isVisible = false
             holder.secondaryIcon.isVisible = false
             holder.secondaryDot.isVisible = false
@@ -182,6 +193,7 @@ class CalendarAdapter(
         if (trimmedLabel.isBlank()) {
             holder.secondaryContainer.isVisible = false
             holder.secondaryLabel.text = ""
+            holder.secondaryLabel.background = null
             holder.secondaryLabel.isVisible = false
             holder.secondaryIcon.isVisible = false
             holder.secondaryDot.isVisible = false
@@ -191,66 +203,92 @@ class CalendarAdapter(
         val isOverride = trimmedLabel.contains("*")
 
         holder.secondaryContainer.isVisible = true
-        val secondaryTextColor = ColorUtils.setAlphaComponent(fallbackTextColor, 180)
-        holder.secondaryLabel.setTextColor(secondaryTextColor)
+        holder.secondaryIcon.isVisible = false
+        holder.secondaryDot.isVisible = false
+        val badgeColor = assignmentColor ?: ColorUtils.setAlphaComponent(fallbackTextColor, 220)
+        holder.secondaryLabel.background = createSecondaryBadgeBackground(context, badgeColor)
+        holder.secondaryLabel.setTextColor(getReadableTextColor(badgeColor))
         holder.secondaryLabel.isVisible = true
-        holder.secondaryLabel.alpha = if (isOverride) 1f else 0.7f
+        holder.secondaryLabel.alpha = 1f
 
-        val labelsPrefs = AssignmentLabelsPrefs(context)
-        val cleanName = trimmedLabel.removeSuffix("*").trim()
-        val label = labelsPrefs.getLabelByName(cleanName)
-        val iconRes = getIconRes(label?.iconKey)
-
-        if (iconRes != null) {
-            holder.secondaryIcon.setImageResource(iconRes)
-            holder.secondaryIcon.isVisible = true
-            holder.secondaryDot.isVisible = false
-        } else {
-            holder.secondaryIcon.isVisible = false
-            holder.secondaryDot.isVisible = true
-
-            val baseColor = assignmentColor ?: fallbackTextColor
-            val finalColor = adjustDotColor(baseColor)
-
-            val dotDrawable = holder.secondaryDot.background?.mutate()
-            if (dotDrawable != null) {
-                val wrapped = DrawableCompat.wrap(dotDrawable)
-                DrawableCompat.setTint(wrapped, finalColor)
-                holder.secondaryDot.background = wrapped
-            } else {
-                holder.secondaryDot.setBackgroundColor(finalColor)
-            }
-        }
-
-        val baseLabel = trimmedLabel.removeSuffix("*").trim()
-
-        val shortLabel = when {
-            baseLabel.startsWith("Dopust", true) -> "Dop."
-            baseLabel.startsWith("Bolniška", true) -> "Boln."
-            baseLabel.startsWith("Dežurstvo", true) -> "Dež."
-            baseLabel.startsWith("Teren", true) -> "Ter."
-            else -> baseLabel.take(3)
-        }
+        val shortLabel = getShortSecondaryLabel(trimmedLabel)
 
         val finalLabel = if (isOverride) "$shortLabel*" else shortLabel
-        holder.secondaryLabel.text =
-            holder.itemView.context.getString(R.string.bullet_label_format, finalLabel)
+        holder.secondaryLabel.text = finalLabel
     }
 
-    private fun getIconRes(iconKey: String?): Int? {
-        return StatusVisuals.getIconRes(iconKey)
-    }
-
-    private fun bindStatusIcons(holder: VH, iconResIds: List<Int>) {
+    private fun bindStatusIcons(
+        holder: VH,
+        iconResIds: List<Int>,
+        iconColors: List<Int>,
+        cellBackgroundColor: Int
+    ) {
         val firstIcon = iconResIds.getOrNull(0)
         val secondIcon = iconResIds.getOrNull(1)
+        val hasIcons = firstIcon != null || secondIcon != null
 
-        holder.statusIconFirst.isVisible = firstIcon != null
-        holder.statusIconSecond.isVisible = secondIcon != null
-        holder.statusIconsContainer.isVisible = firstIcon != null || secondIcon != null
+        holder.statusIconsContainer.visibility = if (hasIcons) View.VISIBLE else View.INVISIBLE
 
-        firstIcon?.let(holder.statusIconFirst::setImageResource)
-        secondIcon?.let(holder.statusIconSecond::setImageResource)
+        bindStatusIcon(holder.statusIconFirst, firstIcon, iconColors.getOrNull(0), cellBackgroundColor)
+        bindStatusIcon(holder.statusIconSecond, secondIcon, iconColors.getOrNull(1), cellBackgroundColor)
+    }
+
+    private fun bindStatusIcon(
+        iconView: ImageView,
+        iconRes: Int?,
+        iconColor: Int?,
+        cellBackgroundColor: Int
+    ) {
+        if (iconRes == null) {
+            iconView.isVisible = false
+            iconView.background = null
+            iconView.clearColorFilter()
+            return
+        }
+
+        val statusColor = iconColor ?: Color.GRAY
+        val circleColor = getContrastingStatusCircleColor(cellBackgroundColor)
+        iconView.setImageResource(iconRes)
+        iconView.background = createStatusIconBackground(iconView.context, circleColor)
+        iconView.setColorFilter(statusColor)
+        iconView.isVisible = true
+    }
+
+    private fun createStatusIconBackground(context: Context, color: Int): GradientDrawable {
+        val strokeColor = if (ColorUtils.calculateLuminance(color) > 0.5) {
+            ColorUtils.blendARGB(color, Color.BLACK, 0.16f)
+        } else {
+            ColorUtils.blendARGB(color, Color.WHITE, 0.22f)
+        }
+
+        return GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(color)
+            setStroke(dpToPx(context, 1f), strokeColor)
+        }
+    }
+
+    private fun getContrastingStatusCircleColor(cellBackgroundColor: Int): Int {
+        return if (ColorUtils.calculateLuminance(cellBackgroundColor) > 0.5) {
+            ColorUtils.blendARGB(cellBackgroundColor, Color.BLACK, 0.82f)
+        } else {
+            ColorUtils.blendARGB(cellBackgroundColor, Color.WHITE, 0.88f)
+        }
+    }
+
+    private fun createSecondaryBadgeBackground(context: Context, color: Int): GradientDrawable {
+        val strokeColor = if (ColorUtils.calculateLuminance(color) > 0.5) {
+            ColorUtils.blendARGB(color, Color.BLACK, 0.18f)
+        } else {
+            ColorUtils.blendARGB(color, Color.WHITE, 0.22f)
+        }
+
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dpToPx(context, 999f).toFloat()
+            setColor(color)
+            setStroke(dpToPx(context, 1f), strokeColor)
+        }
     }
 
     private fun applySelectionState(holder: VH, item: CalendarDayItem) {
@@ -280,29 +318,53 @@ class CalendarAdapter(
         holder.dayCard.scaleY = 1f
     }
 
-    private fun adjustDotColor(color: Int): Int {
-        return ColorUtils.blendARGB(color, Color.WHITE, 0.22f)
-    }
-
     private fun darkenColor(color: Int): Int {
         return ColorUtils.blendARGB(color, Color.BLACK, 0.22f)
     }
     private fun getShortCycleLabel(label: String): String {
         val normalized = label.trim()
+        val lower = normalized.lowercase(Locale.getDefault())
 
-        return when (normalized.lowercase()) {
-            "dopoldan" -> "Dop"
-            "popoldan" -> "Pop"
-            "nočna", "nocna" -> "Noč"
-            "prosto" -> "Pro"
-            else -> {
-                if (normalized.length <= 3) {
-                    normalized
-                } else {
-                    normalized.take(3)
-                }
-            }
+        return when {
+            lower.startsWith("dopold") -> "Dop"
+            lower.startsWith("popold") -> "Pop"
+            lower.startsWith("noc") || lower.startsWith("no") -> "No\u010D"
+            lower.startsWith("prosto") -> "Pro"
+            normalized.length <= 3 -> normalized
+            else -> normalized.take(3)
         }
+    }
+
+    private fun getShortSecondaryLabel(label: String): String {
+        val baseLabel = label.removeSuffix("*").trim()
+        if (baseLabel.length <= 4) return baseLabel
+
+        val rajonMatch = Regex("(?i)^rajon\\s*(\\d+)$").find(baseLabel)
+        if (rajonMatch != null) {
+            return "R${rajonMatch.groupValues[1]}"
+        }
+
+        val wordInitials = baseLabel
+            .split(Regex("\\s+"))
+            .filter { it.isNotBlank() }
+            .mapNotNull { it.firstOrNull()?.uppercaseChar() }
+            .joinToString("")
+
+        if (wordInitials.length in 2..4) return wordInitials
+
+        return baseLabel.take(3).uppercase(Locale.getDefault())
+    }
+
+    private fun getReadableTextColor(backgroundColor: Int): Int {
+        return if (ColorUtils.calculateLuminance(backgroundColor) > 0.5) {
+            Color.BLACK
+        } else {
+            Color.WHITE
+        }
+    }
+
+    private fun dpToPx(context: Context, dp: Float): Int {
+        return (dp * context.resources.displayMetrics.density).toInt()
     }
 
 }
