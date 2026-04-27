@@ -2,6 +2,71 @@
 
 All notable changes to this project will be documented in this file.
 
+
+
+## v2.8
+
+---
+
+### ✨ Added
+
+- Added Work Log manual edit audit safety
+- Added audit metadata for manually edited Work Log events
+- Added future-time warning when manually editing Work Log event times
+- Added “Edited / Urejeno” indicator for manually corrected Work Log events
+- Added basic audit detail display for edited events:
+  - Previous time
+  - New time
+  - Changed at
+  - Future-time correction indicator
+- Added explicit finished Work Log session state to prevent accidental duplicate start events
+- Added clearer separation of Settings sections:
+  - Primary cycle
+  - Secondary cycle
+  - Status labels
+- Added dedicated Status labels card in Settings
+- Added improved secondary cycle settings layout
+- Added new weekly view navigation icon for Home / weekly overview
+- Added Material Components update for Android 15 edge-to-edge compatibility improvements
+
+### 🎨 Improved
+
+- Improved Settings structure after moving cycle configuration out of Home
+- Improved Home screen by reducing configuration clutter
+- Improved Primary cycle settings placement inside Settings
+- Improved Secondary cycle card with clearer description, labels, spacing, and helper text
+- Improved distinction between secondary cycle labels and status labels
+- Improved Settings ordering for better configuration flow
+- Improved off-day color resolution so Off / Prosto uses neutral off-day color instead of cycle color fallback
+- Improved Work Log event editing safety and UI feedback
+- Improved bottom navigation icon clarity for weekly overview
+- Improved Material Components compatibility by updating from 1.12.0 to 1.13.0
+- Improved secondary cycle field alignment and spacing
+- Improved Settings localization consistency in Slovenian and English
+
+### 🛠 Fixed
+
+- Fixed Off / Prosto sometimes using the first cycle color instead of the neutral off-day color
+- Fixed Work Log finished state being interpreted as not working, which could incorrectly show Start Work again
+- Fixed duplicate Start / Prihod events being possible after a completed Work Log day
+- Fixed Work Log status card and primary slider using inconsistent session state
+- Fixed future-edited Finish / Odhod events still allowing new Start / Prihod actions
+- Fixed unused parameter warning in SlideToConfirmView
+- Fixed outdated Settings hint saying templates are located on Home
+- Fixed Settings terminology where status labels were mixed with secondary cycle labels
+- Fixed secondary cycle dropdown text being too close to the left edge
+- Fixed several Settings layout spacing and readability issues
+
+### 🧭 Planned / Not yet included
+
+- First-run onboarding setup flow
+- Replacing Home configuration area with upcoming special days
+- Work Cycle widget showing more upcoming days on larger widget sizes
+- Calendar display algorithm improvements for status icons and secondary label badges
+- Separate semantic status colors independent from cycle theme colors
+- Better long-label handling in weekly preview and calendar
+- Optional future support for multiple work sessions per day
+
 ---
 
 ## v2.7

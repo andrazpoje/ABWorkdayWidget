@@ -105,9 +105,11 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         val options = appWidgetManager.getAppWidgetOptions(widgetId)
         val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
         val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0)
+        val maxHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
+        val effectiveHeight = resolveEffectiveHeight(minHeight, maxHeight)
 
         val isMinimal = minWidth < 90 && minHeight < 90
-        val isCompact = !isMinimal && minHeight < 110
+        val isCompact = !isMinimal && effectiveHeight < 110
 
         val views = when {
             isMinimal -> RemoteViews(context.packageName, R.layout.widget_layout_minimal)
@@ -115,10 +117,10 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
             else -> RemoteViews(context.packageName, R.layout.widget_layout)
         }
 
-        val mode = resolveWidgetMode(minWidth, minHeight)
+        val mode = resolveWidgetMode(minWidth, effectiveHeight)
         val isVeryNarrow = minWidth < 140
         val isSingleCellLike = isMinimal
-        val rowsToShow = if (isSingleCellLike) 0 else resolveExtraRows(minWidth, minHeight)
+        val rowsToShow = if (isSingleCellLike) 0 else resolveExtraRows(minWidth, effectiveHeight)
 
 // 2x1 compact: secondary je dovoljen
         val isCompactLike = isCompact
@@ -133,7 +135,7 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
                 )
 
         val showTodayLabel = mode != WidgetMode.SMALL && !isVeryNarrow && !isSingleCellLike
-        val typography = resolveTypography(mode, minWidth, minHeight)
+        val typography = resolveTypography(mode, minWidth, effectiveHeight)
 
         val skippedOverride = CycleManager.getSkippedDayOverrideLabelOrNull(context, today)
 
@@ -490,6 +492,12 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
             minWidth >= 160 && minHeight >= 110 -> WidgetMode.MEDIUM
             else -> WidgetMode.SMALL
         }
+    }
+
+    private fun resolveEffectiveHeight(minHeight: Int, maxHeight: Int): Int {
+        if (maxHeight <= 0) return minHeight
+        if (minHeight <= 0) return maxHeight
+        return maxOf(minHeight, maxHeight)
     }
 
     private fun resolveExtraRows(minWidth: Int, minHeight: Int): Int {
