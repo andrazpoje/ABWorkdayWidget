@@ -19,7 +19,6 @@ class WorkCycleApp : Application() {
             "workcycle.db"
         )
             .addMigrations(AppDatabase.MIGRATION_2_3)
-            .fallbackToDestructiveMigration()
             .build()
     }
 }

@@ -162,6 +162,7 @@ class MainActivity : AppCompatActivity() {
         setIntent(intent)
 
         if (!::navHostFragment.isInitialized) return
+        if (!LaunchPrefs(this).isOnboardingCompleted()) return
 
         handleWorkLogLaunchIntent(intent)
     }
@@ -253,10 +254,6 @@ class MainActivity : AppCompatActivity() {
     ) {
         if (savedInstanceState != null) return
 
-        if (handleWorkLogLaunchIntent(intent)) {
-            return
-        }
-
         val launchPrefs = LaunchPrefs(this)
 
         binding.root.post {
@@ -266,6 +263,8 @@ class MainActivity : AppCompatActivity() {
                         navController.navigate(R.id.onboardingFragment)
                     }
                 }
+
+                handleWorkLogLaunchIntent(intent) -> Unit
 
                 launchPrefs.shouldShowWhatsNew() -> {
                     runCatching {
