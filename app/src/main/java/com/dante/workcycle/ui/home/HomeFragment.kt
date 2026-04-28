@@ -27,6 +27,7 @@ import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.core.util.DateProvider
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.data.prefs.LaunchPrefs
+import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.databinding.FragmentHomeBinding
 import com.dante.workcycle.domain.holiday.HolidayCountry
@@ -117,6 +118,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var saveButton: MaterialButton
     lateinit var openWidgetsButton: MaterialButton
+    lateinit var dismissWidgetTipButton: MaterialButton
 
     lateinit var widgetHint: TextView
     lateinit var upcomingEventsEmptyText: TextView
@@ -171,6 +173,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         openWidgetsButton.setOnClickListener {
             requestAddWidget()
+        }
+
+        dismissWidgetTipButton.setOnClickListener {
+            requireContext().getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE).edit {
+                putBoolean(Prefs.KEY_HOME_WIDGET_TIP_DISMISSED, true)
+            }
+            widgetPromptContainer.visibility = View.GONE
         }
 
         pickDateButton.setOnClickListener {
@@ -390,6 +399,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         saveButton = root.findViewById(R.id.saveButton)
         revertButton = root.findViewById(R.id.revertButton)
         openWidgetsButton = root.findViewById(R.id.openWidgetsButton)
+        dismissWidgetTipButton = root.findViewById(R.id.dismissWidgetTipButton)
 
         previewRecyclerView = root.findViewById(R.id.previewRecyclerView)
         previewWeekTitle = root.findViewById(R.id.previewWeekTitle)

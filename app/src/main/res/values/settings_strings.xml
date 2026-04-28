@@ -44,6 +44,7 @@
     <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
     <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Workday Widget.</string>
     <string name="open_widgets">Open widgets</string>
+    <string name="home_widget_tip_dismiss">Don’t show again</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / THEME & COLORS -->
@@ -156,6 +157,7 @@
     <string name="template_active_title">Active template</string>
     <string name="template_active_title_format">Active template: %1$s</string>
     <string name="template_locked_message">Some settings are locked because a template is active.</string>
+    <string name="single_label_cycle_message">This template uses a single label, so a start date and first label are not needed.</string>
     <string name="template_posta_slovenije_title">Mail carrier A/B</string>
     <string name="template_posta_slovenije_description">Fixed A/B cycle for mail carriers. Cycle, rules, and start date are locked. Secondary labels are manual-only.</string>
     <string name="template_posta_slovenije_picker_title">Mail carrier A/B</string>
@@ -303,6 +305,7 @@
     <string name="error_cycle_empty">Enter at least one cycle day</string>
     <string name="error_cycle_invalid_format_detailed">Invalid format: "%1$s". Use commas, e.g. A, B, C</string>
     <string name="error_cycle_too_many">Too many items (%1$d). Maximum allowed is %2$d</string>
+    <string name="error_single_label_cycle_too_many">This template uses one label. Keep only one cycle label.</string>
     <string name="error_cycle_empty_item">Empty items are not allowed</string>
     <string name="error_cycle_duplicates">Duplicate values are not allowed</string>
     <plurals name="error_label_too_long">
@@ -343,9 +346,11 @@
     <string name="more_report_bug_subtitle">Send feedback or report an issue</string>
     <string name="more_donate_title">Support development</string>
     <string name="more_donate_subtitle">Help improve the app</string>
-    <string name="nav_home">Home</string>
-    <string name="nav_calendar">Calendar</string>
+    <string name="nav_home">Week</string>
+    <string name="nav_calendar">Month</string>
     <string name="nav_more">More</string>
+    <string name="title_week_view">Week view</string>
+    <string name="title_month_view">Month view</string>
     <string name="email_subject_contact">%1$s - Feedback</string>
     <string name="email_subject_bug_report">%1$s - Bug report</string>
     <string name="email_body_bug_report">Describe the issue:\n\n---\nApp version: %1$s\nDevice: %2$s\nAndroid version: %3$s\n</string>

@@ -445,13 +445,15 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
     }
 
     private fun summaryLines(): List<String> {
-        return listOf(
+        val template = selectedTemplate()
+        return listOfNotNull(
             getString(R.string.onboarding_summary_template_format, selectedTemplateName()),
             getString(
                 R.string.onboarding_summary_start_date_format,
                 selectedStartDate.format(dateFormatter)
-            ),
+            ).takeIf { shouldShowStartDateStep(template) },
             getString(R.string.onboarding_summary_first_label_format, selectedFirstLabel)
+                .takeIf { shouldShowFirstLabelStep(template) }
         )
     }
 
@@ -477,7 +479,7 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
             CycleManager.saveCycle(context, labelsForCurrentSelection())
         }
 
-        if (template?.allowsStartDateEditing != false) {
+        if (shouldShowStartDateStep(template)) {
             CycleManager.saveStartDate(context, selectedStartDate)
             context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE).edit {
                 putInt(AppPrefs.KEY_START_YEAR, selectedStartDate.year)
@@ -486,7 +488,7 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
             }
         }
 
-        if (template?.locksCycleEditing != true) {
+        if (shouldShowFirstLabelStep(template)) {
             context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE).edit {
                 putString(AppPrefs.KEY_FIRST_CYCLE_DAY, selectedFirstLabel)
             }
@@ -507,15 +509,27 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
         val steps = mutableListOf(Step.TEMPLATE)
         val template = selectedTemplate()
 
-        if (template?.allowsStartDateEditing != false) {
+        if (shouldShowStartDateStep(template)) {
             steps += Step.START_DATE
         }
-        if (template?.locksCycleEditing != true) {
+        if (shouldShowFirstLabelStep(template)) {
             steps += Step.FIRST_LABEL
         }
 
         steps += Step.DONE
         return steps
+    }
+
+    private fun shouldShowStartDateStep(template: ScheduleTemplate?): Boolean {
+        return template?.allowsStartDateEditing != false && !isSingleLabelCycleSelected()
+    }
+
+    private fun shouldShowFirstLabelStep(template: ScheduleTemplate?): Boolean {
+        return template?.locksCycleEditing != true && !isSingleLabelCycleSelected()
+    }
+
+    private fun isSingleLabelCycleSelected(): Boolean {
+        return labelsForCurrentSelection().size <= 1
     }
 
     private fun labelsForCurrentSelection(): List<String> {

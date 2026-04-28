@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.dante.workcycle.ui.home.HomeFragment"
-        android:label="@string/nav_home" />
+        android:label="@string/title_week_view" />
 
     <fragment
         android:id="@+id/onboardingFragment"
@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/calendarFragment"
         android:name="com.dante.workcycle.ui.fragments.CalendarFragment"
-        android:label="@string/nav_calendar" />
+        android:label="@string/title_month_view" />
 
     <fragment
         android:id="@+id/settingsFragment"

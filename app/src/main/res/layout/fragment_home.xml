@@ -114,6 +114,15 @@
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
                     app:iconTint="?attr/colorOnPrimary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dismissWidgetTipButton"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="@string/home_widget_tip_dismiss"
+                    android:textAllCaps="false" />
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView

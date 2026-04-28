@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dante.workcycle.R
 import com.dante.workcycle.core.status.StatusVisuals
 import com.dante.workcycle.data.prefs.AppPrefs
+import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
@@ -302,6 +303,12 @@ private fun HomeFragment.getPreviewCycleIndexForDate(date: LocalDate): Int? {
 }
 
 fun HomeFragment.updateWidgetHint() {
+    val prefs = requireContext().getSharedPreferences(Prefs.PREFS_NAME, Context.MODE_PRIVATE)
+    if (prefs.getBoolean(Prefs.KEY_HOME_WIDGET_TIP_DISMISSED, false)) {
+        widgetPromptContainer.visibility = View.GONE
+        return
+    }
+
     val manager = AppWidgetManager.getInstance(requireContext())
     val ids = manager.getAppWidgetIds(
         ComponentName(requireContext(), WorkCycleWidgetProvider::class.java)

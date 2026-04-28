@@ -7,6 +7,7 @@ object Prefs {
     const val KEY_SILENT_NOTIFICATION = "silent_notification"
 
     const val KEY_WIDGET_STYLE = "widget_style"
+    const val KEY_HOME_WIDGET_TIP_DISMISSED = "home_widget_tip_dismissed"
 
     const val KEY_SHOW_ASSIGNMENT_ICONS_CALENDAR = "show_assignment_icons_calendar"
     const val KEY_SHOW_ASSIGNMENT_ICONS_WEEKLY = "show_assignment_icons_weekly"

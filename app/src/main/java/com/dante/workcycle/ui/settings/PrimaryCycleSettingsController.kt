@@ -72,14 +72,18 @@ class PrimaryCycleSettingsController(
     private val activeTemplateTitle: TextView = root.findViewById(R.id.activeTemplateTitle)
     private val activeTemplateDescription: TextView = root.findViewById(R.id.activeTemplateDescription)
     private val templateLockedMessage: TextView = root.findViewById(R.id.templateLockedMessage)
+    private val singleLabelCycleMessage: TextView = root.findViewById(R.id.singleLabelCycleMessage)
     private val presetInputLayout: TextInputLayout = root.findViewById(R.id.presetInputLayout)
     private val presetDropdown: MaterialAutoCompleteTextView = root.findViewById(R.id.presetDropdown)
     private val pickDateButton: MaterialButton = root.findViewById(R.id.pickDateButton)
     private val dateText: TextView = root.findViewById(R.id.dateText)
     private val cycleDaysInputLayout: TextInputLayout = root.findViewById(R.id.cycleDaysInputLayout)
     private val cycleDaysEdit: EditText = root.findViewById(R.id.cycleDaysEdit)
+    private val firstCycleDayLabel: TextView = root.findViewById(R.id.firstCycleDayLabel)
     private val firstCycleDayChipGroup: ChipGroup = root.findViewById(R.id.firstCycleDayChipGroup)
+    private val firstCycleDayInputLayout: TextInputLayout = root.findViewById(R.id.firstCycleDayInputLayout)
     private val firstCycleDayDropdown: MaterialAutoCompleteTextView = root.findViewById(R.id.firstCycleDayDropdown)
+    private val firstCycleDayHint: TextView = root.findViewById(R.id.firstCycleDayHint)
     private val switchSaturdays: SwitchMaterial = root.findViewById(R.id.switchSaturdays)
     private val switchSundays: SwitchMaterial = root.findViewById(R.id.switchSundays)
     private val switchHolidays: SwitchMaterial = root.findViewById(R.id.switchHolidays)
@@ -356,6 +360,10 @@ class PrimaryCycleSettingsController(
             showError(fragment.getString(R.string.error_cycle_too_many, cycle.size, MAX_CYCLE_ITEMS))
             return null
         }
+        if (isSingleLabelTemplateActive() && cycle.size > 1) {
+            showError(fragment.getString(R.string.error_single_label_cycle_too_many))
+            return null
+        }
 
         if (!TemplateManager.isTemplateActive(context)) {
             val duplicateExists = cycle.map { it.lowercase() }.toSet().size != cycle.size
@@ -390,6 +398,8 @@ class PrimaryCycleSettingsController(
         cycleDaysInputLayout.error = when {
             raw.isBlank() || parts.all { it.isEmpty() } -> fragment.getString(R.string.error_cycle_empty)
             parts.any { it.isEmpty() } -> fragment.getString(R.string.error_cycle_empty_item)
+            isSingleLabelTemplateActive() && parts.size > 1 ->
+                fragment.getString(R.string.error_single_label_cycle_too_many)
             parts.size > MAX_CYCLE_ITEMS -> fragment.getString(R.string.error_cycle_too_many, parts.size, MAX_CYCLE_ITEMS)
             parts.any { it.length > MAX_LABEL_LENGTH } -> fragment.resources.getQuantityString(
                 R.plurals.error_label_too_long,
@@ -422,6 +432,13 @@ class PrimaryCycleSettingsController(
             firstCycleDayDropdown.setText("", false)
             firstCycleDayDropdown.isEnabled = false
             renderFirstCycleDayChips(emptyList(), "")
+            return
+        }
+
+        if (isSingleLabelPrimaryCycle()) {
+            firstCycleDayDropdown.setText(cycleLabels.first(), false)
+            renderFirstCycleDayChips(emptyList(), "")
+            firstCycleDayDropdown.isEnabled = false
             return
         }
 
@@ -621,7 +638,7 @@ class PrimaryCycleSettingsController(
         val hasTemplate = template != null
 
         activeTemplateCard.isVisible = hasTemplate
-        templateLockedMessage.isVisible = hasTemplate
+        templateLockedMessage.isVisible = template?.hasLockedSettings() == true
 
         if (template != null) {
             activeTemplateTitle.text = fragment.getString(
@@ -639,11 +656,19 @@ class PrimaryCycleSettingsController(
         val cycleLocked = TemplateManager.isCycleEditingLocked(context)
         val rulesLocked = TemplateManager.isRulesEditingLocked(context)
         val canEditStartDate = TemplateManager.canEditStartDate(context)
+        val singleLabelCycle = isSingleLabelPrimaryCycle()
 
         cycleDaysEdit.setEnabledWithAlpha(!cycleLocked)
-        firstCycleDayDropdown.setEnabledWithAlpha(!cycleLocked)
-        setChipGroupEnabled(!cycleLocked)
-        pickDateButton.setEnabledWithAlpha(canEditStartDate)
+        singleLabelCycleMessage.isVisible = singleLabelCycle
+        dateText.isVisible = !singleLabelCycle
+        pickDateButton.isVisible = !singleLabelCycle
+        firstCycleDayLabel.isVisible = !singleLabelCycle
+        firstCycleDayChipGroup.isVisible = firstCycleDayChipGroup.isVisible && !singleLabelCycle
+        firstCycleDayInputLayout.isVisible = firstCycleDayInputLayout.isVisible && !singleLabelCycle
+        firstCycleDayHint.isVisible = !singleLabelCycle
+        firstCycleDayDropdown.setEnabledWithAlpha(!cycleLocked && !singleLabelCycle)
+        setChipGroupEnabled(!cycleLocked && !singleLabelCycle)
+        pickDateButton.setEnabledWithAlpha(canEditStartDate && !singleLabelCycle)
         switchSaturdays.setEnabledWithAlpha(!rulesLocked)
         switchSundays.setEnabledWithAlpha(!rulesLocked)
         switchHolidays.setEnabledWithAlpha(!rulesLocked)
@@ -679,10 +704,17 @@ class PrimaryCycleSettingsController(
                 R.string.template_reference_date_format,
                 template.fixedStartDate.format(dateFormatter),
                 template.resolveFixedFirstCycleDay(context)
-            ),
+            ).takeIf { !template.isSingleLabelCycle(context) },
             lockedSummary.takeIf { it.isNotBlank() }
         )
         return parts.joinToString("\n\n")
+    }
+
+    private fun ScheduleTemplate.hasLockedSettings(): Boolean {
+        return locksCycleEditing ||
+            locksRulesEditing ||
+            !allowsStartDateEditing ||
+            TemplateManager.isAssignmentModeEditingLocked(context)
     }
 
     private fun updatePresetSelectionState() {
@@ -820,6 +852,15 @@ class PrimaryCycleSettingsController(
         return parseCycleLabels(cycleDaysEdit.text?.toString().orEmpty()) { day ->
             fragment.getString(R.string.cycle_day_fallback, day)
         }
+    }
+
+    private fun isSingleLabelTemplateActive(): Boolean {
+        return TemplateManager.getActiveTemplate(context)?.isSingleLabelCycle(context) == true
+    }
+
+    private fun isSingleLabelPrimaryCycle(): Boolean {
+        return TemplateManager.getActiveTemplate(context)?.isSingleLabelCycle(context)
+            ?: (getCurrentCycleLabelsFromInput().size <= 1)
     }
 
     private fun parseCycleLabels(
@@ -979,6 +1020,10 @@ private fun ScheduleTemplate.getPickerDescriptionRes(): Int {
             R.string.template_posta_slovenije_picker_description
         else -> descriptionRes
     }
+}
+
+private fun ScheduleTemplate.isSingleLabelCycle(context: Context): Boolean {
+    return resolveFixedCycle(context).size <= 1
 }
 
 private fun shortTemplateGroupTitle(title: String): String {

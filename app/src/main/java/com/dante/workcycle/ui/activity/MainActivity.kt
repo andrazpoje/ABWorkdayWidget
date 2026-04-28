@@ -129,8 +129,8 @@ class MainActivity : AppCompatActivity() {
             val appName = getString(R.string.app_name)
 
             val suffix = when (destination.id) {
-                R.id.homeFragment -> ""
-                R.id.calendarFragment -> getString(R.string.nav_calendar)
+                R.id.homeFragment -> getString(R.string.title_week_view)
+                R.id.calendarFragment -> getString(R.string.title_month_view)
                 R.id.onboardingFragment -> getString(R.string.onboarding_welcome_title)
                 R.id.moreFragment -> getString(R.string.nav_more)
                 R.id.statisticsFragment -> getString(R.string.statistics_title)
