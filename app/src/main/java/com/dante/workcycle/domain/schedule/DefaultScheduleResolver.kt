@@ -8,6 +8,15 @@ import com.dante.workcycle.domain.model.DaySchedule
 import com.dante.workcycle.domain.model.ResolvedDay
 import java.time.LocalDate
 
+/**
+ * Resolves the effective schedule state for one calendar day.
+ *
+ * This is the central read path for UI surfaces and widgets: it combines the primary
+ * cycle, skipped-day overrides, explicit primary overrides, secondary labels, manual
+ * secondary labels, and status tags into one [ResolvedDay]. Keep schedule resolution
+ * here as the single source of truth instead of duplicating day-composition rules in
+ * Home, Calendar, Work Log, or widget rendering code.
+ */
 class DefaultScheduleResolver(
     private val context: Context
 ) {
@@ -17,6 +26,15 @@ class DefaultScheduleResolver(
     private val cycleOverrideRepository = CycleOverrideRepository(context)
     private val statusRepository = StatusRepository(context)
 
+    /**
+     * Builds the final day model while preserving each layer's source information.
+     *
+     * Primary cycle labels and status labels are intentionally separate concepts:
+     * status tags describe day semantics such as vacation or sick leave, while the
+     * primary cycle remains the work-cycle label. Future template or language work
+     * should feed this resolver with stable keys and localized display values rather
+     * than bypassing the resolver in presentation code.
+     */
     fun resolve(date: LocalDate): ResolvedDay {
 
         val baseCycleLabel = CycleManager.getCycleDayForDate(context, date)

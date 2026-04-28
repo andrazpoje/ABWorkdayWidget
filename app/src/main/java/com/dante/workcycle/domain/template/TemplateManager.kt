@@ -12,6 +12,15 @@ import com.dante.workcycle.domain.model.CycleMode
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.ManualScheduleRepository
 
+/**
+ * Coordinates applying, clearing, and querying schedule templates.
+ *
+ * Templates are configuration presets, not a separate schedule engine. Applying a
+ * template writes the same persisted cycle/rule preferences that Settings uses, while
+ * lock flags tell UI layers which fields must not be edited for template integrity.
+ * Keep template selection and lock semantics here so future v3.0 work can add stable
+ * template keys or language-aware labels without changing resolver behavior.
+ */
 object TemplateManager {
 
     private const val KEY_ASSIGNMENT_ALLOWED_PREFIXES = "template_assignment_allowed_prefixes"
@@ -58,6 +67,14 @@ object TemplateManager {
         return getAssignmentConfig(context)?.lockAssignmentModeEditing == true
     }
 
+    /**
+     * Applies a built-in template to the persisted primary cycle and related settings.
+     *
+     * Built-in template labels may be localized at apply time, but custom user labels
+     * must never be auto-translated when the app language changes later. Special
+     * templates may also install or remove secondary-label configuration when their
+     * lock rules require it.
+     */
     fun applyTemplate(context: Context, templateId: String) {
         val previousTemplateId = TemplatePrefs.getActiveTemplateId(context)
         val template = ScheduleTemplateProvider.getById(templateId) ?: return

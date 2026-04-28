@@ -3,6 +3,15 @@ package com.dante.workcycle.domain.template
 import com.dante.workcycle.R
 import java.time.LocalDate
 
+/**
+ * Registry of built-in WorkCycle schedule templates.
+ *
+ * Template IDs are stable keys used by preferences, onboarding, Settings, and future
+ * migration logic. Built-in label resources provide localized labels when a template
+ * is applied, while custom user labels remain user data and must not be auto-translated
+ * after creation. Keep new built-in templates here so grouping and lock behavior stay
+ * explicit and auditable.
+ */
 object ScheduleTemplateProvider {
 
     const val TEMPLATE_SINGLE_SHIFT = "template_single_shift"
@@ -15,6 +24,14 @@ object ScheduleTemplateProvider {
 
     const val TEMPLATE_4_ON_4_OFF = "template_4_on_4_off"
 
+    /**
+     * Built-in template definitions and their editing constraints.
+     *
+     * `locksCycleEditing`, `locksRulesEditing`, `allowsStartDateEditing`, and
+     * `allowsCycleOverrides` are UI/business capabilities. They should restrict editing
+     * through TemplateManager and Settings, not change DefaultScheduleResolver's core
+     * schedule calculation rules.
+     */
     private val templates = listOf(
 
         // Splošni template-i
