@@ -4,19 +4,19 @@
     <!-- ========================================================= -->
     <!-- HELP / VSEBINA -->
     <!-- ========================================================= -->
-    <string name="help_getting_started_content">• Najprej preveri Predloge (Templates) – mogoče že obstaja razpored, ki ti ustreza.\n• Če ne, nastavi začetni datum cikla.\n• Določi oznake cikla (npr. A, B ali Jutranja, Popoldanska, Nočna).\n• Izberi, katera oznaka velja na začetni datum.\n• Nastavi pravila (preskok vikendov ali praznikov po potrebi).\n• Shrani nastavitve.\n• Po želji dodaj widget na domači zaslon.</string>
+    <string name="help_getting_started_content">• Ob prvem zagonu te WorkCycle vodi skozi osnovno nastavitev cikla.\n• Izberi predlogo, če že ustreza tvojemu delovnemu razporedu.\n• Če uporabljaš lasten cikel, nastavi začetni datum in izberi, katera oznaka velja na ta datum.\n• Po potrebi nastavi pravila, kot so preskok vikendov ali praznikov.\n• Po začetni nastavitvi lahko cikel in predloge spreminjaš v Nastavitvah.\n• Po želji dodaj gradnik Delovni cikel ali Delovni čas na domači zaslon.</string>
 
-    <string name="help_cycle_logic_content">• Začetni datum je referenčna točka cikla.\n• Izbrana oznaka velja za ta datum.\n• Vsak naslednji veljaven dan premakne cikel naprej.\n• Preskočeni vikendi ali prazniki ne vplivajo na napredovanje cikla.</string>
+    <string name="help_cycle_logic_content">• Začetni datum je referenčna točka cikla.\n• Izbrana prva oznaka velja za ta datum.\n• Vsak veljaven delovni dan premakne cikel naprej.\n• Preskočeni vikendi ali prazniki ne premaknejo cikla naprej.\n• Predloge lahko zaklenejo nekatere nastavitve, kadar je razpored vnaprej določen.\n• Teden, Mesec in widgeti uporabljajo iste izračunane podatke razporeda.</string>
 
-    <string name="help_assignments_content">• Sekundarne oznake omogočajo dodatne oznake (npr. O1, dopust, bolniška).\n• Dan lahko urediš v 7-dnevnem pregledu ali koledarju.\n• Sekundarna oznaka lahko prepiše ali dopolni oznako cikla.\n• Prikaz sekundarnih oznak lahko vklopiš ali izklopiš v nastavitvah.</string>
+    <string name="help_assignments_content">• Sekundarne oznake dodajo dnevu dodatne delovne informacije, na primer rajone, lokacije, izmene ali naloge.\n• Statusne oznake so ločene in pokrivajo stanja, kot so dopust, bolniška, teren ali dežurstvo.\n• Tapni dan v Tednu ali Mesecu za urejanje sekundarne oznake ali statusa.\n• Vgrajene sistemske oznake se samodejno prevajajo.\n• Lastne oznake ostanejo točno takšne, kot jih vneseš.\n• Prikaz sekundarnih oznak lahko urejaš v Nastavitvah.</string>
 
-    <string name="help_preview_content">• Prikazuje naslednjih 7 dni glede na trenutne nastavitve.\n• Klikni na dan za urejanje oznak.\n• Spremembe se prikažejo po shranjevanju.\n• Upošteva pravila cikla in sekundarne oznake.</string>
+    <string name="help_preview_content">• Teden prikazuje operativni pregled izbranega tedna.\n• Z navigacijo po tednih lahko preveriš bližnje dni.\n• Vsak dan lahko prikazuje primarni cikel, sekundarno oznako in status.\n• Teden ni več namenjen konfiguraciji cikla.\n• Za spremembo predlog, oznak cikla, začetnega datuma ali pravil odpri Nastavitve.</string>
 
-    <string name="help_calendar_content">• Prikazuje mesečni pregled cikla.\n• Vsak dan ima skrajšano oznako (A, B, O1).\n• Klik na dan prikaže podrobnosti.\n• Prikaže kombinacijo cikla in sekundarnih oznak.</string>
+    <string name="help_calendar_content">• Mesec prikazuje mesečni pregled tvojega razporeda.\n• Vsak dan lahko prikazuje primarno oznako cikla, sekundarno oznako in ikono statusa.\n• Tapni dan za ogled ali urejanje podrobnosti.\n• Mesec uporablja ista pravila izračuna kot Teden in widgeti.\n• Za boljšo preglednost so priporočene kratke oznake.</string>
 
-    <string name="help_widget_content">• Widget prikazuje trenutni cikel na domačem zaslonu.\n• Samodejno se posodablja vsak dan.\n• Videz widgeta lahko prilagodiš v nastavitvah.\n• Uporablja iste podatke kot aplikacija.</string>
+    <string name="help_widget_content">• Work Cycle widget prikazuje trenutni razpored neposredno na domačem zaslonu.\n• Prihodnji dnevi uporabljajo iste izračunane podatke kot aplikacija.\n• Gradnik Delovni čas prikazuje trenutno stanje beleženja dela in saldo.\n• Widgeti se posodabljajo samodejno, vendar lahko Android posodobitve zamakne zaradi baterije ali zaganjalnika.\n• Videz widgetov lahko prilagodiš v Nastavitvah.</string>
 
-    <string name="help_tips_content">• Uporabljaj kratke oznake (bolj pregledno v koledarju).\n• Naj bo cikel enostaven (A/B ali 2–3 izmene).\n• Sekundarne oznake uporabi za izjeme (dopust, bolniška).\n• Če kaj ne štima, preveri začetni datum in pravila.</string>
+    <string name="help_tips_content">• Primarne oznake cikla naj bodo kratke, na primer A, B, Jutranja, Popoldanska ali Nočna.\n• Sekundarne oznake uporabi za rajone, lokacije, dopust, bolniško ali posebne naloge.\n• Če je razpored napačen, preveri predlogo, začetni datum, prvo oznako in pravila za preskočene dni.\n• Ročni popravki v Work Logu so označeni, da urejeni dogodki ostanejo sledljivi.\n• Če pri ročnem popravku vneseš čas v prihodnosti, WorkCycle pokaže dodatno opozorilo.\n• V trenutni verziji zaključen Work Log dan ne pokaže gumba Start znova, ker je podprta ena zaključena seja na dan.</string>
 
     <!-- ========================================================= -->
     <!-- HELP / NOVOSTI -->
@@ -24,5 +24,5 @@
     <string name="whats_new_title">Kaj je novega</string>
     <string name="whats_new_version_format">Verzija %1$s</string>
     <string name="whats_new_view_full_changelog">Poglej vse spremembe</string>
-    <string name="whats_new_content">• Nov tedenski pregled na domačem zaslonu z navigacijo po tednih\n• Bolj jasen prikaz primarne in sekundarne oznake, npr. B • Š1\n• Izboljšan Work Log widget s prikazom salda\n• Work Log zdaj upošteva pričakovani čas tudi po sekundarni oznaki\n• Dodano opozorilo pred začetkom dela na prost dan, dopust ali bolniško\n• Izboljšan videz Work Log nadzorne plošče in zadnjih dogodkov</string>
+    <string name="whats_new_content">• Izboljšana začetna nastavitev z bolj jasnimi onboarding koraki\n• Popravljen zagon aplikacije, da se pri sveži namestitvi najprej pokaže onboarding\n• Očiščen Teden, ki je zdaj osredotočen na operativni tedenski pregled\n• Legacy migracija nastavitev je prestavljena v varnejšo startup pot\n• Izboljšana besedila pomoči in poimenovanje widgetov\n• Dodana debug-only razvojna orodja za hitrejše testiranje onboardinga in lokalnega reseta\n• Dodano tehnično čiščenje in dokumentacijske osnove za prihodnje funkcije v3.0</string>
 </resources>

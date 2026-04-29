@@ -8,6 +8,12 @@ import com.dante.workcycle.data.local.entity.WorkLogEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
+/**
+ * Room access for the legacy daily Work Log aggregate table.
+ *
+ * Keep this separate from [WorkEventDao]: aggregate rows are compatibility data,
+ * while the current dashboard state is derived from event timelines.
+ */
 @Dao
 interface WorkLogDao {
 

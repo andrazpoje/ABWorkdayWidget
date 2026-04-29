@@ -15,6 +15,13 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+/**
+ * ViewModel for the legacy aggregate Work Log editor.
+ *
+ * The current dashboard uses the event timeline for session state and audit
+ * safety. Keep aggregate editing isolated so it does not conflict with event
+ * based totals, widgets, or future multi-session work.
+ */
 class WorkLogViewModel(
     private val repository: WorkLogRepository
 ) : ViewModel() {

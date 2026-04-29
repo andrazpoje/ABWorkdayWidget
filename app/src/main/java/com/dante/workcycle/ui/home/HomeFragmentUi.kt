@@ -1,11 +1,9 @@
 package com.dante.workcycle.ui.home
 
-import android.app.DatePickerDialog
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.view.View
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dante.workcycle.R
@@ -16,7 +14,6 @@ import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
-import com.dante.workcycle.domain.schedule.parseCycleInput
 import com.dante.workcycle.domain.schedule.sanitizeLabel
 import com.dante.workcycle.ui.adapter.CyclePreviewAdapter
 import com.dante.workcycle.ui.dialogs.EditAssignmentDayBottomSheet
@@ -76,39 +73,6 @@ fun HomeFragment.setupPreviewWeekNavigator() {
 }
 
 fun updateTodayStatus() = Unit
-
-fun HomeFragment.revertToSavedState() {
-    val cycle = CycleManager.loadCycle(requireContext())
-    val startDate = CycleManager.loadStartDate(requireContext())
-
-    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
-
-    val firstDay = prefs.getString(
-        AppPrefs.KEY_FIRST_CYCLE_DAY,
-        cycle.firstOrNull() ?: "A"
-    ) ?: (cycle.firstOrNull() ?: "A")
-
-
-    cycleDaysEdit.setText(cycle.joinToString(", "))
-    selectedDate = startDate
-    updateDateText()
-
-    refreshFirstCycleDayDropdown(firstDay)
-
-
-    switchSaturdays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
-    switchSundays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
-    switchHolidays.isChecked = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
-
-    updateTodayStatus()
-    updateCyclePreview()
-    updateUpcomingEvents()
-
-    clearUnsavedChanges()
-    draftFirstCycleDayIndex = null
-
-    Toast.makeText(requireContext(), getString(R.string.reverted), Toast.LENGTH_SHORT).show()
-}
 
 fun HomeFragment.updateCyclePreview() {
 
@@ -283,7 +247,7 @@ private fun HomeFragment.getPreviewCycleIndexForDate(date: LocalDate): Int? {
         fallbackIndex
     }
 
-    val startDate = selectedDate
+    val startDate = CycleManager.loadStartDate(requireContext())
 
     return if (date == startDate) {
         startIndex
@@ -332,104 +296,15 @@ fun HomeFragment.refreshWidget() {
     updateWidgetHint()
 }
 
-fun HomeFragment.showDatePicker() {
-    val dialog = DatePickerDialog(
-        requireContext(),
-        { _, year, month, dayOfMonth ->
-            selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
-            updateDateText()
-            clearDateCheckResult()
-            markUnsavedChanges()
-            updateTodayStatus()
-            updateCyclePreview()
-        },
-        selectedDate.year,
-        selectedDate.monthValue - 1,
-        selectedDate.dayOfMonth
-    )
-
-    dialog.show()
-}
-
-fun clearDateCheckResult() = Unit
-
-fun HomeFragment.updateDateText() {
-    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-        .withLocale(Locale.getDefault())
-
-    dateText.text = getString(
-        R.string.start_date,
-        selectedDate.format(formatter)
-    )
-}
-
-fun HomeFragment.animateSaveButtonActivated() {
-    saveButton.scaleX = 0.96f
-    saveButton.scaleY = 0.96f
-
-    saveButton.animate()
-        .scaleX(1f)
-        .scaleY(1f)
-        .setDuration(180)
-        .start()
-}
-
-fun HomeFragment.updateSaveButtonVisualState() {
-    if (hasUnsavedChanges) {
-        if (saveBarContainer.visibility != View.VISIBLE) {
-            saveBarContainer.visibility = View.VISIBLE
-            saveBarContainer.alpha = 0f
-            saveBarContainer.animate().alpha(1f).setDuration(200).start()
-        }
-
-        saveButton.isEnabled = true
-        saveButton.alpha = 1f
-
-        revertButton.visibility = View.VISIBLE
-        revertButton.alpha = 1f
-    } else {
-        saveButton.isEnabled = false
-        saveButton.alpha = 0.6f
-
-        revertButton.visibility = View.GONE
-
-        if (saveBarContainer.visibility != View.GONE) {
-            saveBarContainer.animate()
-                .alpha(0f)
-                .setDuration(150)
-                .withEndAction {
-                    saveBarContainer.visibility = View.GONE
-                    saveBarContainer.alpha = 1f
-                }
-                .start()
-        }
-    }
-}
-
-fun HomeFragment.markUnsavedChanges() {
-    if (isInitializing) return
-
-    if (!hasUnsavedChanges) {
-        hasUnsavedChanges = true
-        updateSaveButtonVisualState()
-        animateSaveButtonActivated()
-    }
-}
-
-fun HomeFragment.clearUnsavedChanges() {
-    hasUnsavedChanges = false
-    updateSaveButtonVisualState()
-}
-
 private fun HomeFragment.getPreviewCycle(): List<String> {
-    val inputCycle = parseCycleInput(cycleDaysEdit.text?.toString().orEmpty())
-    return inputCycle.ifEmpty { CycleManager.loadCycle(requireContext()) }
+    return CycleManager.loadCycle(requireContext())
 }
 
 private fun HomeFragment.getPreviewFirstCycleDay(cycle: List<String>): String {
     val fallback = cycle.firstOrNull() ?: "A"
+    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
     return sanitizeLabel(
-        firstCycleDayDropdown.text?.toString().orEmpty(),
+        prefs.getString(AppPrefs.KEY_FIRST_CYCLE_DAY, fallback).orEmpty(),
         fallback
     )
 }
@@ -441,10 +316,14 @@ private fun HomeFragment.isPreviewSkippedOverrideActiveForDate(date: LocalDate):
 
 private fun HomeFragment.isPreviewSkippedDay(date: LocalDate): Boolean {
     val dayOfWeek = date.dayOfWeek.value
+    val prefs = requireContext().getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
+    val skipSaturdays = prefs.getBoolean(AppPrefs.KEY_SKIP_SATURDAYS, true)
+    val skipSundays = prefs.getBoolean(AppPrefs.KEY_SKIP_SUNDAYS, true)
+    val skipHolidays = prefs.getBoolean(AppPrefs.KEY_SKIP_HOLIDAYS, true)
 
-    if (switchSaturdays.isChecked && dayOfWeek == 6) return true
-    if (switchSundays.isChecked && dayOfWeek == 7) return true
-    if (switchHolidays.isChecked && HolidayManager.isHoliday(requireContext(), date)) return true
+    if (skipSaturdays && dayOfWeek == 6) return true
+    if (skipSundays && dayOfWeek == 7) return true
+    if (skipHolidays && HolidayManager.isHoliday(requireContext(), date)) return true
 
     return false
 }

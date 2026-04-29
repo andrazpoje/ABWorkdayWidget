@@ -10,10 +10,22 @@ import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.style.WidgetStyleManager
 import com.dante.workcycle.ui.activity.WorkLogNavigationHelper
 
+/**
+ * RemoteViews renderer for the Work Time widget.
+ *
+ * Rendering owns layout visibility, colors, click targets, and classic/minimal
+ * style application only. Work Log session state, totals, balance, and audit
+ * semantics must already be resolved before a [WorkLogWidgetState] reaches this
+ * class.
+ */
 class WorkLogWidgetRenderer(
     private val context: Context
 ) {
 
+    /**
+     * Creates a RemoteViews tree for one widget instance from a pre-resolved
+     * display state.
+     */
     fun render(
         appWidgetId: Int,
         state: WorkLogWidgetState

@@ -3,9 +3,24 @@ package com.dante.workcycle.ui.worklog
 import com.dante.workcycle.R
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
 
+/**
+ * Validates manual Work Log event edits against the current single-session
+ * timeline rules.
+ *
+ * This prevents corrections from creating impossible sequences while preserving
+ * auditability. Future multi-session support should update this validator in
+ * lockstep with dashboard state, totals, widgets, and recent events.
+ */
 object WorkLogEventValidator {
 
+    /**
+     * Checks both affected dates when an event is moved across days.
+     *
+     * Returns a string resource id for the first validation error, or null when
+     * the edited timeline remains valid.
+     */
     fun validateEditedEvent(
         originalEvent: WorkEvent,
         updatedEvent: WorkEvent,
@@ -56,7 +71,7 @@ object WorkLogEventValidator {
         var isWorking = false
         var isOnBreak = false
 
-        for (event in events.sortedWith(compareBy<WorkEvent> { it.time }.thenBy { it.id })) {
+        for (event in WorkLogSessionStateResolver.ordered(events)) {
             when (event.type) {
                 WorkEventType.CLOCK_IN -> {
                     if (isWorking) {

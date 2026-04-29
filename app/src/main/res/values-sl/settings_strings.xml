@@ -11,17 +11,11 @@
     <string name="settings_notifications_title">Obvestila</string>
     <string name="settings_schedule_title">Razpored</string>
     <string name="settings_saved">Nastavitve shranjene</string>
-    <string name="home_cycle_settings_summary_title">Konfiguracija cikla</string>
-    <string name="home_cycle_settings_summary_template">Aktiven template: %1$s</string>
-    <string name="home_cycle_settings_summary_custom">Lastni cikel: %1$s</string>
-    <string name="open_cycle_settings">Nastavitve cikla</string>
     <string name="home_upcoming_events_title">Bližajoči dogodki</string>
     <string name="home_upcoming_events_empty">V naslednjih dneh ni posebnih dogodkov.</string>
     <string name="home_upcoming_event_holiday">Praznik</string>
     <string name="home_upcoming_event_off_day">Prost dan</string>
     <string name="home_upcoming_event_reason_separator">\u0020•\u0020</string>
-    <string name="unsaved_changes_title">Neshranjene spremembe</string>
-    <string name="unsaved_changes_message">Imaš neshranjene spremembe. Ali jih želiš shraniti pred izhodom?</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / OBVESTILA -->
@@ -81,8 +75,9 @@
     <string name="welcome_title">Dobrodošel v Delovnem ciklu</string>
     <string name="welcome_subtitle">Kratek vodič za prvi začetek. Tukaj hitro nastaviš svoj cikel, razumeš koledar in začneš uporabljati widget.</string>
     <string name="continue_label">Nadaljuj</string>
+    <string name="onboarding_setup_title">Nastavitev</string>
     <string name="onboarding_welcome_title">Dobrodošli v WorkCycle</string>
-    <string name="onboarding_welcome_subtitle">Najprej nastavi osnovni delovni cikel. Kasneje ga lahko spremeniš v nastavitvah.</string>
+    <string name="onboarding_welcome_subtitle">Nastavi svoj osnovni delovni cikel. To ti vzame le minuto, pozneje pa lahko vse spremeniš v Nastavitvah.</string>
     <string name="onboarding_template_title">Izberi predlogo</string>
     <string name="onboarding_template_subtitle">Izberi urnik, ki najbolj ustreza tvojemu delu.</string>
     <string name="onboarding_start_date_title">Nastavi začetni datum</string>
@@ -91,15 +86,16 @@
     <string name="onboarding_first_label_subtitle">Izberi, katera oznaka velja na začetni datum.</string>
     <string name="onboarding_done_title">Nastavitev je končana</string>
     <string name="onboarding_done_subtitle">WorkCycle je pripravljen za uporabo.</string>
-    <string name="onboarding_continue">Nadaljuj</string>
+    <string name="onboarding_done_settings_helper">Te nastavitve lahko pozneje spremeniš v Nastavitvah.</string>
+    <string name="onboarding_continue">Naprej</string>
     <string name="onboarding_back">Nazaj</string>
-    <string name="onboarding_start_using_app">Začni uporabljati aplikacijo</string>
+    <string name="onboarding_start_using_app">Začni</string>
     <string name="onboarding_step_count_format">Korak %1$d od %2$d</string>
-    <string name="onboarding_active_step_title_format">%1$s  %2$s</string>
     <string name="onboarding_completed_step_format">✓ %1$s</string>
     <string name="onboarding_completed">Končano</string>
     <string name="onboarding_skipped">Preskočeno</string>
     <string name="onboarding_choose_template">Izberi predlogo</string>
+    <string name="onboarding_locked_template_helper">Ta predloga ima že določene nastavitve cikla, zato je nastavitev krajša.</string>
     <string name="onboarding_custom_template_description">Nastavi lasten cikel. Oznake lahko kasneje urediš v nastavitvah.</string>
     <string name="onboarding_selected_start_date_format">Začetni datum: %1$s</string>
     <string name="onboarding_selected_first_label_format">Prva oznaka: %1$s</string>
@@ -119,7 +115,6 @@
     <string name="assignment_first_day_hint">Prva oznaka</string>
     <string name="preset_label">Predloga cikla</string>
     <string name="preset_hint">Izberi predlogo cikla</string>
-    <string name="preset_applied">Predloga cikla uporabljena: %1$s</string>
     <string name="preset_ab">A / B</string>
     <string name="preset_two_shift">2-izmensko</string>
     <string name="preset_three_shift">3-izmensko</string>
@@ -168,8 +163,6 @@
     <string name="template_reference_date_format">Referenčni datum: %1$s = %2$s</string>
     <string name="template_description_with_reference_format">%1$s\n\n%2$s</string>
     <string name="template_apply_message_format">%1$s\n\n%2$s</string>
-    <string name="template_dropdown_header_format">— %1$s</string>
-    <string name="template_dropdown_option_format">    %1$s</string>
     <string name="template_locked_summary_format">Zaklenjeno zaradi template-a: %1$s</string>
     <string name="template_locked_item_cycle">cikel</string>
     <string name="template_locked_item_rules">pravila</string>
@@ -181,7 +174,6 @@
     <!-- ========================================================= -->
     <string name="today_label">Danes</string>
     <string name="tomorrow_label">Jutri</string>
-    <string name="home_next_7_days_subtitle">Pregled naslednjih 7 dni</string>
     <string name="home_preview_previous_week">Prejšnji teden</string>
     <string name="home_preview_next_week">Naslednji teden</string>
     <string name="home_preview_today">Trenutni teden</string>
@@ -377,5 +369,17 @@
     <!-- ========================================================= -->
     <string name="edit">Uredi</string>
     <string name="delete">Izbriši</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / SAMO DEBUG -->
+    <!-- ========================================================= -->
+    <string name="debug_developer_tools_title">Razvojna orodja</string>
+    <string name="debug_developer_tools_helper">Orodja samo za debug verzije za testiranje onboardinga in lokalnih podatkov.</string>
+    <string name="debug_developer_tools_enabled">Razvojna orodja omogočena</string>
+    <string name="debug_developer_tools_taps_remaining">Še %1$d dotikov za omogočanje razvojnih orodij</string>
+    <string name="debug_reset_onboarding_test_state">Ponastavi test onboardinga</string>
+    <string name="debug_clear_local_app_data">Počisti lokalne podatke aplikacije</string>
+    <string name="debug_clear_local_data_title">Počisti lokalne podatke?</string>
+    <string name="debug_clear_local_data_message">To debug dejanje počisti lokalne podatke aplikacije in ga ni mogoče razveljaviti.</string>
 
 </resources>

@@ -46,6 +46,14 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+/**
+ * Controller for Settings > Primary cycle.
+ *
+ * Settings is the long-term home for cycle configuration after first-run
+ * onboarding. This controller owns template selection, editable cycle labels,
+ * start date, first label, skip rules, and holiday country controls while
+ * preserving template locks through [TemplateManager].
+ */
 class PrimaryCycleSettingsController(
     private val fragment: Fragment,
     root: View,
@@ -102,6 +110,12 @@ class PrimaryCycleSettingsController(
         context.getSharedPreferences("settings_cycle_sections", Context.MODE_PRIVATE)
     }
 
+    /**
+     * Wires the primary-cycle settings UI and loads the persisted configuration.
+     *
+     * The optional expansion flag is used when Home or navigation wants to open
+     * Settings directly at the cycle configuration area.
+     */
     fun initialize(expandCycleSection: Boolean) {
         isInitializing = true
         supportedCountries = HolidayManager.supportedCountries
@@ -255,6 +269,13 @@ class PrimaryCycleSettingsController(
         }
     }
 
+    /**
+     * Persists editable primary-cycle settings without bypassing active template
+     * locks.
+     *
+     * Manual changes to unlocked cycle/rule fields clear the active template so
+     * later UI surfaces treat the configuration as custom.
+     */
     private fun saveSettings(normalizedCycle: List<String>) {
         val prefs = context.getSharedPreferences(AppPrefs.NAME, Context.MODE_PRIVATE)
         val isCycleLocked = TemplateManager.isCycleEditingLocked(context)
@@ -597,6 +618,10 @@ class PrimaryCycleSettingsController(
             .show()
     }
 
+    /**
+     * Applies a template through [TemplateManager] after warning about existing
+     * day overrides that would no longer match the new template.
+     */
     private fun applyTemplateWithOverrideCheck(templateId: String) {
         val repository = CycleOverrideRepository(context)
         val applyTemplateNow = {
@@ -633,6 +658,13 @@ class PrimaryCycleSettingsController(
         }
     }
 
+    /**
+     * Reflects template capabilities in the UI.
+     *
+     * Locked templates disable protected controls. Single-label cycles hide
+     * start-date and first-label controls because those values are unnecessary,
+     * not because they are locked.
+     */
     private fun updateTemplateUiState() {
         val template = TemplateManager.getActiveTemplate(context)
         val hasTemplate = template != null
@@ -675,6 +707,10 @@ class PrimaryCycleSettingsController(
         holidayCountryDropdown.setEnabledWithAlpha(!rulesLocked)
     }
 
+    /**
+     * Builds the active-template summary shown in Settings, including lock
+     * details and fixed reference values where they matter.
+     */
     private fun buildTemplateDescriptionText(template: ScheduleTemplate): String {
         val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
             .withLocale(Locale.getDefault())
@@ -858,6 +894,10 @@ class PrimaryCycleSettingsController(
         return TemplateManager.getActiveTemplate(context)?.isSingleLabelCycle(context) == true
     }
 
+    /**
+     * Detects the single-label case used by Settings to hide irrelevant
+     * start-date and first-label controls.
+     */
     private fun isSingleLabelPrimaryCycle(): Boolean {
         return TemplateManager.getActiveTemplate(context)?.isSingleLabelCycle(context)
             ?: (getCurrentCycleLabelsFromInput().size <= 1)

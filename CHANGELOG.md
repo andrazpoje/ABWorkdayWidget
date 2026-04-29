@@ -2,7 +2,69 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.9
 
+### ✨ Added
+
+- Added debug-only Developer Tools behind a hidden Settings easter egg for faster development testing
+- Added debug-only onboarding reset tool for testing first-run setup without emulator wipe data
+- Added debug-only local data reset tool for clearing preferences and Work Log test data during development
+- Added dedicated legacy settings migration helper to protect users upgrading from older versions
+- Added architecture documentation with KDoc for schedule, template, status, Work Log, widgets, onboarding, and settings components
+- Added roadmap notes for future Room schema export, migration testing, backup/export, work profiles, and multiple Work Log sessions
+
+### 🎨 Improved
+
+- Improved first-run onboarding text and layout clarity
+- Improved onboarding toolbar title to use Setup / Nastavitev instead of repeating Welcome to WorkCycle
+- Improved onboarding step cards by removing duplicated Step X of Y text
+- Improved onboarding CTA wording with Next / Naprej and shorter final Slovenian action Začni
+- Improved locked-template onboarding explanation
+- Improved final onboarding summary with reminder that settings can be changed later
+- Improved startup routing so onboarding is always checked before What’s New
+- Improved Home/Teden weekly preview to read persisted settings and resolved schedule data instead of hidden configuration fields
+- Improved Help text to match the current Week / Month / Settings structure
+- Improved terminology for Work Cycle widget and Work Time / Delovni čas widget
+- Improved Help wording to separate secondary labels from status labels
+
+### 🧹 Cleanup
+
+- Removed legacy Home/Teden cycle configuration Kotlin wiring
+- Removed hidden legacy cycle configuration XML from Home/Teden
+- Removed obsolete Home-side What’s New routing logic
+- Removed obsolete HomeFragmentForm and HomeFragmentSettings files
+- Removed unused Home/dropdown-era strings
+- Removed unused Work Log expected-start row layout
+- Removed unused hidden dateResultText from cycle settings layout
+- Removed obsolete onboarding active step title format string
+- Cleaned up Home/Teden so it is focused on the operational weekly overview
+
+### 🛠 Technical
+
+- Moved legacy settings migration out of Home and into a dedicated migration helper
+- MainActivity now runs legacy settings migration during startup
+- Centralized launch routing through MainActivity and LaunchPrefs
+- Confirmed Settings remains the owner of cycle, template, start date, first label, and skipped-day rules
+- Confirmed onboarding remains the owner of first-run setup
+- Confirmed Home/Teden no longer contains legacy cycle configuration dependencies
+- Confirmed Gradle/dependency audit has no active build warnings
+- Confirmed Room destructive migration fallback is not used
+- Confirmed Work Log manual edit audit metadata is preserved in the current event model
+
+### 🐛 Fixed
+
+- Fixed fresh-install issue where What’s New could appear instead of onboarding after clearing app data
+- Fixed duplicated launch logic between Home/Teden and MainActivity
+- Fixed onboarding/What’s New ordering so What’s New is suppressed until onboarding is completed
+- Fixed stale Home/Teden dependencies on hidden cycle configuration views
+
+### ✅ Verification
+
+- Verified `assembleDebug --warning-mode all` succeeds without warnings
+- Verified no remaining active references to removed Home legacy configuration files, views, or layouts
+- Verified Settings still uses cycle/rules include layouts correctly
+- Verified widgets still compile and keep their resources
+- Verified startup migration remains available for existing users
 
 ## v2.8
 
@@ -10,62 +72,50 @@ All notable changes to this project will be documented in this file.
 
 ### ✨ Added
 
+- Added first-run setup onboarding for new users
+- Added guided cycle setup with template selection, start date, first label, and setup summary
 - Added Work Log manual edit audit safety
-- Added audit metadata for manually edited Work Log events
-- Added future-time warning when manually editing Work Log event times
-- Added “Edited / Urejeno” indicator for manually corrected Work Log events
-- Added basic audit detail display for edited events:
-  - Previous time
-  - New time
-  - Changed at
-  - Future-time correction indicator
-- Added explicit finished Work Log session state to prevent accidental duplicate start events
-- Added clearer separation of Settings sections:
-  - Primary cycle
-  - Secondary cycle
-  - Status labels
-- Added dedicated Status labels card in Settings
-- Added improved secondary cycle settings layout
-- Added new weekly view navigation icon for Home / weekly overview
-- Added Material Components update for Android 15 edge-to-edge compatibility improvements
+- Added future-time warning for manually edited Work Log times
+- Added Edited / Urejeno indicator and audit metadata for corrected Work Log events
+- Added upcoming events card to the Week view
+- Added dismiss option for the widget tip
+- Added label length guidance for cycle and status labels
+- Added localized built-in system status labels and template cycle labels for Slovenian and English
 
 ### 🎨 Improved
 
-- Improved Settings structure after moving cycle configuration out of Home
-- Improved Home screen by reducing configuration clutter
-- Improved Primary cycle settings placement inside Settings
-- Improved Secondary cycle card with clearer description, labels, spacing, and helper text
-- Improved distinction between secondary cycle labels and status labels
-- Improved Settings ordering for better configuration flow
-- Improved off-day color resolution so Off / Prosto uses neutral off-day color instead of cycle color fallback
-- Improved Work Log event editing safety and UI feedback
-- Improved bottom navigation icon clarity for weekly overview
-- Improved Material Components compatibility by updating from 1.12.0 to 1.13.0
-- Improved secondary cycle field alignment and spacing
-- Improved Settings localization consistency in Slovenian and English
+- Renamed main navigation from Home / Calendar to Week / Month
+- Replaced Home cycle configuration with an operational Week view
+- Improved Week view label spacing and status badges
+- Improved Month view calendar cells with primary, secondary, and status rows
+- Improved status colors with a semantic palette independent from cycle colors
+- Improved Settings structure for Primary cycle, Secondary cycle, and Status labels
+- Improved Single Shift setup by hiding unnecessary start date and first label settings
+- Improved Work Cycle widget upcoming-days display on larger widgets
+- Updated Material Components to 1.13.0 for Android 15 compatibility improvements
+- Removed DEV from the debug app label
+- Removed destructive Room migration fallback for safer Work Log data handling
 
 ### 🛠 Fixed
 
-- Fixed Off / Prosto sometimes using the first cycle color instead of the neutral off-day color
-- Fixed Work Log finished state being interpreted as not working, which could incorrectly show Start Work again
-- Fixed duplicate Start / Prihod events being possible after a completed Work Log day
-- Fixed Work Log status card and primary slider using inconsistent session state
-- Fixed future-edited Finish / Odhod events still allowing new Start / Prihod actions
+- Fixed fresh install routing so onboarding opens before What’s New
+- Fixed onboarding being skipped by Work Log launch intents
+- Fixed Off / Prosto sometimes using the wrong cycle color
+- Fixed finished Work Log days incorrectly allowing a new Start Work action
+- Fixed duplicate Start / Prihod events after Finish / Odhod
+- Fixed Work Log manual edits keeping correct event type and audit metadata
+- Fixed hardcoded status color matching based on localized text
+- Fixed built-in status labels not displaying localized names
+- Fixed outdated Settings hints and several Settings layout issues
+- Fixed Home version label appearing on the Week view
 - Fixed unused parameter warning in SlideToConfirmView
-- Fixed outdated Settings hint saying templates are located on Home
-- Fixed Settings terminology where status labels were mixed with secondary cycle labels
-- Fixed secondary cycle dropdown text being too close to the left edge
-- Fixed several Settings layout spacing and readability issues
 
 ### 🧭 Planned / Not yet included
 
-- First-run onboarding setup flow
-- Replacing Home configuration area with upcoming special days
-- Work Cycle widget showing more upcoming days on larger widget sizes
-- Calendar display algorithm improvements for status icons and secondary label badges
-- Separate semantic status colors independent from cycle theme colors
-- Better long-label handling in weekly preview and calendar
-- Optional future support for multiple work sessions per day
+- In-app language selector
+- Dynamic primary cycle color palette for 4+ primary cycle labels
+- Multiple work sessions per day
+- Further Work Log statistics and summaries
 
 ---
 

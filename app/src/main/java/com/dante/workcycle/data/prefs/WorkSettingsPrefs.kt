@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.dante.workcycle.domain.model.CycleLayer
+import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
 import org.json.JSONObject
 
 class WorkSettingsPrefs(context: Context) {
@@ -27,6 +28,23 @@ class WorkSettingsPrefs(context: Context) {
     fun setDefaultBreakMinutes(minutes: Int) {
         prefs.edit {
             putInt(KEY_DEFAULT_BREAK_MINUTES, minutes)
+        }
+    }
+
+    fun getBreakAccountingMode(): BreakAccountingMode {
+        val rawValue = prefs.getString(
+            KEY_BREAK_ACCOUNTING_MODE,
+            DEFAULT_BREAK_ACCOUNTING_MODE.name
+        )
+
+        return runCatching {
+            BreakAccountingMode.valueOf(rawValue.orEmpty())
+        }.getOrDefault(DEFAULT_BREAK_ACCOUNTING_MODE)
+    }
+
+    fun setBreakAccountingMode(mode: BreakAccountingMode) {
+        prefs.edit {
+            putString(KEY_BREAK_ACCOUNTING_MODE, mode.name)
         }
     }
 
@@ -199,6 +217,7 @@ class WorkSettingsPrefs(context: Context) {
         private const val PREFS_NAME = "work_settings_prefs"
         const val KEY_DAILY_TARGET_MINUTES = "daily_target_minutes"
         const val KEY_DEFAULT_BREAK_MINUTES = "default_break_minutes"
+        const val KEY_BREAK_ACCOUNTING_MODE = "break_accounting_mode"
         const val KEY_OVERTIME_TRACKING_ENABLED = "overtime_tracking_enabled"
         const val KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL = "expected_times_by_layer_and_label"
         const val KEY_EXPECTED_STARTS_BY_LABEL = "expected_starts_by_label"
@@ -208,6 +227,7 @@ class WorkSettingsPrefs(context: Context) {
 
         const val DEFAULT_DAILY_TARGET_MINUTES = 480
         const val DEFAULT_BREAK_MINUTES = 30
+        val DEFAULT_BREAK_ACCOUNTING_MODE = BreakAccountingMode.UNPAID
         const val DEFAULT_OVERTIME_TRACKING_ENABLED = true
         const val DEFAULT_EXPECTED_START_TIME = "08:00"
         const val DEFAULT_EXPECTED_END_TIME = "16:00"

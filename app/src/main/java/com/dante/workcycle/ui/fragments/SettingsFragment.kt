@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
@@ -19,6 +20,7 @@ import com.dante.workcycle.core.theme.ThemePreset
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import android.app.DatePickerDialog
+import com.dante.workcycle.debug.DebugDataResetHelper
 import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,17 +40,22 @@ import com.dante.workcycle.widget.WidgetRefreshHelper
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.launch
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     companion object {
         private const val CHANGELOG_URL =
             "https://github.com/andrazpoje/ABWorkdayWidget/blob/master/CHANGELOG.md"
+        private const val DEVELOPER_TOOLS_UNLOCK_TAPS = 7
+        private const val DEVELOPER_TOOLS_COUNTDOWN_START_TAP = 4
     }
 
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
 
     private var isInitializing = false
+    private var developerToolsTapCount = 0
     private lateinit var primaryCycleSettingsController: PrimaryCycleSettingsController
 
     private data class AssignmentAdvanceModeUiItem(
@@ -93,6 +100,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         updateCustomColorsUi()
         updateActiveTemplateInfoCard()
         setupListeners()
+        setupDeveloperTools()
         setupScrollHint()
         scrollToCycleSettingsIfRequested(scrollToCycleSettings)
         isInitializing = false
@@ -704,6 +712,76 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
 
+    }
+
+    private fun setupDeveloperTools() {
+        binding.cardDeveloperTools.visibility =
+            if (BuildConfig.DEBUG && DebugDataResetHelper.isDeveloperToolsUnlocked(requireContext())) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+
+        if (!BuildConfig.DEBUG) return
+
+        binding.settingsVersionText.setOnClickListener {
+            handleDeveloperToolsVersionTap()
+        }
+
+        binding.buttonResetOnboardingTestState.setOnClickListener {
+            if (DebugDataResetHelper.resetOnboardingTestState(requireContext())) {
+                DebugDataResetHelper.restartApp(requireActivity())
+            }
+        }
+
+        binding.buttonClearLocalAppData.setOnClickListener {
+            showClearLocalDataConfirmation()
+        }
+    }
+
+    private fun handleDeveloperToolsVersionTap() {
+        if (!BuildConfig.DEBUG) return
+        if (DebugDataResetHelper.isDeveloperToolsUnlocked(requireContext())) return
+
+        developerToolsTapCount += 1
+
+        val remaining = DEVELOPER_TOOLS_UNLOCK_TAPS - developerToolsTapCount
+        if (remaining <= 0) {
+            if (DebugDataResetHelper.unlockDeveloperTools(requireContext())) {
+                binding.cardDeveloperTools.visibility = View.VISIBLE
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.debug_developer_tools_enabled),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            return
+        }
+
+        if (developerToolsTapCount >= DEVELOPER_TOOLS_COUNTDOWN_START_TAP) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.debug_developer_tools_taps_remaining, remaining),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun showClearLocalDataConfirmation() {
+        if (!BuildConfig.DEBUG) return
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.debug_clear_local_data_title)
+            .setMessage(R.string.debug_clear_local_data_message)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    if (DebugDataResetHelper.clearLocalAppData(requireContext())) {
+                        DebugDataResetHelper.restartApp(requireActivity())
+                    }
+                }
+            }
+            .show()
     }
 
     private fun saveAppTheme(theme: String) {

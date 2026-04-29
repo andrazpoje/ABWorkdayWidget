@@ -29,6 +29,7 @@ import com.dante.workcycle.core.ui.applyBottomNavInsetAsPadding
 import com.dante.workcycle.core.ui.applyTopStatusBarInsetAsMargin
 import com.dante.workcycle.core.ui.setupDefaultEdgeToEdge
 import com.dante.workcycle.core.ui.updateSystemBarIconContrast
+import com.dante.workcycle.data.migration.LegacySettingsMigration
 import com.dante.workcycle.data.prefs.LaunchPrefs
 import com.dante.workcycle.databinding.ActivityMainBinding
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
@@ -65,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         LaunchPrefs(this).migrateExistingUsersIfNeeded()
+        LegacySettingsMigration.migrateIfNeeded(this)
 
         setupDefaultEdgeToEdge()
 
@@ -131,7 +133,7 @@ class MainActivity : AppCompatActivity() {
             val suffix = when (destination.id) {
                 R.id.homeFragment -> getString(R.string.title_week_view)
                 R.id.calendarFragment -> getString(R.string.title_month_view)
-                R.id.onboardingFragment -> getString(R.string.onboarding_welcome_title)
+                R.id.onboardingFragment -> getString(R.string.onboarding_setup_title)
                 R.id.moreFragment -> getString(R.string.nav_more)
                 R.id.statisticsFragment -> getString(R.string.statistics_title)
                 R.id.whatsNewFragment -> getString(R.string.whats_new_title)
@@ -210,7 +212,9 @@ class MainActivity : AppCompatActivity() {
             destinationId == R.id.moreFragment
         val showWorkLogActions = destinationId == R.id.workLogDashboardFragment
 
-        menu.findItem(R.id.action_work_log)?.isVisible = destinationId != R.id.workLogDashboardFragment
+        menu.findItem(R.id.action_work_log)?.isVisible =
+            destinationId != R.id.workLogDashboardFragment &&
+                destinationId != R.id.onboardingFragment
         menu.findItem(R.id.action_help)?.isVisible = showHomeActions || showWorkLogActions
         menu.findItem(R.id.action_settings)?.isVisible = showHomeActions || showWorkLogActions
 

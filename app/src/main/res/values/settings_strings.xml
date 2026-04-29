@@ -11,17 +11,11 @@
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_schedule_title">Schedule</string>
     <string name="settings_saved">Settings saved</string>
-    <string name="home_cycle_settings_summary_title">Cycle configuration</string>
-    <string name="home_cycle_settings_summary_template">Active template: %1$s</string>
-    <string name="home_cycle_settings_summary_custom">Custom cycle: %1$s</string>
-    <string name="open_cycle_settings">Cycle settings</string>
     <string name="home_upcoming_events_title">Upcoming special days</string>
     <string name="home_upcoming_events_empty">No upcoming special days.</string>
     <string name="home_upcoming_event_holiday">Holiday</string>
     <string name="home_upcoming_event_off_day">Off day</string>
     <string name="home_upcoming_event_reason_separator">\u0020•\u0020</string>
-    <string name="unsaved_changes_title">Unsaved changes</string>
-    <string name="unsaved_changes_message">You have unsaved changes. Save before leaving?</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / NOTIFICATIONS -->
@@ -42,7 +36,7 @@
     <string name="settings_widget_style_classic">Classic</string>
     <string name="settings_widget_style_minimal">Minimal</string>
     <string name="widget_not_added_short">The widget has not been added to the home screen yet.</string>
-    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Workday Widget.</string>
+    <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Work Cycle widget.</string>
     <string name="open_widgets">Open widgets</string>
     <string name="home_widget_tip_dismiss">Don’t show again</string>
 
@@ -81,8 +75,9 @@
     <string name="welcome_title">Welcome to WorkCycle</string>
     <string name="welcome_subtitle">A quick guide to help you set up your cycle, understand the calendar, and start using the widget.</string>
     <string name="continue_label">Continue</string>
+    <string name="onboarding_setup_title">Setup</string>
     <string name="onboarding_welcome_title">Welcome to WorkCycle</string>
-    <string name="onboarding_welcome_subtitle">First, set up your basic work cycle. You can change it later in Settings.</string>
+    <string name="onboarding_welcome_subtitle">Set up your basic work cycle. This only takes a minute, and you can change it later in Settings.</string>
     <string name="onboarding_template_title">Choose a template</string>
     <string name="onboarding_template_subtitle">Choose the schedule that best matches your work.</string>
     <string name="onboarding_start_date_title">Set start date</string>
@@ -91,15 +86,16 @@
     <string name="onboarding_first_label_subtitle">Choose which label applies on the start date.</string>
     <string name="onboarding_done_title">Setup complete</string>
     <string name="onboarding_done_subtitle">WorkCycle is ready to use.</string>
-    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_done_settings_helper">You can change these settings later in Settings.</string>
+    <string name="onboarding_continue">Next</string>
     <string name="onboarding_back">Back</string>
     <string name="onboarding_start_using_app">Start using the app</string>
     <string name="onboarding_step_count_format">Step %1$d of %2$d</string>
-    <string name="onboarding_active_step_title_format">%1$s  %2$s</string>
     <string name="onboarding_completed_step_format">✓ %1$s</string>
     <string name="onboarding_completed">Completed</string>
     <string name="onboarding_skipped">Skipped</string>
     <string name="onboarding_choose_template">Choose template</string>
+    <string name="onboarding_locked_template_helper">This template already has fixed cycle settings, so setup is shorter.</string>
     <string name="onboarding_custom_template_description">Set up a custom cycle. You can adjust labels later in Settings.</string>
     <string name="onboarding_selected_start_date_format">Start date: %1$s</string>
     <string name="onboarding_selected_first_label_format">First label: %1$s</string>
@@ -119,7 +115,6 @@
     <string name="assignment_first_day_hint">First label</string>
     <string name="preset_label">Cycle template</string>
     <string name="preset_hint">Choose cycle template</string>
-    <string name="preset_applied">Cycle template applied: %1$s</string>
     <string name="preset_ab">A / B</string>
     <string name="preset_two_shift">2-shift</string>
     <string name="preset_three_shift">3-shift</string>
@@ -168,8 +163,6 @@
     <string name="template_reference_date_format">Reference date: %1$s = %2$s</string>
     <string name="template_description_with_reference_format">%1$s\n\n%2$s</string>
     <string name="template_apply_message_format">%1$s\n\n%2$s</string>
-    <string name="template_dropdown_header_format">— %1$s</string>
-    <string name="template_dropdown_option_format">    %1$s</string>
     <string name="template_locked_summary_format">Locked by template: %1$s</string>
     <string name="template_locked_item_cycle">cycle</string>
     <string name="template_locked_item_rules">rules</string>
@@ -181,7 +174,6 @@
     <!-- ========================================================= -->
     <string name="today_label">Today</string>
     <string name="tomorrow_label">Tomorrow</string>
-    <string name="home_next_7_days_subtitle">Next 7 days overview</string>
     <string name="home_preview_previous_week">Previous week</string>
     <string name="home_preview_next_week">Next week</string>
     <string name="home_preview_today">Current week</string>
@@ -357,6 +349,18 @@
     <string name="no_email_app_found">No email app found</string>
     <string name="unable_to_open_link">Unable to open link</string>
     <string name="github">GitHub</string>
+
+    <!-- ========================================================= -->
+    <!-- SETTINGS / DEBUG ONLY -->
+    <!-- ========================================================= -->
+    <string name="debug_developer_tools_title">Developer tools</string>
+    <string name="debug_developer_tools_helper">Debug-only tools for testing onboarding and local data resets.</string>
+    <string name="debug_developer_tools_enabled">Developer tools enabled</string>
+    <string name="debug_developer_tools_taps_remaining">%1$d more taps to enable developer tools</string>
+    <string name="debug_reset_onboarding_test_state">Reset onboarding test state</string>
+    <string name="debug_clear_local_app_data">Clear local app data</string>
+    <string name="debug_clear_local_data_title">Clear local data?</string>
+    <string name="debug_clear_local_data_message">This debug action clears local app data and cannot be undone.</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / COUNTRIES -->

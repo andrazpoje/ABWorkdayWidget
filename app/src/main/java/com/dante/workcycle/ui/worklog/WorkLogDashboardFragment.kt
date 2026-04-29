@@ -51,6 +51,7 @@ class WorkLogDashboardFragment :
     private lateinit var groupTargetAndBalance: View
     private lateinit var groupTarget: View
     private lateinit var groupBalance: View
+    private lateinit var groupCreditedTime: View
     private lateinit var spacerTargetBalance: View
     private lateinit var groupSecondaryActions: View
     private lateinit var spacerActionBreak: View
@@ -67,10 +68,12 @@ class WorkLogDashboardFragment :
     private lateinit var cardTodayStatus: MaterialCardView
 
     private lateinit var textBreakStartedAt: TextView
+    private lateinit var textBreakDurationLabel: TextView
     private lateinit var textBreakDuration: TextView
 
     private lateinit var textTargetWork: TextView
     private lateinit var textBalance: TextView
+    private lateinit var textCreditedTime: TextView
 
     private var latestUiState: WorkLogDashboardUiState = WorkLogDashboardUiState()
     private var hasHandledNotificationPermissionPromptThisSession = false
@@ -131,6 +134,7 @@ class WorkLogDashboardFragment :
         groupTargetAndBalance = view.findViewById(R.id.groupTargetAndBalance)
         groupTarget = view.findViewById(R.id.groupTarget)
         groupBalance = view.findViewById(R.id.groupBalance)
+        groupCreditedTime = view.findViewById(R.id.groupCreditedTime)
         spacerTargetBalance = view.findViewById(R.id.spacerTargetBalance)
         groupSecondaryActions = view.findViewById(R.id.groupSecondaryActions)
         spacerActionBreak = view.findViewById(R.id.spacerActionBreak)
@@ -145,10 +149,12 @@ class WorkLogDashboardFragment :
         recyclerRecentEvents = view.findViewById(R.id.recyclerRecentEvents)
 
         textBreakStartedAt = view.findViewById(R.id.textBreakStartedAt)
+        textBreakDurationLabel = view.findViewById(R.id.textBreakDurationLabel)
         textBreakDuration = view.findViewById(R.id.textBreakDuration)
 
         textTargetWork = view.findViewById(R.id.textTargetWork)
         textBalance = view.findViewById(R.id.textBalance)
+        textCreditedTime = view.findViewById(R.id.textCreditedTime)
     }
 
     private fun setupRecyclerView() {
@@ -193,7 +199,9 @@ class WorkLogDashboardFragment :
                 textEndDeviation.text = state.endDeviationText
                 textTargetWork.text = state.targetWorkText
                 textBalance.text = state.balanceText
+                textCreditedTime.text = state.creditedTimeText
                 textBreakStartedAt.text = state.breakStartedAtText
+                textBreakDurationLabel.text = state.breakDurationLabelText
                 textBreakDuration.text = state.breakDurationText
                 textBreakAction.text = state.breakActionText
                 btnMealAction.text = state.mealActionText
@@ -211,9 +219,11 @@ class WorkLogDashboardFragment :
                 groupExpectedStart.isVisible = state.showExpectedStart
                 groupExpectedEnd.isVisible = state.showExpectedEnd
                 spacerExpectedTimes.isVisible = state.showExpectedStart && state.showExpectedEnd
-                groupTargetAndBalance.isVisible = state.showTarget || state.showBalance
+                groupTargetAndBalance.isVisible =
+                    state.showTarget || state.showBalance || state.showCreditedTime
                 groupTarget.isVisible = state.showTarget
                 groupBalance.isVisible = state.showBalance
+                groupCreditedTime.isVisible = state.showCreditedTime
                 spacerTargetBalance.isVisible = state.showTarget && state.showBalance
                 groupSecondaryActions.isVisible = state.showSecondaryActions
                 cardActionBreak.isVisible = state.showBreakActionButton

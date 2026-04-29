@@ -5,6 +5,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 
+/**
+ * Broadcast helper for refreshing all Work Cycle widget instances.
+ *
+ * This helper is intentionally limited to the schedule widget. Work Time widget
+ * refreshes are event/session driven and go through the Work Log widget path.
+ */
 object WidgetUpdater {
 
     fun updateAllWidgets(context: Context) {

@@ -9,6 +9,12 @@ import com.dante.workcycle.data.local.entity.WorkEventEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
+/**
+ * Room access for the event-based Work Log timeline.
+ *
+ * Queries keep a stable time/id ordering because the dashboard, validators, and
+ * widgets derive session state from the ordered event stream.
+ */
 @Dao
 interface WorkEventDao {
 

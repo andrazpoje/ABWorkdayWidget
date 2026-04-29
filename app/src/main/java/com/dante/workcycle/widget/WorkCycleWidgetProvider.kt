@@ -31,6 +31,15 @@ import java.util.Locale
 import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
 import com.dante.workcycle.domain.model.CycleMode
 
+/**
+ * AppWidgetProvider for the Work Cycle home-screen widget.
+ *
+ * This widget must render the same resolved schedule data as Home and Calendar:
+ * all primary labels, skipped days, secondary labels, holidays, and overrides
+ * should come through [DefaultScheduleResolver] instead of independent widget
+ * business logic. RemoteViews code in this class should stay focused on compact
+ * widget presentation, sizing, and click handling.
+ */
 class WorkCycleWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(
@@ -58,6 +67,13 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         updateSingleWidget(context, appWidgetManager, appWidgetId)
     }
 
+    /**
+     * Rebuilds one widget instance from the current resolved schedule and widget
+     * size options.
+     *
+     * Upcoming rows use resolved/effective day data so they stay aligned with
+     * app UI and future schedule-rule changes.
+     */
     private fun updateSingleWidget(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -389,6 +405,12 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         return style == Prefs.WIDGET_STYLE_MINIMAL
     }
 
+    /**
+     * Binds one upcoming-day row from the shared schedule resolver.
+     *
+     * Keep day decisions here data-driven from [DefaultScheduleResolver]; this
+     * method should only compact labels and apply RemoteViews presentation.
+     */
     private fun bindExtraDayRow(
         context: Context,
         resolver: DefaultScheduleResolver,
@@ -608,6 +630,13 @@ class WorkCycleWidgetProvider : AppWidgetProvider() {
         views.setTextViewTextSize(R.id.day6Assignment, TypedValue.COMPLEX_UNIT_SP, typography.rowAssignmentSp)
     }
 
+    /**
+     * Schedules the next conservative date-boundary refresh for the cycle
+     * widget.
+     *
+     * Do not use this path for Work Time minute refresh; Work Log active-session
+     * refresh is owned by the Work Time widget scheduler.
+     */
     private fun scheduleNextUpdate(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 

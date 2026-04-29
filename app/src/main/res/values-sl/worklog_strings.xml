@@ -6,6 +6,8 @@
     <!-- ========================================================= -->
     <string name="work_log_target">Norma</string>
     <string name="work_log_balance">Saldo</string>
+    <string name="work_log_credited_time">Priznan čas</string>
+    <string name="work_log_effective_work">Efektivno delo</string>
     <string name="work_log_break_option_0" translatable="false">0</string>
     <string name="work_log_break_option_30" translatable="false">30</string>
     <string name="work_log_break_option_45" translatable="false">45</string>
@@ -48,6 +50,9 @@
 
     <string name="work_log_break_started_at">Začetek odmora</string>
     <string name="work_log_break_duration">Trajanje odmora</string>
+    <string name="work_log_break_elapsed">Trajanje odmora</string>
+    <string name="work_log_break_remaining">Preostanek odmora</string>
+    <string name="work_log_break_exceeded">Prekoračen odmor</string>
     <string name="work_log_break_action_start">Odmor</string>
 
     <!-- ========================================================= -->
@@ -148,19 +153,21 @@
     <string name="work_log_help_intro_title">Kako deluje evidenca dela</string>
     <string name="work_log_help_intro_body">Evidenca dela združuje dnevno delovno sejo, odmore, malico, opombe, povzetek v gradniku in aktivno obvestilo na enem mestu.</string>
     <string name="work_log_help_start_finish_title">Začetek in zaključek dela</string>
-    <string name="work_log_help_start_finish_body">Uporabi Začetek dela za začetek seje in Zaključek dela za njen konec. Nadzorna plošča nato posodobi stanje, skupni čas in saldo za trenutni dan.</string>
+    <string name="work_log_help_start_finish_body">Uporabi Začetek dela za začetek seje in Zaključek dela za njen konec. Delano danes prikazuje efektivno delo, Saldo pa lahko uporablja priznani delovni čas glede na Obračun odmora.</string>
     <string name="work_log_help_break_title">Odmori</string>
-    <string name="work_log_help_break_body">Odmor označi začetek pavze, ista akcija pa te vrne nazaj na delo. Čas odmora se pokaže na nadzorni plošči in v aktivnem obvestilu, če je to omogočeno.</string>
+    <string name="work_log_help_break_body">Odmor označi začetek pavze, ista akcija pa te vrne nazaj na delo. Obračun odmora določa, ali se odmor pri izračunu Salda odšteje, v celoti šteje ali prizna do dovoljene meje. Pri priznanem odmoru čas do dovoljene meje ne zmanjša Salda; samo odmor nad dovoljeno mejo zmanjša Saldo. Primer: Če je cilj 8h in je 30 min odmora priznano, 7h 30m efektivnega dela + 30 min priznanega odmora pomeni saldo 0h.</string>
     <string name="work_log_help_meal_notes_title">Malica in opombe</string>
-    <string name="work_log_help_meal_notes_body">Malica zabeleži dogodek malice za trenutni dan. Opomba doda kratko besedilo, ki ostane vidno v seznamu zadnjih dogodkov.</string>
+    <string name="work_log_help_meal_notes_body">Malica zabeleži dogodek malice za trenutni dan. Čas odmora, čas malice in povračilo za malico so ločeni pojmi; povračilo za malico se ne izračuna iz Obračuna odmora. Opomba doda kratko besedilo, ki ostane vidno v seznamu zadnjih dogodkov.</string>
     <string name="work_log_help_recent_events_title">Urejanje zadnjih dogodkov</string>
     <string name="work_log_help_recent_events_body">Tapni dogodek v seznamu zadnjih dogodkov za urejanje datuma ali ure. Pred shranjevanjem aplikacija preveri časovni potek, da vrstni red dogodkov ostane smiseln.</string>
     <string name="work_log_help_widget_notification_title">Gradnik in obvestilo</string>
-    <string name="work_log_help_widget_notification_body">Gradnik evidence dela prikaže hiter povzetek za danes. Aktivno obvestilo se prikaže med delom in se samodejno posodablja za delo in odmor, ko je dovoljenje za obvestila omogočeno.</string>
+    <string name="work_log_help_widget_notification_body">Gradnik Delovni čas prikaže hiter povzetek za danes. Aktivno obvestilo se prikaže med delom in se samodejno posodablja za delo in odmor, ko je dovoljenje za obvestila omogočeno.</string>
     <string name="work_log_settings_title">Nastavitve evidence dela</string>
     <string name="work_log_settings_intro_title">Pravila dela</string>
     <string name="work_log_settings_intro_body">Uredi osnovne nastavitve za dnevno normo, privzeti odmor, spremljanje nadur in pričakovane začetke dela.</string>
     <string name="work_log_settings_default_break">Privzeti odmor</string>
+    <string name="work_log_settings_break_accounting">Obračun odmora</string>
+    <string name="work_log_settings_break_accounting_helper">Določa, ali se odmor pri izračunu salda odšteje, v celoti šteje ali prizna do dovoljene meje.</string>
     <string name="work_log_settings_widget_info_mode">Podatek na widgetu med aktivno sejo</string>
     <string name="work_log_settings_widget_info_mode_worked_today">Danes opravljeno (osvežuje se sproti)</string>
     <string name="work_log_settings_widget_info_mode_start_time">Začetek dela (varčnejše)</string>
@@ -175,6 +182,11 @@
     <string name="work_log_settings_expected_time_not_set">Ni nastavljeno</string>
     <string name="work_log_settings_choose_daily_target">Izberi dnevno normo</string>
     <string name="work_log_settings_choose_default_break">Izberi privzeti odmor</string>
+    <string name="work_log_settings_choose_break_accounting">Izberi obračun odmora</string>
+    <string name="work_log_settings_break_accounting_unpaid">Neplačan odmor</string>
+    <string name="work_log_settings_break_accounting_fully_paid">Plačan odmor</string>
+    <string name="work_log_settings_break_accounting_paid_allowance">Plačan do dovoljene meje</string>
+    <string name="work_log_settings_break_accounting_custom">Pravila delodajalca</string>
     <string name="work_log_settings_no_break">Brez odmora</string>
     <string name="work_log_settings_enabled">Vklopljeno</string>
     <string name="work_log_settings_disabled">Izklopljeno</string>

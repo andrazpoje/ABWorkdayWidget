@@ -6,6 +6,8 @@
     <!-- ========================================================= -->
     <string name="work_log_target">Target</string>
     <string name="work_log_balance">Balance</string>
+    <string name="work_log_credited_time">Credited time</string>
+    <string name="work_log_effective_work">Effective work</string>
     <string name="work_log_target_default" translatable="false">8h 00m</string>
     <string name="work_log_break_option_0" translatable="false">0</string>
     <string name="work_log_break_option_30" translatable="false">30</string>
@@ -49,6 +51,9 @@
 
     <string name="work_log_break_started_at">Break started</string>
     <string name="work_log_break_duration">Break duration</string>
+    <string name="work_log_break_elapsed">Break elapsed</string>
+    <string name="work_log_break_remaining">Break remaining</string>
+    <string name="work_log_break_exceeded">Break exceeded</string>
     <string name="work_log_break_action_start">Break</string>
 
     <!-- ========================================================= -->
@@ -149,19 +154,21 @@
     <string name="work_log_help_intro_title">How Work Log works</string>
     <string name="work_log_help_intro_body">Work Log keeps track of your daily work session, breaks, meals, notes, widget summary, and active notification in one place.</string>
     <string name="work_log_help_start_finish_title">Start and finish work</string>
-    <string name="work_log_help_start_finish_body">Use Start work to begin a session and Finish work to close it. The dashboard then updates the current state, daily total, and balance for the day.</string>
+    <string name="work_log_help_start_finish_body">Use Start work to begin a session and Finish work to close it. Worked today shows effective work time, while Balance may use credited work time depending on Break accounting.</string>
     <string name="work_log_help_break_title">Breaks</string>
-    <string name="work_log_help_break_body">Break marks the start of a pause, and the same action returns you to work. Break timing is reflected on the dashboard and in the active notification when available.</string>
+    <string name="work_log_help_break_body">Break marks the start of a pause, and the same action returns you to work. Break accounting controls whether break time is unpaid, fully paid, or credited up to an allowed limit when calculating Balance. In paid allowance mode, credited break time does not reduce Balance; only break time above the allowed limit reduces it. Example: If your target is 8h and 30 min break is credited, 7h 30m of active work plus 30 min credited break results in 0h balance.</string>
     <string name="work_log_help_meal_notes_title">Meals and notes</string>
-    <string name="work_log_help_meal_notes_body">Meal logs a meal event for the day. Note lets you attach a short text note to the current day so context is preserved in Recent Events.</string>
+    <string name="work_log_help_meal_notes_body">Meal logs a meal event for the day. Break time, meal time, and meal reimbursement are separate concepts; meal reimbursement is not calculated from Break accounting. Note lets you attach a short text note to the current day so context is preserved in Recent Events.</string>
     <string name="work_log_help_recent_events_title">Recent Events editing</string>
     <string name="work_log_help_recent_events_body">Tap an event in Recent Events to edit its date or time. The app validates the timeline before saving so event order stays safe and meaningful.</string>
     <string name="work_log_help_widget_notification_title">Widget and notification</string>
-    <string name="work_log_help_widget_notification_body">The Work Log widget shows a quick summary for today. The active notification appears while work is running and updates automatically for work and break states when notification permission is enabled.</string>
+    <string name="work_log_help_widget_notification_body">The Work Time widget shows a quick summary for today. The active notification appears while work is running and updates automatically for work and break states when notification permission is enabled.</string>
     <string name="work_log_settings_title">Work Log Settings</string>
     <string name="work_log_settings_intro_title">Work Rules</string>
     <string name="work_log_settings_intro_body">Adjust the daily target, default break, overtime tracking, and expected start and end times for Work Log.</string>
     <string name="work_log_settings_default_break">Default break</string>
+    <string name="work_log_settings_break_accounting">Break accounting</string>
+    <string name="work_log_settings_break_accounting_helper">Controls whether break time is unpaid, fully paid, or credited up to an allowed limit when calculating balance.</string>
     <string name="work_log_settings_widget_info_mode">Widget info during active session</string>
     <string name="work_log_settings_widget_info_mode_worked_today">Worked today (live refresh)</string>
     <string name="work_log_settings_widget_info_mode_start_time">Start time (battery saver)</string>
@@ -176,6 +183,11 @@
     <string name="work_log_settings_expected_time_not_set">Not set</string>
     <string name="work_log_settings_choose_daily_target">Choose daily target</string>
     <string name="work_log_settings_choose_default_break">Choose default break</string>
+    <string name="work_log_settings_choose_break_accounting">Choose break accounting</string>
+    <string name="work_log_settings_break_accounting_unpaid">Unpaid break</string>
+    <string name="work_log_settings_break_accounting_fully_paid">Fully paid break</string>
+    <string name="work_log_settings_break_accounting_paid_allowance">Paid allowance</string>
+    <string name="work_log_settings_break_accounting_custom">Custom employer policy</string>
     <string name="work_log_settings_no_break">No break</string>
     <string name="work_log_settings_enabled">On</string>
     <string name="work_log_settings_disabled">Off</string>

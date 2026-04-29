@@ -10,6 +10,7 @@ import com.dante.workcycle.core.status.StatusSemantics
 import com.dante.workcycle.data.prefs.StatusLabelsPrefs
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.data.prefs.WorkSessionPrefs
+import com.dante.workcycle.data.prefs.toAccountingRules
 import com.dante.workcycle.data.repository.WorkEventRepository
 import com.dante.workcycle.domain.model.CycleLayer
 import com.dante.workcycle.domain.model.ResolvedDay
@@ -18,6 +19,10 @@ import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.domain.schedule.StatusRepository
+import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
+import com.dante.workcycle.domain.worklog.WorkLogSessionStatus
+import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
+import com.dante.workcycle.domain.worklog.accounting.WorkLogAccountingCalculator
 import com.dante.workcycle.domain.model.WorkEventType.BREAK_END
 import com.dante.workcycle.domain.model.WorkEventType.BREAK_START
 import com.dante.workcycle.domain.model.WorkEventType.CLOCK_IN
@@ -42,6 +47,15 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
+/**
+ * Builds the Work Log dashboard state from the event timeline for the selected
+ * day.
+ *
+ * This is the current source of truth for the dashboard action state, totals,
+ * balance, recent events, persistent notification, and Work Time widget refresh
+ * triggers. The v2.x behavior supports one completed work session per day; once
+ * a day resolves to FINISHED, the dashboard must not offer Start Work again.
+ */
 class WorkLogDashboardViewModel(
     application: Application,
     private val repository: WorkEventRepository
@@ -141,6 +155,12 @@ class WorkLogDashboardViewModel(
         }
     }
 
+    /**
+     * Applies the primary slider action for the current single-session state.
+     *
+     * FINISHED intentionally does nothing so a manually edited CLOCK_OUT, even
+     * one moved into the future, cannot reopen Start Work in the v2.x model.
+     */
     fun onSliderAction() {
         if (isActionLocked()) return
 
@@ -188,6 +208,12 @@ class WorkLogDashboardViewModel(
         }
     }
 
+    /**
+     * Starts a manual break only while the current session is actively working.
+     *
+     * Breaks are user-entered events; there is no automatic break timer,
+     * reminder, or auto-end logic in this flow.
+     */
     fun onBreakAction() {
         if (isActionLocked()) return
 
@@ -219,12 +245,7 @@ class WorkLogDashboardViewModel(
 
         viewModelScope.launch {
             refreshDateIfNeeded()
-            val sessionState = resolveSessionState(currentEvents)
-            val mealAlreadyLogged = hasMealLoggedToday(currentEvents)
-
-            val canLogMeal = sessionState in listOf(SessionState.WORKING, SessionState.ON_BREAK) &&
-                !mealAlreadyLogged
-            if (!canLogMeal) return@launch
+            if (!WorkLogSessionStateResolver.resolve(currentEvents).canLogMeal) return@launch
 
             repository.insert(
                 WorkEvent(
@@ -238,12 +259,18 @@ class WorkLogDashboardViewModel(
     }
 
     private fun buildUiState(events: List<WorkEvent>): WorkLogDashboardUiState {
-        val sessionState = resolveSessionState(events)
+        val now = LocalTime.now()
+        val resolvedSessionState = WorkLogSessionStateResolver.resolve(events, now = now)
+        val accountingSummary = WorkLogAccountingCalculator.calculate(
+            sessionState = resolvedSessionState,
+            rules = workSettingsPrefs.toAccountingRules(),
+            now = now
+        )
+        val sessionState = resolvedSessionState.status.toDashboardSessionState()
         val clockIn = events.firstOrNull { it.type == CLOCK_IN }
-        val workedText = calculateWorkedTodayText(events)
-        val breakStart = findActiveBreakStart(events)
+        val workedText = formatWorkedTodayText(resolvedSessionState.workedMinutes)
+        val breakStart = resolvedSessionState.activeBreakStart
         val hasStartedToday = clockIn != null
-        val hasBreakToday = events.any { it.type == BREAK_START || it.type == BREAK_END }
         val todayResolved = scheduleResolver.resolve(selectedDate)
         val todayCycleLabel = todayResolved.effectiveCycleLabel
         val sessionSnapshot = if (sessionState == SessionState.WORKING || sessionState == SessionState.ON_BREAK) {
@@ -258,12 +285,23 @@ class WorkLogDashboardViewModel(
         val liveExpectedEndText = liveExpectedTimes.endTime
         val expectedEndText = sessionSnapshot?.expectedEnd ?: liveExpectedEndText
         val dailyTargetMinutes = workSettingsPrefs.getDailyTargetMinutes()
+        val defaultBreakMinutes = workSettingsPrefs.getDefaultBreakMinutes()
+        val breakAccountingMode = workSettingsPrefs.getBreakAccountingMode()
         val overtimeTrackingEnabled = workSettingsPrefs.isOvertimeTrackingEnabled()
+        val showCreditedTime = overtimeTrackingEnabled &&
+            breakAccountingMode != BreakAccountingMode.UNPAID &&
+            accountingSummary.creditedWorkMinutes != accountingSummary.effectiveWorkMinutes
         val breakStartedAtText = breakStart?.time?.format(timeFormatter()) ?: WORK_LOG_PLACEHOLDER
-        val breakDurationText = if (sessionState == SessionState.ON_BREAK && breakStart != null) {
-            formatDuration(minutesBetween(breakStart.time, LocalTime.now()))
+        val breakDurationDisplay = if (sessionState == SessionState.ON_BREAK && breakStart != null) {
+            resolveActiveBreakDurationDisplay(
+                elapsedMinutes = minutesBetween(breakStart.time, now),
+                defaultBreakMinutes = defaultBreakMinutes
+            )
         } else {
-            WORK_LOG_PLACEHOLDER
+            ActiveBreakDurationDisplay(
+                labelText = s(R.string.work_log_break_elapsed),
+                valueText = WORK_LOG_PLACEHOLDER
+            )
         }
         val formatter = DateTimeFormatter.ofPattern("d. MMM yyyy", Locale.getDefault())
 
@@ -329,11 +367,8 @@ class WorkLogDashboardViewModel(
             }
         }
 
-        val mealLoggedToday = hasMealLoggedToday(events)
-        val mealButtonEnabled =
-            sessionState in listOf(SessionState.WORKING, SessionState.ON_BREAK) &&
-                !mealLoggedToday &&
-                !isActionLocked()
+        val mealLoggedToday = resolvedSessionState.mealLogged
+        val mealButtonEnabled = resolvedSessionState.canLogMeal && !isActionLocked()
 
         val mealActionText = if (mealLoggedToday) {
             s(R.string.work_log_meal_logged_short)
@@ -364,7 +399,7 @@ class WorkLogDashboardViewModel(
                 null
             },
             showSecondaryActions = hasStartedToday,
-            showBreakActionButton = sessionState == SessionState.WORKING,
+            showBreakActionButton = resolvedSessionState.canStartBreak,
             showExpectedStart = !expectedStartText.isNullOrBlank(),
             expectedStartText = expectedStartText ?: WORK_LOG_PLACEHOLDER,
             showExpectedEnd = !expectedEndText.isNullOrBlank(),
@@ -379,13 +414,16 @@ class WorkLogDashboardViewModel(
             showTarget = hasStartedToday,
             showBalance = hasStartedToday && overtimeTrackingEnabled,
             targetWorkText = formatTargetMinutes(dailyTargetMinutes),
-            balanceText = calculateBalanceText(events, dailyTargetMinutes),
+            balanceText = formatBalanceText(accountingSummary.balanceMinutes),
+            showCreditedTime = hasStartedToday && showCreditedTime,
+            creditedTimeText = formatDuration(accountingSummary.creditedWorkMinutes),
             breakActionText = s(R.string.work_log_break_action_start),
-            breakButtonEnabled = sessionState == SessionState.WORKING && !isActionLocked(),
+            breakButtonEnabled = resolvedSessionState.canStartBreak && !isActionLocked(),
             isOnBreak = sessionState == SessionState.ON_BREAK,
-            showBreakInfo = hasBreakToday,
+            showBreakInfo = sessionState == SessionState.ON_BREAK && breakStart != null,
             breakStartedAtText = breakStartedAtText,
-            breakDurationText = breakDurationText,
+            breakDurationLabelText = breakDurationDisplay.labelText,
+            breakDurationText = breakDurationDisplay.valueText,
             showEndDeviation = endDeviation != null,
             endDeviationText = endDeviation?.text.orEmpty(),
             endDeviationTone = endDeviation?.tone ?: WorkLogDeviationTone.DEFAULT,
@@ -399,23 +437,8 @@ class WorkLogDashboardViewModel(
     }
 
     private fun findLastClockOut(events: List<WorkEvent>): WorkEvent? {
-        return events
-            .filter { it.type == CLOCK_OUT }
-            .maxByOrNull { it.time }
-    }
-
-    private fun findActiveBreakStart(events: List<WorkEvent>): WorkEvent? {
-        var currentBreakStart: WorkEvent? = null
-
-        for (event in events.sortedBy { it.time }) {
-            when (event.type) {
-                BREAK_START -> currentBreakStart = event
-                BREAK_END, CLOCK_OUT -> currentBreakStart = null
-                else -> Unit
-            }
-        }
-
-        return currentBreakStart
+        return WorkLogSessionStateResolver.ordered(events)
+            .lastOrNull { it.type == CLOCK_OUT }
     }
 
     private fun formatDuration(totalMinutes: Long): String {
@@ -425,54 +448,34 @@ class WorkLogDashboardViewModel(
         return "${hours}h ${minutes}m"
     }
 
-    private fun calculateWorkedTodayText(events: List<WorkEvent>): String {
-        var currentStart: LocalTime? = null
-        var breakStart: LocalTime? = null
-        var totalMinutes = 0L
-
-        for (event in events.sortedBy { it.time }) {
-            when (event.type) {
-                CLOCK_IN -> {
-                    currentStart = event.time
-                    breakStart = null
-                }
-
-                BREAK_START -> {
-                    if (currentStart != null) {
-                        totalMinutes += minutesBetween(currentStart, event.time)
-                        breakStart = event.time
-                        currentStart = null
-                    }
-                }
-
-                BREAK_END -> {
-                    if (breakStart != null) {
-                        currentStart = event.time
-                        breakStart = null
-                    }
-                }
-
-                CLOCK_OUT -> {
-                    if (currentStart != null) {
-                        totalMinutes += minutesBetween(currentStart, event.time)
-                        currentStart = null
-                    }
-                    breakStart = null
-                }
-
-                else -> Unit
-            }
-        }
-
-        if (currentStart != null) {
-            totalMinutes += minutesBetween(currentStart, LocalTime.now())
-        }
-
+    private fun formatWorkedTodayText(totalMinutes: Long): String {
         if (totalMinutes <= 0L) return WORK_LOG_PLACEHOLDER
+        return formatDuration(totalMinutes)
+    }
 
-        val hours = totalMinutes / 60
-        val minutes = totalMinutes % 60
-        return "${hours}h ${minutes}m"
+    private fun resolveActiveBreakDurationDisplay(
+        elapsedMinutes: Long,
+        defaultBreakMinutes: Int
+    ): ActiveBreakDurationDisplay {
+        if (defaultBreakMinutes <= 0) {
+            return ActiveBreakDurationDisplay(
+                labelText = s(R.string.work_log_break_elapsed),
+                valueText = formatDuration(elapsedMinutes)
+            )
+        }
+
+        val remainingMinutes = defaultBreakMinutes.toLong() - elapsedMinutes
+        return if (remainingMinutes >= 0) {
+            ActiveBreakDurationDisplay(
+                labelText = s(R.string.work_log_break_remaining),
+                valueText = formatDuration(remainingMinutes)
+            )
+        } else {
+            ActiveBreakDurationDisplay(
+                labelText = s(R.string.work_log_break_exceeded),
+                valueText = formatDuration(-remainingMinutes)
+            )
+        }
     }
 
     private fun minutesBetween(start: LocalTime, end: LocalTime): Long {
@@ -581,21 +584,17 @@ class WorkLogDashboardViewModel(
         )
     }
 
-    private fun calculateBalanceText(events: List<WorkEvent>, dailyTargetMinutes: Int): String {
-        val targetMinutes = dailyTargetMinutes.toLong()
-        val workedMinutes = calculateWorkedMinutes(events)
-        val diff = workedMinutes - targetMinutes
-
+    private fun formatBalanceText(balanceMinutes: Long): String {
         val sign = when {
-            diff > 0 -> "+"
-            diff < 0 -> "-"
+            balanceMinutes > 0 -> "+"
+            balanceMinutes < 0 -> "-"
             else -> ""
         }
 
-        return if (diff == 0L) {
+        return if (balanceMinutes == 0L) {
             "0h 00m"
         } else {
-            val absMinutes = kotlin.math.abs(diff).toInt()
+            val absMinutes = kotlin.math.abs(balanceMinutes).toInt()
             "$sign${formatTargetMinutes(absMinutes)}"
         }
     }
@@ -606,46 +605,13 @@ class WorkLogDashboardViewModel(
         return "${hours}h ${minutes.toString().padStart(2, '0')}m"
     }
 
-    private fun calculateWorkedMinutes(events: List<WorkEvent>): Long {
-        val sorted = events.sortedBy { it.time }
-
-        var currentStart: LocalTime? = null
-        var totalMinutes = 0L
-
-        for (event in sorted) {
-            when (event.type) {
-                CLOCK_IN -> currentStart = event.time
-
-                BREAK_START -> {
-                    if (currentStart != null) {
-                        totalMinutes += minutesBetween(currentStart, event.time)
-                        currentStart = null
-                    }
-                }
-
-                BREAK_END -> currentStart = event.time
-
-                CLOCK_OUT -> {
-                    if (currentStart != null) {
-                        totalMinutes += minutesBetween(currentStart, event.time)
-                        currentStart = null
-                    }
-                }
-
-                else -> Unit
-            }
-        }
-
-        return totalMinutes
-    }
-
     private fun calculateWorkedTextUntilEvent(
         events: List<WorkEvent>,
         clockOutEvent: WorkEvent
     ): String {
         val filtered = events
             .filter { it.time <= clockOutEvent.time }
-            .sortedBy { it.time }
+            .let(WorkLogSessionStateResolver::ordered)
 
         var currentStart: LocalTime? = null
         var totalMinutes = 0L
@@ -677,48 +643,28 @@ class WorkLogDashboardViewModel(
         return formatDuration(totalMinutes)
     }
 
+    /**
+     * Resolves the dashboard action state from the ordered event stream.
+     *
+     * A valid CLOCK_OUT after CLOCK_IN/BREAK marks the day as FINISHED. Keeping
+     * this resolver aligned with totals, validators, widgets, and recent events
+     * is required before v3.0 can safely support multiple sessions per day.
+     */
     private fun resolveSessionState(events: List<WorkEvent>): SessionState {
-        var state = SessionState.NOT_WORKING
+        return WorkLogSessionStateResolver.resolve(events).status.toDashboardSessionState()
+    }
 
-        val sortedEvents = events.sortedWith(
-            compareBy<WorkEvent> { it.time }.thenBy { it.id }
-        )
-
-        for (event in sortedEvents) {
-            when (event.type) {
-                CLOCK_IN -> state = SessionState.WORKING
-
-                BREAK_START -> {
-                    if (state == SessionState.WORKING) {
-                        state = SessionState.ON_BREAK
-                    }
-                }
-
-                BREAK_END -> {
-                    if (state == SessionState.ON_BREAK) {
-                        state = SessionState.WORKING
-                    }
-                }
-
-                CLOCK_OUT -> {
-                    if (state == SessionState.WORKING || state == SessionState.ON_BREAK) {
-                        state = SessionState.FINISHED
-                    }
-                }
-
-                else -> Unit
-            }
+    private fun WorkLogSessionStatus.toDashboardSessionState(): SessionState {
+        return when (this) {
+            WorkLogSessionStatus.NOT_STARTED -> SessionState.NOT_WORKING
+            WorkLogSessionStatus.WORKING -> SessionState.WORKING
+            WorkLogSessionStatus.ON_BREAK -> SessionState.ON_BREAK
+            WorkLogSessionStatus.FINISHED -> SessionState.FINISHED
         }
-
-        return state
     }
 
     private fun timeFormatter(): DateTimeFormatter {
         return DateTimeFormatter.ofPattern("HH:mm")
-    }
-
-    private fun hasMealLoggedToday(events: List<WorkEvent>): Boolean {
-        return events.any { it.type == MEAL }
     }
 
     private fun buildStartDeviation(
@@ -1121,7 +1067,9 @@ class WorkLogDashboardViewModel(
     }
 
     private fun syncPersistentNotification(events: List<WorkEvent>) {
-        when (resolveSessionState(events)) {
+        val resolvedSessionState = WorkLogSessionStateResolver.resolve(events)
+
+        when (resolvedSessionState.status.toDashboardSessionState()) {
             SessionState.NOT_WORKING,
             SessionState.FINISHED -> {
                 notificationManager.remove()
@@ -1129,7 +1077,7 @@ class WorkLogDashboardViewModel(
 
             SessionState.WORKING -> {
                 val clockIn = events.firstOrNull { it.type == CLOCK_IN }
-                val workedText = calculateWorkedTodayText(events)
+                val workedText = formatWorkedTodayText(resolvedSessionState.workedMinutes)
 
                 notificationManager.showOrUpdate(
                     WorkLogNotificationState(
@@ -1157,8 +1105,8 @@ class WorkLogDashboardViewModel(
 
             SessionState.ON_BREAK -> {
                 val clockIn = events.firstOrNull { it.type == CLOCK_IN }
-                val breakStart = findActiveBreakStart(events)
-                val workedText = calculateWorkedTodayText(events)
+                val breakStart = resolvedSessionState.activeBreakStart
+                val workedText = formatWorkedTodayText(resolvedSessionState.workedMinutes)
                 val breakDurationText = breakStart?.let {
                     formatDuration(minutesBetween(it.time, LocalTime.now()))
                 }
@@ -1233,6 +1181,11 @@ class WorkLogDashboardViewModel(
         val endTime: String?
     )
 
+    private data class ActiveBreakDurationDisplay(
+        val labelText: String,
+        val valueText: String
+    )
+
     private data class StartWarningReason(
         val label: String,
         val removableStatusLabel: String? = null
@@ -1263,6 +1216,7 @@ class WorkLogDashboardViewModel(
         val WORK_SETTINGS_KEYS = setOf(
             WorkSettingsPrefs.KEY_DAILY_TARGET_MINUTES,
             WorkSettingsPrefs.KEY_DEFAULT_BREAK_MINUTES,
+            WorkSettingsPrefs.KEY_BREAK_ACCOUNTING_MODE,
             WorkSettingsPrefs.KEY_OVERTIME_TRACKING_ENABLED,
             WorkSettingsPrefs.KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL,
             WorkSettingsPrefs.KEY_EXPECTED_STARTS_BY_LABEL

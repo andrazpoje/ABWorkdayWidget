@@ -8,6 +8,13 @@ import androidx.annotation.VisibleForTesting
 import com.dante.workcycle.widget.WidgetUpdater
 import com.dante.workcycle.widget.worklog.WorkLogWidgetProvider
 
+/**
+ * Central dispatcher for explicit widget refresh requests from app flows.
+ *
+ * Use this instead of sending ad-hoc broadcasts from feature code. It keeps
+ * Work Cycle and Work Time refresh paths separate while allowing settings,
+ * Work Log events, and schedule changes to refresh the relevant widget surface.
+ */
 object WidgetRefreshDispatcher {
 
     fun refreshWorkLogWidgets(context: Context) {

@@ -14,6 +14,7 @@ import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.domain.model.CycleLayer
 import com.dante.workcycle.domain.schedule.CycleManager
+import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
 import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
@@ -27,11 +28,13 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var workSettingsPrefs: WorkSettingsPrefs
     private lateinit var rowDailyTarget: View
     private lateinit var rowDefaultBreak: View
+    private lateinit var rowBreakAccountingMode: View
     private lateinit var rowOvertimeTracking: View
     private lateinit var rowWidgetInfoMode: View
     private lateinit var containerExpectedStartRows: LinearLayout
     private lateinit var textDailyTargetValue: TextView
     private lateinit var textDefaultBreakValue: TextView
+    private lateinit var textBreakAccountingModeValue: TextView
     private lateinit var textOvertimeTrackingValue: TextView
     private lateinit var textWidgetInfoModeValue: TextView
     private lateinit var switchOvertimeTracking: MaterialSwitch
@@ -62,11 +65,13 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private fun setupViews(view: View) {
         rowDailyTarget = view.findViewById(R.id.rowDailyTarget)
         rowDefaultBreak = view.findViewById(R.id.rowDefaultBreak)
+        rowBreakAccountingMode = view.findViewById(R.id.rowBreakAccountingMode)
         rowOvertimeTracking = view.findViewById(R.id.rowOvertimeTracking)
         rowWidgetInfoMode = view.findViewById(R.id.rowWidgetInfoMode)
         containerExpectedStartRows = view.findViewById(R.id.containerExpectedStartRows)
         textDailyTargetValue = view.findViewById(R.id.textDailyTargetValue)
         textDefaultBreakValue = view.findViewById(R.id.textDefaultBreakValue)
+        textBreakAccountingModeValue = view.findViewById(R.id.textBreakAccountingModeValue)
         textOvertimeTrackingValue = view.findViewById(R.id.textOvertimeTrackingValue)
         textWidgetInfoModeValue = view.findViewById(R.id.textWidgetInfoModeValue)
         switchOvertimeTracking = view.findViewById(R.id.switchOvertimeTracking)
@@ -79,6 +84,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
         rowDefaultBreak.setOnClickListener {
             showDefaultBreakDialog()
+        }
+
+        rowBreakAccountingMode.setOnClickListener {
+            showBreakAccountingModeDialog()
         }
 
         rowOvertimeTracking.setOnClickListener {
@@ -102,6 +111,9 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         )
         textDefaultBreakValue.text = formatBreakLabel(
             workSettingsPrefs.getDefaultBreakMinutes()
+        )
+        textBreakAccountingModeValue.text = getBreakAccountingModeLabel(
+            workSettingsPrefs.getBreakAccountingMode()
         )
 
         val overtimeEnabled = workSettingsPrefs.isOvertimeTrackingEnabled()
@@ -131,6 +143,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             .setTitle(R.string.work_log_settings_choose_daily_target)
             .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
                 workSettingsPrefs.setDailyTargetMinutes(presets[which])
+                refreshWorkLogWidget()
                 bindSettings()
                 dialog.dismiss()
             }
@@ -147,6 +160,24 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             .setTitle(R.string.work_log_settings_choose_default_break)
             .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
                 workSettingsPrefs.setDefaultBreakMinutes(presets[which])
+                refreshWorkLogWidget()
+                bindSettings()
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showBreakAccountingModeDialog() {
+        val modes = BreakAccountingMode.entries.toTypedArray()
+        val labels = modes.map(::getBreakAccountingModeLabel).toTypedArray()
+        val checkedIndex = modes.indexOf(workSettingsPrefs.getBreakAccountingMode()).coerceAtLeast(0)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.work_log_settings_choose_break_accounting)
+            .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
+                workSettingsPrefs.setBreakAccountingMode(modes[which])
+                refreshWorkLogWidget()
                 bindSettings()
                 dialog.dismiss()
             }
@@ -166,12 +197,27 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             .setTitle(R.string.work_log_settings_widget_info_mode)
             .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
                 workSettingsPrefs.setWidgetInfoMode(modes[which])
-                WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
+                refreshWorkLogWidget()
                 bindSettings()
                 dialog.dismiss()
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun getBreakAccountingModeLabel(mode: BreakAccountingMode): String {
+        return getString(
+            when (mode) {
+                BreakAccountingMode.UNPAID ->
+                    R.string.work_log_settings_break_accounting_unpaid
+                BreakAccountingMode.FULLY_PAID ->
+                    R.string.work_log_settings_break_accounting_fully_paid
+                BreakAccountingMode.PAID_ALLOWANCE ->
+                    R.string.work_log_settings_break_accounting_paid_allowance
+                BreakAccountingMode.EMPLOYER_POLICY_CUSTOM ->
+                    R.string.work_log_settings_break_accounting_custom
+            }
+        )
     }
 
     private fun getWidgetInfoModeLabel(mode: String): String {
@@ -365,6 +411,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         val safeValue = value?.trim().orEmpty()
         if (safeValue.isBlank()) return null
         return runCatching { LocalTime.parse(safeValue, timeFormatter) }.getOrNull()
+    }
+
+    private fun refreshWorkLogWidget() {
+        WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
     }
 
     private companion object {

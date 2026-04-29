@@ -10,6 +10,13 @@ import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.notifications.NotificationHelper
 import com.dante.workcycle.widget.WidgetUpdater
 
+/**
+ * Handles date/time boundary broadcasts that can invalidate schedule-based UI.
+ *
+ * The receiver refreshes Work Cycle widgets and notification text from
+ * [DefaultScheduleResolver]. Keep this path conservative: it should react to
+ * real date/time changes, not become a high-frequency widget update mechanism.
+ */
 class DayChangeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {

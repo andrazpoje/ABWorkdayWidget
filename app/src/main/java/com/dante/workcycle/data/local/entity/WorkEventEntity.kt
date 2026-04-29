@@ -6,6 +6,13 @@ import com.dante.workcycle.domain.model.WorkEventType
 import java.time.LocalDate
 import java.time.LocalTime
 
+/**
+ * Room representation of a Work Log event.
+ *
+ * Manual-edit audit fields are nullable so pre-audit events can be read without
+ * migration-side data synthesis. The event type must remain unchanged during a
+ * time correction.
+ */
 @Entity(tableName = "work_events")
 data class WorkEventEntity(
     @PrimaryKey(autoGenerate = true)

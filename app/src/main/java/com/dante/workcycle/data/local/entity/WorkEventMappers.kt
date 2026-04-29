@@ -3,6 +3,10 @@ package com.dante.workcycle.data.local.entity
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventEditAudit
 
+/**
+ * Converts persisted event rows into domain events while preserving optional
+ * manual-edit audit metadata for recent events and future widget consistency.
+ */
 fun WorkEventEntity.toDomain(): WorkEvent {
     val audit = if (
         editAuditOldTime != null &&
@@ -34,6 +38,10 @@ fun WorkEventEntity.toDomain(): WorkEvent {
     )
 }
 
+/**
+ * Converts a domain event back to Room without changing its event type or
+ * dropping manual correction metadata.
+ */
 fun WorkEvent.toEntity(): WorkEventEntity {
     val audit = editAudit
     return WorkEventEntity(

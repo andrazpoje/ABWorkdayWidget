@@ -4,18 +4,19 @@
     <!-- ========================================================= -->
     <!-- HELP / CONTENT -->
     <!-- ========================================================= -->
-    <string name="help_getting_started_content">• First check Templates – there might already be a schedule that fits your needs.\n• If not, set the cycle start date.\n• Define cycle labels (e.g. A, B or Morning, Afternoon, Night).\n• Select which label applies on the start date.\n• Configure rules (skip weekends or holidays if needed).\n• Save your settings.\n• Optionally add the widget to your home screen.</string>
-    <string name="help_cycle_logic_content">• The start date is the reference point of the cycle.\n• The selected label applies to that date.\n• Each valid day advances the cycle.\n• Skipped weekends or holidays do not affect the cycle.</string>
+    <string name="help_getting_started_content">• On first launch, WorkCycle guides you through the basic cycle setup.\n• Choose a template if one already fits your work schedule.\n• If you use a custom cycle, set the start date and choose which label applies on that date.\n• Configure cycle rules such as skipped weekends or holidays if needed.\n• After setup, cycle and template settings can be changed from Settings.\n• Add the Work Cycle or Work Time widget to your home screen if you want quick access.</string>
 
-    <string name="help_assignments_content">• Secondary labels add extra labels (e.g. O1, vacation, sick leave).\n• Edit a day in the 7-day preview or calendar.\n• Secondary labels can override or complement the cycle.\n• You can toggle secondary label visibility in settings.</string>
+    <string name="help_cycle_logic_content">• The start date is the reference point of the cycle.\n• The selected first label applies to that date.\n• Each valid workday advances the cycle.\n• Skipped weekends or holidays do not advance the cycle.\n• Templates may lock some settings when the schedule is predefined.\n• The Week, Month and widgets all use the same resolved schedule data.</string>
 
-    <string name="help_preview_content">• Shows the next 7 days based on current settings.\n• Tap a day to edit its labels.\n• Changes appear after saving.\n• Reflects both cycle rules and secondary labels.</string>
+    <string name="help_assignments_content">• Secondary labels add extra work information to a day, such as routes, work areas, shifts or assignments.\n• Status labels are separate and cover states such as vacation, sick leave, field work or standby.\n• Tap a day in Week or Month to edit its secondary label or status.\n• Built-in status labels are translated automatically.\n• Custom labels are kept exactly as you entered them.\n• You can control secondary label visibility from Settings.</string>
 
-    <string name="help_calendar_content">• Displays a monthly overview of the cycle.\n• Each day shows a short label (A, B, O1).\n• Tap a day to see details.\n• Combines cycle and secondary label data.</string>
+    <string name="help_preview_content">• Week shows an operational overview of the selected week.\n• Use week navigation to check nearby days.\n• Each day can show the primary cycle, secondary label and status.\n• Week is no longer used for cycle configuration.\n• To change templates, cycle labels, start date or rules, open Settings.</string>
 
-    <string name="help_widget_content">• The widget shows your current cycle.\n• It updates automatically every day.\n• You can customize its appearance in settings.\n• Uses the same data as the app.</string>
+    <string name="help_calendar_content">• Month shows a monthly overview of your schedule.\n• Each day can show the primary cycle label, secondary label and status icon.\n• Tap a day to see or edit details.\n• Month uses the same resolved schedule rules as Week and widgets.\n• Short labels are recommended for better readability.</string>
 
-    <string name="help_tips_content">• Use short labels for better readability.\n• Keep the cycle simple (A/B or 2–3 shifts).\n• Use secondary labels for exceptions.\n• If something looks wrong, check start date and rules.</string>
+    <string name="help_widget_content">• The Work Cycle widget shows the current schedule directly on your home screen.\n• Upcoming days use the same resolved schedule data as the app.\n• The Work Time widget shows your current work tracking state and balance.\n• Widgets update automatically, but Android may delay updates depending on battery and launcher behavior.\n• You can customize widget appearance from Settings.</string>
+
+    <string name="help_tips_content">• Keep primary cycle labels short, such as A, B, Morning, Afternoon or Night.\n• Use secondary labels for routes, locations, vacation, sick leave or special duties.\n• If the schedule looks wrong, check the template, start date, first label and skipped-day rules.\n• Manual Work Log corrections are marked so edited events stay traceable.\n• If you enter a manual Work Log time in the future, WorkCycle shows an extra warning.\n• In the current version, a finished Work Log day does not show Start again, because one completed session per day is supported.</string>
 
     <!-- ========================================================= -->
     <!-- HELP / WHAT'S NEW -->
@@ -23,5 +24,5 @@
     <string name="whats_new_title">What’s New</string>
     <string name="whats_new_version_format">Version %1$s</string>
     <string name="whats_new_view_full_changelog">View full changelog</string>
-    <string name="whats_new_content">• New weekly overview on Home with week navigation\n• Clearer primary and secondary label display, e.g. B • Š1\n• Improved Work Log widget with balance display\n• Work Log now supports expected times from secondary labels\n• Added warning before starting work on off days, vacation or sick leave\n• Improved Work Log dashboard and recent events layout</string>
+    <string name="whats_new_content">• Improved first-run setup with clearer onboarding steps\n• Fixed startup flow so onboarding appears before What’s New on fresh installs\n• Cleaned up Week so it is focused on the operational weekly overview\n• Moved legacy setup migration into a safer startup path\n• Improved Help text and widget terminology\n• Added debug-only developer tools for faster onboarding and local reset testing\n• Added technical cleanup and documentation foundations for future v3.0 features</string>
 </resources>

@@ -7,6 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 
+/**
+ * Conservative minute-refresh scheduler for the Work Time widget.
+ *
+ * Scheduling is only requested when the rendered widget state reports an active
+ * live mode. Keep this separate from Work Cycle date-boundary refreshes and do
+ * not use it for general widget updates.
+ */
 object WorkLogWidgetRefreshScheduler {
 
     const val ACTION_REFRESH = "com.dante.workcycle.widget.worklog.ACTION_REFRESH"

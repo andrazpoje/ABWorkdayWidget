@@ -4,13 +4,26 @@ import android.content.Context
 import com.dante.workcycle.R
 import com.dante.workcycle.core.util.DateProvider
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
+import com.dante.workcycle.data.prefs.toAccountingRules
 import com.dante.workcycle.data.repository.RepositoryProvider
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
+import com.dante.workcycle.domain.worklog.WorkLogSessionStatus
+import com.dante.workcycle.domain.worklog.accounting.WorkLogAccountingCalculator
 import kotlinx.coroutines.runBlocking
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Builds the Work Time widget display state from the same Work Event timeline
+ * used by the dashboard.
+ *
+ * Widget totals, balance, and live-refresh requirements must stay consistent
+ * with dashboard session state, recent events, and manual edit audit safety.
+ * This class does not schedule refreshes; it only describes whether the
+ * rendered state needs minute refresh while active.
+ */
 class WorkLogWidgetStateFactory(
     private val context: Context
 ) {
@@ -24,6 +37,10 @@ class WorkLogWidgetStateFactory(
 
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
+    /**
+     * Reads today's events and returns a safe fallback state if storage access
+     * fails during widget rendering.
+     */
     fun createCurrentState(): WorkLogWidgetState {
         return runCatching {
             runBlocking {
@@ -35,13 +52,24 @@ class WorkLogWidgetStateFactory(
     }
 
     private fun createState(events: List<WorkEvent>): WorkLogWidgetState {
-        val sortedEvents = events.sortedBy { it.time }
+        val resolvedState = WorkLogSessionStateResolver.resolve(events)
+        val sortedEvents = resolvedState.orderedEvents
+        val balanceText = formatBalanceText(
+            WorkLogAccountingCalculator.calculate(
+                sessionState = resolvedState,
+                rules = workSettingsPrefs.toAccountingRules()
+            ).balanceMinutes
+        )
 
-        return when (resolveSessionState(sortedEvents)) {
-            SessionState.NOT_STARTED -> createNotStartedState()
-            SessionState.WORKING -> createWorkingState(sortedEvents)
-            SessionState.ON_BREAK -> createOnBreakState(sortedEvents)
-            SessionState.FINISHED -> createFinishedState(sortedEvents)
+        return when (resolvedState.status) {
+            WorkLogSessionStatus.NOT_STARTED -> createNotStartedState()
+            WorkLogSessionStatus.WORKING -> createWorkingState(sortedEvents, balanceText)
+            WorkLogSessionStatus.ON_BREAK -> createOnBreakState(
+                events = sortedEvents,
+                activeBreakStart = resolvedState.activeBreakStart,
+                balanceText = balanceText
+            )
+            WorkLogSessionStatus.FINISHED -> createFinishedState(sortedEvents, balanceText)
         }
     }
 
@@ -54,7 +82,10 @@ class WorkLogWidgetStateFactory(
         )
     }
 
-    private fun createWorkingState(events: List<WorkEvent>): WorkLogWidgetState {
+    private fun createWorkingState(
+        events: List<WorkEvent>,
+        balanceText: String
+    ): WorkLogWidgetState {
         val clockIn = events.firstOrNull { it.type == WorkEventType.CLOCK_IN }
         val startedAtText = context.getString(
             R.string.work_log_widget_started_at_value,
@@ -68,16 +99,19 @@ class WorkLogWidgetStateFactory(
             statusText = context.getString(R.string.work_log_state_working),
             primaryValueText = if (isLiveMode) formatWorkedTodayText(workedMinutes) else startedAtText,
             secondaryValueText = if (isLiveMode) startedAtText else formatWorkedTodayText(workedMinutes),
-            tertiaryValueText = formatBalanceText(workedMinutes),
+            tertiaryValueText = balanceText,
             requiresMinuteRefresh = isLiveMode
         )
     }
 
-    private fun createOnBreakState(events: List<WorkEvent>): WorkLogWidgetState {
-        val breakStart = findActiveBreakStart(events)
+    private fun createOnBreakState(
+        events: List<WorkEvent>,
+        activeBreakStart: WorkEvent?,
+        balanceText: String
+    ): WorkLogWidgetState {
         val breakStartedText = context.getString(
             R.string.work_log_widget_break_started_value,
-            breakStart?.time?.format(timeFormatter).orEmpty()
+            activeBreakStart?.time?.format(timeFormatter).orEmpty()
         )
         val isLiveMode = isLiveWidgetInfoMode()
         val workedMinutes = calculateWorkedMinutes(events)
@@ -87,12 +121,15 @@ class WorkLogWidgetStateFactory(
             statusText = context.getString(R.string.work_log_state_break),
             primaryValueText = if (isLiveMode) formatWorkedTodayText(workedMinutes) else breakStartedText,
             secondaryValueText = if (isLiveMode) breakStartedText else formatWorkedTodayText(workedMinutes),
-            tertiaryValueText = formatBalanceText(workedMinutes),
+            tertiaryValueText = balanceText,
             requiresMinuteRefresh = isLiveMode
         )
     }
 
-    private fun createFinishedState(events: List<WorkEvent>): WorkLogWidgetState {
+    private fun createFinishedState(
+        events: List<WorkEvent>,
+        balanceText: String
+    ): WorkLogWidgetState {
         val lastClockOut = events.lastOrNull { it.type == WorkEventType.CLOCK_OUT }
         val workedMinutes = calculateWorkedMinutes(events)
 
@@ -104,64 +141,8 @@ class WorkLogWidgetStateFactory(
                 lastClockOut?.time?.format(timeFormatter).orEmpty()
             ),
             secondaryValueText = formatWorkedTodayText(workedMinutes),
-            tertiaryValueText = formatBalanceText(workedMinutes)
+            tertiaryValueText = balanceText
         )
-    }
-
-    private fun resolveSessionState(events: List<WorkEvent>): SessionState {
-        var isWorking = false
-        var isOnBreak = false
-        var hasClockOut = false
-
-        for (event in events) {
-            when (event.type) {
-                WorkEventType.CLOCK_IN -> {
-                    isWorking = true
-                    isOnBreak = false
-                }
-
-                WorkEventType.BREAK_START -> {
-                    if (isWorking) {
-                        isOnBreak = true
-                    }
-                }
-
-                WorkEventType.BREAK_END -> {
-                    if (isWorking) {
-                        isOnBreak = false
-                    }
-                }
-
-                WorkEventType.CLOCK_OUT -> {
-                    isWorking = false
-                    isOnBreak = false
-                    hasClockOut = true
-                }
-
-                else -> Unit
-            }
-        }
-
-        return when {
-            isWorking && isOnBreak -> SessionState.ON_BREAK
-            isWorking -> SessionState.WORKING
-            hasClockOut -> SessionState.FINISHED
-            else -> SessionState.NOT_STARTED
-        }
-    }
-
-    private fun findActiveBreakStart(events: List<WorkEvent>): WorkEvent? {
-        var currentBreakStart: WorkEvent? = null
-
-        for (event in events) {
-            when (event.type) {
-                WorkEventType.BREAK_START -> currentBreakStart = event
-                WorkEventType.BREAK_END, WorkEventType.CLOCK_OUT -> currentBreakStart = null
-                else -> Unit
-            }
-        }
-
-        return currentBreakStart
     }
 
     private fun calculateWorkedMinutes(events: List<WorkEvent>): Long {
@@ -222,16 +203,18 @@ class WorkLogWidgetStateFactory(
                 WorkSettingsPrefs.WIDGET_INFO_MODE_WORKED_TODAY
     }
 
-    private fun formatBalanceText(workedMinutes: Long): String {
-        val targetMinutes = workSettingsPrefs.getDailyTargetMinutes().toLong()
-        val difference = workedMinutes - targetMinutes
+    private fun formatBalanceText(balanceMinutes: Long): String {
         val sign = when {
-            difference > 0L -> "+"
-            difference < 0L -> "-"
+            balanceMinutes > 0L -> "+"
+            balanceMinutes < 0L -> "-"
             else -> ""
         }
 
-        val value = if (difference == 0L) "0m" else sign + formatCompactDuration(kotlin.math.abs(difference))
+        val value = if (balanceMinutes == 0L) {
+            "0m"
+        } else {
+            sign + formatCompactDuration(kotlin.math.abs(balanceMinutes))
+        }
 
         return context.getString(R.string.work_log_widget_balance_value, value)
     }
@@ -255,10 +238,4 @@ class WorkLogWidgetStateFactory(
         return "${hours}h ${minutes.toString().padStart(2, '0')}m"
     }
 
-    private enum class SessionState {
-        NOT_STARTED,
-        WORKING,
-        ON_BREAK,
-        FINISHED
-    }
 }

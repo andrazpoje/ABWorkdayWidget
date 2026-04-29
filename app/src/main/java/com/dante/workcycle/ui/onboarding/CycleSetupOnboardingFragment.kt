@@ -34,6 +34,18 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
+/**
+ * First-run cycle setup flow.
+ *
+ * This fragment owns initial WorkCycle configuration only: choosing a template,
+ * optional start date, optional first label, and completion state. Long-term
+ * editing belongs in Settings via [PrimaryCycleSettingsController]. Locked
+ * templates and single-label cycles intentionally skip setup steps that are not
+ * meaningful for that template.
+ *
+ * TODO(v3.0): Consider adding optional Work Log setup and language selection
+ * after the base cycle is configured, without duplicating Settings logic.
+ */
 class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle_setup) {
 
     private enum class Step {
@@ -144,6 +156,10 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
         )
     }
 
+    /**
+     * Updates the draft template and resets dependent draft fields from template
+     * capabilities without applying the template to persistent settings yet.
+     */
     private fun applyTemplateSelection(templateId: String) {
         selectedTemplateId = templateId.takeIf { it != CUSTOM_TEMPLATE_ID }
 
@@ -209,8 +225,6 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
             binding.onboardingStepsContainer.addView(
                 createStepCard(
                     step = step,
-                    index = index,
-                    total = steps.size,
                     state = when {
                         index < currentIndex -> StepState.COMPLETED
                         index == currentIndex -> StepState.ACTIVE
@@ -225,8 +239,6 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
 
     private fun createStepCard(
         step: Step,
-        index: Int,
-        total: Int,
         state: StepState
     ): MaterialCardView {
         val context = requireContext()
@@ -263,11 +275,7 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
                         R.string.onboarding_completed_step_format,
                         getString(step.titleRes())
                     )
-                    isActive -> getString(
-                        R.string.onboarding_active_step_title_format,
-                        getString(R.string.onboarding_step_count_format, index + 1, total),
-                        getString(step.titleRes())
-                    )
+                    isActive -> getString(step.titleRes())
                     else -> getString(step.titleRes())
                 }
                 textSize = if (isActive) 16f else 14f
@@ -418,6 +426,25 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
 
     private fun addDoneContent(content: LinearLayout) {
         val onSurface = resolveThemeColor(com.google.android.material.R.attr.colorOnSurface)
+        val onSurfaceVariant = resolveThemeColor(com.google.android.material.R.attr.colorOnSurfaceVariant)
+        val template = selectedTemplate()
+
+        if (template != null && template.hasLockedSetup()) {
+            content.addText(
+                text = getString(R.string.onboarding_locked_template_helper),
+                textSize = 13f,
+                color = onSurfaceVariant,
+                topMargin = 10
+            )
+        }
+
+        content.addText(
+            text = getString(R.string.onboarding_done_settings_helper),
+            textSize = 13f,
+            color = onSurfaceVariant,
+            topMargin = 10
+        )
+
         content.addText(
             text = summaryLines().joinToString(separator = "\n"),
             textSize = 14f,
@@ -467,6 +494,10 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
         binding.onboardingFinishButton.isVisible = isDone
     }
 
+    /**
+     * Persists the initial cycle setup through the same template and cycle
+     * helpers used by Settings, then marks onboarding complete.
+     */
     private fun finishOnboarding() {
         val context = requireContext()
         val template = selectedTemplate()
@@ -505,6 +536,12 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
         }
     }
 
+    /**
+     * Builds the visible accordion steps for the selected template.
+     *
+     * Locked templates and single-label cycles are shortened so users do not see
+     * irrelevant start-date or first-label steps.
+     */
     private fun stepsForCurrentSelection(): List<Step> {
         val steps = mutableListOf(Step.TEMPLATE)
         val template = selectedTemplate()
@@ -520,10 +557,18 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
         return steps
     }
 
+    /**
+     * Start date matters only when the template allows it and the cycle has more
+     * than one label.
+     */
     private fun shouldShowStartDateStep(template: ScheduleTemplate?): Boolean {
         return template?.allowsStartDateEditing != false && !isSingleLabelCycleSelected()
     }
 
+    /**
+     * First label matters only when cycle editing is not locked and the selected
+     * cycle can actually rotate between multiple labels.
+     */
     private fun shouldShowFirstLabelStep(template: ScheduleTemplate?): Boolean {
         return template?.locksCycleEditing != true && !isSingleLabelCycleSelected()
     }
@@ -625,6 +670,10 @@ class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle
                 R.string.template_posta_slovenije_picker_description
             else -> descriptionRes
         }
+    }
+
+    private fun ScheduleTemplate.hasLockedSetup(): Boolean {
+        return locksCycleEditing || !allowsStartDateEditing
     }
 
     private enum class StepState {

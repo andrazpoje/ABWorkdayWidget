@@ -5,6 +5,12 @@ import androidx.room.PrimaryKey
 import java.time.LocalDate
 import java.time.LocalTime
 
+/**
+ * Room representation of the legacy daily Work Log aggregate.
+ *
+ * This is intentionally separate from the event timeline used by the current
+ * dashboard and Work Time widget.
+ */
 @Entity(tableName = "work_logs")
 data class WorkLogEntity(
     @PrimaryKey(autoGenerate = true)

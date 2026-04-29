@@ -8,6 +8,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
+/**
+ * Repository boundary for legacy daily Work Log aggregate rows.
+ *
+ * The current dashboard flow is event-based; keep this repository for aggregate
+ * compatibility and avoid mixing it into event timeline state resolution.
+ */
 class WorkLogRepository(
     private val dao: WorkLogDao
 ) {

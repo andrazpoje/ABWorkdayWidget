@@ -6,6 +6,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 
+/**
+ * AppWidgetProvider for the Work Time widget.
+ *
+ * The provider coordinates state creation, RemoteViews rendering, and optional
+ * minute refresh scheduling. Work Log session decisions belong in
+ * [WorkLogWidgetStateFactory] and must stay consistent with the dashboard,
+ * recent events, manual edit audit safety, and future multiple-session support.
+ */
 class WorkLogWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -22,6 +30,10 @@ class WorkLogWidgetProvider : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
+    /**
+     * Renders every widget instance and schedules minute refresh only when the
+     * current Work Log state explicitly requires live active-session updates.
+     */
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,

@@ -8,6 +8,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
+/**
+ * Repository boundary for the event-based Work Log timeline.
+ *
+ * Callers should keep using this API for dashboard state, recent events, manual
+ * edit audit data, and widget summaries so all surfaces resolve the same day
+ * state.
+ */
 class WorkEventRepository(
     private val dao: WorkEventDao
 ) {

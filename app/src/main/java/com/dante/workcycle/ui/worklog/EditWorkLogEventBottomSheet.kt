@@ -29,6 +29,14 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Bottom sheet for manually correcting the date/time of an existing Work Log
+ * event.
+ *
+ * Manual corrections must preserve the original event type and record audit
+ * metadata. If the selected timestamp is in the future, the user must confirm
+ * the correction before it is saved.
+ */
 class EditWorkLogEventBottomSheet(
     private val event: WorkEvent,
     private val onSaved: (() -> Unit)? = null
@@ -152,6 +160,10 @@ class EditWorkLogEventBottomSheet(
         }
     }
 
+    /**
+     * Confirms intentional future-time corrections before audit metadata is
+     * persisted with wasFutureTime=true.
+     */
     private fun showFutureTimeWarning() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.work_log_edit_future_time_title)
@@ -196,6 +208,10 @@ class EditWorkLogEventBottomSheet(
         val time: LocalTime
     )
 
+    /**
+     * Holds the pending manual correction and writes audit metadata only when
+     * the event date or time changes.
+     */
     class EditWorkLogEventViewModel(
         private val originalEvent: WorkEvent,
         private val repository: com.dante.workcycle.data.repository.WorkEventRepository
@@ -217,6 +233,10 @@ class EditWorkLogEventBottomSheet(
             _uiState.value = _uiState.value.copy(time = time)
         }
 
+        /**
+         * Returns true only for actual date/time corrections that point after
+         * the current device time.
+         */
         fun isFutureTimeEdit(): Boolean {
             if (!hasTimeCorrection()) return false
 
@@ -228,6 +248,10 @@ class EditWorkLogEventBottomSheet(
             return selectedDateTime.isAfter(LocalDateTime.now())
         }
 
+        /**
+         * Validates both the original and destination day timelines so moving an
+         * event cannot silently create an invalid Work Log sequence.
+         */
         suspend fun validate(): Int? {
             val updatedEvent = originalEvent.copy(
                 date = uiState.value.date,
@@ -245,6 +269,10 @@ class EditWorkLogEventBottomSheet(
             )
         }
 
+        /**
+         * Saves the correction while keeping the original event type intact and
+         * attaching latest-edit audit metadata when time changed.
+         */
         suspend fun save(wasFutureTime: Boolean) {
             val updatedDate = uiState.value.date
             val updatedTime = uiState.value.time
