@@ -10,7 +10,6 @@ import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
 import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
 import com.dante.workcycle.domain.worklog.WorkLogSessionStatus
-import com.dante.workcycle.domain.worklog.accounting.WorkLogAccountingCalculator
 import kotlinx.coroutines.runBlocking
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -55,10 +54,10 @@ class WorkLogWidgetStateFactory(
         val resolvedState = WorkLogSessionStateResolver.resolve(events)
         val sortedEvents = resolvedState.orderedEvents
         val balanceText = formatBalanceText(
-            WorkLogAccountingCalculator.calculate(
+            WorkLogWidgetBalanceCalculator.calculateBalanceMinutes(
                 sessionState = resolvedState,
                 rules = workSettingsPrefs.toAccountingRules()
-            ).balanceMinutes
+            )
         )
 
         return when (resolvedState.status) {
