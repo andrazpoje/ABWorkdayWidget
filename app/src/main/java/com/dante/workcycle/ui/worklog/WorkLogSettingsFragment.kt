@@ -1,36 +1,52 @@
 package com.dante.workcycle.ui.worklog
 
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.dante.workcycle.R
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
+import com.dante.workcycle.data.repository.RepositoryProvider
 import com.dante.workcycle.domain.model.CycleLayer
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
+import com.dante.workcycle.domain.worklog.export.WorkLogCsvExporter
 import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.OutputStreamWriter
+import java.nio.charset.StandardCharsets
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
     private lateinit var workSettingsPrefs: WorkSettingsPrefs
+    private val workEventRepository by lazy {
+        RepositoryProvider.workEventRepository(requireContext())
+    }
     private lateinit var rowDailyTarget: View
     private lateinit var rowDefaultBreak: View
     private lateinit var rowBreakAccountingMode: View
     private lateinit var rowOvertimeTracking: View
     private lateinit var rowWidgetInfoMode: View
+    private lateinit var rowExportWorkLogCsv: View
     private lateinit var containerExpectedStartRows: LinearLayout
     private lateinit var textDailyTargetValue: TextView
     private lateinit var textDefaultBreakValue: TextView
@@ -40,6 +56,13 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var switchOvertimeTracking: MaterialSwitch
 
     private var isBindingSwitch = false
+    private val exportWorkLogCsvLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("text/csv")
+    ) { uri ->
+        if (uri != null) {
+            exportWorkLogCsv(uri)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,6 +91,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         rowBreakAccountingMode = view.findViewById(R.id.rowBreakAccountingMode)
         rowOvertimeTracking = view.findViewById(R.id.rowOvertimeTracking)
         rowWidgetInfoMode = view.findViewById(R.id.rowWidgetInfoMode)
+        rowExportWorkLogCsv = view.findViewById(R.id.rowExportWorkLogCsv)
         containerExpectedStartRows = view.findViewById(R.id.containerExpectedStartRows)
         textDailyTargetValue = view.findViewById(R.id.textDailyTargetValue)
         textDefaultBreakValue = view.findViewById(R.id.textDefaultBreakValue)
@@ -96,6 +120,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
         rowWidgetInfoMode.setOnClickListener {
             showWidgetInfoModeDialog()
+        }
+
+        rowExportWorkLogCsv.setOnClickListener {
+            exportWorkLogCsvLauncher.launch(buildWorkLogCsvFileName())
         }
 
         switchOvertimeTracking.setOnCheckedChangeListener { _, isChecked ->
@@ -415,6 +443,47 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
     private fun refreshWorkLogWidget() {
         WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
+    }
+
+    private fun buildWorkLogCsvFileName(): String {
+        return "workcycle-work-log-${LocalDate.now()}.csv"
+    }
+
+    private fun exportWorkLogCsv(uri: Uri) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val exportResult = runCatching {
+                val events = withContext(Dispatchers.IO) {
+                    workEventRepository.getAllEventsForExport()
+                }
+                val csv = WorkLogCsvExporter.export(events)
+
+                withContext(Dispatchers.IO) {
+                    requireContext().contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        OutputStreamWriter(outputStream, StandardCharsets.UTF_8).use { writer ->
+                            writer.write(csv)
+                            writer.flush()
+                        }
+                    } ?: error("Failed to open CSV export output stream.")
+                }
+
+                events.isEmpty()
+            }
+
+            if (exportResult.isSuccess) {
+                val messageRes = if (exportResult.getOrDefault(false)) {
+                    R.string.work_log_export_csv_header_only
+                } else {
+                    R.string.work_log_export_csv_success
+                }
+                Toast.makeText(requireContext(), getString(messageRes), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.work_log_export_csv_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private companion object {

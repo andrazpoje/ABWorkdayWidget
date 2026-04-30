@@ -19,6 +19,10 @@ class WorkEventRepository(
     private val dao: WorkEventDao
 ) {
 
+    suspend fun getAllEventsForExport(): List<WorkEvent> {
+        return dao.getAllOrdered().map { it.toDomain() }
+    }
+
     suspend fun getByDate(date: LocalDate): List<WorkEvent> {
         return dao.getByDate(date).map { it.toDomain() }
     }

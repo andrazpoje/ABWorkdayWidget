@@ -208,4 +208,9 @@
     <string name="work_log_settings_weekly_target_body">Spremljaj pričakovani delovni čas čez cel teden, ne samo po dnevih.</string>
     <string name="work_log_settings_reminders">Opomniki za pozabljen zaključek dela</string>
     <string name="work_log_settings_reminders_body">Dodaj pravila za opomnike na dneve, ko je bilo delo začeto, ne pa tudi zaključeno.</string>
+    <string name="work_log_settings_export_csv">Izvozi Work Log CSV</string>
+    <string name="work_log_settings_export_csv_helper">Izvozi surove Work Log dogodke z audit podatki ročnih popravkov.</string>
+    <string name="work_log_export_csv_success">Work Log CSV je izvožen</string>
+    <string name="work_log_export_csv_failed">Izvoz Work Log CSV ni uspel</string>
+    <string name="work_log_export_csv_header_only">Ni najdenih Work Log dogodkov, izvožena je samo glava CSV.</string>
 </resources>
