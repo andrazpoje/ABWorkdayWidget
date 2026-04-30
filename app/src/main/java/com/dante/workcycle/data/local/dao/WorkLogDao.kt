@@ -17,6 +17,9 @@ import java.time.LocalDate
 @Dao
 interface WorkLogDao {
 
+    @Query("SELECT * FROM work_logs ORDER BY date ASC, id ASC")
+    suspend fun getAllOrdered(): List<WorkLogEntity>
+
     @Query("SELECT * FROM work_logs WHERE date = :date LIMIT 1")
     suspend fun getByDate(date: LocalDate): WorkLogEntity?
 

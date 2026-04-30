@@ -11,12 +11,18 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
+import com.dante.workcycle.WorkCycleApp
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
+import com.dante.workcycle.data.local.db.AppDatabase
 import com.dante.workcycle.data.prefs.AssignmentLabelsPrefs
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.data.repository.RepositoryProvider
+import com.dante.workcycle.domain.backup.WorkCycleBackupManifest
+import com.dante.workcycle.domain.backup.WorkCycleBackupPayloadCollector
+import com.dante.workcycle.domain.backup.WorkCycleBackupWriter
 import com.dante.workcycle.domain.model.CycleLayer
 import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
@@ -47,6 +53,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var rowOvertimeTracking: View
     private lateinit var rowWidgetInfoMode: View
     private lateinit var rowExportWorkLogCsv: View
+    private lateinit var rowExportFullBackup: View
     private lateinit var containerExpectedStartRows: LinearLayout
     private lateinit var textDailyTargetValue: TextView
     private lateinit var textDefaultBreakValue: TextView
@@ -61,6 +68,13 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     ) { uri ->
         if (uri != null) {
             exportWorkLogCsv(uri)
+        }
+    }
+    private val exportFullBackupLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/zip")
+    ) { uri ->
+        if (uri != null) {
+            exportFullBackup(uri)
         }
     }
 
@@ -92,6 +106,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         rowOvertimeTracking = view.findViewById(R.id.rowOvertimeTracking)
         rowWidgetInfoMode = view.findViewById(R.id.rowWidgetInfoMode)
         rowExportWorkLogCsv = view.findViewById(R.id.rowExportWorkLogCsv)
+        rowExportFullBackup = view.findViewById(R.id.rowExportFullBackup)
         containerExpectedStartRows = view.findViewById(R.id.containerExpectedStartRows)
         textDailyTargetValue = view.findViewById(R.id.textDailyTargetValue)
         textDefaultBreakValue = view.findViewById(R.id.textDefaultBreakValue)
@@ -124,6 +139,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
         rowExportWorkLogCsv.setOnClickListener {
             exportWorkLogCsvLauncher.launch(buildWorkLogCsvFileName())
+        }
+
+        rowExportFullBackup.setOnClickListener {
+            exportFullBackupLauncher.launch(buildFullBackupFileName())
         }
 
         switchOvertimeTracking.setOnCheckedChangeListener { _, isChecked ->
@@ -449,6 +468,21 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         return "workcycle-work-log-${LocalDate.now()}.csv"
     }
 
+    private fun buildFullBackupFileName(): String {
+        return "workcycle-backup-${LocalDate.now()}.zip"
+    }
+
+    private fun buildBackupManifest(): WorkCycleBackupManifest {
+        return WorkCycleBackupManifest(
+            backupFormatVersion = 1,
+            createdAt = System.currentTimeMillis(),
+            appVersionName = BuildConfig.VERSION_NAME,
+            appVersionCode = BuildConfig.VERSION_CODE,
+            databaseVersion = AppDatabase.DATABASE_VERSION,
+            packageName = BuildConfig.APPLICATION_ID
+        )
+    }
+
     private fun exportWorkLogCsv(uri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch {
             val exportResult = runCatching {
@@ -480,6 +514,45 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.work_log_export_csv_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun exportFullBackup(uri: Uri) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val exportResult = runCatching {
+                val app = requireContext().applicationContext as WorkCycleApp
+                val collector = WorkCycleBackupPayloadCollector(
+                    context = requireContext(),
+                    database = app.database
+                )
+                val payload = withContext(Dispatchers.IO) {
+                    collector.collect(buildBackupManifest())
+                }
+                val zipBytes = withContext(Dispatchers.IO) {
+                    WorkCycleBackupWriter.toByteArray(payload)
+                }
+
+                withContext(Dispatchers.IO) {
+                    requireContext().contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(zipBytes)
+                        outputStream.flush()
+                    } ?: error("Failed to open backup export output stream.")
+                }
+            }
+
+            if (exportResult.isSuccess) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.work_cycle_backup_export_success),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.work_cycle_backup_export_failed),
                     Toast.LENGTH_SHORT
                 ).show()
             }

@@ -30,6 +30,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun workEventDao(): WorkEventDao
 
     companion object {
+        const val DATABASE_VERSION = 3
+
         /**
          * Adds nullable manual-edit audit columns to existing Work Event rows.
          *
