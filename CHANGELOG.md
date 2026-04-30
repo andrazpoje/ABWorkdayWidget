@@ -5,24 +5,36 @@ All notable changes to this project will be documented in this file.
 ## v3.0
 
 ### Added
-- Added Work Log break accounting modes: unpaid break, fully paid break, paid allowance, and custom employer policy
-- Added Work Log accounting foundation for effective work, credited time, paid break allowance, excess break, and balance
+- Added `WorkLogSessionStateResolver` as the shared Work Log state foundation for ordering, status, active break, meal state, worked minutes, and action flags
+- Added Work Log accounting foundation with `WorkLogAccountingCalculator`, `WorkLogAccountingRulesFactory`, and `WorkSettingsPrefs.toAccountingRules()`
+- Added Break Accounting Mode in Work Log Settings:
+  - unpaid break
+  - fully paid break
+  - paid allowance
+  - custom employer policy
 - Added conditional “Credited time / Priznan čas” display on the Work Log dashboard
-- Added clearer active break display with elapsed, remaining, and exceeded break states
-- Added unit tests for Work Log session state and accounting calculations
+- Added active break dashboard labels for elapsed, remaining, and exceeded break states
+- Added `WorkLogWidgetBalanceCalculator` for pure Kotlin widget balance parity coverage
+- Added `WorkLogCsvExporter` and first Work Log CSV export flow in Work Log Settings
+- Added local JVM tests for Work Log resolver, accounting calculator, accounting rules factory, widget balance calculator, and CSV exporter
 
 ### Improved
 - Dashboard balance now uses the Work Log accounting rules
 - Work Time widget balance now matches dashboard accounting behavior
-- Work Time widget now refreshes immediately after relevant Work Log Settings changes
+- Work Time widget now refreshes immediately after relevant Work Log Settings changes:
+  - Break Accounting Mode
+  - daily target
+  - default break minutes
+  - widget info mode
 - Work Log dashboard now distinguishes effective work from credited time
-- Improved Work Log Help and Settings wording around break accounting, meal time, and balance
+- Improved active break display so the value shows only duration while the label carries elapsed / remaining / exceeded meaning
+- Improved Work Log Help and Settings wording around break accounting, meal time, effective work, and balance
 
 ### Technical
-- Centralized Work Log session status, ordering, active break, meal state, and worked time through `WorkLogSessionStateResolver`
-- Added pure Kotlin `WorkLogAccountingCalculator`
-- Added `WorkLogAccountingRulesFactory` and settings-to-accounting mapping
-- Kept Room schema unchanged for this accounting foundation
+- Dashboard and Work Time widget now share resolver-based status handling
+- Dashboard and Work Time widget now share the same accounting layer for balance/saldo
+- Work Log CSV export currently writes raw `WorkEvent` data plus manual edit audit metadata without derived accounting columns
+- Room schema and migrations were not changed in this v3.0 development work
 
 ---
 

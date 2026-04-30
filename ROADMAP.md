@@ -46,6 +46,16 @@ v2.9 je bila foundations / cleanup verzija. Namen je bil stabilizirati aplikacij
 
 **Status:** aktivni razvoj.
 
+### Completed so far
+
+- [x] Work Log resolver foundation
+- [x] Work Log accounting foundation
+- [x] Dashboard/widget balance parity prek skupnega accounting layerja
+- [x] Break Accounting Mode v Work Log Settings
+- [x] Credited time UI na dashboardu
+- [x] Active break elapsed / remaining / exceeded prikaz
+- [x] Work Log CSV export prek SAF CreateDocument
+
 v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zaključiti Work Log foundation, nato lahko doda uporabniške funkcije nad stabilno arhitekturo.
 
 ### v3.0 cilji
@@ -131,7 +141,6 @@ v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zakl
 
 ### Preostalo
 
-- [ ] Widget balance accounting parity audit
 - [ ] Notification accounting parity audit, če bo prikazoval saldo
 - [ ] Recent event total accounting audit
 - [ ] Advanced Work Rules UI:
@@ -337,7 +346,8 @@ Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar pred po�
 - [ ] Multiple active work profiles
 - [ ] Advanced Work Log rules
 - [ ] Advanced statistics
-- [ ] Export PDF/CSV
+- [ ] Export PDF
+- [ ] Date range export
 - [ ] Custom templates
 - [ ] Advanced widget customization
 - [ ] Multiple work sessions per day
