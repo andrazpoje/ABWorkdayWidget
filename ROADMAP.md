@@ -50,11 +50,18 @@ v2.9 je bila foundations / cleanup verzija. Namen je bil stabilizirati aplikacij
 
 - [x] Work Log resolver foundation
 - [x] Work Log accounting foundation
+- [x] Break Accounting Mode
 - [x] Dashboard/widget balance parity prek skupnega accounting layerja
-- [x] Break Accounting Mode v Work Log Settings
-- [x] Credited time UI na dashboardu
-- [x] Active break elapsed / remaining / exceeded prikaz
-- [x] Work Log CSV export prek SAF CreateDocument
+- [x] Credited time / Priznan čas UI
+- [x] Effective work / Efektivno delo label
+- [x] Active break elapsed / remaining / exceeded display
+- [x] WorkLogWidgetBalanceCalculator + testi
+- [x] Work Log CSV export
+- [x] Local full backup export foundation
+- [x] ZIP + JSON backup writer
+- [x] Backup manifest / payload / collector
+- [x] SharedPreferences backup filtering
+- [x] Manual edit audit metadata included v CSV/backup exportih
 
 v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zaključiti Work Log foundation, nato lahko doda uporabniške funkcije nad stabilno arhitekturo.
 
@@ -97,7 +104,6 @@ v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zakl
 ### Preostalo / previdno
 
 - [ ] Ne centralizirati recent event totalov, dokler ni multi-session design
-- [ ] Ne centralizirati widget accounting/balance brez ločenega parity audita
 - [ ] Ne spreminjati validator semantics brez testov za malformed timelines
 - [ ] Pred multi-session dodati session grouping design
 
@@ -131,6 +137,7 @@ v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zakl
 - [x] Work Log Settings UI ima `Obračun odmora`
 - [x] `WorkSettingsPrefs -> WorkLogAccountingRules` mapper dodan
 - [x] Dashboard saldo uporablja `WorkLogAccountingCalculator.balanceMinutes`
+- [x] Work Time widget saldo uporablja `WorkLogAccountingCalculator.balanceMinutes`
 - [x] Privzeti mode je `UNPAID`, da obstoječe vedenje ostane nespremenjeno
 - [x] `PAID_ALLOWANCE` omogoča slovenski/poštarski obračun:
   - 30 min pri 8h
@@ -198,8 +205,7 @@ Ni še implementirano. Accounting in active break display sta pripravljena osnov
 
 - [ ] Reminder-first pristop
 - [ ] Brez auto-end v prvem koraku
-- [ ] Notification ob doseženi dolžini odmora:
-  - `Odmor traja že 30 min. Zaključi odmor?`
+- [ ] Notification ob doseženi dolžini odmora
 - [ ] Auto-end samo kot kasnejša opcija
 - [ ] Auto-end mora biti audit-safe
 - [ ] Samodejno ustvarjen dogodek naj ima source, npr. `auto_break_end`
@@ -241,29 +247,50 @@ Več sej na dan in split shifts so ena ključnih funkcionalnih vrzeli pred priho
 
 ### Status
 
-Ni še implementirano.
+Export-only foundation je narejen. Restore/import še ne obstaja.
 
 ### Zakaj je pomembno
 
 Pred plačljivo verzijo mora imeti uporabnik občutek, da so Work Log podatki varni in prenosljivi.
 
-### Plan
+### Zaključeno
 
-- [ ] Read-only audit obstoječih podatkov:
-  - Room Work Events
-  - legacy Work Logs
-  - SharedPreferences
-  - Cycle settings
-  - Assignment/status labels
-  - Work Settings
-- [ ] Določiti export format:
-  - CSV za Work Log events
-  - JSON backup za app settings
-  - PDF report kasneje
-- [ ] Lokalni backup/restore pred cloud sync
-- [ ] Backup mora vključevati Room + SharedPreferences
-- [ ] Restore mora imeti jasna opozorila
-- [ ] Export naj bo kandidat za Premium one-time
+- [x] Work Log CSV export prek SAF `CreateDocument("text/csv")`
+- [x] CSV export uporablja raw `WorkEvent` podatke
+- [x] CSV export vključuje manual edit audit metadata
+- [x] Dodani:
+  - `WorkCycleBackupManifest`
+  - `WorkCycleBackupPayload`
+  - `WorkCycleBackupWriter`
+  - `WorkCycleBackupRoomJsonMapper`
+  - `WorkCycleBackupPrefsJsonMapper`
+  - `WorkCycleBackupPrefsSpec`
+  - `WorkCycleBackupPayloadCollector`
+- [x] Full local backup export uporablja SAF `CreateDocument("application/zip")`
+- [x] ZIP vsebuje:
+  - `manifest.json`
+  - `room/work_events.json`
+  - `room/work_logs.json`
+  - `prefs/*.json`
+- [x] SharedPreferences backup filtering izključi:
+  - debug state
+  - transient UI hints
+  - session snapshot state
+- [x] Brez Room/schema sprememb
+
+### Preostalo
+
+- [ ] Restore/import
+- [ ] Backup validation UI
+- [ ] Backup summary preview
+- [ ] Encryption
+- [ ] Cloud sync / cloud backup
+- [ ] Scheduled backup
+- [ ] Premium gating
+- [ ] Date range CSV export
+- [ ] PDF export
+- [ ] Restore/import mora imeti ločen audit, validation layer, warning dialog in explicit replace-all policy
+- [ ] Pred prihodnjimi Room schema spremembami omogočiti schema export in migration tests
 
 ---
 
@@ -347,11 +374,13 @@ Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar pred po�
 - [ ] Advanced Work Log rules
 - [ ] Advanced statistics
 - [ ] Export PDF
+- [ ] Export CSV
 - [ ] Date range export
 - [ ] Custom templates
 - [ ] Advanced widget customization
 - [ ] Multiple work sessions per day
 - [ ] Split-shift profiles
+- [ ] Local backup/export
 - [ ] Local backup/restore
 
 ### Premium subscription kandidati
@@ -459,13 +488,14 @@ Future feature. Ni del osnovnega v3.0 sklopa.
 - [ ] Widget color system poenotiti z aplikacijo
 - [ ] Per-profile widgets, če se uvede Work Profiles
 - [ ] Widget guidance po onboardingu
-- [ ] Work Time widget accounting parity po stabilizaciji dashboard accounting
+- [ ] Advanced widget customization
 
 ---
 
 ## Future – Sync / Backup
 
-- [ ] Firebase/cloud sync med napravami
+- [ ] Cloud sync med napravami
+- [ ] Cloud backup
 - [ ] Export/backup pred resetom ali zamenjavo službe
 - [ ] Restore backup
 - [ ] Sync naj bo Premium subscription kandidat
@@ -474,12 +504,25 @@ Future feature. Ni del osnovnega v3.0 sklopa.
 
 ---
 
+## Future – Statistics
+
+- [ ] Daily / weekly / monthly work totals
+- [ ] Effective vs credited work breakdown
+- [ ] Break usage overview
+- [ ] Overtime trends
+- [ ] Export-friendly statistics summaries
+
+---
+
 ## Notes
 
 - v2.9 je zaključena/released verzija.
 - v3.0 je trenutni aktivni razvojni sklop.
 - Work Log accounting je zdaj osrednji v3.0 foundation.
+- Room schema ni bila spremenjena med trenutnim v3.0 accounting/export foundation delom.
 - Room schema naj ostane nespremenjena, dokler ni sprejet multi-session model.
+- Pred prihodnjimi Room schema spremembami omogočiti schema export in migration tests.
+- Restore/import je bolj tvegan sklop in mora imeti ločen audit, validation layer, warning dialog in explicit replace-all policy.
 - Transport, hospitality split shifts in healthcare 12h pravila zahtevajo posebne profile; ne hardcodati v osnovno logiko.
 - Meal reimbursement / prehrana med delom je ločen koncept od break time.
 - Roadmap ni pravni dokument in ne predstavlja pravnega mnenja.
