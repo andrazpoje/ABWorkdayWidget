@@ -2,6 +2,8 @@ package com.dante.workcycle.domain.worklog.accounting
 
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.worklog.WorkLogDaySessionMode
+import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
 import java.time.LocalDate
 import java.time.LocalTime
 import org.junit.Assert.assertEquals
@@ -174,6 +176,156 @@ class WorkLogAccountingCalculatorTest {
         assertEquals(0L, summary.balanceMinutes)
     }
 
+    @Test
+    fun unpaidFinishedTwoSessionsCreditsOnlyEffectiveWork() {
+        val summary = calculateMultipleSessions(
+            events = listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 10, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 12, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 4, hour = 14, minute = 0, type = WorkEventType.CLOCK_OUT)
+            ),
+            rules = WorkLogAccountingRules(
+                breakAccountingMode = BreakAccountingMode.UNPAID,
+                dailyTargetMinutes = 480
+            ),
+            now = time(15, 0)
+        )
+
+        assertEquals(360L, summary.presenceMinutes)
+        assertEquals(240L, summary.effectiveWorkMinutes)
+        assertEquals(0L, summary.actualBreakMinutes)
+        assertEquals(0L, summary.paidBreakMinutes)
+        assertEquals(240L, summary.creditedWorkMinutes)
+        assertEquals(-240L, summary.balanceMinutes)
+    }
+
+    @Test
+    fun fullyPaidMultiSessionCreditsBreaksButNotOffSessionGap() {
+        val summary = calculateMultipleSessions(
+            events = listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 10, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 12, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 4, hour = 13, minute = 0, type = WorkEventType.BREAK_START),
+                event(id = 5, hour = 13, minute = 30, type = WorkEventType.BREAK_END),
+                event(id = 6, hour = 14, minute = 0, type = WorkEventType.CLOCK_OUT)
+            ),
+            rules = WorkLogAccountingRules(
+                breakAccountingMode = BreakAccountingMode.FULLY_PAID,
+                dailyTargetMinutes = 240
+            ),
+            now = time(15, 0)
+        )
+
+        assertEquals(360L, summary.presenceMinutes)
+        assertEquals(210L, summary.effectiveWorkMinutes)
+        assertEquals(30L, summary.actualBreakMinutes)
+        assertEquals(30L, summary.paidBreakMinutes)
+        assertEquals(240L, summary.creditedWorkMinutes)
+        assertEquals(0L, summary.balanceMinutes)
+    }
+
+    @Test
+    fun paidAllowanceCapsTotalBreaksAcrossSessionsPerDay() {
+        val summary = calculateMultipleSessions(
+            events = listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 9, minute = 0, type = WorkEventType.BREAK_START),
+                event(id = 3, hour = 9, minute = 20, type = WorkEventType.BREAK_END),
+                event(id = 4, hour = 10, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 5, hour = 12, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 6, hour = 13, minute = 0, type = WorkEventType.BREAK_START),
+                event(id = 7, hour = 13, minute = 25, type = WorkEventType.BREAK_END),
+                event(id = 8, hour = 14, minute = 0, type = WorkEventType.CLOCK_OUT)
+            ),
+            rules = WorkLogAccountingRules(
+                breakAccountingMode = BreakAccountingMode.PAID_ALLOWANCE,
+                dailyTargetMinutes = 240,
+                paidBreakBaseMinutesAt8h = 30,
+                paidBreakProportionalEnabled = false,
+                paidBreakMinimumThresholdMinutes = 0,
+                allowanceBasis = BreakAllowanceBasis.DAILY_TARGET
+            ),
+            now = time(15, 0)
+        )
+
+        assertEquals(195L, summary.effectiveWorkMinutes)
+        assertEquals(45L, summary.actualBreakMinutes)
+        assertEquals(30L, summary.paidBreakAllowanceMinutes)
+        assertEquals(30L, summary.paidBreakMinutes)
+        assertEquals(15L, summary.excessBreakMinutes)
+        assertEquals(225L, summary.creditedWorkMinutes)
+        assertEquals(-15L, summary.balanceMinutes)
+    }
+
+    @Test
+    fun activeSecondSessionUsesLiveEffectiveWorkAndDaySpanPresence() {
+        val summary = calculateMultipleSessions(
+            events = listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 10, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 12, minute = 0, type = WorkEventType.CLOCK_IN)
+            ),
+            rules = WorkLogAccountingRules(
+                breakAccountingMode = BreakAccountingMode.UNPAID,
+                dailyTargetMinutes = 480
+            ),
+            now = time(13, 30)
+        )
+
+        assertEquals(330L, summary.presenceMinutes)
+        assertEquals(210L, summary.effectiveWorkMinutes)
+        assertEquals(0L, summary.actualBreakMinutes)
+        assertEquals(210L, summary.creditedWorkMinutes)
+        assertEquals(-270L, summary.balanceMinutes)
+    }
+
+    @Test
+    fun activeBreakInSecondSessionCountsBreakUntilNow() {
+        val summary = calculateMultipleSessions(
+            events = listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 10, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 12, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 4, hour = 13, minute = 0, type = WorkEventType.BREAK_START)
+            ),
+            rules = WorkLogAccountingRules(
+                breakAccountingMode = BreakAccountingMode.PAID_ALLOWANCE,
+                dailyTargetMinutes = 240,
+                paidBreakBaseMinutesAt8h = 30,
+                paidBreakProportionalEnabled = false,
+                paidBreakMinimumThresholdMinutes = 0,
+                allowanceBasis = BreakAllowanceBasis.DAILY_TARGET
+            ),
+            now = time(13, 30)
+        )
+
+        assertEquals(330L, summary.presenceMinutes)
+        assertEquals(180L, summary.effectiveWorkMinutes)
+        assertEquals(30L, summary.actualBreakMinutes)
+        assertEquals(30L, summary.paidBreakMinutes)
+        assertEquals(210L, summary.creditedWorkMinutes)
+        assertEquals(-30L, summary.balanceMinutes)
+    }
+
+    @Test
+    fun emptySessionsStatePathMatchesEventBasedSingleSessionAccounting() {
+        val events = finishedDayWithBreak(breakEndHour = 12, breakEndMinute = 30)
+        val fromEvents = WorkLogAccountingCalculator.calculate(
+            events = events,
+            rules = paidAllowanceRules(dailyTargetMinutes = 480),
+            now = time(17, 0)
+        )
+        val fromSingleSessionState = WorkLogAccountingCalculator.calculate(
+            sessionState = WorkLogSessionStateResolver.resolve(events, now = time(17, 0)),
+            rules = paidAllowanceRules(dailyTargetMinutes = 480),
+            now = time(17, 0)
+        )
+
+        assertEquals(fromEvents, fromSingleSessionState)
+    }
+
     private fun paidAllowanceRules(dailyTargetMinutes: Int): WorkLogAccountingRules {
         return WorkLogAccountingRules(
             breakAccountingMode = BreakAccountingMode.PAID_ALLOWANCE,
@@ -182,6 +334,24 @@ class WorkLogAccountingCalculatorTest {
             paidBreakProportionalEnabled = true,
             paidBreakMinimumThresholdMinutes = 240,
             allowanceBasis = BreakAllowanceBasis.DAILY_TARGET
+        )
+    }
+
+    private fun calculateMultipleSessions(
+        events: List<WorkEvent>,
+        rules: WorkLogAccountingRules,
+        now: LocalTime
+    ): WorkLogAccountingSummary {
+        val sessionState = WorkLogSessionStateResolver.resolve(
+            events = events,
+            now = now,
+            sessionMode = WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY
+        )
+
+        return WorkLogAccountingCalculator.calculate(
+            sessionState = sessionState,
+            rules = rules,
+            now = now
         )
     }
 

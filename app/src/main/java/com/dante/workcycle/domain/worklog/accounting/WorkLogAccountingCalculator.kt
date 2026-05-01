@@ -2,6 +2,7 @@ package com.dante.workcycle.domain.worklog.accounting
 
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.worklog.WorkLogResolvedSession
 import com.dante.workcycle.domain.worklog.WorkLogSessionState
 import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
 import com.dante.workcycle.domain.worklog.WorkLogSessionStatus
@@ -38,9 +39,18 @@ object WorkLogAccountingCalculator {
         rules: WorkLogAccountingRules = WorkLogAccountingRules(),
         now: LocalTime = LocalTime.now()
     ): WorkLogAccountingSummary {
-        val effectiveWorkMinutes = sessionState.workedMinutes
+        val hasResolvedSessions = sessionState.sessions.isNotEmpty()
+        val effectiveWorkMinutes = if (hasResolvedSessions) {
+            sessionState.sessions.sumOf { it.workedMinutes }
+        } else {
+            sessionState.workedMinutes
+        }
         val presenceMinutes = calculatePresenceMinutes(sessionState, now)
-        val actualBreakMinutes = calculateActualBreakMinutes(sessionState.orderedEvents, now)
+        val actualBreakMinutes = if (hasResolvedSessions) {
+            calculateActualBreakMinutesForSessions(sessionState.sessions, now)
+        } else {
+            calculateActualBreakMinutes(sessionState.orderedEvents, now)
+        }
         val paidBreakAllowanceMinutes = calculatePaidBreakAllowanceMinutes(
             rules = rules,
             presenceMinutes = presenceMinutes
@@ -68,7 +78,11 @@ object WorkLogAccountingCalculator {
         }
 
         val creditedWorkMinutes = when (rules.breakAccountingMode) {
-            BreakAccountingMode.FULLY_PAID -> presenceMinutes
+            BreakAccountingMode.FULLY_PAID -> if (hasResolvedSessions) {
+                effectiveWorkMinutes + paidBreakMinutes
+            } else {
+                presenceMinutes
+            }
             else -> effectiveWorkMinutes + paidBreakMinutes
         }
 
@@ -88,6 +102,8 @@ object WorkLogAccountingCalculator {
         sessionState: WorkLogSessionState,
         now: LocalTime
     ): Long {
+        // Multi-session v3.0 uses a day-span presence policy: first valid
+        // clock-in through last valid clock-out, or now while a session is active.
         val start = sessionState.firstClockIn?.time ?: return 0L
         val end = when (sessionState.status) {
             WorkLogSessionStatus.WORKING,
@@ -98,6 +114,15 @@ object WorkLogAccountingCalculator {
         }
 
         return minutesBetween(start, end)
+    }
+
+    private fun calculateActualBreakMinutesForSessions(
+        sessions: List<WorkLogResolvedSession>,
+        now: LocalTime
+    ): Long {
+        return sessions.sumOf { session ->
+            calculateActualBreakMinutes(session.events, now)
+        }
     }
 
     private fun calculateActualBreakMinutes(
