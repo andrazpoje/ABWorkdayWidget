@@ -372,6 +372,11 @@
     <string name="debug_premium_override_enabled">Premium test override enabled</string>
     <string name="debug_premium_override_locked">Premium test override locked</string>
     <string name="debug_premium_override_reset">Premium test override reset</string>
+    <string name="debug_premium_test_state_title">Premium test state</string>
+    <string name="debug_premium_test_override_format">Override: %1$s</string>
+    <string name="debug_premium_test_sample_gate_format">Sample backup gate: %1$s (%2$s)</string>
+    <string name="debug_premium_test_allowed">allowed</string>
+    <string name="debug_premium_test_locked">locked</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / COUNTRIES -->

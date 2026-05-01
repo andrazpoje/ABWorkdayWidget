@@ -750,6 +750,33 @@
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
 
+                    <TextView
+                        android:id="@+id/textPremiumTestStateTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/debug_premium_test_state_title"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textPremiumTestOverride"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="13sp"
+                        tools:text="Override: NONE" />
+
+                    <TextView
+                        android:id="@+id/textPremiumTestDecision"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="13sp"
+                        tools:text="Sample backup gate: locked (NONE)" />
+
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/buttonResetOnboardingTestState"
                         style="@style/Widget.Material3.Button.OutlinedButton"

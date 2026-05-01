@@ -72,6 +72,7 @@ v2.9 je bila foundations / cleanup verzija. Namen je bil stabilizirati aplikacij
 - [x] Override entitlement model for future debug/tester/founder unlocks
 - [x] Debug-only Premium override controls in Developer tools
 - [x] PremiumProvider runtime FeatureGate chain foundation
+- [x] Developer tools Premium state diagnostics
 - [x] Full backup export moved to main Settings Backup card
 - [x] SharedPreferences backup filtering
 - [x] Manual edit audit metadata included v CSV/backup exportih

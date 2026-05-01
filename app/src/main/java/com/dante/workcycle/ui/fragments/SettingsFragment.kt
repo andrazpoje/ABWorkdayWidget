@@ -36,6 +36,8 @@ import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
 import com.dante.workcycle.domain.model.CycleMode
 import com.dante.workcycle.domain.premium.DebugPremiumEntitlementPrefs
 import com.dante.workcycle.domain.premium.EntitlementOverrideMode
+import com.dante.workcycle.domain.premium.PremiumFeature
+import com.dante.workcycle.domain.premium.PremiumProvider
 import com.dante.workcycle.domain.template.TemplateManager
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.style.WidgetStyleManager
@@ -777,6 +779,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 getString(R.string.debug_premium_override_enabled),
                 Toast.LENGTH_SHORT
             ).show()
+            updatePremiumTestStateUi()
         }
 
         binding.buttonLockPremiumForTesting.setOnClickListener {
@@ -790,6 +793,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 getString(R.string.debug_premium_override_locked),
                 Toast.LENGTH_SHORT
             ).show()
+            updatePremiumTestStateUi()
         }
 
         binding.buttonResetPremiumOverride.setOnClickListener {
@@ -803,7 +807,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 getString(R.string.debug_premium_override_reset),
                 Toast.LENGTH_SHORT
             ).show()
+            updatePremiumTestStateUi()
         }
+
+        updatePremiumTestStateUi()
     }
 
     private fun handleDeveloperToolsVersionTap() {
@@ -849,6 +856,35 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
             }
             .show()
+    }
+
+    private fun updatePremiumTestStateUi() {
+        if (!BuildConfig.DEBUG) return
+
+        val prefs = DebugPremiumEntitlementPrefs.create(
+            context = requireContext(),
+            isDebugBuild = BuildConfig.DEBUG
+        )
+        val override = prefs.getOverride()
+        val decision = PremiumProvider.featureGate(requireContext())
+            .canUse(PremiumFeature.LOCAL_FULL_BACKUP_EXPORT)
+
+        binding.textPremiumTestStateTitle.text = getString(R.string.debug_premium_test_state_title)
+        binding.textPremiumTestOverride.text = getString(
+            R.string.debug_premium_test_override_format,
+            override.mode.name
+        )
+        binding.textPremiumTestDecision.text = getString(
+            R.string.debug_premium_test_sample_gate_format,
+            getString(
+                if (decision.allowed) {
+                    R.string.debug_premium_test_allowed
+                } else {
+                    R.string.debug_premium_test_locked
+                }
+            ),
+            decision.source.name
+        )
     }
 
     private fun saveAppTheme(theme: String) {

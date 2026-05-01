@@ -393,5 +393,10 @@
     <string name="debug_premium_override_enabled">Premium testni override omogočen</string>
     <string name="debug_premium_override_locked">Premium testni override zaklenjen</string>
     <string name="debug_premium_override_reset">Premium testni override ponastavljen</string>
+    <string name="debug_premium_test_state_title">Stanje Premium testa</string>
+    <string name="debug_premium_test_override_format">Override: %1$s</string>
+    <string name="debug_premium_test_sample_gate_format">Testni dostop do varnostne kopije: %1$s (%2$s)</string>
+    <string name="debug_premium_test_allowed">dovoljeno</string>
+    <string name="debug_premium_test_locked">zaklenjeno</string>
 
 </resources>
