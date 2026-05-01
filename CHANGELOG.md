@@ -16,10 +16,14 @@ All notable changes to this project will be documented in this file.
 - Added active break dashboard labels for elapsed, remaining, and exceeded break states
 - Added `WorkLogWidgetBalanceCalculator` for pure Kotlin widget balance parity coverage
 - Added `WorkLogCsvExporter` and first Work Log CSV export flow in Work Log Settings
+- Added date range support for Work Log CSV export
 - Added local JVM tests for Work Log resolver, accounting calculator, accounting rules factory, widget balance calculator, and CSV exporter
 - Added Work Log CSV export with raw Work Log events and manual edit audit metadata
 - Added full local ZIP backup export for WorkCycle data and settings
+- Added full backup export in the main Settings backup section
 - Added backup manifest, payload, writer, Room JSON mapper, SharedPreferences JSON mapper, and backup collector foundation
+- Added backup validation and preview foundation with ZIP preflight diagnostics
+- Added Premium / FeatureGate foundation with central premium feature tier models and gate decisions
 
 
 ### Improved
@@ -33,6 +37,8 @@ All notable changes to this project will be documented in this file.
 - Work Log dashboard now distinguishes effective work from credited time
 - Improved active break display so the value shows only duration while the label carries elapsed / remaining / exceeded meaning
 - Improved Work Log Help and Settings wording around break accounting, meal time, effective work, and balance
+- Work Log CSV export now offers Export all and Export date range from one entry point
+- Backup export is now located in the main Settings Backup section instead of Work Log Settings
 - Added explicit backup filtering so debug, transient, and session snapshot state is excluded from exported backups
 
 
@@ -40,10 +46,19 @@ All notable changes to this project will be documented in this file.
 - Dashboard and Work Time widget now share resolver-based status handling
 - Dashboard and Work Time widget now share the same accounting layer for balance/saldo
 - Work Log CSV export currently writes raw `WorkEvent` data plus manual edit audit metadata without derived accounting columns
+- Added read-only date-range query support for Work Log CSV export
+- Kept `WorkLogCsvExporter` unchanged and reused it with filtered event lists
 - Room schema and migrations were not changed in this v3.0 development work
 - Added export-only backup foundation without restore/import behavior
 - Added backup ZIP structure with `manifest.json`, `room/work_events.json`, `room/work_logs.json`, and `prefs/*.json`
+- Added pure Kotlin backup ZIP validator, ZIP reader, JSON parser, and preview/summary model
+- Added structured backup validation result with warnings/errors separation
+- Added central entitlement / gating API with `FeatureTier`, `PremiumFeature`, `GateDecision`, `EntitlementRepository`, and `FeatureGate`
+- Added local JVM tests for premium feature tier mapping and default locked entitlement behavior
 - Kept Room schema and migrations unchanged
+- Play Billing is not included yet
+- Existing backup/export functionality is not gated or locked yet
+- Restore/import and Premium gating are not included yet
 
 ---
 

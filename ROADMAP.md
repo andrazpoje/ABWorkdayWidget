@@ -65,6 +65,9 @@ v2.9 je bila foundations / cleanup verzija. Namen je bil stabilizirati aplikacij
 - [x] Backup validation foundation
 - [x] Backup preview model
 - [x] Backup ZIP preflight validation
+- [x] Premium / FeatureGate foundation
+- [x] Free / Premium one-time / Subscription tier model
+- [x] Tested premium feature tier mapping
 - [x] Full backup export moved to main Settings Backup card
 - [x] SharedPreferences backup filtering
 - [x] Manual edit audit metadata included v CSV/backup exportih
@@ -418,6 +421,13 @@ Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar mora Fre
 - [ ] Free core should remain generous.
 - [ ] Split shifts / multiple sessions are currently planned as Free core, not Premium.
 - [ ] Premium should add convenience, power-user features, advanced export/reporting, profiles, customization, and backup tools, not block essential work logging.
+- [x] Premium / FeatureGate foundation is in place without Play Billing or active UI gating.
+- [ ] Play Billing integration
+- [ ] Premium screen
+- [ ] Real entitlement storage
+- [ ] Debug/tester unlock
+- [ ] UI gating for specific features
+- [ ] Restore purchases
 
 ### Predlagane cene
 
