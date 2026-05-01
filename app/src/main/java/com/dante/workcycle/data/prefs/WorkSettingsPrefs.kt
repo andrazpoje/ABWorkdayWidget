@@ -78,11 +78,11 @@ class WorkSettingsPrefs(context: Context) {
     }
 
     /**
-     * Controls whether Work Log can use multiple start/finish sessions in the same day.
+     * Controls whether Work Log can interpret multiple start/finish sessions
+     * within the same day.
      *
-     * When disabled, Work Log keeps the legacy one-session-per-day behavior.
-     * When enabled, dashboard, validation, accounting, widget state, and notifications
-     * interpret ordered Work Log events as multiple sessions.
+     * The default false value preserves the previous single-session-per-day
+     * behavior.
      */
     fun isMultipleWorkSessionsEnabled(): Boolean {
         return prefs.getBoolean(

@@ -89,7 +89,7 @@ v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zakl
 - Ločen accounting sloj za delovni čas, odmore in saldo
 - Mednarodno prilagodljiva pravila odmora
 - Jasnejši Work Log dashboard
-- Priprava za split shifts / multiple sessions
+- Podpora za več delovnih sej na dan / split shifts
 - Priprava za export/backup/premium smer
 - Brez nepotrebnih Room schema sprememb, dokler model več sej ni potrjen
 
