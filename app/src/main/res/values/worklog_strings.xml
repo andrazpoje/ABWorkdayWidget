@@ -208,7 +208,7 @@
     <string name="work_log_settings_daily_target_body">Set the default expected work duration for a day.</string>
     <string name="work_log_settings_overtime">Overtime tracking</string>
     <string name="work_log_settings_multiple_sessions">Allow multiple work sessions per day</string>
-    <string name="work_log_settings_multiple_sessions_helper">Enables split shifts and multiple start/finish sessions in a future update. Currently this setting prepares the app but does not change logging behavior yet.</string>
+    <string name="work_log_settings_multiple_sessions_helper">Allows another work session to be started after finishing the current one. Useful for split shifts or multiple work periods in the same day.</string>
     <string name="work_log_settings_overtime_body">Control how extra time is calculated and shown in balances.</string>
     <string name="work_log_settings_break_rules">Break rules</string>
     <string name="work_log_settings_break_rules_body">Configure minimum breaks, paid or unpaid break handling, and break reminders.</string>

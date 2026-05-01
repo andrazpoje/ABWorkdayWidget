@@ -9,8 +9,9 @@ import java.time.LocalTime
  *
  * This resolver is the v3.0 foundation for making dashboard, validators,
  * widgets, totals, and future reminders share one interpretation of Work Log
- * events. It currently preserves the existing one-completed-session-per-day
- * model: once a valid CLOCK_OUT finishes the day, Start is not available again.
+ * events. The default resolve mode preserves the existing single-session-per-day
+ * behavior, while multi-session resolution is available when explicitly
+ * requested through [WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY].
  *
  * Events are ordered by time and then id, matching the DAO and manual-edit
  * validator semantics. Future multiple-session support should extend this

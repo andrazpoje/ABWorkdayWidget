@@ -199,7 +199,7 @@
     <string name="work_log_settings_daily_target_body">Nastavi privzeto pričakovano trajanje dela za en dan.</string>
     <string name="work_log_settings_overtime">Spremljanje nadur</string>
     <string name="work_log_settings_multiple_sessions">Dovoli več delovnih sej na dan</string>
-    <string name="work_log_settings_multiple_sessions_helper">Omogoča deljeni delovni čas in več začetkov/končanj v prihodnji nadgradnji. Trenutno nastavitev samo pripravi aplikacijo in še ne spremeni beleženja.</string>
+    <string name="work_log_settings_multiple_sessions_helper">Omogoča začetek nove delovne seje po zaključku trenutne. Uporabno za deljeni delovni čas ali več delovnih obdobij v istem dnevu.</string>
     <string name="work_log_settings_overtime_body">Določi, kako se izračuna in prikaže dodatni čas v saldu.</string>
     <string name="work_log_settings_break_rules">Pravila odmorov</string>
     <string name="work_log_settings_break_rules_body">Nastavi minimalne odmore, plačane ali neplačane odmore ter opomnike za odmore.</string>
