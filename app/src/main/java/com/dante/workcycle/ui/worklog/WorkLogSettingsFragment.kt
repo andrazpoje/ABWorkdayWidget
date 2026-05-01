@@ -48,6 +48,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var rowDefaultBreak: View
     private lateinit var rowBreakAccountingMode: View
     private lateinit var rowOvertimeTracking: View
+    private lateinit var rowMultipleWorkSessions: View
     private lateinit var rowWidgetInfoMode: View
     private lateinit var rowExportWorkLogCsv: View
     private lateinit var containerExpectedStartRows: LinearLayout
@@ -55,8 +56,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var textDefaultBreakValue: TextView
     private lateinit var textBreakAccountingModeValue: TextView
     private lateinit var textOvertimeTrackingValue: TextView
+    private lateinit var textMultipleWorkSessionsValue: TextView
     private lateinit var textWidgetInfoModeValue: TextView
     private lateinit var switchOvertimeTracking: MaterialSwitch
+    private lateinit var switchMultipleWorkSessions: MaterialSwitch
     private var pendingCsvExportRequest: CsvExportRequest? = null
 
     private var isBindingSwitch = false
@@ -96,6 +99,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         rowDefaultBreak = view.findViewById(R.id.rowDefaultBreak)
         rowBreakAccountingMode = view.findViewById(R.id.rowBreakAccountingMode)
         rowOvertimeTracking = view.findViewById(R.id.rowOvertimeTracking)
+        rowMultipleWorkSessions = view.findViewById(R.id.rowMultipleWorkSessions)
         rowWidgetInfoMode = view.findViewById(R.id.rowWidgetInfoMode)
         rowExportWorkLogCsv = view.findViewById(R.id.rowExportWorkLogCsv)
         containerExpectedStartRows = view.findViewById(R.id.containerExpectedStartRows)
@@ -103,8 +107,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         textDefaultBreakValue = view.findViewById(R.id.textDefaultBreakValue)
         textBreakAccountingModeValue = view.findViewById(R.id.textBreakAccountingModeValue)
         textOvertimeTrackingValue = view.findViewById(R.id.textOvertimeTrackingValue)
+        textMultipleWorkSessionsValue = view.findViewById(R.id.textMultipleWorkSessionsValue)
         textWidgetInfoModeValue = view.findViewById(R.id.textWidgetInfoModeValue)
         switchOvertimeTracking = view.findViewById(R.id.switchOvertimeTracking)
+        switchMultipleWorkSessions = view.findViewById(R.id.switchMultipleWorkSessions)
     }
 
     private fun setupActions() {
@@ -124,6 +130,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             switchOvertimeTracking.toggle()
         }
 
+        rowMultipleWorkSessions.setOnClickListener {
+            switchMultipleWorkSessions.toggle()
+        }
+
         rowWidgetInfoMode.setOnClickListener {
             showWidgetInfoModeDialog()
         }
@@ -135,6 +145,12 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         switchOvertimeTracking.setOnCheckedChangeListener { _, isChecked ->
             if (isBindingSwitch) return@setOnCheckedChangeListener
             workSettingsPrefs.setOvertimeTrackingEnabled(isChecked)
+            bindSettings()
+        }
+
+        switchMultipleWorkSessions.setOnCheckedChangeListener { _, isChecked ->
+            if (isBindingSwitch) return@setOnCheckedChangeListener
+            workSettingsPrefs.setMultipleWorkSessionsEnabled(isChecked)
             bindSettings()
         }
     }
@@ -159,8 +175,18 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             }
         )
 
+        val multipleWorkSessionsEnabled = workSettingsPrefs.isMultipleWorkSessionsEnabled()
+        textMultipleWorkSessionsValue.text = getString(
+            if (multipleWorkSessionsEnabled) {
+                R.string.work_log_settings_enabled
+            } else {
+                R.string.work_log_settings_disabled
+            }
+        )
+
         isBindingSwitch = true
         switchOvertimeTracking.isChecked = overtimeEnabled
+        switchMultipleWorkSessions.isChecked = multipleWorkSessionsEnabled
         isBindingSwitch = false
 
         textWidgetInfoModeValue.text = getWidgetInfoModeLabel(workSettingsPrefs.getWidgetInfoMode())

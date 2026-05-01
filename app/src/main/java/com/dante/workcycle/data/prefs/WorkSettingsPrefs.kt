@@ -77,6 +77,24 @@ class WorkSettingsPrefs(context: Context) {
         }
     }
 
+    /**
+     * Phase 0 foundation flag for future split-shift / multi-session support.
+     *
+     * This does not change current Work Log runtime behavior yet.
+     */
+    fun isMultipleWorkSessionsEnabled(): Boolean {
+        return prefs.getBoolean(
+            KEY_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY,
+            DEFAULT_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY
+        )
+    }
+
+    fun setMultipleWorkSessionsEnabled(enabled: Boolean) {
+        prefs.edit {
+            putBoolean(KEY_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY, enabled)
+        }
+    }
+
     fun getExpectedStartConfig(label: String): ExpectedStartConfig? {
         return getExpectedStartConfig(CycleLayer.PRIMARY, label)
     }
@@ -222,6 +240,8 @@ class WorkSettingsPrefs(context: Context) {
         const val KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL = "expected_times_by_layer_and_label"
         const val KEY_EXPECTED_STARTS_BY_LABEL = "expected_starts_by_label"
         const val KEY_WIDGET_INFO_MODE = "widget_info_mode"
+        const val KEY_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY =
+            "allow_multiple_work_sessions_per_day"
         const val WIDGET_INFO_MODE_WORKED_TODAY = "worked_today"
         const val WIDGET_INFO_MODE_START_TIME = "start_time"
 
@@ -229,6 +249,7 @@ class WorkSettingsPrefs(context: Context) {
         const val DEFAULT_BREAK_MINUTES = 30
         val DEFAULT_BREAK_ACCOUNTING_MODE = BreakAccountingMode.UNPAID
         const val DEFAULT_OVERTIME_TRACKING_ENABLED = true
+        const val DEFAULT_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY = false
         const val DEFAULT_EXPECTED_START_TIME = "08:00"
         const val DEFAULT_EXPECTED_END_TIME = "16:00"
 
