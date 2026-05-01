@@ -151,6 +151,186 @@ class WorkLogSessionStateResolverTest {
     }
 
     @Test
+    fun multiSessionStartFinishStartFinishReturnsTwoSessions() {
+        val firstStart = event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN)
+        val firstFinish = event(id = 2, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT)
+        val secondStart = event(id = 3, hour = 13, minute = 0, type = WorkEventType.CLOCK_IN)
+        val secondFinish = event(id = 4, hour = 16, minute = 0, type = WorkEventType.CLOCK_OUT)
+
+        val state = resolveMultiple(
+            listOf(firstStart, firstFinish, secondStart, secondFinish),
+            now = time(17, 0)
+        )
+
+        assertEquals(WorkLogSessionStatus.FINISHED, state.status)
+        assertEquals(2, state.sessions.size)
+        assertEquals(1, state.sessions[0].index)
+        assertEquals(2, state.sessions[1].index)
+        assertEquals(firstStart, state.sessions[0].clockIn)
+        assertEquals(firstFinish, state.sessions[0].clockOut)
+        assertEquals(secondStart, state.sessions[1].clockIn)
+        assertEquals(secondFinish, state.sessions[1].clockOut)
+    }
+
+    @Test
+    fun multiSessionActiveSecondSessionResolvesToWorking() {
+        val state = resolveMultiple(
+            listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 13, minute = 0, type = WorkEventType.CLOCK_IN)
+            ),
+            now = time(14, 0)
+        )
+
+        assertEquals(WorkLogSessionStatus.WORKING, state.status)
+        assertEquals(2, state.sessions.size)
+        assertEquals(300L, state.workedMinutes)
+        assertTrue(state.canFinish)
+        assertTrue(state.canStartBreak)
+        assertFalse(state.canStart)
+    }
+
+    @Test
+    fun multiSessionSecondSessionBreakResolvesToOnBreak() {
+        val breakStart = event(id = 4, hour = 14, minute = 0, type = WorkEventType.BREAK_START)
+        val state = resolveMultiple(
+            listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 13, minute = 0, type = WorkEventType.CLOCK_IN),
+                breakStart
+            ),
+            now = time(14, 30)
+        )
+
+        assertEquals(WorkLogSessionStatus.ON_BREAK, state.status)
+        assertEquals(breakStart, state.activeBreakStart)
+        assertEquals(breakStart, state.sessions[1].activeBreakStart)
+        assertEquals(300L, state.workedMinutes)
+        assertTrue(state.canEndBreak)
+        assertFalse(state.canStartBreak)
+        assertTrue(state.requiresLiveTick)
+    }
+
+    @Test
+    fun multiSessionWorkedMinutesSumAcrossSessions() {
+        val state = resolveMultiple(
+            listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 10, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 13, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 4, hour = 16, minute = 30, type = WorkEventType.CLOCK_OUT)
+            ),
+            now = time(17, 0)
+        )
+
+        assertEquals(330L, state.workedMinutes)
+        assertEquals(120L, state.sessions[0].workedMinutes)
+        assertEquals(210L, state.sessions[1].workedMinutes)
+    }
+
+    @Test
+    fun multiSessionFirstClockInAndLastClockOutSpanValidSessions() {
+        val firstStart = event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN)
+        val secondFinish = event(id = 4, hour = 16, minute = 0, type = WorkEventType.CLOCK_OUT)
+        val state = resolveMultiple(
+            listOf(
+                firstStart,
+                event(id = 2, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 3, hour = 13, minute = 0, type = WorkEventType.CLOCK_IN),
+                secondFinish
+            ),
+            now = time(17, 0)
+        )
+
+        assertEquals(firstStart, state.firstClockIn)
+        assertEquals(secondFinish, state.lastClockOut)
+    }
+
+    @Test
+    fun multiSessionMealLoggedRemainsDayLevel() {
+        val state = resolveMultiple(
+            listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                event(id = 2, hour = 11, minute = 0, type = WorkEventType.MEAL),
+                event(id = 3, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT),
+                event(id = 4, hour = 13, minute = 0, type = WorkEventType.CLOCK_IN)
+            ),
+            now = time(14, 0)
+        )
+
+        assertTrue(state.mealLogged)
+        assertFalse(state.canLogMeal)
+    }
+
+    @Test
+    fun multiSessionCanStartAfterFinishedOnlyInMultipleSessionMode() {
+        val events = listOf(
+            event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+            event(id = 2, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT)
+        )
+
+        val singleSessionState = WorkLogSessionStateResolver.resolve(events, now = time(13, 0))
+        val multiSessionState = resolveMultiple(events, now = time(13, 0))
+
+        assertEquals(WorkLogSessionStatus.FINISHED, singleSessionState.status)
+        assertEquals(WorkLogSessionStatus.FINISHED, multiSessionState.status)
+        assertFalse(singleSessionState.canStart)
+        assertTrue(multiSessionState.canStart)
+    }
+
+    @Test
+    fun multiSessionDuplicateClockInWhileActiveIsIgnored() {
+        val duplicateStart = event(id = 2, hour = 9, minute = 0, type = WorkEventType.CLOCK_IN)
+        val state = resolveMultiple(
+            listOf(
+                event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+                duplicateStart,
+                event(id = 3, hour = 10, minute = 0, type = WorkEventType.CLOCK_OUT)
+            ),
+            now = time(11, 0)
+        )
+
+        assertEquals(1, state.sessions.size)
+        assertEquals(120L, state.workedMinutes)
+        assertFalse(state.sessions.first().events.contains(duplicateStart))
+    }
+
+    @Test
+    fun multiSessionBreakStartOutsideActiveSessionIsIgnored() {
+        val invalidBreakStart = event(id = 1, hour = 8, minute = 0, type = WorkEventType.BREAK_START)
+        val state = resolveMultiple(
+            listOf(
+                invalidBreakStart,
+                event(id = 2, hour = 9, minute = 0, type = WorkEventType.CLOCK_IN)
+            ),
+            now = time(10, 0)
+        )
+
+        assertEquals(WorkLogSessionStatus.WORKING, state.status)
+        assertEquals(60L, state.workedMinutes)
+        assertFalse(state.sessions.first().events.contains(invalidBreakStart))
+    }
+
+    @Test
+    fun multiSessionClockOutWithoutActiveSessionIsIgnored() {
+        val invalidClockOut = event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_OUT)
+        val state = resolveMultiple(
+            listOf(
+                invalidClockOut,
+                event(id = 2, hour = 9, minute = 0, type = WorkEventType.CLOCK_IN)
+            ),
+            now = time(10, 0)
+        )
+
+        assertEquals(WorkLogSessionStatus.WORKING, state.status)
+        assertNull(state.lastClockOut)
+        assertEquals(60L, state.workedMinutes)
+        assertFalse(state.sessions.first().events.contains(invalidClockOut))
+    }
+
+    @Test
     fun malformedClockOutBeforeStartStaysNotStarted() {
         val state = WorkLogSessionStateResolver.resolve(
             listOf(event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_OUT)),
@@ -300,6 +480,17 @@ class WorkLogSessionStateResolverTest {
 
     private fun time(hour: Int, minute: Int): LocalTime {
         return LocalTime.of(hour, minute)
+    }
+
+    private fun resolveMultiple(
+        events: List<WorkEvent>,
+        now: LocalTime
+    ): WorkLogSessionState {
+        return WorkLogSessionStateResolver.resolve(
+            events = events,
+            now = now,
+            sessionMode = WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY
+        )
     }
 
     private companion object {

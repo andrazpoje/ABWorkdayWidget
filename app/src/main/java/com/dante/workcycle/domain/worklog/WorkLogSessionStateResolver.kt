@@ -22,6 +22,28 @@ object WorkLogSessionStateResolver {
         events: List<WorkEvent>,
         now: LocalTime = LocalTime.now()
     ): WorkLogSessionState {
+        return resolve(
+            events = events,
+            now = now,
+            sessionMode = WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY
+        )
+    }
+
+    fun resolve(
+        events: List<WorkEvent>,
+        now: LocalTime = LocalTime.now(),
+        sessionMode: WorkLogDaySessionMode
+    ): WorkLogSessionState {
+        return when (sessionMode) {
+            WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY -> resolveSingleSession(events, now)
+            WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY -> resolveMultipleSessions(events, now)
+        }
+    }
+
+    private fun resolveSingleSession(
+        events: List<WorkEvent>,
+        now: LocalTime
+    ): WorkLogSessionState {
         val orderedEvents = ordered(events)
         var status = WorkLogSessionStatus.NOT_STARTED
         var firstClockIn: WorkEvent? = null
@@ -111,6 +133,123 @@ object WorkLogSessionStateResolver {
         )
     }
 
+    private fun resolveMultipleSessions(
+        events: List<WorkEvent>,
+        now: LocalTime
+    ): WorkLogSessionState {
+        val orderedEvents = ordered(events)
+        val sessions = mutableListOf<MutableResolvedSession>()
+        var activeSession: MutableResolvedSession? = null
+        var firstClockIn: WorkEvent? = null
+        var lastClockOut: WorkEvent? = null
+        var mealLogged = false
+
+        for (event in orderedEvents) {
+            when (event.type) {
+                WorkEventType.CLOCK_IN -> {
+                    if (activeSession == null) {
+                        val session = MutableResolvedSession(
+                            index = sessions.size + 1,
+                            clockIn = event,
+                            currentWorkStart = event.time
+                        )
+                        firstClockIn = firstClockIn ?: event
+                        activeSession = session
+                        sessions += session
+                    }
+                }
+
+                WorkEventType.BREAK_START -> {
+                    val session = activeSession
+                    if (session?.status == WorkLogSessionStatus.WORKING) {
+                        session.currentWorkStart?.let { start ->
+                            session.workedMinutes += minutesBetween(start, event.time)
+                        }
+                        session.currentWorkStart = null
+                        session.activeBreakStart = event
+                        session.status = WorkLogSessionStatus.ON_BREAK
+                        session.events += event
+                    }
+                }
+
+                WorkEventType.BREAK_END -> {
+                    val session = activeSession
+                    if (session?.status == WorkLogSessionStatus.ON_BREAK) {
+                        session.currentWorkStart = event.time
+                        session.activeBreakStart = null
+                        session.status = WorkLogSessionStatus.WORKING
+                        session.events += event
+                    }
+                }
+
+                WorkEventType.CLOCK_OUT -> {
+                    val session = activeSession
+                    if (
+                        session?.status == WorkLogSessionStatus.WORKING ||
+                        session?.status == WorkLogSessionStatus.ON_BREAK
+                    ) {
+                        session.currentWorkStart?.let { start ->
+                            session.workedMinutes += minutesBetween(start, event.time)
+                        }
+                        session.currentWorkStart = null
+                        session.activeBreakStart = null
+                        session.clockOut = event
+                        session.status = WorkLogSessionStatus.FINISHED
+                        session.events += event
+                        lastClockOut = event
+                        activeSession = null
+                    }
+                }
+
+                WorkEventType.MEAL -> {
+                    mealLogged = true
+                    activeSession?.events?.add(event)
+                }
+
+                WorkEventType.NOTE -> {
+                    activeSession?.events?.add(event)
+                }
+            }
+        }
+
+        activeSession?.let { session ->
+            if (session.status == WorkLogSessionStatus.WORKING) {
+                session.currentWorkStart?.let { start ->
+                    session.workedMinutes += minutesBetween(start, now)
+                }
+            }
+        }
+
+        val status = activeSession?.status
+            ?: if (sessions.isNotEmpty()) {
+                WorkLogSessionStatus.FINISHED
+            } else {
+                WorkLogSessionStatus.NOT_STARTED
+            }
+        val resolvedSessions = sessions.map { it.toResolvedSession() }
+
+        return WorkLogSessionState(
+            orderedEvents = orderedEvents,
+            status = status,
+            firstClockIn = firstClockIn,
+            lastClockOut = lastClockOut,
+            activeBreakStart = activeSession?.activeBreakStart,
+            workedMinutes = resolvedSessions.sumOf { it.workedMinutes },
+            mealLogged = mealLogged,
+            canStart = activeSession == null,
+            canFinish = status == WorkLogSessionStatus.WORKING,
+            canStartBreak = status == WorkLogSessionStatus.WORKING,
+            canEndBreak = status == WorkLogSessionStatus.ON_BREAK,
+            canLogMeal = status in setOf(
+                WorkLogSessionStatus.WORKING,
+                WorkLogSessionStatus.ON_BREAK
+            ) && !mealLogged,
+            requiresLiveTick = status == WorkLogSessionStatus.WORKING ||
+                status == WorkLogSessionStatus.ON_BREAK,
+            sessions = resolvedSessions
+        )
+    }
+
     fun ordered(events: List<WorkEvent>): List<WorkEvent> {
         return events.sortedWith(
             compareBy<WorkEvent> { it.time }.thenBy { it.id }
@@ -126,6 +265,29 @@ object WorkLogSessionStateResolver {
         }
 
         return (endMinutes - startMinutes).toLong()
+    }
+
+    private data class MutableResolvedSession(
+        val index: Int,
+        val clockIn: WorkEvent,
+        var clockOut: WorkEvent? = null,
+        var status: WorkLogSessionStatus = WorkLogSessionStatus.WORKING,
+        var activeBreakStart: WorkEvent? = null,
+        var currentWorkStart: LocalTime? = null,
+        var workedMinutes: Long = 0L,
+        val events: MutableList<WorkEvent> = mutableListOf(clockIn)
+    ) {
+        fun toResolvedSession(): WorkLogResolvedSession {
+            return WorkLogResolvedSession(
+                index = index,
+                status = status,
+                clockIn = clockIn,
+                clockOut = clockOut,
+                activeBreakStart = activeBreakStart,
+                workedMinutes = workedMinutes,
+                events = events.toList()
+            )
+        }
     }
 }
 
@@ -148,7 +310,23 @@ data class WorkLogSessionState(
     val canStartBreak: Boolean,
     val canEndBreak: Boolean,
     val canLogMeal: Boolean,
-    val requiresLiveTick: Boolean
+    val requiresLiveTick: Boolean,
+    val sessions: List<WorkLogResolvedSession> = emptyList()
+)
+
+enum class WorkLogDaySessionMode {
+    SINGLE_SESSION_PER_DAY,
+    MULTIPLE_SESSIONS_PER_DAY
+}
+
+data class WorkLogResolvedSession(
+    val index: Int,
+    val status: WorkLogSessionStatus,
+    val clockIn: WorkEvent,
+    val clockOut: WorkEvent?,
+    val activeBreakStart: WorkEvent?,
+    val workedMinutes: Long,
+    val events: List<WorkEvent>
 )
 
 enum class WorkLogSessionStatus {
