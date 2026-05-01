@@ -428,7 +428,6 @@ Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar mora Fre
 - [ ] Premium should add convenience, power-user features, advanced export/reporting, profiles, customization, and backup tools, not block essential work logging.
 - [x] Premium / FeatureGate foundation is in place without Play Billing or active UI gating.
 - [ ] Debug-only SharedPreferences entitlement storage
-- [ ] Developer tools premium toggle
 - [ ] Runtime FeatureGate chain wiring
 - [ ] Tester/founder unlock flow
 - [ ] Play Billing integration
