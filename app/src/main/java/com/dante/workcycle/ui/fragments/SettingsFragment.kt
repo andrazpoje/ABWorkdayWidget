@@ -34,6 +34,8 @@ import com.dante.workcycle.domain.backup.WorkCycleBackupPayloadCollector
 import com.dante.workcycle.domain.backup.WorkCycleBackupWriter
 import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
 import com.dante.workcycle.domain.model.CycleMode
+import com.dante.workcycle.domain.premium.DebugPremiumEntitlementPrefs
+import com.dante.workcycle.domain.premium.EntitlementOverrideMode
 import com.dante.workcycle.domain.template.TemplateManager
 import com.dante.workcycle.notifications.MidnightAlarmScheduler
 import com.dante.workcycle.style.WidgetStyleManager
@@ -760,6 +762,47 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         binding.buttonClearLocalAppData.setOnClickListener {
             showClearLocalDataConfirmation()
+        }
+
+        // TODO: Connect Developer tools premium override to the FeatureGate runtime chain
+        // for future UI gating tests. No production entitlement behavior should live here.
+        binding.buttonUnlockPremiumForTesting.setOnClickListener {
+            val prefs = DebugPremiumEntitlementPrefs.create(
+                context = requireContext(),
+                isDebugBuild = BuildConfig.DEBUG
+            )
+            prefs.setOverrideMode(EntitlementOverrideMode.UNLOCK_ALL_PREMIUM)
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.debug_premium_override_enabled),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        binding.buttonLockPremiumForTesting.setOnClickListener {
+            val prefs = DebugPremiumEntitlementPrefs.create(
+                context = requireContext(),
+                isDebugBuild = BuildConfig.DEBUG
+            )
+            prefs.setOverrideMode(EntitlementOverrideMode.LOCK_ALL_PREMIUM)
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.debug_premium_override_locked),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        binding.buttonResetPremiumOverride.setOnClickListener {
+            val prefs = DebugPremiumEntitlementPrefs.create(
+                context = requireContext(),
+                isDebugBuild = BuildConfig.DEBUG
+            )
+            prefs.clear()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.debug_premium_override_reset),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

@@ -366,6 +366,12 @@
     <string name="debug_clear_local_app_data">Clear local app data</string>
     <string name="debug_clear_local_data_title">Clear local data?</string>
     <string name="debug_clear_local_data_message">This debug action clears local app data and cannot be undone.</string>
+    <string name="debug_unlock_premium_for_testing">Unlock Premium for testing</string>
+    <string name="debug_lock_premium_for_testing">Lock Premium for testing</string>
+    <string name="debug_reset_premium_override">Reset Premium override</string>
+    <string name="debug_premium_override_enabled">Premium test override enabled</string>
+    <string name="debug_premium_override_locked">Premium test override locked</string>
+    <string name="debug_premium_override_reset">Premium test override reset</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / COUNTRIES -->

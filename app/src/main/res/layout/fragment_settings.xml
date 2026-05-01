@@ -765,6 +765,30 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/debug_clear_local_app_data" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonUnlockPremiumForTesting"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/debug_unlock_premium_for_testing" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonLockPremiumForTesting"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/debug_lock_premium_for_testing" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonResetPremiumOverride"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/debug_reset_premium_override" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

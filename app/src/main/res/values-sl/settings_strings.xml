@@ -387,4 +387,11 @@
     <string name="debug_clear_local_data_title">Počisti lokalne podatke?</string>
     <string name="debug_clear_local_data_message">To debug dejanje počisti lokalne podatke aplikacije in ga ni mogoče razveljaviti.</string>
 
+    <string name="debug_unlock_premium_for_testing">Odkleni Premium za testiranje</string>
+    <string name="debug_lock_premium_for_testing">Zakleni Premium za testiranje</string>
+    <string name="debug_reset_premium_override">Ponastavi Premium override</string>
+    <string name="debug_premium_override_enabled">Premium testni override omogočen</string>
+    <string name="debug_premium_override_locked">Premium testni override zaklenjen</string>
+    <string name="debug_premium_override_reset">Premium testni override ponastavljen</string>
+
 </resources>
