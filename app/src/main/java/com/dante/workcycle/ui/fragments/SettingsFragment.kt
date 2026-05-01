@@ -4,30 +4,34 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.dante.workcycle.BuildConfig
 import com.dante.workcycle.R
+import com.dante.workcycle.WorkCycleApp
 import com.dante.workcycle.core.theme.AppThemeManager
 import com.dante.workcycle.core.theme.ThemePreset
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
-import android.app.DatePickerDialog
+import com.dante.workcycle.data.local.db.AppDatabase
 import com.dante.workcycle.debug.DebugDataResetHelper
 import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.databinding.FragmentSettingsBinding
+import com.dante.workcycle.domain.backup.WorkCycleBackupManifest
+import com.dante.workcycle.domain.backup.WorkCycleBackupPayloadCollector
+import com.dante.workcycle.domain.backup.WorkCycleBackupWriter
 import com.dante.workcycle.domain.model.AssignmentCycleAdvanceMode
 import com.dante.workcycle.domain.model.CycleMode
 import com.dante.workcycle.domain.template.TemplateManager
@@ -37,11 +41,16 @@ import com.dante.workcycle.ui.activity.MainActivity
 import com.dante.workcycle.ui.dialogs.ColorPickerDialog
 import com.dante.workcycle.ui.settings.PrimaryCycleSettingsController
 import com.dante.workcycle.widget.WidgetRefreshHelper
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
+
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     companion object {
@@ -57,6 +66,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var isInitializing = false
     private var developerToolsTapCount = 0
     private lateinit var primaryCycleSettingsController: PrimaryCycleSettingsController
+    private val exportFullBackupLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/zip")
+    ) { uri ->
+        if (uri != null) {
+            exportFullBackup(uri)
+        }
+    }
 
     private data class AssignmentAdvanceModeUiItem(
         val mode: AssignmentCycleAdvanceMode,
@@ -687,6 +703,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.buttonSettingsFullChangelog.setOnClickListener {
             openChangelog()
         }
+        setupBackupActions()
         binding.editStartDate.setOnClickListener {
             if (TemplateManager.isAssignmentModeEditingLocked(requireContext())) return@setOnClickListener
             showSecondaryStartDatePicker()
@@ -712,6 +729,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         }
 
 
+    }
+
+    private fun setupBackupActions() {
+        // TODO: Add Premium/ProFeature gating here later and disable this card in the standard tier.
+        binding.rowExportFullBackup.setOnClickListener {
+            exportFullBackupLauncher.launch(buildFullBackupFileName())
+        }
     }
 
     private fun setupDeveloperTools() {
@@ -807,6 +831,60 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private fun refreshWidget() {
         WidgetRefreshHelper.refresh(requireContext())
+    }
+
+    private fun buildFullBackupFileName(): String {
+        return "workcycle-backup-${LocalDate.now()}.zip"
+    }
+
+    private fun buildBackupManifest(): WorkCycleBackupManifest {
+        return WorkCycleBackupManifest(
+            backupFormatVersion = 1,
+            createdAt = System.currentTimeMillis(),
+            appVersionName = BuildConfig.VERSION_NAME,
+            appVersionCode = BuildConfig.VERSION_CODE,
+            databaseVersion = AppDatabase.DATABASE_VERSION,
+            packageName = BuildConfig.APPLICATION_ID
+        )
+    }
+
+    private fun exportFullBackup(uri: Uri) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val exportResult = runCatching {
+                val app = requireContext().applicationContext as WorkCycleApp
+                val collector = WorkCycleBackupPayloadCollector(
+                    context = requireContext(),
+                    database = app.database
+                )
+                val payload = withContext(Dispatchers.IO) {
+                    collector.collect(buildBackupManifest())
+                }
+                val zipBytes = withContext(Dispatchers.IO) {
+                    WorkCycleBackupWriter.toByteArray(payload)
+                }
+
+                withContext(Dispatchers.IO) {
+                    requireContext().contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(zipBytes)
+                        outputStream.flush()
+                    } ?: error("Failed to open backup export output stream.")
+                }
+            }
+
+            if (exportResult.isSuccess) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.work_cycle_backup_export_success),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.work_cycle_backup_export_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private fun showAddCycleLabelDialog() {

@@ -220,8 +220,4 @@
     <string name="work_log_export_csv_failed">Izvoz Work Log CSV ni uspel</string>
     <string name="work_log_export_csv_header_only">Ni najdenih Work Log dogodkov, izvožena je samo glava CSV.</string>
     <string name="work_log_export_csv_range_header_only">V izbranem obdobju ni najdenih Work Log dogodkov, izvožena je samo glava CSV.</string>
-    <string name="work_cycle_backup_export_title">Izvozi celotno varnostno kopijo</string>
-    <string name="work_cycle_backup_export_helper">Izvozi podatke in nastavitve WorkCycle kot ZIP varnostno kopijo.</string>
-    <string name="work_cycle_backup_export_success">Varnostna kopija izvožena</string>
-    <string name="work_cycle_backup_export_failed">Izvoz varnostne kopije ni uspel</string>
 </resources>

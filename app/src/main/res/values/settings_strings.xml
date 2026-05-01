@@ -10,6 +10,7 @@
     <string name="settings_about_title">About</string>
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_schedule_title">Schedule</string>
+    <string name="settings_backup_title">Backup</string>
     <string name="settings_saved">Settings saved</string>
     <string name="home_upcoming_events_title">Upcoming special days</string>
     <string name="home_upcoming_events_empty">No upcoming special days.</string>
@@ -39,6 +40,10 @@
     <string name="widget_add_manual_hint">Long press on the home screen, open Widgets, then add the Work Cycle widget.</string>
     <string name="open_widgets">Open widgets</string>
     <string name="home_widget_tip_dismiss">Don’t show again</string>
+    <string name="work_cycle_backup_export_title">Export full backup</string>
+    <string name="work_cycle_backup_export_helper">Export WorkCycle data and settings as a ZIP backup.</string>
+    <string name="work_cycle_backup_export_success">Full backup exported</string>
+    <string name="work_cycle_backup_export_failed">Failed to export full backup</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / THEME & COLORS -->

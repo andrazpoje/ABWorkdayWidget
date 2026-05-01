@@ -10,6 +10,7 @@
     <string name="settings_about_title">O aplikaciji</string>
     <string name="settings_notifications_title">Obvestila</string>
     <string name="settings_schedule_title">Razpored</string>
+    <string name="settings_backup_title">Varnostne kopije</string>
     <string name="settings_saved">Nastavitve shranjene</string>
     <string name="home_upcoming_events_title">Bližajoči dogodki</string>
     <string name="home_upcoming_events_empty">V naslednjih dneh ni posebnih dogodkov.</string>
@@ -39,6 +40,10 @@
     <string name="widget_add_manual_hint">Na domačem zaslonu naredi dolg pritisk, odpri Pripomočke in dodaj gradnik Delovni cikel.</string>
     <string name="open_widgets">Odpri widgete</string>
     <string name="home_widget_tip_dismiss">Ne prikazuj več</string>
+    <string name="work_cycle_backup_export_title">Izvozi celotno varnostno kopijo</string>
+    <string name="work_cycle_backup_export_helper">Izvozi podatke in nastavitve WorkCycle kot ZIP varnostno kopijo.</string>
+    <string name="work_cycle_backup_export_success">Varnostna kopija izvožena</string>
+    <string name="work_cycle_backup_export_failed">Izvoz varnostne kopije ni uspel</string>
 
     <!-- ========================================================= -->
     <!-- SETTINGS / TEMA IN BARVE -->
