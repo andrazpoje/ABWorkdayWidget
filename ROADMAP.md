@@ -51,6 +51,9 @@ v2.9 je bila foundations / cleanup verzija. Namen je bil stabilizirati aplikacij
 - [x] Work Log resolver foundation
 - [x] Work Log accounting foundation
 - [x] Break Accounting Mode
+- [x] Multiple work sessions / split shifts runtime support
+- [x] Start new session dashboard action
+- [x] Session-aware resolver, validator, accounting, widget, and notification
 - [x] Dashboard/widget balance parity prek skupnega accounting layerja
 - [x] Credited time / Priznan čas UI
 - [x] Effective work / Efektivno delo label
@@ -234,27 +237,39 @@ Ni še implementirano. Accounting in active break display sta pripravljena osnov
 
 ### Status
 
-Ni še implementirano. Pripravljamo z resolver/accounting foundation.
+Runtime support je implementiran brez Room schema sprememb. Seje so trenutno derived iz urejenih raw Work Log eventov.
 
 ### Zakaj je pomembno
 
 Več sej na dan in split shifts so ena ključnih funkcionalnih vrzeli v Free core, ker jih veliko uporabnikov potrebuje za osnovno beleženje dela.
 
-### Plan
+### Completed
 
-- [ ] Najprej design brez Room sprememb
-- [ ] Odločitev: `sessionId`, `sessionIndex` ali derived grouping
-- [ ] Nastavitev: `Dovoli več delovnih sej na dan`
-- [ ] Default: OFF
-- [ ] Po zaključenem dnevu prikaži `Začni novo sejo` samo, če je funkcija vklopljena
-- [ ] Vsaka seja ima svoj Start / Finish
-- [ ] Dnevni total sešteje vse seje
-- [ ] Saldo uporablja accounting summary čez vse seje
-- [ ] Recent events podpira več sej
-- [ ] Widget podpira več sej
-- [ ] Manual edit audit podpira več sej
-- [ ] Future-time safety podpira več sej
+- [x] Phase 0 setting: `Dovoli več delovnih sej na dan`
+- [x] Default: OFF
+- [x] Resolver session segmentation
+- [x] Mode-aware validator
+- [x] Manual edit mode wiring
+- [x] Accounting session parity
+- [x] Widget session parity
+- [x] Dashboard `Začni novo sejo` runtime
+- [x] Dnevni total sešteje vse derived seje
+- [x] Saldo uporablja accounting summary čez vse derived seje
+
+### Remaining / future
+
+- [ ] Recent events session grouping / index
+- [ ] Optional `sessionId` / schema evolution
+- [ ] Richer session summary UI
+- [ ] PDF/reporting awareness
+- [ ] Restore/import session-aware policy
 - [ ] Kasneje dodati poštni split-shift profil, npr. 08:00–10:00 in 12:00–18:00
+
+### Notes
+
+- [x] Split shifts / multiple sessions remain Free core
+- [x] No Room schema change yet
+- [x] Sessions are currently derived from ordered raw events
 
 ---
 

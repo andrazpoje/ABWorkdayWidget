@@ -17,6 +17,8 @@ All notable changes to this project will be documented in this file.
 - Added `WorkLogWidgetBalanceCalculator` for pure Kotlin widget balance parity coverage
 - Added `WorkLogCsvExporter` and first Work Log CSV export flow in Work Log Settings
 - Added date range support for Work Log CSV export
+- Added multiple work sessions / split shifts runtime support
+- Added `Start new session` action when multiple sessions are enabled
 - Added local JVM tests for Work Log resolver, accounting calculator, accounting rules factory, widget balance calculator, and CSV exporter
 - Added Work Log CSV export with raw Work Log events and manual edit audit metadata
 - Added full local ZIP backup export for WorkCycle data and settings
@@ -37,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - Work Log dashboard now distinguishes effective work from credited time
 - Improved active break display so the value shows only duration while the label carries elapsed / remaining / exceeded meaning
 - Improved Work Log Help and Settings wording around break accounting, meal time, effective work, and balance
+- Work Log accounting, widget balance, dashboard state, notification, and manual edit validation are now session-aware for multiple work sessions
 - Work Log CSV export now offers Export all and Export date range from one entry point
 - Backup export is now located in the main Settings Backup section instead of Work Log Settings
 - Added explicit backup filtering so debug, transient, and session snapshot state is excluded from exported backups
@@ -45,10 +48,15 @@ All notable changes to this project will be documented in this file.
 ### Technical
 - Dashboard and Work Time widget now share resolver-based status handling
 - Dashboard and Work Time widget now share the same accounting layer for balance/saldo
+- Added resolver session segmentation for multiple work sessions without Room schema changes
+- Kept multiple work sessions derived from ordered raw Work Log events
 - Work Log CSV export currently writes raw `WorkEvent` data plus manual edit audit metadata without derived accounting columns
+- Kept CSV and backup exports raw-event based without `sessionId`
 - Added read-only date-range query support for Work Log CSV export
 - Kept `WorkLogCsvExporter` unchanged and reused it with filtered event lists
 - Room schema and migrations were not changed in this v3.0 development work
+- `sessionId` has not been added yet
+- Recent events session grouping remains deferred as follow-up polish
 - Added export-only backup foundation without restore/import behavior
 - Added backup ZIP structure with `manifest.json`, `room/work_events.json`, `room/work_logs.json`, and `prefs/*.json`
 - Added pure Kotlin backup ZIP validator, ZIP reader, JSON parser, and preview/summary model
