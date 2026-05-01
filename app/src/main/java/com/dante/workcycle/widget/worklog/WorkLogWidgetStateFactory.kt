@@ -8,6 +8,8 @@ import com.dante.workcycle.data.prefs.toAccountingRules
 import com.dante.workcycle.data.repository.RepositoryProvider
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.worklog.WorkLogDaySessionMode
+import com.dante.workcycle.domain.worklog.WorkLogSessionState
 import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
 import com.dante.workcycle.domain.worklog.WorkLogSessionStatus
 import kotlinx.coroutines.runBlocking
@@ -51,24 +53,54 @@ class WorkLogWidgetStateFactory(
     }
 
     private fun createState(events: List<WorkEvent>): WorkLogWidgetState {
-        val resolvedState = WorkLogSessionStateResolver.resolve(events)
+        val now = LocalTime.now()
+        val resolvedState = WorkLogSessionStateResolver.resolve(
+            events = events,
+            now = now,
+            sessionMode = resolveSessionMode()
+        )
         val sortedEvents = resolvedState.orderedEvents
         val balanceText = formatBalanceText(
             WorkLogWidgetBalanceCalculator.calculateBalanceMinutes(
                 sessionState = resolvedState,
-                rules = workSettingsPrefs.toAccountingRules()
+                rules = workSettingsPrefs.toAccountingRules(),
+                now = now
             )
         )
 
         return when (resolvedState.status) {
             WorkLogSessionStatus.NOT_STARTED -> createNotStartedState()
-            WorkLogSessionStatus.WORKING -> createWorkingState(sortedEvents, balanceText)
-            WorkLogSessionStatus.ON_BREAK -> createOnBreakState(
-                events = sortedEvents,
-                activeBreakStart = resolvedState.activeBreakStart,
+            WorkLogSessionStatus.WORKING -> createWorkingState(
+                clockIn = findActiveClockIn(sortedEvents, resolvedState),
+                workedMinutes = resolvedState.workedMinutes,
                 balanceText = balanceText
             )
-            WorkLogSessionStatus.FINISHED -> createFinishedState(sortedEvents, balanceText)
+            WorkLogSessionStatus.ON_BREAK -> createOnBreakState(
+                activeBreakStart = resolvedState.activeBreakStart,
+                workedMinutes = resolvedState.workedMinutes,
+                balanceText = balanceText
+            )
+            WorkLogSessionStatus.FINISHED -> createFinishedState(
+                events = sortedEvents,
+                workedMinutes = resolvedState.workedMinutes,
+                balanceText = balanceText
+            )
+        }
+    }
+
+    private fun findActiveClockIn(
+        events: List<WorkEvent>,
+        resolvedState: WorkLogSessionState
+    ): WorkEvent? {
+        return resolvedState.sessions.lastOrNull { it.clockOut == null }?.clockIn
+            ?: events.firstOrNull { it.type == WorkEventType.CLOCK_IN }
+    }
+
+    private fun resolveSessionMode(): WorkLogDaySessionMode {
+        return if (workSettingsPrefs.isMultipleWorkSessionsEnabled()) {
+            WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY
+        } else {
+            WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY
         }
     }
 
@@ -82,16 +114,15 @@ class WorkLogWidgetStateFactory(
     }
 
     private fun createWorkingState(
-        events: List<WorkEvent>,
+        clockIn: WorkEvent?,
+        workedMinutes: Long,
         balanceText: String
     ): WorkLogWidgetState {
-        val clockIn = events.firstOrNull { it.type == WorkEventType.CLOCK_IN }
         val startedAtText = context.getString(
             R.string.work_log_widget_started_at_value,
             clockIn?.time?.format(timeFormatter).orEmpty()
         )
         val isLiveMode = isLiveWidgetInfoMode()
-        val workedMinutes = calculateWorkedMinutes(events)
 
         return WorkLogWidgetState(
             title = context.getString(R.string.work_log_widget_title),
@@ -104,8 +135,8 @@ class WorkLogWidgetStateFactory(
     }
 
     private fun createOnBreakState(
-        events: List<WorkEvent>,
         activeBreakStart: WorkEvent?,
+        workedMinutes: Long,
         balanceText: String
     ): WorkLogWidgetState {
         val breakStartedText = context.getString(
@@ -113,7 +144,6 @@ class WorkLogWidgetStateFactory(
             activeBreakStart?.time?.format(timeFormatter).orEmpty()
         )
         val isLiveMode = isLiveWidgetInfoMode()
-        val workedMinutes = calculateWorkedMinutes(events)
 
         return WorkLogWidgetState(
             title = context.getString(R.string.work_log_widget_title),
@@ -127,10 +157,10 @@ class WorkLogWidgetStateFactory(
 
     private fun createFinishedState(
         events: List<WorkEvent>,
+        workedMinutes: Long,
         balanceText: String
     ): WorkLogWidgetState {
         val lastClockOut = events.lastOrNull { it.type == WorkEventType.CLOCK_OUT }
-        val workedMinutes = calculateWorkedMinutes(events)
 
         return WorkLogWidgetState(
             title = context.getString(R.string.work_log_widget_title),
@@ -142,52 +172,6 @@ class WorkLogWidgetStateFactory(
             secondaryValueText = formatWorkedTodayText(workedMinutes),
             tertiaryValueText = balanceText
         )
-    }
-
-    private fun calculateWorkedMinutes(events: List<WorkEvent>): Long {
-        var currentStart: LocalTime? = null
-        var totalMinutes = 0L
-
-        for (event in events) {
-            when (event.type) {
-                WorkEventType.CLOCK_IN -> currentStart = event.time
-
-                WorkEventType.BREAK_START -> {
-                    if (currentStart != null) {
-                        totalMinutes += minutesBetween(currentStart, event.time)
-                        currentStart = null
-                    }
-                }
-
-                WorkEventType.BREAK_END -> currentStart = event.time
-
-                WorkEventType.CLOCK_OUT -> {
-                    if (currentStart != null) {
-                        totalMinutes += minutesBetween(currentStart, event.time)
-                        currentStart = null
-                    }
-                }
-
-                else -> Unit
-            }
-        }
-
-        if (currentStart != null) {
-            totalMinutes += minutesBetween(currentStart, LocalTime.now())
-        }
-
-        return totalMinutes
-    }
-
-    private fun minutesBetween(start: LocalTime, end: LocalTime): Long {
-        val startMinutes = start.hour * 60 + start.minute
-        var endMinutes = end.hour * 60 + end.minute
-
-        if (endMinutes < startMinutes) {
-            endMinutes += 24 * 60
-        }
-
-        return (endMinutes - startMinutes).toLong()
     }
 
     private fun formatWorkedTodayText(workedMinutes: Long): String {
