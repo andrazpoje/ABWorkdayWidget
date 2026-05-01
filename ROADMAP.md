@@ -80,6 +80,9 @@ v2.9 je bila foundations / cleanup verzija. Namen je bil stabilizirati aplikacij
 - [x] Full backup export moved to main Settings Backup card
 - [x] SharedPreferences backup filtering
 - [x] Manual edit audit metadata included v CSV/backup exportih
+- [x] Workday rollover calculator foundation
+- [x] Rollover-aware event ordering foundation
+- [x] Workday rollover setting foundation
 
 v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zaključiti Work Log foundation, nato lahko doda uporabniške funkcije nad stabilno arhitekturo.
 
@@ -270,17 +273,33 @@ Več sej na dan in split shifts so ena ključnih funkcionalnih vrzeli v Free cor
 - [x] Split shifts / multiple sessions remain Free core
 - [x] No Room schema change yet
 - [x] Sessions are currently derived from ordered raw events
+- [x] Runtime overnight handling is not enabled yet
+- [x] Default `00:00` preserves current behavior
 
 
 ### Future – Overnight shifts / workday rollover
 
-- [ ] Add Workday rollover time setting for overnight/night shifts.
-- [ ] Default: `00:00`.
-- [ ] Optional presets: `03:00`, `04:00`, `05:00`, `06:00`.
-- [ ] Events after midnight but before the rollover time can still belong to the previous work date.
-- [ ] Expected start/end times should support overnight shifts when expected end time is earlier than expected start time.
-- [ ] Do not auto-guess overnight work only from event times; use an explicit setting or clear user confirmation.
-- [ ] Keep this as a separate future Work Log foundation task after multiple sessions are stable.
+Runtime overnight handling is not enabled yet. The current setting only prepares future support.
+
+### Completed foundation
+
+- [x] Workday rollover calculator foundation
+- [x] Rollover-aware event ordering foundation
+- [x] Workday rollover setting foundation
+- [x] Default: `00:00`
+- [x] Optional presets: `03:00`, `04:00`, `05:00`, `06:00`
+
+### Remaining / future
+
+- [ ] Runtime overnight handling
+- [ ] Effective work date integration
+- [ ] Resolver/validator/accounting rollover integration
+- [ ] Widget rollover refresh scheduling
+- [ ] Events after midnight but before the rollover time can still belong to the previous work date
+- [ ] Expected start/end times should support overnight shifts when expected end time is earlier than expected start time
+- [ ] Do not auto-guess overnight work only from event times; use an explicit setting or clear user confirmation
+- [ ] ActualDateTime / workDate schema decision
+- [ ] Restore/import overnight semantics
 
 ---
 

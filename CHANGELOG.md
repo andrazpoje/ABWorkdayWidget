@@ -76,6 +76,15 @@ All notable changes to this project will be documented in this file.
 - Existing backup/export functionality is not gated or locked yet
 - Existing runtime behavior is unchanged
 - Restore/import and Premium gating are not included yet
+- Added Workday rollover setting foundation for future overnight shift support
+- Added Workday rollover time presets: `00:00`, `03:00`, `04:00`, `05:00`, `06:00`
+- Added safe `LocalTime` persistence for `workday_rollover_time` with fallback to `00:00`
+- Added `getWorkdayRolloverTime()` / `setWorkdayRolloverTime()` in `WorkSettingsPrefs`
+- Added Work Log Settings UI for selecting the workday rollover time
+- Added `work_log_settings_rollover` and `work_log_settings_rollover_helper` strings in EN/SL
+- Runtime overnight handling is not enabled yet
+- Existing Work Log date/session behavior is unchanged
+- Room schema and migrations were not changed
 
 ---
 
