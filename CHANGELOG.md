@@ -56,12 +56,14 @@ All notable changes to this project will be documented in this file.
 - Added central entitlement / gating API with `FeatureTier`, `PremiumFeature`, `GateDecision`, `EntitlementRepository`, and `FeatureGate`
 - Added entitlement repository chain foundation with `OverrideEntitlementRepository` and `CompositeEntitlementRepository`
 - Added debug-only Premium override controls in Developer tools for future UI gating tests
+- Added `PremiumProvider` as the central runtime assembly point for the `FeatureGate` chain
 - Added local JVM tests for premium feature tier mapping and default locked entitlement behavior
 - Added local JVM tests for entitlement override and repository priority-chain behavior
 - Kept Room schema and migrations unchanged
 - Play Billing is not included yet
 - SharedPreferences entitlement storage is not included yet
 - UI gating is not included yet; current debug override controls are only a test foundation
+- The runtime `FeatureGate` chain is not used for locking existing features yet
 - Existing backup/export functionality is not gated or locked yet
 - Existing runtime behavior is unchanged
 - Restore/import and Premium gating are not included yet
