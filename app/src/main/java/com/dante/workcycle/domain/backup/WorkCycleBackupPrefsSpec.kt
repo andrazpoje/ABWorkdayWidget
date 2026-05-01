@@ -3,6 +3,7 @@ package com.dante.workcycle.domain.backup
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.data.prefs.Prefs
 import com.dante.workcycle.data.prefs.WorkSettingsPrefs
+import com.dante.workcycle.domain.premium.PremiumEntitlementPrefsNames
 import com.dante.workcycle.domain.schedule.CycleManager
 
 /**
@@ -93,6 +94,9 @@ object WorkCycleBackupPrefsSpec {
                 KEY_DEBUG_DEVELOPER_TOOLS_UNLOCKED
             )
         ),
+        PremiumEntitlementPrefsNames.DEBUG_OVERRIDE_PREFS_NAME to Rule(excluded = true),
+        PremiumEntitlementPrefsNames.TESTER_UNLOCK_PREFS_NAME to Rule(excluded = true),
+        PremiumEntitlementPrefsNames.ENTITLEMENT_CACHE_PREFS_NAME to Rule(excluded = true),
         PREFS_WORK_SESSION_SNAPSHOT to Rule(excluded = true)
     )
 

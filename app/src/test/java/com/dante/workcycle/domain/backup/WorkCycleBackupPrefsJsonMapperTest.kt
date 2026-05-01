@@ -2,6 +2,7 @@ package com.dante.workcycle.domain.backup
 
 import com.dante.workcycle.data.prefs.AppPrefs
 import com.dante.workcycle.data.prefs.Prefs
+import com.dante.workcycle.domain.premium.PremiumEntitlementPrefsNames
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -93,6 +94,30 @@ class WorkCycleBackupPrefsJsonMapperTest {
         assertFalse(names.contains("work_session_snapshot_prefs"))
         assertTrue(names.contains(Prefs.PREFS_NAME))
         assertTrue(names.contains("work_settings_prefs"))
+    }
+
+    @Test
+    fun premiumEntitlementPrefsFilesAreExcluded() {
+        val names = WorkCycleBackupPrefsSpec.includedPrefsNames()
+
+        assertFalse(
+            WorkCycleBackupPrefsSpec.isIncludedPrefsFile(
+                PremiumEntitlementPrefsNames.DEBUG_OVERRIDE_PREFS_NAME
+            )
+        )
+        assertFalse(
+            WorkCycleBackupPrefsSpec.isIncludedPrefsFile(
+                PremiumEntitlementPrefsNames.TESTER_UNLOCK_PREFS_NAME
+            )
+        )
+        assertFalse(
+            WorkCycleBackupPrefsSpec.isIncludedPrefsFile(
+                PremiumEntitlementPrefsNames.ENTITLEMENT_CACHE_PREFS_NAME
+            )
+        )
+        assertFalse(names.contains(PremiumEntitlementPrefsNames.DEBUG_OVERRIDE_PREFS_NAME))
+        assertFalse(names.contains(PremiumEntitlementPrefsNames.TESTER_UNLOCK_PREFS_NAME))
+        assertFalse(names.contains(PremiumEntitlementPrefsNames.ENTITLEMENT_CACHE_PREFS_NAME))
     }
 
     @Test
