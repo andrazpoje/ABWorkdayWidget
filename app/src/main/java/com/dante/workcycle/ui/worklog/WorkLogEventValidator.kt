@@ -3,6 +3,7 @@ package com.dante.workcycle.ui.worklog
 import com.dante.workcycle.R
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.worklog.WorkLogDaySessionMode
 import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
 
 /**
@@ -27,13 +28,29 @@ object WorkLogEventValidator {
         originalDateEvents: List<WorkEvent>,
         updatedDateEvents: List<WorkEvent>
     ): Int? {
+        return validateEditedEvent(
+            originalEvent = originalEvent,
+            updatedEvent = updatedEvent,
+            originalDateEvents = originalDateEvents,
+            updatedDateEvents = updatedDateEvents,
+            sessionMode = WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY
+        )
+    }
+
+    fun validateEditedEvent(
+        originalEvent: WorkEvent,
+        updatedEvent: WorkEvent,
+        originalDateEvents: List<WorkEvent>,
+        updatedDateEvents: List<WorkEvent>,
+        sessionMode: WorkLogDaySessionMode
+    ): Int? {
         val originalDayCandidate = buildOriginalDayCandidate(
             originalEvent = originalEvent,
             updatedEvent = updatedEvent,
             originalDateEvents = originalDateEvents
         )
 
-        validateTimeline(originalDayCandidate)?.let { return it }
+        validateTimeline(originalDayCandidate, sessionMode)?.let { return it }
 
         val updatedDayCandidate = buildUpdatedDayCandidate(
             originalEvent = originalEvent,
@@ -41,7 +58,7 @@ object WorkLogEventValidator {
             updatedDateEvents = updatedDateEvents
         )
 
-        return validateTimeline(updatedDayCandidate)
+        return validateTimeline(updatedDayCandidate, sessionMode)
     }
 
     private fun buildOriginalDayCandidate(
@@ -67,14 +84,24 @@ object WorkLogEventValidator {
         return withoutOriginal + updatedEvent
     }
 
-    private fun validateTimeline(events: List<WorkEvent>): Int? {
+    private fun validateTimeline(
+        events: List<WorkEvent>,
+        sessionMode: WorkLogDaySessionMode
+    ): Int? {
         var isWorking = false
         var isOnBreak = false
+        var hasFinishedSession = false
 
         for (event in WorkLogSessionStateResolver.ordered(events)) {
             when (event.type) {
                 WorkEventType.CLOCK_IN -> {
-                    if (isWorking) {
+                    if (
+                        isWorking ||
+                        (
+                            sessionMode == WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY &&
+                                hasFinishedSession
+                            )
+                    ) {
                         return R.string.work_log_edit_validation_clock_in
                     }
                     isWorking = true
@@ -101,6 +128,7 @@ object WorkLogEventValidator {
                     }
                     isWorking = false
                     isOnBreak = false
+                    hasFinishedSession = true
                 }
 
                 WorkEventType.MEAL,
