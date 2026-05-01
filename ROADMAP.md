@@ -271,6 +271,17 @@ Več sej na dan in split shifts so ena ključnih funkcionalnih vrzeli v Free cor
 - [x] No Room schema change yet
 - [x] Sessions are currently derived from ordered raw events
 
+
+### Future – Overnight shifts / workday rollover
+
+- [ ] Add Workday rollover time setting for overnight/night shifts.
+- [ ] Default: `00:00`.
+- [ ] Optional presets: `03:00`, `04:00`, `05:00`, `06:00`.
+- [ ] Events after midnight but before the rollover time can still belong to the previous work date.
+- [ ] Expected start/end times should support overnight shifts when expected end time is earlier than expected start time.
+- [ ] Do not auto-guess overnight work only from event times; use an explicit setting or clear user confirmation.
+- [ ] Keep this as a separate future Work Log foundation task after multiple sessions are stable.
+
 ---
 
 ## v3.0 – Local backup/export foundation
@@ -581,7 +592,7 @@ Future feature. Ni del osnovnega v3.0 sklopa.
 - v3.0 je trenutni aktivni razvojni sklop.
 - Work Log accounting je zdaj osrednji v3.0 foundation.
 - Room schema ni bila spremenjena med trenutnim v3.0 accounting/export foundation delom.
-- Room schema naj ostane nespremenjena, dokler ni sprejet multi-session model.
+- Room schema naj ostane nespremenjena, dokler ni sprejeta jasna `sessionId` / schema evolution odločitev.
 - Pred prihodnjimi Room schema spremembami omogočiti schema export in migration tests.
 - Restore/import je bolj tvegan sklop in mora imeti ločen audit, validation layer, warning dialog in explicit replace-all policy.
 - Transport, hospitality split shifts in healthcare 12h pravila zahtevajo posebne profile; ne hardcodati v osnovno logiko.
