@@ -78,9 +78,11 @@ class WorkSettingsPrefs(context: Context) {
     }
 
     /**
-     * Phase 0 foundation flag for future split-shift / multi-session support.
+     * Controls whether Work Log can use multiple start/finish sessions in the same day.
      *
-     * This does not change current Work Log runtime behavior yet.
+     * When disabled, Work Log keeps the legacy one-session-per-day behavior.
+     * When enabled, dashboard, validation, accounting, widget state, and notifications
+     * interpret ordered Work Log events as multiple sessions.
      */
     fun isMultipleWorkSessionsEnabled(): Boolean {
         return prefs.getBoolean(
