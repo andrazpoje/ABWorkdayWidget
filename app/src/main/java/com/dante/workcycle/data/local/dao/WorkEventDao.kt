@@ -21,6 +21,16 @@ interface WorkEventDao {
     @Query("SELECT * FROM work_events ORDER BY date ASC, time ASC, id ASC")
     suspend fun getAllOrdered(): List<WorkEventEntity>
 
+    @Query(
+        "SELECT * FROM work_events " +
+            "WHERE date BETWEEN :startDate AND :endDate " +
+            "ORDER BY date ASC, time ASC, id ASC"
+    )
+    suspend fun getBetweenOrdered(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): List<WorkEventEntity>
+
     @Query("SELECT * FROM work_events WHERE date = :date ORDER BY time ASC, id ASC")
     suspend fun getByDate(date: LocalDate): List<WorkEventEntity>
 

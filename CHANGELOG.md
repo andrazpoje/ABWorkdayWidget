@@ -17,6 +17,10 @@ All notable changes to this project will be documented in this file.
 - Added `WorkLogWidgetBalanceCalculator` for pure Kotlin widget balance parity coverage
 - Added `WorkLogCsvExporter` and first Work Log CSV export flow in Work Log Settings
 - Added local JVM tests for Work Log resolver, accounting calculator, accounting rules factory, widget balance calculator, and CSV exporter
+- Added Work Log CSV export with raw Work Log events and manual edit audit metadata
+- Added full local ZIP backup export for WorkCycle data and settings
+- Added backup manifest, payload, writer, Room JSON mapper, SharedPreferences JSON mapper, and backup collector foundation
+
 
 ### Improved
 - Dashboard balance now uses the Work Log accounting rules
@@ -29,12 +33,17 @@ All notable changes to this project will be documented in this file.
 - Work Log dashboard now distinguishes effective work from credited time
 - Improved active break display so the value shows only duration while the label carries elapsed / remaining / exceeded meaning
 - Improved Work Log Help and Settings wording around break accounting, meal time, effective work, and balance
+- Added explicit backup filtering so debug, transient, and session snapshot state is excluded from exported backups
+
 
 ### Technical
 - Dashboard and Work Time widget now share resolver-based status handling
 - Dashboard and Work Time widget now share the same accounting layer for balance/saldo
 - Work Log CSV export currently writes raw `WorkEvent` data plus manual edit audit metadata without derived accounting columns
 - Room schema and migrations were not changed in this v3.0 development work
+- Added export-only backup foundation without restore/import behavior
+- Added backup ZIP structure with `manifest.json`, `room/work_events.json`, `room/work_logs.json`, and `prefs/*.json`
+- Kept Room schema and migrations unchanged
 
 ---
 

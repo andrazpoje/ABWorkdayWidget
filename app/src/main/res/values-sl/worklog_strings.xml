@@ -210,9 +210,16 @@
     <string name="work_log_settings_reminders_body">Dodaj pravila za opomnike na dneve, ko je bilo delo začeto, ne pa tudi zaključeno.</string>
     <string name="work_log_settings_export_csv">Izvozi Work Log CSV</string>
     <string name="work_log_settings_export_csv_helper">Izvozi surove Work Log dogodke z audit podatki ročnih popravkov.</string>
+    <string name="work_log_export_all">Izvozi vse</string>
+    <string name="work_log_export_date_range">Izvozi obdobje</string>
+    <string name="work_log_export_choose_range">Izberi obdobje izvoza</string>
+    <string name="work_log_export_from_date">Začetni datum</string>
+    <string name="work_log_export_to_date">Končni datum</string>
+    <string name="work_log_export_invalid_date_range">Neveljavno obdobje</string>
     <string name="work_log_export_csv_success">Work Log CSV je izvožen</string>
     <string name="work_log_export_csv_failed">Izvoz Work Log CSV ni uspel</string>
     <string name="work_log_export_csv_header_only">Ni najdenih Work Log dogodkov, izvožena je samo glava CSV.</string>
+    <string name="work_log_export_csv_range_header_only">V izbranem obdobju ni najdenih Work Log dogodkov, izvožena je samo glava CSV.</string>
     <string name="work_cycle_backup_export_title">Izvozi celotno varnostno kopijo</string>
     <string name="work_cycle_backup_export_helper">Izvozi podatke in nastavitve WorkCycle kot ZIP varnostno kopijo.</string>
     <string name="work_cycle_backup_export_success">Varnostna kopija izvožena</string>

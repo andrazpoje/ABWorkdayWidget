@@ -23,6 +23,13 @@ class WorkEventRepository(
         return dao.getAllOrdered().map { it.toDomain() }
     }
 
+    suspend fun getEventsBetweenForExport(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): List<WorkEvent> {
+        return dao.getBetweenOrdered(startDate, endDate).map { it.toDomain() }
+    }
+
     suspend fun getByDate(date: LocalDate): List<WorkEvent> {
         return dao.getByDate(date).map { it.toDomain() }
     }

@@ -28,6 +28,7 @@ import com.dante.workcycle.domain.schedule.CycleManager
 import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
 import com.dante.workcycle.domain.worklog.export.WorkLogCsvExporter
 import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -35,11 +36,13 @@ import com.google.android.material.timepicker.TimeFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 
 class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
@@ -61,13 +64,16 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var textOvertimeTrackingValue: TextView
     private lateinit var textWidgetInfoModeValue: TextView
     private lateinit var switchOvertimeTracking: MaterialSwitch
+    private var pendingCsvExportRequest: CsvExportRequest? = null
 
     private var isBindingSwitch = false
     private val exportWorkLogCsvLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("text/csv")
     ) { uri ->
+        val request = pendingCsvExportRequest ?: CsvExportRequest.All
+        pendingCsvExportRequest = null
         if (uri != null) {
-            exportWorkLogCsv(uri)
+            exportWorkLogCsv(uri, request)
         }
     }
     private val exportFullBackupLauncher = registerForActivityResult(
@@ -138,7 +144,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         }
 
         rowExportWorkLogCsv.setOnClickListener {
-            exportWorkLogCsvLauncher.launch(buildWorkLogCsvFileName())
+            showWorkLogCsvExportDialog()
         }
 
         rowExportFullBackup.setOnClickListener {
@@ -464,8 +470,100 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         WidgetRefreshDispatcher.refreshWorkLogWidgets(requireContext())
     }
 
+    private fun showWorkLogCsvExportDialog() {
+        val options = arrayOf(
+            getString(R.string.work_log_export_all),
+            getString(R.string.work_log_export_date_range)
+        )
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.work_log_export_choose_range)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> launchAllWorkLogCsvExport()
+                    1 -> showWorkLogCsvStartDatePicker()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showWorkLogCsvStartDatePicker() {
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(getString(R.string.work_log_export_from_date))
+            .setSelection(
+                LocalDate.now()
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            )
+            .build()
+
+        picker.addOnPositiveButtonClickListener { selection ->
+            val startDate = Instant.ofEpochMilli(selection)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+            showWorkLogCsvEndDatePicker(startDate)
+        }
+
+        picker.show(childFragmentManager, "work_log_csv_export_start_date")
+    }
+
+    private fun showWorkLogCsvEndDatePicker(startDate: LocalDate) {
+        val picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(getString(R.string.work_log_export_to_date))
+            .setSelection(
+                startDate.atStartOfDay(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            )
+            .build()
+
+        picker.addOnPositiveButtonClickListener { selection ->
+            val endDate = Instant.ofEpochMilli(selection)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+
+            if (endDate.isBefore(startDate)) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.work_log_export_invalid_date_range),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@addOnPositiveButtonClickListener
+            }
+
+            launchRangeWorkLogCsvExport(startDate, endDate)
+        }
+
+        picker.show(childFragmentManager, "work_log_csv_export_end_date")
+    }
+
+    private fun launchAllWorkLogCsvExport() {
+        pendingCsvExportRequest = CsvExportRequest.All
+        exportWorkLogCsvLauncher.launch(buildWorkLogCsvFileName())
+    }
+
+    private fun launchRangeWorkLogCsvExport(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ) {
+        pendingCsvExportRequest = CsvExportRequest.Range(
+            startDate = startDate,
+            endDate = endDate
+        )
+        exportWorkLogCsvLauncher.launch(buildWorkLogCsvFileName(startDate, endDate))
+    }
+
     private fun buildWorkLogCsvFileName(): String {
         return "workcycle-work-log-${LocalDate.now()}.csv"
+    }
+
+    private fun buildWorkLogCsvFileName(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): String {
+        return "workcycle-work-log-${startDate}_to_${endDate}.csv"
     }
 
     private fun buildFullBackupFileName(): String {
@@ -483,11 +581,20 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         )
     }
 
-    private fun exportWorkLogCsv(uri: Uri) {
+    private fun exportWorkLogCsv(
+        uri: Uri,
+        request: CsvExportRequest
+    ) {
         viewLifecycleOwner.lifecycleScope.launch {
             val exportResult = runCatching {
                 val events = withContext(Dispatchers.IO) {
-                    workEventRepository.getAllEventsForExport()
+                    when (request) {
+                        CsvExportRequest.All -> workEventRepository.getAllEventsForExport()
+                        is CsvExportRequest.Range -> workEventRepository.getEventsBetweenForExport(
+                            startDate = request.startDate,
+                            endDate = request.endDate
+                        )
+                    }
                 }
                 val csv = WorkLogCsvExporter.export(events)
 
@@ -504,10 +611,14 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             }
 
             if (exportResult.isSuccess) {
-                val messageRes = if (exportResult.getOrDefault(false)) {
-                    R.string.work_log_export_csv_header_only
-                } else {
-                    R.string.work_log_export_csv_success
+                val isEmpty = exportResult.getOrDefault(false)
+                val messageRes = when {
+                    isEmpty && request is CsvExportRequest.Range ->
+                        R.string.work_log_export_csv_range_header_only
+                    isEmpty ->
+                        R.string.work_log_export_csv_header_only
+                    else ->
+                        R.string.work_log_export_csv_success
                 }
                 Toast.makeText(requireContext(), getString(messageRes), Toast.LENGTH_SHORT).show()
             } else {
@@ -561,5 +672,14 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
     private companion object {
         val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    }
+
+    private sealed interface CsvExportRequest {
+        data object All : CsvExportRequest
+
+        data class Range(
+            val startDate: LocalDate,
+            val endDate: LocalDate
+        ) : CsvExportRequest
     }
 }

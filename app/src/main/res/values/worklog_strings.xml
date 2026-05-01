@@ -171,6 +171,12 @@
     <string name="work_log_settings_break_accounting_helper">Controls whether break time is unpaid, fully paid, or credited up to an allowed limit when calculating balance.</string>
     <string name="work_log_settings_export_csv">Export Work Log CSV</string>
     <string name="work_log_settings_export_csv_helper">Export raw Work Log events with manual edit audit data.</string>
+    <string name="work_log_export_all">Export all</string>
+    <string name="work_log_export_date_range">Export date range</string>
+    <string name="work_log_export_choose_range">Choose export range</string>
+    <string name="work_log_export_from_date">From date</string>
+    <string name="work_log_export_to_date">To date</string>
+    <string name="work_log_export_invalid_date_range">Invalid date range</string>
     <string name="work_log_settings_widget_info_mode">Widget info during active session</string>
     <string name="work_log_settings_widget_info_mode_worked_today">Worked today (live refresh)</string>
     <string name="work_log_settings_widget_info_mode_start_time">Start time (battery saver)</string>
@@ -214,6 +220,7 @@
     <string name="work_log_export_csv_success">Work Log CSV exported</string>
     <string name="work_log_export_csv_failed">Failed to export Work Log CSV</string>
     <string name="work_log_export_csv_header_only">No Work Log events found, exported header only.</string>
+    <string name="work_log_export_csv_range_header_only">No Work Log events found in the selected range, exported header only.</string>
     <string name="work_cycle_backup_export_title">Export full backup</string>
     <string name="work_cycle_backup_export_helper">Export WorkCycle data and settings as a ZIP backup.</string>
     <string name="work_cycle_backup_export_success">Full backup exported</string>
