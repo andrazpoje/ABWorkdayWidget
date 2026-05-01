@@ -9,10 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.dante.workcycle.R
+import com.dante.workcycle.data.prefs.WorkSettingsPrefs
 import com.dante.workcycle.data.repository.RepositoryProvider
 import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventEditAudit
 import com.dante.workcycle.domain.model.WorkEventType
+import com.dante.workcycle.domain.worklog.WorkLogDaySessionMode
 import com.dante.workcycle.widget.base.WidgetRefreshDispatcher
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -142,7 +144,7 @@ class EditWorkLogEventBottomSheet(
 
     private fun save() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val validationMessageRes = viewModel.validate()
+            val validationMessageRes = viewModel.validate(getValidationSessionMode())
             if (validationMessageRes != null) {
                 Toast.makeText(
                     requireContext(),
@@ -157,6 +159,17 @@ class EditWorkLogEventBottomSheet(
             } else {
                 persistEdit(wasFutureTime = false)
             }
+        }
+    }
+
+    private fun getValidationSessionMode(): WorkLogDaySessionMode {
+        val isMultipleSessionsEnabled = WorkSettingsPrefs(requireContext())
+            .isMultipleWorkSessionsEnabled()
+
+        return if (isMultipleSessionsEnabled) {
+            WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY
+        } else {
+            WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY
         }
     }
 
@@ -252,7 +265,7 @@ class EditWorkLogEventBottomSheet(
          * Validates both the original and destination day timelines so moving an
          * event cannot silently create an invalid Work Log sequence.
          */
-        suspend fun validate(): Int? {
+        suspend fun validate(sessionMode: WorkLogDaySessionMode): Int? {
             val updatedEvent = originalEvent.copy(
                 date = uiState.value.date,
                 time = uiState.value.time
@@ -265,7 +278,8 @@ class EditWorkLogEventBottomSheet(
                 originalEvent = originalEvent,
                 updatedEvent = updatedEvent,
                 originalDateEvents = originalDateEvents,
-                updatedDateEvents = updatedDateEvents
+                updatedDateEvents = updatedDateEvents,
+                sessionMode = sessionMode
             )
         }
 
