@@ -215,7 +215,7 @@
     <string name="work_log_settings_meal_rules">Meal rules</string>
     <string name="work_log_settings_meal_rules_body">Define when meal logging is expected and how meal events affect the day.</string>
     <string name="work_log_settings_rollover">Workday rollover time</string>
-    <string name="work_log_settings_rollover_body">Choose when late-night work should count toward the next day.</string>
+    <string name="work_log_settings_rollover_helper">Sets when a new work day starts for future overnight-shift support. Default 00:00 keeps current behavior. Runtime overnight handling is not enabled yet.</string>
     <string name="work_log_settings_weekly_target">Weekly target</string>
     <string name="work_log_settings_weekly_target_body">Track expected work time across the whole week, not only day by day.</string>
     <string name="work_log_settings_reminders">Forgotten clock-out reminders</string>

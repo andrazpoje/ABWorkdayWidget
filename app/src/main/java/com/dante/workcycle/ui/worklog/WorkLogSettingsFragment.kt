@@ -49,6 +49,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var rowBreakAccountingMode: View
     private lateinit var rowOvertimeTracking: View
     private lateinit var rowMultipleWorkSessions: View
+    private lateinit var rowWorkdayRollover: View
     private lateinit var rowWidgetInfoMode: View
     private lateinit var rowExportWorkLogCsv: View
     private lateinit var containerExpectedStartRows: LinearLayout
@@ -57,6 +58,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
     private lateinit var textBreakAccountingModeValue: TextView
     private lateinit var textOvertimeTrackingValue: TextView
     private lateinit var textMultipleWorkSessionsValue: TextView
+    private lateinit var textWorkdayRolloverValue: TextView
     private lateinit var textWidgetInfoModeValue: TextView
     private lateinit var switchOvertimeTracking: MaterialSwitch
     private lateinit var switchMultipleWorkSessions: MaterialSwitch
@@ -100,6 +102,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         rowBreakAccountingMode = view.findViewById(R.id.rowBreakAccountingMode)
         rowOvertimeTracking = view.findViewById(R.id.rowOvertimeTracking)
         rowMultipleWorkSessions = view.findViewById(R.id.rowMultipleWorkSessions)
+        rowWorkdayRollover = view.findViewById(R.id.rowWorkdayRollover)
         rowWidgetInfoMode = view.findViewById(R.id.rowWidgetInfoMode)
         rowExportWorkLogCsv = view.findViewById(R.id.rowExportWorkLogCsv)
         containerExpectedStartRows = view.findViewById(R.id.containerExpectedStartRows)
@@ -108,6 +111,7 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
         textBreakAccountingModeValue = view.findViewById(R.id.textBreakAccountingModeValue)
         textOvertimeTrackingValue = view.findViewById(R.id.textOvertimeTrackingValue)
         textMultipleWorkSessionsValue = view.findViewById(R.id.textMultipleWorkSessionsValue)
+        textWorkdayRolloverValue = view.findViewById(R.id.textWorkdayRolloverValue)
         textWidgetInfoModeValue = view.findViewById(R.id.textWidgetInfoModeValue)
         switchOvertimeTracking = view.findViewById(R.id.switchOvertimeTracking)
         switchMultipleWorkSessions = view.findViewById(R.id.switchMultipleWorkSessions)
@@ -132,6 +136,10 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
 
         rowMultipleWorkSessions.setOnClickListener {
             switchMultipleWorkSessions.toggle()
+        }
+
+        rowWorkdayRollover.setOnClickListener {
+            showWorkdayRolloverDialog()
         }
 
         rowWidgetInfoMode.setOnClickListener {
@@ -182,6 +190,9 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             } else {
                 R.string.work_log_settings_disabled
             }
+        )
+        textWorkdayRolloverValue.text = timeFormatter.format(
+            workSettingsPrefs.getWorkdayRolloverTime()
         )
 
         isBindingSwitch = true
@@ -258,6 +269,22 @@ class WorkLogSettingsFragment : Fragment(R.layout.fragment_work_log_settings) {
             .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
                 workSettingsPrefs.setWidgetInfoMode(modes[which])
                 refreshWorkLogWidget()
+                bindSettings()
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showWorkdayRolloverDialog() {
+        val presets = WorkSettingsPrefs.WORKDAY_ROLLOVER_PRESETS
+        val labels = presets.map(timeFormatter::format).toTypedArray()
+        val checkedIndex = presets.indexOf(workSettingsPrefs.getWorkdayRolloverTime()).coerceAtLeast(0)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.work_log_settings_rollover)
+            .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
+                workSettingsPrefs.setWorkdayRolloverTime(presets[which])
                 bindSettings()
                 dialog.dismiss()
             }

@@ -6,6 +6,8 @@ import androidx.core.content.edit
 import com.dante.workcycle.domain.model.CycleLayer
 import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
 import org.json.JSONObject
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class WorkSettingsPrefs(context: Context) {
 
@@ -94,6 +96,29 @@ class WorkSettingsPrefs(context: Context) {
     fun setMultipleWorkSessionsEnabled(enabled: Boolean) {
         prefs.edit {
             putBoolean(KEY_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY, enabled)
+        }
+    }
+
+    /**
+     * Setting-only foundation for future workday rollover support.
+     *
+     * The default 00:00 value preserves current runtime behavior until rollover
+     * integration is explicitly wired into dashboard, widget, and validation flows.
+     */
+    fun getWorkdayRolloverTime(): LocalTime {
+        val rawValue = prefs.getString(
+            KEY_WORKDAY_ROLLOVER_TIME,
+            DEFAULT_WORKDAY_ROLLOVER_TIME
+        ).orEmpty()
+
+        return runCatching {
+            LocalTime.parse(rawValue, timeFormatter)
+        }.getOrDefault(DEFAULT_WORKDAY_ROLLOVER_LOCAL_TIME)
+    }
+
+    fun setWorkdayRolloverTime(time: LocalTime) {
+        prefs.edit {
+            putString(KEY_WORKDAY_ROLLOVER_TIME, timeFormatter.format(time))
         }
     }
 
@@ -244,6 +269,7 @@ class WorkSettingsPrefs(context: Context) {
         const val KEY_WIDGET_INFO_MODE = "widget_info_mode"
         const val KEY_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY =
             "allow_multiple_work_sessions_per_day"
+        const val KEY_WORKDAY_ROLLOVER_TIME = "workday_rollover_time"
         const val WIDGET_INFO_MODE_WORKED_TODAY = "worked_today"
         const val WIDGET_INFO_MODE_START_TIME = "start_time"
 
@@ -252,11 +278,22 @@ class WorkSettingsPrefs(context: Context) {
         val DEFAULT_BREAK_ACCOUNTING_MODE = BreakAccountingMode.UNPAID
         const val DEFAULT_OVERTIME_TRACKING_ENABLED = true
         const val DEFAULT_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY = false
+        const val DEFAULT_WORKDAY_ROLLOVER_TIME = "00:00"
         const val DEFAULT_EXPECTED_START_TIME = "08:00"
         const val DEFAULT_EXPECTED_END_TIME = "16:00"
 
         val DAILY_TARGET_PRESETS = listOf(240, 360, 450, 480, 600, 720)
         val BREAK_PRESETS = listOf(0, 15, 20, 30, 45, 60)
+        val WORKDAY_ROLLOVER_PRESETS = listOf(
+            LocalTime.MIDNIGHT,
+            LocalTime.of(3, 0),
+            LocalTime.of(4, 0),
+            LocalTime.of(5, 0),
+            LocalTime.of(6, 0)
+        )
+
+        private val DEFAULT_WORKDAY_ROLLOVER_LOCAL_TIME = LocalTime.MIDNIGHT
+        private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     }
 
     data class ExpectedStartConfig(

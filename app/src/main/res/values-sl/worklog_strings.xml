@@ -205,8 +205,8 @@
     <string name="work_log_settings_break_rules_body">Nastavi minimalne odmore, plačane ali neplačane odmore ter opomnike za odmore.</string>
     <string name="work_log_settings_meal_rules">Pravila malice</string>
     <string name="work_log_settings_meal_rules_body">Določi, kdaj je malica pričakovana in kako vpliva na dan.</string>
-    <string name="work_log_settings_rollover">Ura prehoda v nov delovni dan</string>
-    <string name="work_log_settings_rollover_body">Izberi, kdaj naj se pozno nočno delo šteje v naslednji dan.</string>
+    <string name="work_log_settings_rollover">Prehod delovnega dne</string>
+    <string name="work_log_settings_rollover_helper">Določa, kdaj se začne nov delovni dan za prihodnjo podporo nočnim izmenam. Privzeto 00:00 ohrani trenutno vedenje. Nočno beleženje še ni aktivno.</string>
     <string name="work_log_settings_weekly_target">Tedenska norma</string>
     <string name="work_log_settings_weekly_target_body">Spremljaj pričakovani delovni čas čez cel teden, ne samo po dnevih.</string>
     <string name="work_log_settings_reminders">Opomniki za pozabljen zaključek dela</string>
