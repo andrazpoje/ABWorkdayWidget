@@ -38,6 +38,7 @@
     <string name="work_log_deviation_minutes_format">%1$s%2$d min</string>
 
     <string name="work_log_slide_start">Povleci za začetek dela</string>
+    <string name="work_log_start_new_session">Začni novo sejo</string>
     <string name="work_log_slide_finish">Povleci za zaključek dela</string>
     <string name="work_log_slide_end_break">Povleci za konec odmora</string>
 

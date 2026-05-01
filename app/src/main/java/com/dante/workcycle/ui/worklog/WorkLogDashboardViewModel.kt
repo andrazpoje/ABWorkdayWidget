@@ -19,6 +19,8 @@ import com.dante.workcycle.domain.model.WorkEvent
 import com.dante.workcycle.domain.model.WorkEventType
 import com.dante.workcycle.domain.schedule.DefaultScheduleResolver
 import com.dante.workcycle.domain.schedule.StatusRepository
+import com.dante.workcycle.domain.worklog.WorkLogDaySessionMode
+import com.dante.workcycle.domain.worklog.WorkLogSessionState
 import com.dante.workcycle.domain.worklog.WorkLogSessionStateResolver
 import com.dante.workcycle.domain.worklog.WorkLogSessionStatus
 import com.dante.workcycle.domain.worklog.accounting.BreakAccountingMode
@@ -53,8 +55,9 @@ import java.util.Locale
  *
  * This is the current source of truth for the dashboard action state, totals,
  * balance, recent events, persistent notification, and Work Time widget refresh
- * triggers. The v2.x behavior supports one completed work session per day; once
- * a day resolves to FINISHED, the dashboard must not offer Start Work again.
+ * triggers. Multiple completed sessions are enabled only when the Work Log
+ * setting allows them; otherwise the dashboard preserves the previous
+ * one-completed-session-per-day behavior.
  */
 class WorkLogDashboardViewModel(
     application: Application,
@@ -156,18 +159,20 @@ class WorkLogDashboardViewModel(
     }
 
     /**
-     * Applies the primary slider action for the current single-session state.
+     * Applies the primary slider action for the current session mode.
      *
-     * FINISHED intentionally does nothing so a manually edited CLOCK_OUT, even
-     * one moved into the future, cannot reopen Start Work in the v2.x model.
+     * In single-session mode FINISHED still does nothing. In multi-session mode
+     * the resolver can expose canStart=true after FINISHED to start a new
+     * session safely.
      */
     fun onSliderAction() {
         if (isActionLocked()) return
 
         viewModelScope.launch {
             refreshDateIfNeeded()
+            val resolvedSessionState = resolveWorkLogSessionState(currentEvents)
 
-            when (resolveSessionState(currentEvents)) {
+            when (resolvedSessionState.status.toDashboardSessionState()) {
                 SessionState.NOT_WORKING -> {
                     createSessionSnapshot()
                     repository.insert(
@@ -179,7 +184,18 @@ class WorkLogDashboardViewModel(
                     )
                 }
 
-                SessionState.FINISHED -> Unit
+                SessionState.FINISHED -> {
+                    if (resolvedSessionState.canStart) {
+                        createSessionSnapshot()
+                        repository.insert(
+                            WorkEvent(
+                                date = selectedDate,
+                                time = LocalTime.now(),
+                                type = CLOCK_IN
+                            )
+                        )
+                    }
+                }
 
                 SessionState.WORKING -> {
                     repository.insert(
@@ -245,7 +261,7 @@ class WorkLogDashboardViewModel(
 
         viewModelScope.launch {
             refreshDateIfNeeded()
-            if (!WorkLogSessionStateResolver.resolve(currentEvents).canLogMeal) return@launch
+            if (!resolveWorkLogSessionState(currentEvents).canLogMeal) return@launch
 
             repository.insert(
                 WorkEvent(
@@ -260,17 +276,26 @@ class WorkLogDashboardViewModel(
 
     private fun buildUiState(events: List<WorkEvent>): WorkLogDashboardUiState {
         val now = LocalTime.now()
-        val resolvedSessionState = WorkLogSessionStateResolver.resolve(events, now = now)
+        val resolvedSessionState = resolveWorkLogSessionState(events, now = now)
         val accountingSummary = WorkLogAccountingCalculator.calculate(
             sessionState = resolvedSessionState,
             rules = workSettingsPrefs.toAccountingRules(),
             now = now
         )
         val sessionState = resolvedSessionState.status.toDashboardSessionState()
-        val clockIn = events.firstOrNull { it.type == CLOCK_IN }
+        val firstClockIn = resolvedSessionState.firstClockIn
+        val activeClockIn = findActiveClockIn(events, resolvedSessionState)
+        val displayClockIn = if (
+            sessionState == SessionState.WORKING ||
+            sessionState == SessionState.ON_BREAK
+        ) {
+            activeClockIn ?: firstClockIn
+        } else {
+            firstClockIn
+        }
         val workedText = formatWorkedTodayText(resolvedSessionState.workedMinutes)
         val breakStart = resolvedSessionState.activeBreakStart
-        val hasStartedToday = clockIn != null
+        val hasStartedToday = firstClockIn != null
         val todayResolved = scheduleResolver.resolve(selectedDate)
         val todayCycleLabel = todayResolved.effectiveCycleLabel
         val sessionSnapshot = if (sessionState == SessionState.WORKING || sessionState == SessionState.ON_BREAK) {
@@ -307,17 +332,20 @@ class WorkLogDashboardViewModel(
 
         val lastClockOut = findLastClockOut(events)
         val startDeviation = buildStartDeviation(
-            actualStartEvent = clockIn,
+            actualStartEvent = firstClockIn,
             expectedStart = expectedStartText
         )
         val endDeviation = buildEndDeviation(
-            actualStartEvent = clockIn,
+            actualStartEvent = firstClockIn,
             actualEndEvent = lastClockOut,
             expectedStart = expectedStartText,
             expectedEnd = expectedEndText,
             overtimeTrackingEnabled = overtimeTrackingEnabled,
             sessionState = sessionState
         )
+        val canStartNewSession = sessionState == SessionState.FINISHED &&
+            resolvedSessionState.canStart
+        val showPrimaryAction = sessionState != SessionState.FINISHED || canStartNewSession
 
         val stateText: String
         val stateDetailText: String
@@ -344,7 +372,11 @@ class WorkLogDashboardViewModel(
                 )
                 visualState = WorkLogDashboardVisualState.FINISHED
                 sliderAction = WorkLogSliderAction.START_WORK
-                sliderActionText = s(R.string.work_log_slide_start)
+                sliderActionText = if (canStartNewSession) {
+                    s(R.string.work_log_start_new_session)
+                } else {
+                    s(R.string.work_log_slide_start)
+                }
                 sliderIconRes = R.drawable.ic_work_time_24
             }
 
@@ -388,8 +420,8 @@ class WorkLogDashboardViewModel(
             sliderAction = sliderAction,
             sliderActionText = sliderActionText,
             sliderIconRes = sliderIconRes,
-            showPrimaryAction = sessionState != SessionState.FINISHED,
-            sliderEnabled = sessionState != SessionState.FINISHED && !isActionLocked(),
+            showPrimaryAction = showPrimaryAction,
+            sliderEnabled = showPrimaryAction && !isActionLocked(),
             startWarning = if (
                 sessionState != SessionState.FINISHED &&
                 sliderAction == WorkLogSliderAction.START_WORK
@@ -405,7 +437,7 @@ class WorkLogDashboardViewModel(
             showExpectedEnd = !expectedEndText.isNullOrBlank(),
             expectedEndText = expectedEndText ?: WORK_LOG_PLACEHOLDER,
             showStartedAt = hasStartedToday,
-            startedAtText = clockIn?.time?.format(timeFormatter()) ?: WORK_LOG_PLACEHOLDER,
+            startedAtText = displayClockIn?.time?.format(timeFormatter()) ?: WORK_LOG_PLACEHOLDER,
             showStartDeviation = startDeviation != null,
             startDeviationText = startDeviation?.text.orEmpty(),
             startDeviationTone = startDeviation?.tone ?: WorkLogDeviationTone.DEFAULT,
@@ -651,7 +683,34 @@ class WorkLogDashboardViewModel(
      * is required before v3.0 can safely support multiple sessions per day.
      */
     private fun resolveSessionState(events: List<WorkEvent>): SessionState {
-        return WorkLogSessionStateResolver.resolve(events).status.toDashboardSessionState()
+        return resolveWorkLogSessionState(events).status.toDashboardSessionState()
+    }
+
+    private fun resolveWorkLogSessionState(
+        events: List<WorkEvent>,
+        now: LocalTime = LocalTime.now()
+    ): WorkLogSessionState {
+        return WorkLogSessionStateResolver.resolve(
+            events = events,
+            now = now,
+            sessionMode = resolveSessionMode()
+        )
+    }
+
+    private fun resolveSessionMode(): WorkLogDaySessionMode {
+        return if (workSettingsPrefs.isMultipleWorkSessionsEnabled()) {
+            WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY
+        } else {
+            WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY
+        }
+    }
+
+    private fun findActiveClockIn(
+        events: List<WorkEvent>,
+        resolvedState: WorkLogSessionState
+    ): WorkEvent? {
+        return resolvedState.sessions.lastOrNull { it.clockOut == null }?.clockIn
+            ?: events.firstOrNull { it.type == CLOCK_IN }
     }
 
     private fun WorkLogSessionStatus.toDashboardSessionState(): SessionState {
@@ -1067,7 +1126,8 @@ class WorkLogDashboardViewModel(
     }
 
     private fun syncPersistentNotification(events: List<WorkEvent>) {
-        val resolvedSessionState = WorkLogSessionStateResolver.resolve(events)
+        val now = LocalTime.now()
+        val resolvedSessionState = resolveWorkLogSessionState(events, now)
 
         when (resolvedSessionState.status.toDashboardSessionState()) {
             SessionState.NOT_WORKING,
@@ -1076,7 +1136,7 @@ class WorkLogDashboardViewModel(
             }
 
             SessionState.WORKING -> {
-                val clockIn = events.firstOrNull { it.type == CLOCK_IN }
+                val clockIn = findActiveClockIn(events, resolvedSessionState)
                 val workedText = formatWorkedTodayText(resolvedSessionState.workedMinutes)
 
                 notificationManager.showOrUpdate(
@@ -1104,11 +1164,11 @@ class WorkLogDashboardViewModel(
             }
 
             SessionState.ON_BREAK -> {
-                val clockIn = events.firstOrNull { it.type == CLOCK_IN }
+                val clockIn = findActiveClockIn(events, resolvedSessionState)
                 val breakStart = resolvedSessionState.activeBreakStart
                 val workedText = formatWorkedTodayText(resolvedSessionState.workedMinutes)
                 val breakDurationText = breakStart?.let {
-                    formatDuration(minutesBetween(it.time, LocalTime.now()))
+                    formatDuration(minutesBetween(it.time, now))
                 }
 
                 notificationManager.showOrUpdate(
@@ -1219,7 +1279,8 @@ class WorkLogDashboardViewModel(
             WorkSettingsPrefs.KEY_BREAK_ACCOUNTING_MODE,
             WorkSettingsPrefs.KEY_OVERTIME_TRACKING_ENABLED,
             WorkSettingsPrefs.KEY_EXPECTED_TIMES_BY_LAYER_AND_LABEL,
-            WorkSettingsPrefs.KEY_EXPECTED_STARTS_BY_LABEL
+            WorkSettingsPrefs.KEY_EXPECTED_STARTS_BY_LABEL,
+            WorkSettingsPrefs.KEY_ALLOW_MULTIPLE_WORK_SESSIONS_PER_DAY
         )
     }
 }
