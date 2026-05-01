@@ -11,7 +11,7 @@ Ta dokument vsebuje načrt razvoja, backlog ideje, monetizacijsko smer in tehni�
 ## Roadmap načela
 
 - Osnovna aplikacija mora ostati uporabna brez plačila.
-- Premium naj najprej odklepa offline / lokalne power-user funkcije.
+- Premium naj najprej odklepa offline / lokalne power-user funkcije, ne pa blokirati osnovnega Work Log poteka.
 - Naročnina naj bo rezervirana za funkcije, ki imajo stalni strošek ali stalno storitev: sync, cloud backup, GPS/geofencing suggestions, web/live sharing.
 - Work Log podatki so občutljivi; brez tihih destructive migracij.
 - Ročni popravki morajo ostati audit-safe.
@@ -57,9 +57,15 @@ v2.9 je bila foundations / cleanup verzija. Namen je bil stabilizirati aplikacij
 - [x] Active break elapsed / remaining / exceeded display
 - [x] WorkLogWidgetBalanceCalculator + testi
 - [x] Work Log CSV export
+- [x] Date range CSV export
+- [x] Export all / Export date range CSV flow
 - [x] Local full backup export foundation
 - [x] ZIP + JSON backup writer
 - [x] Backup manifest / payload / collector
+- [x] Backup validation foundation
+- [x] Backup preview model
+- [x] Backup ZIP preflight validation
+- [x] Full backup export moved to main Settings Backup card
 - [x] SharedPreferences backup filtering
 - [x] Manual edit audit metadata included v CSV/backup exportih
 
@@ -223,7 +229,7 @@ Ni še implementirano. Pripravljamo z resolver/accounting foundation.
 
 ### Zakaj je pomembno
 
-Več sej na dan in split shifts so ena ključnih funkcionalnih vrzeli pred prihodnjo Premium verzijo.
+Več sej na dan in split shifts so ena ključnih funkcionalnih vrzeli v Free core, ker jih veliko uporabnikov potrebuje za osnovno beleženje dela.
 
 ### Plan
 
@@ -258,6 +264,9 @@ Pred plačljivo verzijo mora imeti uporabnik občutek, da so Work Log podatki va
 - [x] Work Log CSV export prek SAF `CreateDocument("text/csv")`
 - [x] CSV export uporablja raw `WorkEvent` podatke
 - [x] CSV export vključuje manual edit audit metadata
+- [x] CSV export podpira `Export all`
+- [x] CSV export podpira `Export date range`
+- [x] Date range CSV export uporablja inclusive date range in range-specific filename
 - [x] Dodani:
   - `WorkCycleBackupManifest`
   - `WorkCycleBackupPayload`
@@ -267,6 +276,7 @@ Pred plačljivo verzijo mora imeti uporabnik občutek, da so Work Log podatki va
   - `WorkCycleBackupPrefsSpec`
   - `WorkCycleBackupPayloadCollector`
 - [x] Full local backup export uporablja SAF `CreateDocument("application/zip")`
+- [x] Full backup export je prestavljen v glavni Settings `Backup / Varnostne kopije` kartico
 - [x] ZIP vsebuje:
   - `manifest.json`
   - `room/work_events.json`
@@ -276,19 +286,29 @@ Pred plačljivo verzijo mora imeti uporabnik občutek, da so Work Log podatki va
   - debug state
   - transient UI hints
   - session snapshot state
+- [x] Dodani pure Kotlin backup validation foundation razredi:
+  - `WorkCycleBackupValidationResult`
+  - `WorkCycleBackupPreview`
+  - `WorkCycleBackupValidator`
+  - `WorkCycleBackupZipReader`
+  - `WorkCycleBackupJsonParser`
+- [x] Backup validator preverja ZIP strukturo, manifest, required segmente, prefs segmente in audit field prisotnost
 - [x] Brez Room/schema sprememb
 
 ### Preostalo
 
 - [ ] Restore/import
 - [ ] Backup validation UI
+- [ ] Backup preview dialog / summary UI
 - [ ] Backup summary preview
 - [ ] Encryption
 - [ ] Cloud sync / cloud backup
 - [ ] Scheduled backup
 - [ ] Premium gating
-- [ ] Date range CSV export
 - [ ] PDF export
+- [ ] Share intent
+- [ ] Replace-all restore policy
+- [ ] Restore/import mora uporabiti validator kot preflight korak
 - [ ] Restore/import mora imeti ločen audit, validation layer, warning dialog in explicit replace-all policy
 - [ ] Pred prihodnjimi Room schema spremembami omogočiti schema export in migration tests
 
@@ -345,12 +365,11 @@ Ni še implementirano za Work Log setup.
 
 ## Premium readiness – minimum before paid launch
 
-Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar pred poštenim Premium odklepom potrebuje nekaj funkcij, ki jih plačljive aplikacije običajno ponujajo: več profilov/služb, split shifts, export/backup, reminders, statistiko ali widget customization.
+Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar mora Free core ostati bogat in uporaben. Premium naj doda convenience, power-user funkcije, napreden export/reporting, profile, customization in backup orodja, ne pa blokirati bistvenega Work Log beleženja.
 
 ### Minimum za Premium one-time
 
 - [ ] Multiple active work profiles ali vsaj Work Profiles foundation
-- [ ] Split shifts / multiple sessions
 - [ ] Export CSV/PDF
 - [ ] Lokalni backup/restore
 - [ ] Osnovna statistika
@@ -360,6 +379,9 @@ Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar pred po�
 
 ### Free naj ostane
 
+- [ ] Free core should remain generous
+- [ ] Split shifts / multiple sessions are currently planned as Free core, not Premium
+- [ ] Essential work logging must not be blocked behind Premium
 - [ ] Osnovni delovni cikel
 - [ ] Tedenski in mesečni pregled
 - [ ] Osnovni statusi
@@ -371,15 +393,14 @@ Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar pred po�
 ### Premium one-time kandidati
 
 - [ ] Multiple active work profiles
+- [ ] Full local backup/export
+- [ ] Date range CSV export
+- [ ] PDF export
 - [ ] Advanced Work Log rules
 - [ ] Advanced statistics
-- [ ] Export PDF
-- [ ] Export CSV
-- [ ] Date range export
+- [ ] Advanced reports
 - [ ] Custom templates
 - [ ] Advanced widget customization
-- [ ] Multiple work sessions per day
-- [ ] Split-shift profiles
 - [ ] Local backup/export
 - [ ] Local backup/restore
 
@@ -391,6 +412,12 @@ Raziskava trga kaže, da je WorkCycle že močan osebni utility, vendar pred po�
 - [ ] Live/web sharing
 - [ ] Future web companion
 - [ ] Napredni reminderji, če vključujejo cloud/sync logiko
+
+### Opombe
+
+- [ ] Free core should remain generous.
+- [ ] Split shifts / multiple sessions are currently planned as Free core, not Premium.
+- [ ] Premium should add convenience, power-user features, advanced export/reporting, profiles, customization, and backup tools, not block essential work logging.
 
 ### Predlagane cene
 
