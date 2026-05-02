@@ -69,8 +69,8 @@ All notable changes to this project will be documented in this file.
 - Added local JVM tests for premium feature tier mapping and default locked entitlement behavior
 - Added local JVM tests for entitlement override and repository priority-chain behavior
 - Kept Room schema and migrations unchanged
-- Play Billing is not included yet
-- SharedPreferences entitlement storage is not included yet
+- Debug-only SharedPreferences entitlement override storage is included for Developer tools testing
+- Production entitlement storage and Play Billing integration are not included yet
 - UI gating is not included yet; current debug override controls and diagnostic display are only a test foundation
 - The runtime `FeatureGate` chain is not used for locking existing features yet
 - Existing backup/export functionality is not gated or locked yet
