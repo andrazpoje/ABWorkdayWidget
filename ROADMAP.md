@@ -126,7 +126,7 @@ v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zakl
 
 - [ ] Ne centralizirati recent event totalov, dokler ni multi-session design
 - [ ] Ne spreminjati validator semantics brez testov za malformed timelines
-- [ ] Pred multi-session dodati session grouping design
+- [ ] Pred sessionId/schema evolution ali recent events redesign dodati jasen session grouping design
 
 ---
 
@@ -166,6 +166,34 @@ v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zakl
   - 4h prag
   - presežek odmora zmanjša saldo
 - [x] Brez Room/schema sprememb
+
+### Future – Expected start/end times by schedule layer
+
+- [ ] Dodati nastavitev za vir pričakovanih začetkov/končanj dela:
+  - Primary cycle
+  - Secondary cycle / assignment layer
+- [ ] Nastavitev naj bo v Work Log Settings / Work Rules kot radio group:
+  - `Use primary cycle labels`
+  - `Use secondary labels`
+- [ ] Če je izbran Secondary layer, manjkajoča sekundarna oznaka naj varno pade nazaj na Primary cycle ali prikaže jasno opozorilo
+- [ ] Pričakovani začetni in končni časi naj se nastavljajo po labelih, ne globalno samo za cel dan
+- [ ] Defaulti za 3-shift template:
+  - Morning: `06:00–14:00`
+  - Afternoon: `14:00–22:00`
+  - Night: `22:00–06:00`
+- [ ] Defaulti za 2-shift template:
+  - Morning: `06:00–14:00`
+  - Afternoon: `14:00–22:00`
+- [ ] A/B template naj ne dobi agresivnih privzetih ur, razen če template izrecno definira delovne čase
+- [ ] Custom/free-form cikli naj uporabniku pustijo ročni vnos pričakovanih časov
+- [ ] Expected start/end times naj uporabljajo stabilne label/template keye, kjer obstajajo, ne samo lokaliziranega display teksta
+- [ ] Pri spremembi template-a naj aplikacija ponudi uporabo privzetih časov template-a, ne pa tiho prepisati uporabniških nastavitev
+- [ ] Pri spremembi jezika se expected time mapping ne sme pokvariti zaradi prevedenih labelov
+- [ ] Night shift / cross-midnight expected end time, kjer je end time manjši od start time, zahteva runtime overnight handling
+- [ ] Ne uporabljati `22:00–06:00` za deviation računanje, dokler rollover/runtime overnight logic ni pravilno priklopljen
+- [ ] Expected-time deviation logic mora uporabljati pravilno timeline datetime logiko, ne samo `LocalDate + LocalTime`
+- [ ] Ročni popravki Work Log dogodkov morajo ostati audit-safe tudi pri expected-time deviation izračunih
+- [ ] Widget/notification naj expected-time podatke uporabljata šele po ločenem parity auditu
 
 ### Preostalo
 
@@ -215,6 +243,98 @@ v3.0 se ne sme obravnavati kot en sam ogromen feature release. Najprej mora zakl
 - [ ] Ne dodajati dodatnih polj na glavno kartico brez potrebe
 
 ---
+
+## Future – Payroll-ready Work Log results
+
+- [ ] Dodati dnevni števec prehrane kot ločen obračunski rezultat, ne kot navaden Work Log dogodek
+- [ ] Ločiti:
+  - odmor kot časovni dogodek
+  - malico kot uporabniški dogodek
+  - prehrano kot dnevni obračunski rezultat
+- [ ] Nastavljiv prag za prehrano, npr. 4h prisotnosti
+- [ ] Nastavljiv znesek ali samo oznaka “prehrana dosežena”
+- [ ] Prehrana naj bo vključena v export/report, ne nujno v glavni timer
+- [ ] Ne hardcodati slovenskih pravil; dodati country/sector preset kasneje
+
+## Future – Payroll export templates
+
+- [ ] Dodati export templates za payroll/accounting uporabo
+- [ ] Začetni template: generic payroll CSV/XLSX
+- [ ] Kasnejši template kandidati:
+  - SAOP
+  - PANTHEON
+  - Minimax
+  - Vasco / Birokrat
+- [ ] Export naj vsebuje:
+  - datum
+  - prihod
+  - odhod
+  - efektivno delo
+  - priznan čas
+  - odmor
+  - saldo
+  - prehrana dosežena
+  - opombe
+  - ročni popravki / audit indicator
+- [ ] Raw evidence export naj ostane ločen od payroll summary exporta
+- [ ] Ne uvajati direktne payroll integracije pred stabilnim CSV/XLSX template sistemom
+
+## Future – Work Log reminders and forgotten clock-out
+
+- [ ] Opozorilo za pozabljeno odjavo
+- [ ] Opozorilo za predolg odmor
+- [ ] Opozorilo za doseženo planirano dolžino odmora
+- [ ] Opozorilo pred pričakovanim koncem izmene
+- [ ] Reminder-first pristop, brez samodejnega popravljanja evidence
+- [ ] Auto-close naj ostane kasnejša opcija in mora biti audit-safe
+- [ ] Nastavitve reminderjev naj bodo v Work Log Settings / Work Rules
+
+## Future – End-of-day Work Log summary
+
+- [ ] Po `Zaključi delo` prikazati kratek povzetek dneva
+- [ ] Povzetek naj vsebuje:
+  - prihod
+  - odhod
+  - efektivno delo
+  - priznan čas
+  - odmor/malica
+  - saldo
+  - prehrana dosežena / ni dosežena
+  - opombe
+- [ ] Uporabnik naj lahko odpre ročni popravek iz povzetka
+- [ ] Ročni popravki iz povzetka morajo ostati audit-safe
+- [ ] Povzetek naj ne spreminja raw dogodkov brez uporabnikove potrditve
+
+## Future – Event-based location for Work Log
+
+- [ ] Dodati strogo opt-in event-based location support
+- [ ] Lokacijo shraniti samo ob izbranih dogodkih:
+  - začetek dela
+  - konec dela
+  - začetek/konec odmora
+  - začetek/konec malice
+- [ ] Brez stalnega GPS tracking-a poti
+- [ ] Če je uporabnik izven pričakovane lokacije, prikazati mehko opozorilo in možnost vnosa razloga
+- [ ] Lokacijski podatki naj bodo jasno označeni in izvozljivi samo, če jih uporabnik omogoči
+- [ ] GPS/geofencing suggestions naj ostanejo Premium subscription kandidat
+
+## Future – Work Log dashboard polish
+
+- [ ] Na vrhu Work Log dashboarda prikazati današnji kontekst:
+  - današnji cikel / izmena
+  - pričakovani čas
+  - status prehrane
+  - saldo
+- [ ] Glavni CTA naj ostane zelo jasen:
+  - Začni delo
+  - Zaključi delo
+  - Končaj odmor
+- [ ] Med aktivnim delom prikazati lepljiv status z mini timerjem
+- [ ] Hitre akcije naj ostanejo pod glavnim statusom:
+  - Odmor
+  - Malica
+  - Opomba
+- [ ] Ne preobremeniti dashboarda z nastavitvami ali dolgimi seznami
 
 ## v3.0 – Break / meal reminder foundation
 
@@ -383,10 +503,35 @@ Ni še implementirano.
   - English
   - Deutsch kasneje
 - [ ] Uporabiti AndroidX/AppCompat per-app language support
+- [ ] Jezik uporabiti prek sistemskih string resources, ne prek ročnega menjavanja tekstov
+- [ ] Po spremembi jezika osvežiti glavne zaslone:
+  - Home / Tedenski pregled
+  - Calendar / Mesečni koledar
+  - Settings
+  - More
+  - Help
+  - What’s New
+  - Work Log Dashboard
+  - Work Log Settings
+- [ ] Po spremembi jezika osvežiti widgete:
+  - Work Cycle widget
+  - Work Time widget
 - [ ] Custom/user labels se ne prevajajo samodejno
+- [ ] Uporabniško vpisana imena ciklov, sekundarnih oznak in statusov morajo ostati nespremenjena
 - [ ] Built-in system labels se lokalizirajo prek stabilnih `iconKey`
 - [ ] Built-in template labels se lokalizirajo prek stabilnih `templateKey` / label keyev
-- [ ] Preveriti widgete po spremembi jezika
+- [ ] Built-in cycle labels naj uporabljajo stabilne ključe in lokaliziran prikaz, ne samo shranjen display tekst
+- [ ] Ob spremembi jezika naj se varno osvežijo built-in/template cycle labele, kjer aplikacija zanesljivo ve, da niso uporabniško spremenjene
+- [ ] Obstoječih shranjenih tekstovnih labelov se ne sme slepo prevajati; mapirati se smejo samo znane built-in/template labele
+- [ ] Pri custom/free-form ciklih aplikacija ne sme samodejno spreminjati imen ciklov
+- [ ] A/B oznake lahko ostanejo nespremenjene, pomožna imena templateov pa naj se lokalizirajo, kjer so vezana na built-in keye
+- [ ] Preveriti widgete po spremembi jezika, posebej:
+  - Danes / Today
+  - Jutri / Tomorrow
+  - Prosto / Off
+  - built-in cycle labels
+  - built-in status labels
+- [ ] Dodati regression test ali ročni smoke-test checklist za menjavo jezika
 
 Language selector naj ostane Free funkcija, ker podpira širitev na mednarodni trg.
 
@@ -414,6 +559,41 @@ Ni še implementirano za Work Log setup.
   - Slovenia general
   - Slovenia postal/courier
   - Global default
+
+---
+
+## v3.0 / Future – Settings UI polish
+
+- [ ] Dodati expand/collapse možnost na vse večje Settings kartice, ne samo na Primarni cikel in Rules
+- [ ] Uporabnik naj lahko razširi ali skrči posamezne sklope nastavitev:
+  - Primarni cikel
+  - Sekundarne oznake / statusi
+  - Work Log settings
+  - Work Rules
+  - Widget settings
+  - Backup / export
+  - Developer tools
+  - Premium / future features, ko bodo dodane
+- [ ] Stanje razširjenih/skrčenih kartic naj se shrani lokalno v SharedPreferences
+- [ ] Privzeto naj ostanejo odprti samo najpomembnejši ali pogosto uporabljeni sklopi
+- [ ] Redkeje uporabljeni in napredni sklopi naj bodo privzeto skrčeni
+- [ ] Ne skrivati nevarnih/destructive akcij brez jasnega naslova in opozorila
+- [ ] Uporabiti enoten header UI za vse collapsible kartice:
+  - naslov
+  - kratek opis
+  - expand/collapse ikona
+- [ ] To obravnavati kot UI/UX polish, brez sprememb scheduling, Work Log accounting, backup ali premium logike
+
+### Settings schedule cleanup
+
+- [ ] Obdržati samo en `Active template` summary prikaz
+- [ ] Prednostno obdržati zgornji summary card pod `Schedule`, da je aktiven template viden tudi, ko je `Primary cycle` zaprt
+- [ ] Odstraniti podvojen `Active template` summary znotraj `Primary cycle` vsebine
+- [ ] `Primary cycle` naj vsebuje samo dejanske nastavitve: izbira template-a, začetni datum, dnevi cikla in prvi cikel na začetni datum
+- [ ] Pri izbiri `Cycle day on start date` ne prikazovati `1/1`, kadar se oznaka v ciklu pojavi samo enkrat
+- [ ] Prikaz `1/2`, `2/2`, `1/3` itd. uporabiti samo, kadar se ista oznaka pojavi večkrat v ciklu
+- [ ] To je UI cleanup brez spremembe scheduling logike
+
 
 ---
 
@@ -566,8 +746,23 @@ Future feature. Ni del osnovnega v3.0 sklopa.
 - [ ] Naprednejši prikaz več statusov na isti dan
 - [ ] Dolg pritisk na datum za hitro dodajanje izjeme/statusa
 - [ ] Upcoming events card compact polish
+- [ ] Klik na upcoming special day naj odpre mesečni koledar na izbranem datumu
+- [ ] Calendar naj zna sprejeti initial/target date argument iz Home/upcoming events kartice
+- [ ] Pri prehodu iz upcoming special day naj se ciljni datum vizualno označi ali vsaj izbere
 - [ ] Možnost override-a prostega dne v delovni dan
 - [ ] Manual mode kot premium/future feature
+
+- [ ] Work Log start on Off day handling:
+  - Če uporabnik začne delo na dnevu, ki je po urniku označen kot `Off / Prosto`, aplikacija ne sme tiho spreminjati urnika.
+  - Prikazati dialog: `Ta dan je v urniku označen kot prost. Ali želiš ta dan označiti kot delovni dan?`
+  - Možnosti:
+    - samo začni beleženje dela
+    - označi dan kot delovni dan
+    - prekliči
+  - Če uporabnik izbere označitev kot delovni dan, shraniti one-day schedule override za ta datum.
+  - Ne spreminjati osnovnega cikla, template-a ali prihodnjih dni brez izrecne potrditve.
+  - Work Log raw event mora ostati zabeležen neodvisno od tega, ali uporabnik spremeni urnik.
+  - Kasneje razmisliti o posebni oznaki/statusu, npr. `Izredno delo`, `Delo na prost dan` ali `Delo na praznik`.
 
 ---
 
@@ -599,11 +794,14 @@ Future feature. Ni del osnovnega v3.0 sklopa.
   - prazniki
 - [ ] Per-profile widgets, če se uvede Work Profiles
 - [ ] Widget guidance po onboardingu
-- [ ] Advanced widget customization
+- [ ] Advanced widget customization:
+  - izbira compact / classic / card-style widgeta
+  - prikaz today-only ali danes + jutri
+  - prikaz/skritje expected time
+  - prikaz/skritje sekundarnih oznak
+  - custom barve in style presets
 - [ ] Widgeta ne preobremeniti s podatki iz evidence dela; Work Log naj ostane ločena widget izkušnja
 - [ ] To obravnavati kot vizualno/UX nadgradnjo, ne kot prepis scheduling logike
-
----
 
 ## Future – Sync / Backup
 
@@ -624,6 +822,128 @@ Future feature. Ni del osnovnega v3.0 sklopa.
 - [ ] Break usage overview
 - [ ] Overtime trends
 - [ ] Export-friendly statistics summaries
+
+---
+
+## Future – Enterprise / B2B ideas
+
+Te funkcije niso del trenutnega v3.0/v3.1 fokusa. So dolgoročne ideje za primer, če WorkCycle kasneje preraste iz osebnega utility orodja v rešitev za manjše ekipe, podjetja ali profesionalno evidenco delovnega časa.
+
+### Approval workflow
+
+- [ ] Dodati možnost potrjevanja Work Log zapisov s strani nadrejenega ali odgovorne osebe
+- [ ] Uporabnik zaključi dan, odgovorna oseba pa lahko zapis:
+  - potrdi
+  - zavrne
+  - vrne v popravek
+- [ ] Potrditve morajo biti audit-safe
+- [ ] Ročni popravki po potrditvi morajo biti posebej označeni
+- [ ] Funkcija zahteva uporabniške račune, role/permissions in verjetno sync/backend
+- [ ] Ni primerno za osnovni osebni offline WorkCycle model
+
+### Kiosk mode
+
+- [ ] Razmisliti o kiosk načinu za skupno napravo, npr. tablico pri vhodu
+- [ ] Več uporabnikov se lahko prijavi/odjavi na isti napravi
+- [ ] Identifikacija uporabnika prek:
+  - PIN kode
+  - NFC kartice
+  - QR kode
+  - drugega varnega načina
+- [ ] Kiosk mode je B2B funkcija in zahteva jasen admin/team model
+- [ ] Ni prioriteta za osebno različico aplikacije
+
+### NFC / Bluetooth beacon support
+
+- [ ] Razmisliti o NFC prijavi/odjavi prek fizičnega NFC taga na lokaciji
+- [ ] Razmisliti o Bluetooth beacon zaznavi za predlog začetka ali konca dela
+- [ ] Uporabiti samo kot opt-in funkcijo
+- [ ] NFC/beacon naj sproži predlog ali potrjen dogodek, ne tiho spreminjati evidence
+- [ ] Funkcija zahteva dodatno testiranje naprav, dovoljenj, zanesljivosti in zasebnosti
+- [ ] Primerna predvsem za B2B/field-service scenarije
+
+### Biometrics
+
+- [ ] Biometrija naj ostane samo dolgoročna opcijska B2B ideja
+- [ ] Možni scenariji:
+  - selfie ob prijavi
+  - preverjanje identitete pri kiosk mode
+  - preprečevanje prijave za drugo osebo
+- [ ] Ne dodajati v osebni WorkCycle brez jasne pravne potrebe
+- [ ] Zahteva ločen pravni/GDPR audit
+- [ ] Zahteva jasno politiko hrambe podatkov, privolitev, varnost in možnost izbrisa
+- [ ] Biometrija ne sme biti privzeto omogočena
+
+### API / webhooks
+
+- [ ] Razmisliti o API-ju za branje Work Log podatkov, urnikov, profilov in export rezultatov
+- [ ] Razmisliti o webhookih za dogodke:
+  - clock-in
+  - clock-out
+  - break start/end
+  - manual edit
+  - daily summary completed
+- [ ] API/webhooks zahtevajo backend, avtentikacijo, varnost, rate limiting in verzioniranje
+- [ ] Najprej narediti stabilen CSV/XLSX export template sistem
+- [ ] API naj pride šele po stabilnem podatkovnem modelu, syncu in jasni premium/subscription strategiji
+
+### Multi-company / team admin
+
+- [ ] Razmisliti o podpori za več podjetij ali ekip
+- [ ] Dodati admin/team model samo, če WorkCycle kasneje postane B2B rešitev
+- [ ] Možni koncepti:
+  - podjetje
+  - ekipa/oddelek
+  - uporabniki
+  - vodje
+  - pravila po ekipi
+  - lokacije
+  - skupinski export
+- [ ] Ločiti od osebnih Work Profiles
+- [ ] Osebni Work Profiles naj ostanejo bližja in enostavnejša funkcija
+- [ ] Team admin zahteva backend, uporabniške račune, permissions, sync in varnostni audit
+
+### Continuous GPS tracking
+
+- [ ] Stalno GPS sledenje naj ostane samo dolgoročna opt-in B2B/field-service ideja
+- [ ] Privzeta smer WorkCycle naj ostane event-based location, ne stalno sledenje
+- [ ] Stalni GPS je primeren samo za specifične terenske scenarije, kjer obstaja jasna potreba
+- [ ] Zahteva:
+  - ločen privacy/GDPR audit
+  - jasno uporabniško privolitev
+  - nastavitev hrambe podatkov
+  - možnost izklopa
+  - jasen prikaz, kdaj se lokacija zbira
+- [ ] Ne uporabljati stalnega GPS kot osnovne funkcije osebnega WorkCycle
+
+### Direct ERP / payroll integrations
+
+- [ ] Razmisliti o direktnih integracijah s payroll/ERP sistemi šele po stabilnem export template sistemu
+- [ ] Možni dolgoročni kandidati:
+  - SAOP
+  - PANTHEON
+  - Minimax
+  - Vasco / Birokrat
+  - drugi lokalni payroll sistemi
+- [ ] Najprej zgraditi generic payroll CSV/XLSX export
+- [ ] Nato dodati ponudniško prilagojene export template
+- [ ] Direktna integracija naj pride šele, če obstaja jasen API, uporabniško povpraševanje in vzdržljiv maintenance model
+- [ ] Ne prenašati payroll odgovornosti v WorkCycle; aplikacija naj najprej ostane audit-ready input za payroll sistem
+
+### Enterprise notes
+
+- [ ] Te funkcije niso pogoj za Premium one-time launch
+- [ ] Te funkcije niso del Free core
+- [ ] Večina teh funkcij zahteva backend/cloud/subscription model
+- [ ] Vsaka funkcija mora imeti ločen product, privacy, security in technical audit
+- [ ] Ne uvajati enterprise funkcij, dokler osebni WorkCycle core ni stabilen:
+  - cikli
+  - Work Log
+  - backup/restore
+  - export templates
+  - reminders
+  - osnovna statistika
+  - več osebnih work profilov
 
 ---
 
