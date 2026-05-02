@@ -136,6 +136,49 @@ class WorkLogEventValidatorTest {
     }
 
     @Test
+    fun editedTimelineIsRevalidatedAfterMovingBreakStartPastBreakEnd() {
+        val originalEvents = listOf(
+            event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+            event(id = 2, hour = 9, minute = 0, type = WorkEventType.BREAK_START),
+            event(id = 3, hour = 9, minute = 15, type = WorkEventType.BREAK_END),
+            event(id = 4, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT)
+        )
+        val originalBreakStart = originalEvents[1]
+        val updatedBreakStart = originalBreakStart.copy(time = LocalTime.of(12, 30))
+
+        val result = WorkLogEventValidator.validateEditedEvent(
+            originalEvent = originalBreakStart,
+            updatedEvent = updatedBreakStart,
+            originalDateEvents = originalEvents,
+            updatedDateEvents = originalEvents,
+            sessionMode = WorkLogDaySessionMode.SINGLE_SESSION_PER_DAY
+        )
+
+        assertEquals(R.string.work_log_edit_validation_break_end, result)
+    }
+
+    @Test
+    fun editedTimelineUsesEffectiveOrderForDuplicateClockInValidation() {
+        val originalEvents = listOf(
+            event(id = 1, hour = 8, minute = 0, type = WorkEventType.CLOCK_IN),
+            event(id = 2, hour = 12, minute = 0, type = WorkEventType.CLOCK_OUT),
+            event(id = 3, hour = 13, minute = 0, type = WorkEventType.CLOCK_IN)
+        )
+        val originalSecondClockIn = originalEvents[2]
+        val updatedSecondClockIn = originalSecondClockIn.copy(time = LocalTime.of(11, 0))
+
+        val result = WorkLogEventValidator.validateEditedEvent(
+            originalEvent = originalSecondClockIn,
+            updatedEvent = updatedSecondClockIn,
+            originalDateEvents = originalEvents,
+            updatedDateEvents = originalEvents,
+            sessionMode = WorkLogDaySessionMode.MULTIPLE_SESSIONS_PER_DAY
+        )
+
+        assertEquals(R.string.work_log_edit_validation_clock_in, result)
+    }
+
+    @Test
     fun mealRemainsPermissive() {
         val result = validate(
             events = listOf(

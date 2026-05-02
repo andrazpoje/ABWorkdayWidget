@@ -53,6 +53,19 @@ class WorkCycleBackupValidatorTest {
     }
 
     @Test
+    fun missingWorkLogsReturnsError() {
+        val result = validate(
+            zipOf(
+                "manifest.json" to sampleManifest().toJsonString(),
+                "room/work_events.json" to "[]"
+            )
+        )
+
+        assertFalse(result.isValid)
+        assertTrue(result.errors.any { it.code == "MISSING_WORK_LOGS" })
+    }
+
+    @Test
     fun invalidJsonInWorkEventsReturnsError() {
         val result = validate(
             samplePayload(
