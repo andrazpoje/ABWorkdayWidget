@@ -736,7 +736,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     }
 
     private fun setupBackupActions() {
-        // TODO: Add Premium/ProFeature gating here later and disable this card in the standard tier.
+        // TODO: Deferred after the v3.0 release pass. If backup export is ever
+        // gated, do it through the audited runtime FeatureGate chain rather
+        // than ad hoc UI checks here. Do not enable real premium gating from
+        // this screen piecemeal.
         binding.rowExportFullBackup.setOnClickListener {
             exportFullBackupLauncher.launch(buildFullBackupFileName())
         }
@@ -766,8 +769,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             showClearLocalDataConfirmation()
         }
 
-        // TODO: Connect Developer tools premium override to the FeatureGate runtime chain
-        // for future UI gating tests. No production entitlement behavior should live here.
+        // TODO: Deferred after the v3.0 release pass. Connect Developer tools
+        // premium override to the audited runtime FeatureGate chain only for
+        // debug diagnostics and future UI gating tests. Do not place
+        // production entitlement, billing, or real gating behavior here.
         binding.buttonUnlockPremiumForTesting.setOnClickListener {
             val prefs = DebugPremiumEntitlementPrefs.create(
                 context = requireContext(),
@@ -931,6 +936,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         viewLifecycleOwner.lifecycleScope.launch {
             val exportResult = runCatching {
                 val app = requireContext().applicationContext as WorkCycleApp
+                // Future restore/import must remain a separate flow and must
+                // use WorkCycleBackupValidator preflight before any write to
+                // local database or prefs.
                 val collector = WorkCycleBackupPayloadCollector(
                     context = requireContext(),
                     database = app.database

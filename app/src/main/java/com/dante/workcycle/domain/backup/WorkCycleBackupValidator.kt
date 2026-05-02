@@ -8,6 +8,9 @@ import java.io.InputStream
  * This is a pure Kotlin preflight/preview foundation for future restore/import
  * flows and diagnostics. It does not restore data, does not write local state,
  * and does not guarantee legal/accounting compliance of the backup contents.
+ *
+ * Any future restore/import flow must use this validator as a preflight step
+ * before attempting database or SharedPreferences writes.
  */
 object WorkCycleBackupValidator {
 

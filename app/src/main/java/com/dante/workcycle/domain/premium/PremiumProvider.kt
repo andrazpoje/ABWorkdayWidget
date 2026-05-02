@@ -18,6 +18,11 @@ import com.dante.workcycle.BuildConfig
  * - tester/founder repository
  * - Play Billing / cached entitlement repository
  * - active UI gating
+ *
+ * Deferred after the v3.0 release pass:
+ * - add new entitlement sources only through a separate audit of chain order,
+ *   release safety, and backup exclusion rules
+ * - do not enable Play Billing or real UI gating from this file piecemeal
  */
 object PremiumProvider {
 
@@ -55,8 +60,13 @@ object PremiumProvider {
         return CompositeEntitlementRepository(
             repositories = listOf(
                 debugOverrideRepository
-                // TODO: Insert tester/founder repository here.
-                // TODO: Insert Play Billing / local entitlement cache repository here.
+                // TODO: Deferred after the v3.0 release pass. Insert the
+                // tester/founder repository here only after a separate audit of
+                // priority, release safety, and backup exclusion behavior.
+                // TODO: Deferred after the v3.0 release pass. Insert the Play
+                // Billing / local entitlement cache repository here only as
+                // part of a dedicated entitlement audit. Do not enable billing
+                // or real runtime gating piecemeal from this provider.
             ),
             fallback = fallbackRepository
         )

@@ -43,8 +43,10 @@ import java.util.Locale
  * templates and single-label cycles intentionally skip setup steps that are not
  * meaningful for that template.
  *
- * TODO(v3.0): Consider adding optional Work Log setup and language selection
- * after the base cycle is configured, without duplicating Settings logic.
+ * TODO(v3.0): Deferred after the release pass. Consider adding optional Work
+ * Log setup and language selection after the base cycle is configured, without
+ * duplicating Settings logic or mixing onboarding polish with Settings-owned
+ * runtime behavior.
  */
 class CycleSetupOnboardingFragment : Fragment(R.layout.fragment_onboarding_cycle_setup) {
 

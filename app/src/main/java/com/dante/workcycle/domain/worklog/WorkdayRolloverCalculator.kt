@@ -12,6 +12,11 @@ import java.time.LocalTime
  * work date while [timelineDateTime] gives events a stable ordering position
  * inside that work date. A future schema decision may still split stored
  * workDate from actualDateTime for stronger evidence and restore/import safety.
+ *
+ * Deferred after the v3.0 release pass:
+ * - runtime overnight handling requires a separate schema/data-model audit
+ * - do not wire rollover into resolver, validator, accounting, dashboard, or
+ *   widget behavior piecemeal
  */
 object WorkdayRolloverCalculator {
 
