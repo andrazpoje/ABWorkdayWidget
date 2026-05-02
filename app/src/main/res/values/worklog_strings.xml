@@ -153,8 +153,7 @@
     <string name="work_log_edit_validation_break_end">This change would place a break end before a break starts.</string>
     <string name="work_log_help_title">Work Log Help</string>
     <string name="work_log_help_intro_title">How Work Log works</string>
-    <string name="work_log_help_intro_body">Work Log keeps track of your daily work session, breaks, meals, notes, widget summary, and active notification in one place.</string>
-    <string name="work_log_help_start_finish_title">Start and finish work</string>
+    <string name="work_log_help_intro_body">Work Log keeps track of your work sessions, breaks, meals, notes, widget summary, and active notification in one place.</string>    <string name="work_log_help_start_finish_title">Start and finish work</string>
     <string name="work_log_help_start_finish_body">Use Start work to begin a session and Finish work to close it. Worked today shows effective work time, while Balance may use credited work time depending on Break accounting.</string>
     <string name="work_log_help_break_title">Breaks</string>
     <string name="work_log_help_break_body">Break marks the start of a pause, and the same action returns you to work. Break accounting controls whether break time is unpaid, fully paid, or credited up to an allowed limit when calculating Balance. In paid allowance mode, credited break time does not reduce Balance; only break time above the allowed limit reduces it. Example: If your target is 8h and 30 min break is credited, 7h 30m of active work plus 30 min credited break results in 0h balance.</string>

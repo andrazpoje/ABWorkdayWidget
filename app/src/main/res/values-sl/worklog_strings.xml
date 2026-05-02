@@ -152,8 +152,7 @@
     <string name="work_log_edit_validation_break_end">Ta sprememba bi konec odmora postavila pred začetek odmora.</string>
     <string name="work_log_help_title">Pomoč za delovni čas</string>
     <string name="work_log_help_intro_title">Kako deluje evidenca dela</string>
-    <string name="work_log_help_intro_body">Evidenca dela združuje dnevno delovno sejo, odmore, malico, opombe, povzetek v gradniku in aktivno obvestilo na enem mestu.</string>
-    <string name="work_log_help_start_finish_title">Začetek in zaključek dela</string>
+    <string name="work_log_help_intro_body">Evidenca dela spremlja tvoje delovne seje, odmore, malice, opombe, povzetek na gradniku in aktivno obvestilo na enem mestu.</string>    <string name="work_log_help_start_finish_title">Začetek in zaključek dela</string>
     <string name="work_log_help_start_finish_body">Uporabi Začetek dela za začetek seje in Zaključek dela za njen konec. Delano danes prikazuje efektivno delo, Saldo pa lahko uporablja priznani delovni čas glede na Obračun odmora.</string>
     <string name="work_log_help_break_title">Odmori</string>
     <string name="work_log_help_break_body">Odmor označi začetek pavze, ista akcija pa te vrne nazaj na delo. Obračun odmora določa, ali se odmor pri izračunu Salda odšteje, v celoti šteje ali prizna do dovoljene meje. Pri priznanem odmoru čas do dovoljene meje ne zmanjša Salda; samo odmor nad dovoljeno mejo zmanjša Saldo. Primer: Če je cilj 8h in je 30 min odmora priznano, 7h 30m efektivnega dela + 30 min priznanega odmora pomeni saldo 0h.</string>
