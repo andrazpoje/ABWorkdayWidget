@@ -573,13 +573,35 @@ Future feature. Ni del osnovnega v3.0 sklopa.
 
 ## Future – Widgets
 
+- [ ] Prenova glavnega WorkCycle widgeta v bolj sodoben card-style prikaz
+- [ ] Današnji cikel naj bo glavni poudarek z večjo barvno oznako cikla, nazivom in pričakovanim časovnim razponom
+- [ ] Jutrišnji ali naslednji relevanten dan naj bo prikazan kot sekundarna vrstica za hiter pregled
+- [ ] Widget naj ostane osredotočen na cikel/urnik in naj bo ločen od Work Log widgeta
 - [ ] Nadaljnji size-aware layout za Work Cycle widget
-- [ ] Boljši 1x1 widget
+- [ ] Boljši 1x1 widget:
+  - compact today-only cycle view
+  - brez prenatrpanih dodatnih informacij
+- [ ] 2x1 widget:
+  - danes + jutri
+  - jasna barvna oznaka cikla
+  - pričakovani čas izmene, če je nastavljen
+- [ ] 2x2 in večji widget:
+  - danes + prihajajoči dnevi
+  - opcijsko sekundarne oznake/statusi
 - [ ] Work Time widget z break/meal remaining time
 - [ ] Widget color system poenotiti z aplikacijo
+- [ ] Ohraniti podporo za lastne barve ciklov in prihodnji skupni sistem barv za aplikacijo in widgete
+- [ ] Kasneje razmisliti o opcijskem prikazu sekundarnih oznak/statusov:
+  - dopust
+  - bolniška
+  - teren
+  - dežurstvo
+  - prazniki
 - [ ] Per-profile widgets, če se uvede Work Profiles
 - [ ] Widget guidance po onboardingu
 - [ ] Advanced widget customization
+- [ ] Widgeta ne preobremeniti s podatki iz evidence dela; Work Log naj ostane ločena widget izkušnja
+- [ ] To obravnavati kot vizualno/UX nadgradnjo, ne kot prepis scheduling logike
 
 ---
 
