@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - Added backup manifest, payload, writer, Room JSON mapper, SharedPreferences JSON mapper, and backup collector foundation
 - Added backup validation and preview foundation with ZIP preflight diagnostics
 - Added Premium / FeatureGate foundation with central premium feature tier models and gate decisions
+- Added persisted Settings section expand/collapse state for larger Settings cards
 
 
 ### Improved
@@ -43,6 +44,10 @@ All notable changes to this project will be documented in this file.
 - Work Log CSV export now offers Export all and Export date range from one entry point
 - Backup export is now located in the main Settings Backup section instead of Work Log Settings
 - Added explicit backup filtering so debug, transient, and session snapshot state is excluded from exported backups
+- Improved Settings usability with collapsible sections for larger settings groups
+- Improved Settings overview by keeping larger sections collapsed by default
+- Improved Settings Schedule area by keeping only one visible Active template summary
+- Improved Month calendar readability by highlighting today's date with a clear outer border
 
 
 ### Technical
@@ -85,6 +90,17 @@ All notable changes to this project will be documented in this file.
 - Runtime overnight handling is not enabled yet
 - Existing Work Log date/session behavior is unchanged
 - Room schema and migrations were not changed
+- Added `SettingsSectionPrefs` as a UI-only SharedPreferences wrapper for Settings expand/collapse state
+- Kept Settings expand/collapse state separate from functional app preferences
+- Removed duplicate Active template summary from the Primary cycle include layout
+- Added lint release-pass fixes:
+  - replaced layout `android:tint` usage with `app:tint`
+  - removed preview-only `tools:*` attributes from the cycle preview item layout to avoid lint analysis crashes
+  - disabled only the crashing `NullSafeMutableLiveData` lint detector as a targeted workaround
+- Confirmed final v3.0 release-pass checks:
+  - `testDebugUnitTest --rerun-tasks`
+  - `assembleDebug --rerun-tasks`
+  - `lintDebug --no-configuration-cache --rerun-tasks`
 
 ---
 

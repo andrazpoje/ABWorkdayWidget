@@ -562,37 +562,32 @@ Ni še implementirano za Work Log setup.
 
 ---
 
-## v3.0 / Future – Settings UI polish
+## v3.0 – Settings UI polish
 
-- [ ] Dodati expand/collapse možnost na vse večje Settings kartice, ne samo na Primarni cikel in Rules
-- [ ] Uporabnik naj lahko razširi ali skrči posamezne sklope nastavitev:
-  - Primarni cikel
-  - Sekundarne oznake / statusi
-  - Work Log settings
-  - Work Rules
-  - Widget settings
-  - Backup / export
-  - Developer tools
-  - Premium / future features, ko bodo dodane
-- [ ] Stanje razširjenih/skrčenih kartic naj se shrani lokalno v SharedPreferences
-- [ ] Privzeto naj ostanejo odprti samo najpomembnejši ali pogosto uporabljeni sklopi
-- [ ] Redkeje uporabljeni in napredni sklopi naj bodo privzeto skrčeni
-- [ ] Ne skrivati nevarnih/destructive akcij brez jasnega naslova in opozorila
-- [ ] Uporabiti enoten header UI za vse collapsible kartice:
-  - naslov
-  - kratek opis
-  - expand/collapse ikona
-- [ ] To obravnavati kot UI/UX polish, brez sprememb scheduling, Work Log accounting, backup ali premium logike
+### Zaključeno
 
-### Settings schedule cleanup
+- [x] Dodana expand/collapse možnost na večje Settings kartice
+- [x] Vse večje Settings kartice so privzeto zaprte za boljši pregled
+- [x] Stanje razširjenih/skrčenih kartic se lokalno shrani v SharedPreferences
+- [x] Dodan `SettingsSectionPrefs` kot UI-only prefs wrapper za stanje Settings sekcij
+- [x] Uporabljeni stabilni section keyi namesto user-facing tekstov
+- [x] About kartica ostane vedno vidna in brez collapse logike
+- [x] Zgornji `Schedule / Active template` summary ostane vedno viden
+- [x] Odstranjen podvojen `Active template` summary znotraj `Primary cycle`
+- [x] `Primary cycle` zdaj vsebuje samo dejanske nastavitve cikla
+- [x] Ohranjen namenski navigation override za odpiranje `Primary cycle`, kadar aplikacija eksplicitno skoči na ta sklop
+- [x] Patch je UI-only:
+  - brez sprememb scheduling logike
+  - brez sprememb Work Log accounting logike
+  - brez Room/schema sprememb
+  - brez sprememb backup/export logike
+  - brez sprememb premium/FeatureGate logike
 
-- [ ] Obdržati samo en `Active template` summary prikaz
-- [ ] Prednostno obdržati zgornji summary card pod `Schedule`, da je aktiven template viden tudi, ko je `Primary cycle` zaprt
-- [ ] Odstraniti podvojen `Active template` summary znotraj `Primary cycle` vsebine
-- [ ] `Primary cycle` naj vsebuje samo dejanske nastavitve: izbira template-a, začetni datum, dnevi cikla in prvi cikel na začetni datum
+### Preostalo / future polish
+
 - [ ] Pri izbiri `Cycle day on start date` ne prikazovati `1/1`, kadar se oznaka v ciklu pojavi samo enkrat
 - [ ] Prikaz `1/2`, `2/2`, `1/3` itd. uporabiti samo, kadar se ista oznaka pojavi večkrat v ciklu
-- [ ] To je UI cleanup brez spremembe scheduling logike
+- [ ] Po daljšem testiranju po potrebi prilagoditi privzeto odprte/zaprte sekcije
 
 
 ---
