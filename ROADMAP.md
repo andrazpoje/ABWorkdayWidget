@@ -959,3 +959,8 @@ Te funkcije niso del trenutnega v3.0/v3.1 fokusa. So dolgoročne ideje za primer
 - Transport, hospitality split shifts in healthcare 12h pravila zahtevajo posebne profile; ne hardcodati v osnovno logiko.
 - Meal reimbursement / prehrana med delom je ločen koncept od break time.
 - Roadmap ni pravni dokument in ne predstavlja pravnega mnenja.
+
+### Build / release hygiene
+
+- Resource XML datoteke morajo ostati UTF-8 brez BOM. Pri PowerShell skriptnih popravkih ne uporabljati `Set-Content -Encoding UTF8`; uporabljati `[System.Text.UTF8Encoding]($false)`, da ne pride do `line 1:0 mismatched input '´╗┐'` / resource merge napak.
+- Gradle ukaze v release/test passu zaganjati zaporedno, ne vzporedno. Sočasni `testDebugUnitTest`, `assembleDebug` in `lintDebug` zagoni lahko povzročijo lažne resource/cache/file-lock napake v `app/build` ali `.gradle`.
