@@ -3,6 +3,7 @@ package com.dante.workcycle.ui.adapter
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,8 +71,6 @@ class CalendarAdapter(
         holder.dayCard.strokeColor = Color.TRANSPARENT
         holder.dayCard.cardElevation = 0f
 
-        holder.dayCardFrame.foreground = null
-
         holder.dayNumber.alpha = 0f
         holder.dayLabel.alpha = 0f
 
@@ -112,7 +111,6 @@ class CalendarAdapter(
         holder.dayCard.strokeWidth = 0
         holder.dayCard.strokeColor = Color.TRANSPARENT
         holder.dayCard.cardElevation = 0f
-        holder.dayCardFrame.foreground = null
         holder.dayCard.scaleX = 1f
         holder.dayCard.scaleY = 1f
 
@@ -292,35 +290,34 @@ class CalendarAdapter(
     }
 
     private fun applySelectionState(holder: VH, item: CalendarDayItem) {
-        val baseColor = item.primaryColor ?: Color.GRAY
+        val context = holder.itemView.context
+        val todayStrokeColor = resolveThemeColor(
+            context = context,
+            attrRes = androidx.appcompat.R.attr.colorPrimary
+        )
 
-        when {
-            item.isSelected -> {
-                holder.dayCard.strokeWidth = 3
-                holder.dayCard.strokeColor = darkenColor(baseColor)
-                holder.dayCard.cardElevation = 3f
-            }
-
-            item.isToday -> {
-                holder.dayCard.strokeWidth = 2
-                holder.dayCard.strokeColor = darkenColor(baseColor)
-                holder.dayCard.cardElevation = 2f
-            }
-
-            else -> {
-                holder.dayCard.strokeWidth = 0
-                holder.dayCard.strokeColor = Color.TRANSPARENT
-                holder.dayCard.cardElevation = 0f
-            }
+        if (item.isToday) {
+            holder.dayCard.strokeWidth = dpToPx(context, 3f)
+            holder.dayCard.strokeColor = todayStrokeColor
+            holder.dayCard.cardElevation = 3f
+        } else {
+            holder.dayCard.strokeWidth = 0
+            holder.dayCard.strokeColor = Color.TRANSPARENT
+            holder.dayCard.cardElevation = 0f
         }
 
+        holder.dayCardFrame.foreground = null
         holder.dayCard.scaleX = 1f
         holder.dayCard.scaleY = 1f
     }
 
-    private fun darkenColor(color: Int): Int {
-        return ColorUtils.blendARGB(color, Color.BLACK, 0.22f)
+    private fun resolveThemeColor(context: Context, attrRes: Int): Int {
+        return TypedValue().let { typedValue ->
+            context.theme.resolveAttribute(attrRes, typedValue, true)
+            typedValue.data
+        }
     }
+
     private fun getShortCycleLabel(label: String): String {
         val normalized = label.trim()
         val lower = normalized.lowercase(Locale.getDefault())
