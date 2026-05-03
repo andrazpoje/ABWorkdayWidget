@@ -2,7 +2,6 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
@@ -32,16 +31,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="Tor." />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/dayDateText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textSize="12sp"
-                tools:text="7. apr. 2026" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <!-- DESNO: PRIMARY + SECONDARY + STATUS -->
@@ -70,8 +67,7 @@
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    tools:text="Dopoldansko • Skladišče" />
+                    android:textStyle="bold" />
 
                 <!-- SECONDARY -->
                 <LinearLayout
@@ -103,9 +99,7 @@
                         android:ellipsize="end"
                         android:maxWidth="96dp"
                         android:maxLines="1"
-                        android:textSize="14sp"
-                        tools:text=" • Š1"
-                        tools:visibility="visible" />
+                        android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -127,9 +121,7 @@
                 android:paddingBottom="3dp"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:visibility="gone"
-                tools:text="Dopust"
-                tools:visibility="visible" />
+                android:visibility="gone" />
 
         </LinearLayout>
 

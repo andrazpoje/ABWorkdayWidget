@@ -73,6 +73,11 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+    lint {
+        // Workaround for AndroidX Lifecycle lint / Kotlin analysis API crash during lintDebug.
+        // This disables only the crashing detector, not lint as a whole.
+        disable 'NullSafeMutableLiveData'
+    }
 }
 
 dependencies {
