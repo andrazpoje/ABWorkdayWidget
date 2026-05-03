@@ -25,6 +25,7 @@ import com.dante.workcycle.core.theme.ThemePreset
 import com.dante.workcycle.core.ui.applySystemBarsBottomInsetAsPadding
 import com.dante.workcycle.core.ui.applySystemBarsHorizontalInsetAsPadding
 import com.dante.workcycle.data.local.db.AppDatabase
+import com.dante.workcycle.data.prefs.SettingsSectionPrefs
 import com.dante.workcycle.debug.DebugDataResetHelper
 import com.dante.workcycle.data.prefs.SecondaryCyclePrefs
 import com.dante.workcycle.data.prefs.Prefs
@@ -47,6 +48,7 @@ import com.dante.workcycle.ui.settings.PrimaryCycleSettingsController
 import com.dante.workcycle.widget.WidgetRefreshHelper
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.core.view.isVisible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,6 +72,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
     private var isInitializing = false
     private var developerToolsTapCount = 0
     private lateinit var primaryCycleSettingsController: PrimaryCycleSettingsController
+    private lateinit var settingsSectionPrefs: SettingsSectionPrefs
     private val exportFullBackupLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/zip")
     ) { uri ->
@@ -92,6 +95,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         binding.settingsScrollView.applySystemBarsBottomInsetAsPadding()
         binding.settingsContentContainer.applySystemBarsHorizontalInsetAsPadding()
+        settingsSectionPrefs = SettingsSectionPrefs(requireContext())
 
         val secondaryPrefs = SecondaryCyclePrefs(requireContext())
         val scrollToCycleSettings = arguments?.getBoolean(
@@ -119,6 +123,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         updateSecondaryUi()
         updateCustomColorsUi()
         updateActiveTemplateInfoCard()
+        setupCollapsibleSections()
         setupListeners()
         setupDeveloperTools()
         setupScrollHint()
@@ -427,6 +432,85 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 hint.visibility = View.GONE
             }
         }
+    }
+
+    private fun setupCollapsibleSections() {
+        setupCollapsibleSection(
+            header = binding.secondaryCycleHeader,
+            content = binding.secondaryCycleSection,
+            arrow = binding.secondaryCycleArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_SECONDARY_CYCLE
+        )
+        setupCollapsibleSection(
+            header = binding.statusLabelsHeader,
+            content = binding.statusLabelsSection,
+            arrow = binding.statusLabelsArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_STATUS_LABELS
+        )
+        setupCollapsibleSection(
+            header = binding.displayHeader,
+            content = binding.displaySection,
+            arrow = binding.displayArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_DISPLAY
+        )
+        setupCollapsibleSection(
+            header = binding.colorsHeader,
+            content = binding.colorsSection,
+            arrow = binding.colorsArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_COLORS
+        )
+        setupCollapsibleSection(
+            header = binding.appearanceHeader,
+            content = binding.appearanceSection,
+            arrow = binding.appearanceArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_APPEARANCE
+        )
+        setupCollapsibleSection(
+            header = binding.widgetHeader,
+            content = binding.widgetSection,
+            arrow = binding.widgetArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_WIDGETS
+        )
+        setupCollapsibleSection(
+            header = binding.notificationsHeader,
+            content = binding.notificationsSection,
+            arrow = binding.notificationsArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_NOTIFICATIONS
+        )
+        setupCollapsibleSection(
+            header = binding.backupHeader,
+            content = binding.backupSection,
+            arrow = binding.backupArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_BACKUP
+        )
+        setupCollapsibleSection(
+            header = binding.developerToolsHeader,
+            content = binding.developerToolsSection,
+            arrow = binding.developerToolsArrow,
+            sectionKey = SettingsSectionPrefs.SECTION_DEVELOPER_TOOLS
+        )
+    }
+
+    private fun setupCollapsibleSection(
+        header: View,
+        content: View,
+        arrow: View,
+        sectionKey: String,
+        defaultExpanded: Boolean = false
+    ) {
+        val expanded = settingsSectionPrefs.isExpanded(sectionKey, defaultExpanded)
+        setSectionExpanded(content, arrow, expanded)
+
+        header.setOnClickListener {
+            val newExpanded = !content.isVisible
+            setSectionExpanded(content, arrow, newExpanded)
+            settingsSectionPrefs.setExpanded(sectionKey, newExpanded)
+        }
+    }
+
+    private fun setSectionExpanded(content: View, arrow: View, expanded: Boolean) {
+        content.isVisible = expanded
+        arrow.rotation = if (expanded) 180f else 0f
     }
 
     private fun scrollToCycleSettingsIfRequested(shouldScroll: Boolean) {

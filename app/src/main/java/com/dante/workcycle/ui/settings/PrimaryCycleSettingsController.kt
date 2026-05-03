@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import com.dante.workcycle.R
 import com.dante.workcycle.core.util.CycleColorHelper
 import com.dante.workcycle.data.prefs.AppPrefs
+import com.dante.workcycle.data.prefs.SettingsSectionPrefs
 import com.dante.workcycle.domain.holiday.HolidayCountry
 import com.dante.workcycle.domain.holiday.HolidayManager
 import com.dante.workcycle.domain.schedule.CycleManager
@@ -62,8 +63,8 @@ class PrimaryCycleSettingsController(
 
     companion object {
         const val ARG_SCROLL_TO_CYCLE_SETTINGS = "scrollToCycleSettings"
-        private const val SECTION_CYCLE = "settings_cycle"
-        private const val SECTION_RULES = "settings_rules"
+        private const val SECTION_CYCLE = SettingsSectionPrefs.SECTION_PRIMARY_CYCLE
+        private const val SECTION_RULES = SettingsSectionPrefs.SECTION_RULES
         private const val MAX_CYCLE_ITEMS = 16
         private const val MAX_LABEL_LENGTH = 24
     }
@@ -76,9 +77,6 @@ class PrimaryCycleSettingsController(
     private val rulesSection: View = root.findViewById(R.id.rulesSection)
     private val cycleArrow: ImageView = root.findViewById(R.id.cycleArrow)
     private val rulesArrow: ImageView = root.findViewById(R.id.rulesArrow)
-    private val activeTemplateCard: View = root.findViewById(R.id.activeTemplateCard)
-    private val activeTemplateTitle: TextView = root.findViewById(R.id.activeTemplateTitle)
-    private val activeTemplateDescription: TextView = root.findViewById(R.id.activeTemplateDescription)
     private val templateLockedMessage: TextView = root.findViewById(R.id.templateLockedMessage)
     private val singleLabelCycleMessage: TextView = root.findViewById(R.id.singleLabelCycleMessage)
     private val presetInputLayout: TextInputLayout = root.findViewById(R.id.presetInputLayout)
@@ -105,10 +103,7 @@ class PrimaryCycleSettingsController(
     private var selectedDate: LocalDate = LocalDate.now()
     private var draftFirstCycleDayIndex: Int? = null
     private lateinit var supportedCountries: List<HolidayCountry>
-
-    private val sectionPrefs by lazy {
-        context.getSharedPreferences("settings_cycle_sections", Context.MODE_PRIVATE)
-    }
+    private val sectionPrefs by lazy { SettingsSectionPrefs(context) }
 
     /**
      * Wires the primary-cycle settings UI and loads the persisted configuration.
@@ -139,13 +134,13 @@ class PrimaryCycleSettingsController(
         key: String,
         defaultExpanded: Boolean
     ) {
-        val savedExpanded = sectionPrefs.getBoolean(key, defaultExpanded)
+        val savedExpanded = sectionPrefs.isExpanded(key, defaultExpanded)
         setSectionExpanded(content, arrow, savedExpanded)
 
         header.setOnClickListener {
             val expanded = !content.isVisible
             setSectionExpanded(content, arrow, expanded)
-            sectionPrefs.edit { putBoolean(key, expanded) }
+            sectionPrefs.setExpanded(key, expanded)
         }
     }
 
@@ -667,21 +662,12 @@ class PrimaryCycleSettingsController(
      */
     private fun updateTemplateUiState() {
         val template = TemplateManager.getActiveTemplate(context)
-        val hasTemplate = template != null
 
-        activeTemplateCard.isVisible = hasTemplate
         templateLockedMessage.isVisible = template?.hasLockedSettings() == true
 
         if (template != null) {
-            activeTemplateTitle.text = fragment.getString(
-                R.string.template_active_title_format,
-                fragment.getString(template.titleRes)
-            )
-            activeTemplateDescription.text = buildTemplateDescriptionText(template)
             presetDropdown.setText(fragment.getString(template.titleRes), false)
         } else {
-            activeTemplateTitle.text = fragment.getString(R.string.template_active_title)
-            activeTemplateDescription.text = ""
             presetDropdown.setText(resolvePresetDisplayNameForCurrentState(), false)
         }
 
@@ -705,45 +691,6 @@ class PrimaryCycleSettingsController(
         switchSundays.setEnabledWithAlpha(!rulesLocked)
         switchHolidays.setEnabledWithAlpha(!rulesLocked)
         holidayCountryDropdown.setEnabledWithAlpha(!rulesLocked)
-    }
-
-    /**
-     * Builds the active-template summary shown in Settings, including lock
-     * details and fixed reference values where they matter.
-     */
-    private fun buildTemplateDescriptionText(template: ScheduleTemplate): String {
-        val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
-            .withLocale(Locale.getDefault())
-        val lockedItems = mutableListOf<String>()
-
-        if (template.locksCycleEditing) lockedItems += fragment.getString(R.string.template_locked_item_cycle)
-        if (template.locksRulesEditing) lockedItems += fragment.getString(R.string.template_locked_item_rules)
-        if (!template.allowsStartDateEditing) lockedItems += fragment.getString(R.string.template_locked_item_start_date)
-        if (TemplateManager.isAssignmentModeEditingLocked(context)) {
-            lockedItems += fragment.getString(R.string.template_locked_item_assignment_mode)
-        }
-
-        val lockedSummary = if (lockedItems.isNotEmpty()) {
-            fragment.getString(R.string.template_locked_summary_format, lockedItems.joinToString(", "))
-        } else {
-            ""
-        }
-        val continuousText = when (template.id) {
-            ScheduleTemplateProvider.TEMPLATE_PANAMA_223,
-            ScheduleTemplateProvider.TEMPLATE_4_ON_4_OFF -> fragment.getString(R.string.template_continuous_shift)
-            else -> null
-        }
-        val parts = listOfNotNull(
-            fragment.getString(template.descriptionRes),
-            continuousText,
-            fragment.getString(
-                R.string.template_reference_date_format,
-                template.fixedStartDate.format(dateFormatter),
-                template.resolveFixedFirstCycleDay(context)
-            ).takeIf { !template.isSingleLabelCycle(context) },
-            lockedSummary.takeIf { it.isNotBlank() }
-        )
-        return parts.joinToString("\n\n")
     }
 
     private fun ScheduleTemplate.hasLockedSettings(): Boolean {
